@@ -1,0 +1,9 @@
+NAME
+    crucible help - show help about Crucible
+
+SYNOPSIS
+    crucible help [<command-name>|<topic>]
+
+DESCRIPTION
+    Show help for the given command or topic. If none is given, then print help
+    for the main crucible command.

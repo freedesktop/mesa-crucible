@@ -1,0 +1,34 @@
+NAME
+    crucible run - run tests
+
+SYNOPSIS
+    crucible run [--no-cleanup] [<testname>...]
+
+DESCRIPTION
+    Run tests in the order given on the command line. If no tests are given
+    then run all tests. Example tests are not run, except those whose names
+    match a given glob pattern (see `crucible help ls-example-tests`).
+
+OPTIONS
+    --no-cleanup
+        Disable each test's cleanup phase. This is useful because a test may
+        crash during cleanup but otherwise pass.
+
+EXAMPLES
+    Run all tests (except example tests).
+        $ crucible run
+
+    Run one test.
+        $ crucible run functional.miptree.2d.levels01
+
+    Run multiple tests.
+        $ crucible run functional.miptree.2d.levels01 \\
+                       functional.miptree.2d.levels02 \\
+                       functional.miptree.cubemap.levels09
+
+    Run tests that match glob patterns.
+        $ crucible run 'functional.miptree.cubemap.*' \\
+                       'functional.txf.*'
+
+    Run all example tests.
+        $ crucible run 'example.*'

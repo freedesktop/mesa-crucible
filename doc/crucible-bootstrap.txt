@@ -1,0 +1,10 @@
+NAME
+    crucible booststrap - bootstrap test data
+
+SYNOPSIS
+    crucible bootstrap <test-name>
+        [--width <image-width>]
+        [--height <image-height>]
+
+DESCRIPTION
+    TODO

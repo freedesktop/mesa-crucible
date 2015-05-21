@@ -1,0 +1,33 @@
+/bin/*
+/data/*.actual.png
+
+# generated files
+*_gen.c
+*_gen.h
+
+# emacs
+.dir-locals.el
+*~
+
+# autotools
+.deps
+.dirstamp
+*.o
+*.lo
+*.la
+.libs
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+compile
+config.guess
+config.log
+config.status
+config.sub
+configure
+depcomp
+install-sh
+libtool
+ltmain.sh
+missing

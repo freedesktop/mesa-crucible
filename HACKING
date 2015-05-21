@@ -1,0 +1,55 @@
+Directory Layout
+================
+- data
+  Data files for tests, such as reference images, vertex data, texture
+  images, etc.
+
+- misc
+  If you want Crucible to play nicely with bash, zsh, vim, emacs, or whatever,
+  then then look in misc/.
+
+- include
+  Headers under include/ are public within the project. That is, they define
+  API that is available to the entire codebase.  This contrasts with headers
+  under src/, which are private to their containing directory.
+
+- src/crucible
+  Source for the test framework, but not the tests themselves. Consider this
+  directory Crucible's "standard library", intended to be used by tests.  This
+  includes the test runner (the crucible command), png and image tools, logging
+  code, and generally any common code shared among many tests.
+
+- src/tests
+  Source for the tests themselves.
+
+- src/tests/examples
+  Example tests that demonstrate how to use the framework or how to accomplish
+  a tricky testing task.
+
+- src/tests/functional
+  Functional tests, such as
+      - Draw a triangle, then verify the render target contains a triangle.
+      - Load an image file, generate a mipmap, then compare it against it
+        a reference image.
+
+- src/tests/stress
+  Stress tests, such as
+      - Verify that the Vulkan driver can manage the maximium sizes that it
+        advertises. For example, query the maximum texture size, then do some
+        basic texturing with a texture that size.
+      - Concurrently construct and submit multiple command buffers, each in
+        a separate thread that renders to a subregion of shared render target.
+
+
+Writing Tests
+=============
+Tests live in the 'src/tests' directory. The Crucible API available to tests is
+in 'include/crucible/cru.h'. (Headers in 'src/crucible' are private to
+Crucible's test framework and are not available to the tests themselves).
+
+After writing a test, you will likely need to generate a reference image for
+it.  The command 'crucible bootstrap-test' can generate one for you.
+
+All images in the 'data' directory are available to tests. You can load an
+image with `cru_image_load_file(filename)`, where filename is relative to the
+'data' directory.
