@@ -460,6 +460,32 @@ t_dump_seq_image(cru_image_t *image)
     cru_image_write_file(image, filename.buf);
 }
 
+void cru_printflike(2, 3)
+t_dump_image_f(cru_image_t *image, const char *format, ...)
+{
+    va_list va;
+
+    va_start(va, format);
+    t_dump_image_fv(image, format, va);
+    va_end(va);
+}
+
+void
+t_dump_image_fv(cru_image_t *image, const char *format, va_list va)
+{
+    cru_test_t *t = cru_current_test;
+
+    if (t->no_dump)
+        return;
+
+    string_t filename = STRING_INIT;
+    string_appendf(&filename, t_name);
+    string_append_char(&filename, '.');
+    string_vappendf(&filename, format, va);
+
+    cru_image_write_file(image, filename.buf);
+}
+
 void
 t_compare_image(void)
 {
