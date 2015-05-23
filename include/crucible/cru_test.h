@@ -122,11 +122,6 @@ void __t_assert(const char *file, int line, bool cond, const char *cond_string);
 /// \see t_ref_image
 void t_compare_image(void) cru_noreturn;
 
-/// Dump image to file.
-///
-/// This function is a no-op if image dumping is disabled on the cmdline.
-void t_dump_image(cru_image_t *image, const char *filename);
-
 /// Dump images to sequentially named files.
 ///
 /// Each call dumps the image to a sequentially named file. The filename is

@@ -431,17 +431,6 @@ t_end(enum cru_test_result result)
 }
 
 void
-t_dump_image(cru_image_t *image, const char *filename)
-{
-    cru_test_t *t = cru_current_test;
-
-    if (t->no_dump)
-        return;
-
-    cru_image_write_file(image, filename);
-}
-
-void
 t_dump_seq_image(cru_image_t *image)
 {
     cru_test_t *t = cru_current_test;
