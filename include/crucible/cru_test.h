@@ -127,6 +127,20 @@ void t_compare_image(void) cru_noreturn;
 /// This function is a no-op if image dumping is disabled on the cmdline.
 void t_dump_image(cru_image_t *image, const char *filename);
 
+/// Dump images to sequentially named files.
+///
+/// Each call dumps the image to a sequentially named file. The filename is
+/// prefixed by the testname. and the sequence resets to 0 each time the test
+/// is run. In other words, differently named tests will not clobber each
+/// other's files. But if you run a test twice, the second run will clobber any
+/// the files dumped by the first run.
+///
+/// This is useful for tests that produce multiple images that all need
+/// inspection.
+///
+/// This function is a no-op if image dumping is disabled on the cmdline.
+void t_dump_seq_image(cru_image_t *image);
+
 /// \defgroup Test data
 /// \{
 #define t_name __t_name()

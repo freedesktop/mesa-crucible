@@ -28,6 +28,7 @@
 #include <crucible/cru_image.h>
 #include <crucible/cru_log.h>
 #include <crucible/cru_misc.h>
+#include <crucible/cru_refcount.h>
 #include <crucible/cru_slist.h>
 #include <crucible/string.h>
 #include <crucible/xalloc.h>
@@ -71,6 +72,9 @@ struct cru_test {
 
     string_t ref_image_filename;
     cru_image_t *image;
+
+    /// Atomic counter for t_dump_seq_image().
+    cru_refcount_t dump_seq;
 
     uint32_t width;
     uint32_t height;
@@ -435,6 +439,25 @@ t_dump_image(cru_image_t *image, const char *filename)
         return;
 
     cru_image_write_file(image, filename);
+}
+
+void
+t_dump_seq_image(cru_image_t *image)
+{
+    cru_test_t *t = cru_current_test;
+
+    if (t->no_dump)
+        return;
+
+    uint64_t seq = cru_refcount_get(&t->dump_seq);
+    if (seq > 9999) {
+        cru_loge("image sequence count exceeds 9999");
+        t_fail();
+    }
+
+    string_t filename = STRING_INIT;
+    string_printf(&filename, "%s.seq%04lu.png", t_name, seq);
+    cru_image_write_file(image, filename.buf);
 }
 
 void
