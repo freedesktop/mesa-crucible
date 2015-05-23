@@ -21,8 +21,6 @@
 
 #include <crucible/cru.h>
 
-#define DEBUG_DUMP_IMAGES
-
 #define WIDTH 256
 #define HEIGHT 256
 
@@ -178,18 +176,15 @@ setup_dest(struct dest *dest)
 static void
 compare_images(struct src *src, struct dest *dest1, struct dest *dest2)
 {
-#ifdef DEBUG_DUMP_IMAGES
-    // FINISHME: Add a cmdline flag to toggle image dumping.
     string_t filename = STRING_INIT;
 
     string_copy_cstr(&filename, t_name);
     string_append_cstr(&filename, ".dest1.png");
-    cru_image_write_file(dest1->cru_image, filename.buf);
+    t_dump_image(dest1->cru_image, filename.buf);
 
     string_copy_cstr(&filename, t_name);
     string_append_cstr(&filename, ".dest2.png");
-    cru_image_write_file(dest2->cru_image, filename.buf);
-#endif
+    t_dump_image(dest2->cru_image, filename.buf);
 
     t_assert(cru_image_compare(t_ref_image(), dest1->cru_image));
     t_assert(cru_image_compare(t_ref_image(), dest2->cru_image));
