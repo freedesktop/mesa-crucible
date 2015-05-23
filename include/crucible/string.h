@@ -66,6 +66,11 @@ string_init(string_t *s)
 static inline void
 string_set_len(string_t *s, size_t len)
 {
+    if (s->buf == string_dummy) {
+        assert(len == 0);
+        return;
+    }
+
     assert(len < s->cap);
     s->len = len;
     s->buf[s->len] = 0;
