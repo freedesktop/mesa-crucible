@@ -69,7 +69,7 @@ struct cru_test {
     /// Don't run the cleanup commands in cru_test::cleanup_stacks.
     bool no_cleanup;
 
-    char *image_filename;
+    string_t ref_image_filename;
     cru_image_t *image;
 
     uint32_t width;
@@ -121,33 +121,22 @@ cru_test_get_current(void)
 static void
 cru_test_set_image_filename(cru_test_t *t)
 {
-    const char *ext;
-
-    const char *basename = NULL;
-    size_t filename_len;
-
     // Always define the reference image's filename, even when
     // cru_test_def_t::no_image is set. This will be useful for tests that
     // generate their reference images at runtime and wish to dump them to
     // disk.
 
     assert(t->phase == CRU_TEST_PHASE_PRESTART);
-    assert(t->image_filename == NULL);
+    assert(t->ref_image_filename.len == 0);
 
     if (t->def->image_filename) {
         // Test uses a custom filename.
-        basename = t->def->image_filename;
-        ext = "";
+        string_copy_cstr(&t->ref_image_filename, t->def->image_filename);
     } else {
         // Test uses the default filename.
-        basename = t->def->name;
-        ext = ".ref.png";
+        string_copy_cstr(&t->ref_image_filename, t->def->name);
+        string_append_cstr(&t->ref_image_filename, ".ref.png");
     }
-
-    filename_len = strlen(basename) + strlen(ext);
-
-    t->image_filename = xmalloc(filename_len + 1);
-    sprintf(t->image_filename, "%s%s", basename, ext);
 }
 
 static void
@@ -158,9 +147,10 @@ cru_test_load_image_file(void)
     if (t->image)
         return;
 
-    assert(t->image_filename);
+    assert(!t->def->no_image);
+    assert(t->ref_image_filename.len > 0);
 
-    t->image = cru_image_load_file(t->image_filename);
+    t->image = cru_image_load_file(t->ref_image_filename.buf);
     if (!t->image)
         t_fail();
 
@@ -183,7 +173,7 @@ cru_test_destroy(cru_test_t *t)
 
     pthread_mutex_destroy(&t->result_mutex);
     pthread_cond_destroy(&t->result_cond);
-    free(t->image_filename);
+    string_finish(&t->ref_image_filename);
     free(t);
 }
 
@@ -197,7 +187,7 @@ cru_test_create(const cru_test_def_t *def)
     t->def = def;
     t->phase = CRU_TEST_PHASE_PRESTART;
     t->result = CRU_TEST_RESULT_PASS;
-
+    t->ref_image_filename = STRING_INIT;
     t->no_dump = true;
 
     // Disable the cleanup handlers because they consitently crash Mesa.
@@ -458,7 +448,7 @@ t_compare_image(void)
     // test.
     t_assert(!t->def->no_image);
 
-    assert(t->image_filename); assert(t->width > 0);
+    assert(t->width > 0);
     assert(t->height > 0);
 
     VkBuffer buffer;
@@ -524,7 +514,7 @@ t_compare_image(void)
 
     if (t->bootstrap) {
         assert(!t->image);
-        t_assert(cru_image_write_file(actual_image, t->image_filename));
+        t_assert(cru_image_write_file(actual_image, t->ref_image_filename.buf));
         t_pass();
     }
 
