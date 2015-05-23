@@ -78,3 +78,38 @@ cru_define_test {
     .name = "example.image.copy-ref-image",
     .start = test_copy_ref_image,
 };
+
+static void
+test_dump_seq_images(void)
+{
+    const uint32_t width = 16;
+    const uint32_t height = 16;
+
+    void *pixels = xmalloc(4 * width * height);
+    cru_image_t *img = cru_image_from_pixels(pixels, VK_FORMAT_R8G8B8A8_UNORM,
+                                             width, height);
+    t_cleanup_push(img);
+
+    // Dump a red, green, then blue image.
+    for (int i = 0; i < 3; ++i) {
+        for (uint32_t y = 0; y < height; ++y) {
+            for (uint32_t x = 0; x < width; ++x) {
+                uint8_t *rgba = pixels + 4 * (y * width + x);
+                rgba[0] = i == 0 ? 0xff : 0x00;
+                rgba[1] = i == 1 ? 0xff : 0x00;
+                rgba[2] = i == 2 ? 0xff : 0x00;
+                rgba[3] = 0xff;
+            }
+        }
+
+        t_dump_seq_image(img);
+    }
+
+    t_pass();
+}
+
+cru_define_test {
+    .name = "example.image.dump-seq-images",
+    .start = test_dump_seq_images,
+    .no_image = true,
+};
