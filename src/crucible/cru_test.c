@@ -126,11 +126,13 @@ cru_test_set_image_filename(cru_test_t *t)
     const char *basename = NULL;
     size_t filename_len;
 
+    // Always define the reference image's filename, even when
+    // cru_test_def_t::no_image is set. This will be useful for tests that
+    // generate their reference images at runtime and wish to dump them to
+    // disk.
+
     assert(t->phase == CRU_TEST_PHASE_PRESTART);
     assert(t->image_filename == NULL);
-
-    if (t->def->no_image)
-        return;
 
     if (t->def->image_filename) {
         // Test uses a custom filename.
