@@ -101,19 +101,6 @@ setup_src(struct src *src)
     void *map;
     vkMapMemory(t_device, mem, 0, mem_reqs.size, 0, &map);
 
-#if 0
-    for (uint32_t y = 0; y < height; ++y) {
-        for (uint32_t x = 0; x < width; ++x) {
-            uint8_t *rgba = map + 4 * (y * width + x);
-
-            rgba[0] = 0;
-            rgba[1] = 0xff;
-            rgba[2] = 0;
-            rgba[3] = 0xff;
-        }
-    }
-#endif
-
     cru_image_t *cru_image = cru_image_from_pixels(map, VK_FORMAT_R8G8B8A8_UNORM,
                                                    width, height);
     t_cleanup_push_cru_image(cru_image);
