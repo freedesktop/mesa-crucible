@@ -28,7 +28,6 @@
 
 struct src {
     VkImage vk_image;
-    cru_image_t *cru_image;
 };
 
 struct dest {
@@ -98,28 +97,20 @@ setup_src(struct src *src)
         &mem);
     t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DEVICE_MEMORY, mem);
 
-    void *map;
-    vkMapMemory(t_device, mem, 0, mem_reqs.size, 0, &map);
+    void *vk_map;
+    vkMapMemory(t_device, mem, 0, mem_reqs.size, 0, &vk_map);
 
-    cru_image_t *cru_image = cru_image_from_pixels(map, VK_FORMAT_R8G8B8A8_UNORM,
-                                                   width, height);
-    t_cleanup_push_cru_image(cru_image);
-    t_assert(cru_image_copy(cru_image, t_ref_image()));
+    // Copy refeference image into the Vulkan image.
+    void *ref_map = cru_image_map(t_ref_image(), CRU_IMAGE_MAP_ACCESS_READ);
+    t_assert(ref_map);
+    memcpy(vk_map, ref_map, 4 * width * height);
+    t_assert(cru_image_unmap(t_ref_image()));
 
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_IMAGE, image,
                             /*allocationIndex*/ 0, mem,
                             /*offset*/ 0);
 
-#ifdef DEBUG_DUMP_IMAGES
-    // FINISHME: Add a cmdline flag to toggle image dumping.
-    string_t filename = STRING_INIT;
-    string_append_cstr(&filename, t_name);
-    string_append_cstr(&filename, ".src.png");
-    cru_image_write_file(cru_image, filename.buf);
-#endif
-
     src->vk_image = image;
-    src->cru_image = cru_image;
 }
 
 static void
@@ -200,8 +191,8 @@ compare_images(struct src *src, struct dest *dest1, struct dest *dest2)
     cru_image_write_file(dest2->cru_image, filename.buf);
 #endif
 
-    t_assert(cru_image_compare(src->cru_image, dest1->cru_image));
-    t_assert(cru_image_compare(src->cru_image, dest2->cru_image));
+    t_assert(cru_image_compare(t_ref_image(), dest1->cru_image));
+    t_assert(cru_image_compare(t_ref_image(), dest2->cru_image));
     t_pass();
 }
 
