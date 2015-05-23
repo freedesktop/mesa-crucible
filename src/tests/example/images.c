@@ -61,6 +61,12 @@ test_copy_ref_image(void)
 
     cru_image_copy(copy_image, t_ref_image());
 
+    // Dump the copied image to "{testname}.actual.png".
+    string_t copy_filename = STRING_INIT;
+    string_append_cstr(&copy_filename, t_name);
+    string_append_cstr(&copy_filename, ".actual.png");
+    t_dump_image(copy_image, copy_filename.buf);
+
     for (uint32_t i = 0; i < width * height; ++i) {
         t_assert(copy_pixels[i] == green);
     }
