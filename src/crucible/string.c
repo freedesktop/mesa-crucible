@@ -304,7 +304,7 @@ string_appendf(string_t *s, const char *format, ...)
     va_list va;
 
     va_start(va, format);
-    string_appendf(s, format, va);
+    string_vappendf(s, format, va);
     va_end(va);
 }
 
