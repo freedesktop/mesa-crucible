@@ -821,6 +821,7 @@ cru_test_start_main_thread(void *arg)
 
         vkCreateFramebuffer(t_device,
             &(VkFramebufferCreateInfo) {
+                .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
                 .colorAttachmentCount = 1,
                 .pColorAttachments = (VkColorAttachmentBindInfo[]) {
                     {
