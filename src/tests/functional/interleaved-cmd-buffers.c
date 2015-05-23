@@ -176,18 +176,12 @@ setup_dest(struct dest *dest)
 static void
 compare_images(struct src *src, struct dest *dest1, struct dest *dest2)
 {
-    string_t filename = STRING_INIT;
-
-    string_copy_cstr(&filename, t_name);
-    string_append_cstr(&filename, ".dest1.png");
-    t_dump_image(dest1->cru_image, filename.buf);
-
-    string_copy_cstr(&filename, t_name);
-    string_append_cstr(&filename, ".dest2.png");
-    t_dump_image(dest2->cru_image, filename.buf);
+    t_dump_seq_image(dest1->cru_image);
+    t_dump_seq_image(dest2->cru_image);
 
     t_assert(cru_image_compare(t_ref_image(), dest1->cru_image));
     t_assert(cru_image_compare(t_ref_image(), dest2->cru_image));
+
     t_pass();
 }
 
