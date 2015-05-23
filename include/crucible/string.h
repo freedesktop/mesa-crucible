@@ -22,6 +22,7 @@
 #pragma once
 
 #include <assert.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -99,6 +100,11 @@ bool string_endswith(const string_t *s, const string_t *tail);
 bool string_endswith_cstr(const string_t *s, const char *tail);
 int64_t string_rfind_char(const string_t *s, char c);
 void string_rstrip_char(string_t *s, char c);
+void string_printf(string_t *s, const char *format, ...) cru_printflike(2, 3);
+void string_vprintf(string_t *s, const char *format, va_list va);
+void string_appendf(string_t *s, const char *format, ...) cru_printflike(2, 3);
+void string_vappendf(string_t *s, const char *format, va_list va);
+
 bool path_is_abs(const string_t *path);
 void path_get_abs(string_t *dest, const string_t *path);
 void path_append(string_t *dest, const string_t *tail);

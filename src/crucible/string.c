@@ -21,8 +21,10 @@
 
 #include <limits.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
+#include <crucible/cru_log.h>
 #include <crucible/cru_misc.h>
 #include <crucible/string.h>
 #include <crucible/xalloc.h>
@@ -275,6 +277,59 @@ string_rstrip_char(string_t *s, char c)
     while (s->len > 0 && s->buf[s->len - 1] == c) {
         string_set_len(s, s->len - 1);
     }
+}
+
+/// Like sprintf, but resized the string as needed.
+void cru_printflike(2, 3)
+string_printf(string_t *s, const char *format, ...)
+{
+    va_list va;
+
+    va_start(va, format);
+    string_vprintf(s, format, va);
+    va_end(va);
+}
+
+void
+string_vprintf(string_t *s, const char *format, va_list va)
+{
+    string_set_len(s, 0);
+    string_vappendf(s, format, va);
+}
+
+/// Like string_printf(), but appends to rather than replaces the string.
+void cru_printflike(2, 3)
+string_appendf(string_t *s, const char *format, ...)
+{
+    va_list va;
+
+    va_start(va, format);
+    string_appendf(s, format, va);
+    va_end(va);
+}
+
+void
+string_vappendf(string_t *s, const char *format, va_list va)
+{
+    va_list va_probe;
+    va_copy(va_probe, va);
+
+    int len = vsnprintf(NULL, 0, format, va_probe);
+    if (len < 0) {
+        cru_loge("vsnprintf failed");
+        abort();
+    }
+
+    va_end(va_probe);
+
+    string_grow(s, len);
+
+    if (vsnprintf(s->buf + s->len, s->cap, format, va) != len) {
+        cru_loge("vsnprintf failed");
+        abort();
+    }
+
+    string_set_len(s, s->len + len);
 }
 
 bool
