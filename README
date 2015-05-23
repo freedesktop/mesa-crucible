@@ -47,9 +47,9 @@ To run all tests:
 
 To run specific tests:
 
-  $ crucible run functional.basic-clear
-  $ crucible run functional.basic-clear info.device-properties
+  $ crucible run func.basic-clear
+  $ crucible run func.basic-clear info.device-properties
 
 The run command also supports glob patterns:
 
-  $ crucible run 'functional.draw*indirect' 'functional.miptree.*'
+  $ crucible run 'func.draw*indirect' 'func.miptree.*'

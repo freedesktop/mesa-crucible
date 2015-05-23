@@ -59,8 +59,8 @@ bin_crucible_SOURCES = \
 	src/crucible/xalloc.c \
 	src/tests/example/basic.c \
 	src/tests/example/images.c \
-	src/tests/functional/first.c \
-	src/tests/functional/interleaved-cmd-buffers.c
+	src/tests/func/first.c \
+	src/tests/func/interleaved-cmd-buffers.c
 
 bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread -lpng16
 

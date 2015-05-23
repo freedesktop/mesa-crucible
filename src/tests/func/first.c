@@ -591,6 +591,6 @@ test(void)
 }
 
 cru_define_test {
-    .name = "functional.first",
+    .name = "func.first",
     .start = test,
 };

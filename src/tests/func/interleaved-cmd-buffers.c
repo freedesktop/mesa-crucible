@@ -238,13 +238,13 @@ test_end1_end2_submit1_submit2(void)
 }
 
 cru_define_test {
-    .name = "functional.interleaved-cmd-buffers.end1-submit1-end2-submit2",
-    .image_filename = "functional.interleaved-cmd-buffers.ref.png",
+    .name = "func.interleaved-cmd-buffers.end1-submit1-end2-submit2",
+    .image_filename = "func.interleaved-cmd-buffers.ref.png",
     .start = test_end1_submit1_end2_submit2,
 };
 
 cru_define_test {
-    .name = "functional.interleaved-cmd-buffers.end1-end2-submit1-submit2",
-    .image_filename = "functional.interleaved-cmd-buffers.ref.png",
+    .name = "func.interleaved-cmd-buffers.end1-end2-submit1-submit2",
+    .image_filename = "func.interleaved-cmd-buffers.ref.png",
     .start = test_end1_end2_submit1_submit2,
 };

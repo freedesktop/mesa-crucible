@@ -26,7 +26,7 @@ Directory Layout
   Example tests that demonstrate how to use the framework or how to accomplish
   a tricky testing task.
 
-- src/tests/functional
+- src/tests/func
   Functional tests, such as
       - Draw a triangle, then verify the render target contains a triangle.
       - Load an image file, generate a mipmap, then compare it against it

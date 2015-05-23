@@ -47,28 +47,28 @@ $ crucible run 'example.*'
 * Run all functional and stress tests.
 +
 ----
-$ crucible run 'functional.*' 'stress.*'
+$ crucible run 'func.*' 'stress.*'
 ----
 
 * Run one test.
 +
 ----
-$ crucible run functional.miptree.2d.levels01
+$ crucible run func.miptree.2d.levels01
 ----
 
 * Run multiple tests by name.
 +
 ----
-$ crucible run functional.miptree.2d.levels01 \
-               functional.miptree.2d.levels02 \
-               functional.miptree.cubemap.levels09
+$ crucible run func.miptree.2d.levels01 \
+               func.miptree.2d.levels02 \
+               func.miptree.cubemap.levels09
 ----
 
 * Run multiple tests by glob patterns.
 +
 ----
-$ crucible run 'functional.miptree.cubemap.*' \
-               'functional.txf.*'
+$ crucible run 'func.miptree.cubemap.*' \
+               'func.txf.*'
 ----
 
 SEE ALSO
