@@ -34,6 +34,7 @@ enum {
 
 static int opt_flag;
 static int opt_no_cleanup = 0;
+static int opt_dump = 0;
 static int opt_all_tests = 1;
 
 // From man:getopt(3) :
@@ -49,6 +50,8 @@ static const char *shortopts = "-:";
 static const struct option longopts[] = {
     {"help",          no_argument,       &opt_flag,       OPT_HELP},
     {"no-cleanup",    no_argument,       &opt_no_cleanup, true},
+    {"dump",          no_argument,       &opt_dump,       true},
+    {"no-dump",       no_argument,       &opt_dump,       false},
     {0},
 };
 
@@ -135,6 +138,8 @@ run_single_test(const cru_test_def_t *def)
         report_result(def->name, CRU_TEST_RESULT_FAIL);
         return;
     }
+
+    cru_test_enable_dump(test, opt_dump);
 
     if (opt_no_cleanup)
         cru_test_disable_cleanup(test);

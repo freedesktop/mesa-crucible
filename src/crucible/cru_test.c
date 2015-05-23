@@ -61,6 +61,11 @@ struct cru_test {
     /// Run the test in bootstrap mode.
     bool bootstrap;
 
+    /// Disable image dumps.
+    ///
+    /// \see t_dump_image()
+    bool no_dump;
+
     /// Don't run the cleanup commands in cru_test::cleanup_stacks.
     bool no_cleanup;
 
@@ -191,6 +196,8 @@ cru_test_create(const cru_test_def_t *def)
     t->phase = CRU_TEST_PHASE_PRESTART;
     t->result = CRU_TEST_RESULT_PASS;
 
+    t->no_dump = true;
+
     // Disable the cleanup handlers because they consitently crash Mesa.
     // TODO: Enable cleanup after Mesa is fixed.
     t->no_cleanup = true;
@@ -244,6 +251,15 @@ cru_test_enable_bootstrap(cru_test_t *t,
     t->height = image_height;
 
     return true;
+}
+
+void
+cru_test_enable_dump(cru_test_t *t, bool enable)
+{
+    assert(t->phase == CRU_TEST_PHASE_PRESTART);
+    assert(!cru_current_test);
+
+    t->no_dump = !enable;
 }
 
 bool
@@ -416,6 +432,17 @@ t_end(enum cru_test_result result)
     // FINISHME: Run the cleanup handlers here if this is the last test thread.
     pthread_cond_broadcast(&t->result_cond);
     pthread_exit(NULL);
+}
+
+void
+t_dump_image(cru_image_t *image, const char *filename)
+{
+    cru_test_t *t = cru_current_test;
+
+    if (t->no_dump)
+        return;
+
+    cru_image_write_file(image, filename);
 }
 
 void

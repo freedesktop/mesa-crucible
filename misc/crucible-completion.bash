@@ -17,7 +17,7 @@ __crucible_ls_tests()
 
 __crucible_run()
 {
-   COMPREPLY=($(compgen -W "--help --no-cleanup $($1 ls-tests)" -- ${COMP_WORDS[COMP_CWORD]}))
+   COMPREPLY=($(compgen -W "--help --dump --no-dump --no-cleanup $($1 ls-tests)" -- ${COMP_WORDS[COMP_CWORD]}))
 }
 
 __crucible()

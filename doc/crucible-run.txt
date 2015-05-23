@@ -2,7 +2,7 @@ NAME
     crucible run - run tests
 
 SYNOPSIS
-    crucible run [--no-cleanup] [<testname>...]
+    crucible run [--no-cleanup] [--dump|--no-dump] [<testname>...]
 
 DESCRIPTION
     Run tests in the order given on the command line. If no tests are given
@@ -13,6 +13,9 @@ OPTIONS
     --no-cleanup
         Disable each test's cleanup phase. This is useful because a test may
         crash during cleanup but otherwise pass.
+
+    --dump, --no-dump [default: --no-dump]
+        Dump (or disable dumping) test images into Crucible's data directory.
 
 EXAMPLES
     Run all tests (except example tests).
