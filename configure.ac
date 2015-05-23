@@ -50,4 +50,18 @@ fi
 AC_SUBST([MINIGBM_CPPFLAGS])
 AC_SUBST([MINIGBM_LDFLAGS])
 
+AC_ARG_VAR([ASCIIDOC], [path to asciidoc executable])
+AC_SUBST([ASCIIDOC])
+AC_CHECK_PROGS([ASCIIDOC], [asciidoc])
+if test "x$ASCIIDOC" = "x"; then
+    AC_MSG_ERROR([AsciiDoc not found - unable to build documentation])
+fi
+
+AC_ARG_VAR([A2X], [path to a2x, the AsciiDoc toolchain manager])
+AC_SUBST([A2X])
+AC_CHECK_PROGS([A2X], [a2x])
+if test "x$A2X" = "x"; then
+    AC_MSG_ERROR([a2x not found - unable to build documentation])
+fi
+
 AC_OUTPUT(Makefile)

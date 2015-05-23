@@ -1,8 +1,0 @@
-NAME
-    crucible ls-example-tests - list names of example tests
-
-SYNOPSIS
-    crucible ls-example-tests
-
-DESCRIPTION
-    This command takes no arguments.

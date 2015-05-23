@@ -1,8 +1,0 @@
-NAME
-    crucible version - show version info
-
-SYNOPSIS
-    crucible version
-
-DESCRIPTION
-    This command takes no arguments.

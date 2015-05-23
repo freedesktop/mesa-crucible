@@ -63,3 +63,20 @@ bin_crucible_SOURCES = \
 	src/tests/functional/interleaved-cmd-buffers.c
 
 bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread -lpng16
+
+man1_MANS = \
+    doc/crucible-bootstrap.1 \
+    doc/crucible-help.1 \
+    doc/crucible-ls-example-tests.1 \
+    doc/crucible-ls-tests.1 \
+    doc/crucible-run.1 \
+    doc/crucible-version.1
+
+.PHONY: man
+man: $(man1_MANS)
+	@
+
+%.1: %.1.txt
+	$(AM_V_GEN)$(A2X) --format manpage $^
+
+CLEANFILES = $(man1_MANS)

@@ -1,6 +1,9 @@
 /bin/*
 /data/*.actual.png
 /data/*.seq*.png
+/doc/*.1
+/doc/*.5
+/doc/*.7
 
 # generated files
 *_gen.c

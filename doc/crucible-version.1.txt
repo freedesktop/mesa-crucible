@@ -1,0 +1,16 @@
+crucible-version(1)
+===================
+:doctype: manpage
+
+NAME
+----
+crucible-version - show version info
+
+SYNOPSIS
+---------
+[verse]
+*crucible version*
+
+DESCRIPTION
+-----------
+Just print Crucible's version. That's all :)

@@ -1,8 +1,0 @@
-NAME
-    crucible ls-tests - list test names
-
-SYNOPSIS
-    crucible ls-tests
-
-DESCRIPTION
-    This command takes no arguments.

@@ -1,0 +1,16 @@
+crucible-bootstrap(1)
+=====================
+:doctype: manpage
+
+NAME
+----
+crucible-bootstrap - bootstrap test data
+
+SYNOPSIS
+--------
+[verse]
+*crucible bootstrap* <test-name> [--width <image-width>] [--height <image-height>]
+
+DESCRIPTION
+-----------
+TODO

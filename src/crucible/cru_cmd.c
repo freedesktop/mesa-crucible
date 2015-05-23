@@ -84,13 +84,13 @@ cru_command_page_help(const cru_command_t *cmd)
 {
     int err;
 
-    // Build path to "{prefix}/doc/crucible-{command}.txt".
+    // Build path to "{prefix}/doc/crucible-{command}.1".
     string_t help_path = STRING_INIT;
     path_append(&help_path, cru_prefix_path());
     path_append_cstr(&help_path, "doc");
     path_append_cstr(&help_path, "crucible-");
     string_append_cstr(&help_path, cmd->name);
-    string_append_cstr(&help_path, ".txt");
+    string_append_cstr(&help_path, ".1");
 
     struct stat help_stat;
     err = stat(help_path.buf, &help_stat);
@@ -107,16 +107,12 @@ cru_command_page_help(const cru_command_t *cmd)
         }
     }
 
-    char *pager = getenv("PAGER");
-    if (!pager || !pager[0]) {
-        pager = "less";
-    }
+    char *man_args[] = {"man", "--local-file", help_path.buf, NULL};
 
-    char *pager_args[] = {pager, help_path.buf, NULL};
-
-    err = execvp(pager_args[0], pager_args);
+    err = execvp(man_args[0], man_args);
     if (err) {
-        cru_loge("exec failed: %s %s", pager_args[0], pager_args[1]);
+        cru_loge("exec failed: %s %s %s",
+                 man_args[0], man_args[1], man_args[2]);
         exit(1);
     }
 

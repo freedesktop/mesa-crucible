@@ -1,0 +1,77 @@
+crucible-run(1)
+===============
+:doctype: manpage
+
+NAME
+----
+crucible-run - run tests
+
+SYNOPSIS
+--------
+[verse]
+*crucible run* [--no-cleanup] [--dump|--no-dump] [<pattern>...]
+
+DESCRIPTION
+-----------
+Run tests in the order given on the command line. If no tests are given, then
+run all tests (except example tests). The list of <pattern>s may consist of
+a mixture of literal test names and glob patterns.
+
+You can list all non-example tests with *crucible-ls-tests(1)*, and list
+examples tests with *crucible-ls-example-tests(1)*.  (Example tests are those
+whose names match "example.*").
+
+OPTIONS
+-------
+--no-cleanup::
+    Disable each test's cleanup phase. This is useful because a test may crash
+    during cleanup but otherwise pass.
+
+--dump, --no-dump [default: disabled]::
+    Dump (or disable dumping) test images into Crucible's data directory.
+
+EXAMPLES
+--------
+* Run all tests (except example tests).
++
+----
+$ crucible run
+----
+
+* Run all example tests.
++
+----
+$ crucible run 'example.*'
+----
+
+* Run all functional and stress tests.
++
+----
+$ crucible run 'functional.*' 'stress.*'
+----
+
+* Run one test.
++
+----
+$ crucible run functional.miptree.2d.levels01
+----
+
+* Run multiple tests by name.
++
+----
+$ crucible run functional.miptree.2d.levels01 \
+               functional.miptree.2d.levels02 \
+               functional.miptree.cubemap.levels09
+----
+
+* Run multiple tests by glob patterns.
++
+----
+$ crucible run 'functional.miptree.cubemap.*' \
+               'functional.txf.*'
+----
+
+SEE ALSO
+--------
+*crucible-ls-tests(1)*,
+*crucible-ls-example-tests(1)*

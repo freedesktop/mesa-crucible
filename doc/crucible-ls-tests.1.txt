@@ -1,0 +1,20 @@
+crucible-ls-tests(1)
+====================
+:doctype: manpage
+
+NAME
+----
+crucible-ls-tests - list test names
+
+SYNOPSIS
+--------
+[verse]
+*crucible ls-tests*
+
+DESCRIPTION
+-----------
+List all tests, except example tests.
+
+SEE ALSO
+--------
+*crucible-ls-example-tests(1)*
