@@ -65,7 +65,8 @@ bin_crucible_SOURCES = \
 	src/tests/func/ds/basic.c \
 	src/tests/func/query/timestamp.c \
 	src/tests/func/first.c \
-	src/tests/func/interleaved-cmd-buffers.c
+	src/tests/func/interleaved-cmd-buffers.c \
+	src/tests/stress/lots-of-surface-state.c
 
 bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread -lpng16
 
