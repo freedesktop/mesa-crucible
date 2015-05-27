@@ -26,6 +26,9 @@
 /// some of the more mysterious APIs should be used.
 ///
 /// NOTES:
+///   - Functions prefixed with 't_' operate on the thread-local test context
+///     and are reentrant.
+///
 ///   - The test ends when the start function returns even if the test has live
 ///     subthreads.
 ///
