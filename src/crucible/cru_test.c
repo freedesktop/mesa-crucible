@@ -581,7 +581,44 @@ t_pass(void)
 }
 
 void cru_noreturn
-t_skip(void)
+__t_skip(const char *file, int line)
+{
+    __t_skipf(file, line, NULL);
+}
+
+void cru_noreturn
+__t_skipf(const char *file, int line, const char *format, ...)
+{
+    va_list va;
+
+    va_start(va, format);
+    __t_skipfv(file, line, format, va);
+    va_end(va);
+}
+
+void cru_noreturn
+__t_skipfv(const char *file, int line, const char *format, va_list va)
+{
+    // Check for cancellation because cancelled tests should produce no
+    // messages.
+    t_check_cancelled();
+
+    string_t s = STRING_INIT;
+    string_appendf(&s, "%s:%d", file, line);
+
+    if (format) {
+        string_append_cstr(&s, ": ");
+        string_vappendf(&s, format, va);
+    }
+
+    cru_logi(s.buf);
+    string_finish(&s);
+
+    __t_skip_silent();
+}
+
+void cru_noreturn
+__t_skip_silent(void)
 {
     t_end(CRU_TEST_RESULT_SKIP);
 }

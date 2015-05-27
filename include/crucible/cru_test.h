@@ -110,7 +110,15 @@ struct cru_test_def {
 
 void t_end(cru_test_result_t result) cru_noreturn;
 void t_pass(void) cru_noreturn;
-void t_skip(void) cru_noreturn;
+
+#define t_skip() __t_skip(__FILE__, __LINE__)
+#define t_skipf(format, ...) __t_skipf(__FILE__, __LINE__, format, ##__VA_ARGS__)
+#define t_skipvf(format, va) __t_skipfv(__FILE__, __LINE__, format, va)
+#define t_skip_silent() __t_skip_silent()
+void __t_skip(const char *file, int line) cru_noreturn;
+void __t_skipf(const char *file, int line, const char *format, ...) cru_noreturn cru_printflike(3, 4);
+void __t_skipfv(const char *file, int line, const char *format, va_list va) cru_noreturn;
+void __t_skip_silent(void) cru_noreturn;
 
 #define t_fail() __t_fail(__FILE__, __LINE__)
 #define t_failf(format, ...) __t_failf(__FILE__, __LINE__, format, ##__VA_ARGS__)
