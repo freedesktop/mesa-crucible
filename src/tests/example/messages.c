@@ -47,3 +47,15 @@ cru_define_test {
     .start = test_assertf,
     .no_image = true,
 };
+
+static void
+test_failf(void)
+{
+    t_failf("i failed on %s", __DATE__);
+}
+
+cru_define_test {
+    .name = "example.messages.failf",
+    .start = test_failf,
+    .no_image = true,
+};
