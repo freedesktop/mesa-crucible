@@ -615,7 +615,7 @@ __t_failfv(const char *file, int line, const char *format, va_list va)
         string_vappendf(&s, format, va);
     }
 
-    cru_log_tag("fail", s.buf);
+    cru_loge(s.buf);
     string_finish(&s);
 
     __t_fail_silent();
