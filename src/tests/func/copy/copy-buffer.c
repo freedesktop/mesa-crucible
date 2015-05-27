@@ -147,8 +147,6 @@ test_large_copy(void)
 
     vkUnmapMemory(t_device, mem);
     vkFreeMemory(t_device, mem);
-
-    t_pass();
 }
 
 cru_define_test {
