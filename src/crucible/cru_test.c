@@ -597,15 +597,42 @@ t_fail(void)
 }
 
 void
-__t_assert(const char *file, int line,
-              bool cond, const char *cond_string)
+__t_assert(const char *file, int line, bool cond, const char *cond_string)
+{
+    __t_assertf(file, line, cond, cond_string, NULL);
+}
+
+void cru_printflike(5, 6)
+__t_assertf(const char *file, int line, bool cond, const char *cond_string,
+            const char *format, ...)
+{
+    va_list va;
+
+    va_start(va, format);
+    __t_assertfv(file, line, cond, cond_string, format, va);
+    va_end(va);
+}
+
+void
+__t_assertfv(const char *file, int line, bool cond, const char *cond_string,
+             const char *format, va_list va)
 {
     t_check_cancelled();
 
-    if (!cond) {
-        cru_loge("%s:%d: assertion failed: %s", file, line, cond_string);
-        t_fail();
+    if (cond)
+        return;
+
+    cru_loge("%s:%d: assertion failed: %s", file, line, cond_string);
+
+    if (format) {
+        string_t s = STRING_INIT;
+        string_appendf(&s, "%s:%d: ", file, line);
+        string_vappendf(&s, format, va);
+        cru_loge(s.buf);
+        string_finish(&s);
     }
+
+    t_end(CRU_TEST_RESULT_FAIL);
 }
 
 static void
