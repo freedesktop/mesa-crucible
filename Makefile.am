@@ -61,6 +61,7 @@ bin_crucible_SOURCES = \
 	src/tests/example/images.c \
 	src/tests/example/messages.c \
 	src/tests/func/copy/copy-buffer.c \
+	src/tests/func/ds/basic.c \
 	src/tests/func/query/timestamp.c \
 	src/tests/func/first.c \
 	src/tests/func/interleaved-cmd-buffers.c
