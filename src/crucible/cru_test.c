@@ -589,9 +589,36 @@ t_skip(void)
 void cru_noreturn
 __t_fail(const char *file, int line)
 {
+    __t_failf(file, line, NULL);
+}
+
+void cru_noreturn
+__t_failf(const char *file, int line, const char *format, ...)
+{
+    va_list va;
+
+    va_start(va, format);
+    __t_failfv(file, line, format, va);
+    va_end(va);
+}
+
+void cru_noreturn
+__t_failfv(const char *file, int line, const char *format, va_list va)
+{
     t_check_cancelled();
-    cru_log_tag("fail", "%s:%d", file, line);
-    t_fail_silent();
+
+    string_t s = STRING_INIT;
+    string_appendf(&s, "%s:%d", file, line);
+
+    if (format) {
+        string_append_cstr(&s, ": ");
+        string_vappendf(&s, format, va);
+    }
+
+    cru_log_tag("fail", s.buf);
+    string_finish(&s);
+
+    __t_fail_silent();
 }
 
 void cru_noreturn

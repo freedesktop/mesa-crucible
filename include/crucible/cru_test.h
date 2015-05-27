@@ -113,8 +113,12 @@ void t_pass(void) cru_noreturn;
 void t_skip(void) cru_noreturn;
 
 #define t_fail() __t_fail(__FILE__, __LINE__)
+#define t_failf(format, ...) __t_failf(__FILE__, __LINE__, format, ##__VA_ARGS__)
+#define t_failvf(format, va) __t_failfv(__FILE__, __LINE__, format, va)
 #define t_fail_silent() __t_fail_silent()
 void __t_fail(const char *file, int line) cru_noreturn;
+void __t_failf(const char *file, int line, const char *format, ...) cru_noreturn cru_printflike(3, 4);
+void __t_failfv(const char *file, int line, const char *format, va_list va) cru_noreturn;
 void __t_fail_silent(void) cru_noreturn;
 
 #define t_assert(cond) __t_assert(__FILE__, __LINE__, (cond), #cond)
