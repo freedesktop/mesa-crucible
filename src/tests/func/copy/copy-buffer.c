@@ -24,7 +24,7 @@
 static void
 test_large_copy(void)
 {
-    /* We'll test copying 1000k buffers */
+    //  We'll test copying 1000k buffers
     const int buffer_size = 1024000;
 
     VkBufferCreateInfo buffer_info = {
@@ -58,22 +58,22 @@ test_large_copy(void)
     void *map;
     vkMapMemory(t_device, mem, 0, buffer_requirements.size * 2, 0, &map);
 
-    /* Fill the first buffer_size of the memory with a pattern */
+    // Fill the first buffer_size of the memory with a pattern
     uint32_t *map32 = map;
     for (unsigned i = 0; i < buffer_size / sizeof(*map32); i++)
         map32[i] = i;
 
-    /* Fill the rest with 0 */
+    // Fill the rest with 0
     memset((char *)map + buffer_size, 0, memory_size - buffer_size);
 
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER,
                             buffer1,
-                            0, /* allocation index */
+                            /*allocation index*/ 0,
                             mem, 0);
 
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER,
                             buffer2,
-                            0, /* allocation index */
+                            /*allocation index*/ 0,
                             mem, buffer_requirements.size);
 
     VkCmdBuffer cmdBuffer;
