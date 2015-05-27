@@ -116,7 +116,6 @@ void t_fail(void) cru_noreturn;
 #define t_assert(cond) __t_assert(__FILE__, __LINE__, (cond), #cond)
 #define t_assertf(cond, format, ...) __t_assertf(__FILE__, __LINE__, (cond), #cond, format, ##__VA_ARGS__)
 #define t_assertfv(cond, format, va) __t_assertfv(__FILE__, __LINE__, (cond), #cond, format, va)
-#define t_failif(cond, format, ...) t_assert(!cond) // TODO: Print error message
 #define t_try(error) t_assert(error == 0)
 void __t_assert(const char *file, int line, bool cond, const char *cond_string);
 void __t_assertf(const char *file, int line, bool cond, const char *cond_string, const char *format, ...) cru_printflike(5, 6);
