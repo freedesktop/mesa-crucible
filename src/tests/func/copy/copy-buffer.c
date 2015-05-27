@@ -20,7 +20,6 @@
 // IN THE SOFTWARE.
 
 #include <crucible/cru.h>
-#include <stdio.h>
 
 static void
 test_large_copy(void)
@@ -141,11 +140,9 @@ test_large_copy(void)
 
     uint32_t *map32_2 = map + buffer_requirements.size;
     for (unsigned i = 0; i < buffer_size / sizeof(*map32); i++) {
-        if (map32[i] != map32_2[i]) {
-            t_fail();
-            fprintf(stderr, "buffer mismatch at dword %d: found 0x%x, "
-                    "expected 0x%x\n", i, map32_2[i], map32[i]);
-        }
+        t_assertf(map32[i] == map32_2[i],
+                  "buffer mismatch at dword %d: found 0x%x, "
+                  "expected 0x%x", i, map32_2[i], map32[i]);
     }
 
     vkUnmapMemory(t_device, mem);
