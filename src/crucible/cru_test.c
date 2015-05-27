@@ -155,8 +155,7 @@ cru_test_load_image_file(void)
     assert(t->ref_image_filename.len > 0);
 
     t->image = cru_image_load_file(t->ref_image_filename.buf);
-    if (!t->image)
-        t_fail();
+    t_assert(t->image);
 
     t_cleanup_push(t->image);
     t->width = cru_image_get_width(t->image);
@@ -439,10 +438,7 @@ t_dump_seq_image(cru_image_t *image)
         return;
 
     uint64_t seq = cru_refcount_get(&t->dump_seq);
-    if (seq > 9999) {
-        cru_loge("image sequence count exceeds 9999");
-        t_fail();
-    }
+    t_assertf(seq <= 9999, "image sequence %lu exceeds 9999", seq);
 
     string_t filename = STRING_INIT;
     string_printf(&filename, "%s.seq%04lu.png", t_name, seq);
@@ -692,10 +688,7 @@ cru_test_start_main_thread(void *arg)
     assert(t->phase == CRU_TEST_PHASE_SETUP);
     cru_test_setup_thread(t);
 
-    if (!t->def->start) {
-       cru_loge("test defines no start function");
-       t_fail();
-    }
+    t_assertf(t->def->start, "test defines no start function");
 
     if (!t->bootstrap && !t->def->no_image)
         cru_test_load_image_file();
