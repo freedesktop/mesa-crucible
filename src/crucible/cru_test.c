@@ -605,6 +605,8 @@ __t_failf(const char *file, int line, const char *format, ...)
 void cru_noreturn
 __t_failfv(const char *file, int line, const char *format, va_list va)
 {
+    // Check for cancellation because cancelled tests should produce no
+    // messages.
     t_check_cancelled();
 
     string_t s = STRING_INIT;
@@ -648,6 +650,8 @@ void
 __t_assertfv(const char *file, int line, bool cond, const char *cond_string,
              const char *format, va_list va)
 {
+    // Check for cancellation because cancelled tests should produce no
+    // messages.
     t_check_cancelled();
 
     if (cond)
