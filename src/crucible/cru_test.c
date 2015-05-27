@@ -574,19 +574,19 @@ t_compare_image(void)
     t_pass();
 }
 
-void
+void cru_noreturn
 t_pass(void)
 {
     t_end(CRU_TEST_RESULT_PASS);
 }
 
-void
+void cru_noreturn
 t_skip(void)
 {
     t_end(CRU_TEST_RESULT_SKIP);
 }
 
-void
+void cru_noreturn
 t_fail(void)
 {
     t_end(CRU_TEST_RESULT_FAIL);
