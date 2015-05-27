@@ -111,7 +111,11 @@ struct cru_test_def {
 void t_end(cru_test_result_t result) cru_noreturn;
 void t_pass(void) cru_noreturn;
 void t_skip(void) cru_noreturn;
-void t_fail(void) cru_noreturn;
+
+#define t_fail() __t_fail(__FILE__, __LINE__)
+#define t_fail_silent() __t_fail_silent()
+void __t_fail(const char *file, int line) cru_noreturn;
+void __t_fail_silent(void) cru_noreturn;
 
 #define t_assert(cond) __t_assert(__FILE__, __LINE__, (cond), #cond)
 #define t_assertf(cond, format, ...) __t_assertf(__FILE__, __LINE__, (cond), #cond, format, ##__VA_ARGS__)

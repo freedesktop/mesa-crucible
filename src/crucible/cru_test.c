@@ -568,7 +568,7 @@ t_compare_image(void)
         string_append_cstr(&actual_path, ".actual.png");
         cru_image_write_file(actual_image, actual_path.buf);
 
-        t_fail();
+        t_fail_silent();
     }
 
     t_pass();
@@ -587,7 +587,15 @@ t_skip(void)
 }
 
 void cru_noreturn
-t_fail(void)
+__t_fail(const char *file, int line)
+{
+    t_check_cancelled();
+    cru_log_tag("fail", "%s:%d", file, line);
+    t_fail_silent();
+}
+
+void cru_noreturn
+__t_fail_silent(void)
 {
     t_end(CRU_TEST_RESULT_FAIL);
 }
@@ -662,7 +670,7 @@ fail_create_cleanup_stack:
         cru_current_test_cleanup = NULL;
     }
 
-    t_fail();
+    t_fail_silent();
 }
 
 static void *
@@ -981,7 +989,7 @@ t_create_thread(void (*start)(void *arg), void *arg)
 
 fail:
     free(thread);
-    t_fail();
+    t_fail_silent();
 }
 
 static void
