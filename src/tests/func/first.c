@@ -25,14 +25,6 @@ static void
 create_pipeline(VkDevice device, VkPipeline *pipeline,
                 VkPipelineLayout pipeline_layout)
 {
-    VkPipelineIaStateCreateInfo ia_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO,
-        .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
-        .disableVertexReuse = false,
-        .primitiveRestartEnable = false,
-        .primitiveRestartIndex = 0
-    };
-
     static const char vs_source[] = GLSL(330,
         layout(location = 0) in vec4 a_position;
         layout(location = 1) in vec4 a_color;
@@ -83,33 +75,8 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
         },
         &fs);
 
-    VkPipelineShaderStageCreateInfo vs_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-        .pNext = &ia_create_info,
-        .shader = {
-            .stage = VK_SHADER_STAGE_VERTEX,
-            .shader = vs,
-            .linkConstBufferCount = 0,
-            .pLinkConstBufferInfo = NULL,
-            .pSpecializationInfo = NULL,
-        },
-    };
-
-    VkPipelineShaderStageCreateInfo fs_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-        .pNext = &vs_create_info,
-        .shader = {
-            .stage = VK_SHADER_STAGE_FRAGMENT,
-            .shader = fs,
-            .linkConstBufferCount = 0,
-            .pLinkConstBufferInfo = NULL,
-            .pSpecializationInfo = NULL,
-        }
-    };
-
     VkPipelineVertexInputCreateInfo vi_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_CREATE_INFO,
-        .pNext = &fs_create_info,
         .bindingCount = 2,
         .pVertexBindingDescriptions = (VkVertexInputBindingDescription[]) {
             {
@@ -140,21 +107,19 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
         },
     };
 
-    VkPipelineRsStateCreateInfo rs_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_RS_STATE_CREATE_INFO,
+    struct cru_GraphicsPipelineCreateInfo cru_info = {
+        .sType = CRU_STRUCTURE_TYPE_PIPELINE_CREATE_INFO,
         .pNext = &vi_create_info,
 
-        .depthClipEnable = true,
-        .rasterizerDiscardEnable = false,
-        .fillMode = VK_FILL_MODE_SOLID,
-        .cullMode = VK_CULL_MODE_NONE,
-        .frontFace = VK_FRONT_FACE_CCW,
+        .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+        .vertex_shader = vs,
+        .fragment_shader = fs,
     };
 
-    vkCreateGraphicsPipeline(t_device,
+    cru_CreateGraphicsPipeline(t_device,
         &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-            .pNext = &rs_create_info,
+            .pNext = &cru_info,
             .flags = 0,
             .layout = pipeline_layout
         },
