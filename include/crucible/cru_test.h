@@ -176,6 +176,10 @@ void t_dump_image_fv(cru_image_t *image, const char *format, va_list va);
 #define t_device (*__t_device())
 #define t_queue (*__t_queue())
 #define t_cmd_buffer (*__t_cmd_buffer())
+#define t_dynamic_vp_state (*__t_dynamic_vp_state())
+#define t_dynamic_rs_state (*__t_dynamic_rs_state())
+#define t_dynamic_cb_state (*__t_dynamic_cb_state())
+#define t_dynamic_ds_state (*__t_dynamic_ds_state())
 #define t_image (*__t_image())
 #define t_image_color_view (*__t_image_color_view())
 #define t_image_texture_view (*__t_image_texture_view())
@@ -192,6 +196,10 @@ const VkDevice *__t_device(void);
 const VkPhysicalDevice *__t_physical_device(void);
 const VkQueue *__t_queue(void);
 const VkCmdBuffer *__t_cmd_buffer(void);
+const VkDynamicVpState *__t_dynamic_vp_state(void);
+const VkDynamicRsState *__t_dynamic_rs_state(void);
+const VkDynamicCbState *__t_dynamic_cb_state(void);
+const VkDynamicDsState *__t_dynamic_ds_state(void);
 const VkImage *__t_image(void);
 const VkColorAttachmentView *__t_image_color_view(void);
 const VkImageView *__t_image_texture_view(void);

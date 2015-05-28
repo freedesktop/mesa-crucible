@@ -83,6 +83,10 @@ struct cru_test {
     VkDevice device;
     VkQueue queue;
     VkCmdBuffer cmd_buffer;
+    VkDynamicVpState dynamic_vp_state;
+    VkDynamicRsState dynamic_rs_state;
+    VkDynamicCbState dynamic_cb_state;
+    VkDynamicDsState dynamic_ds_state;
     VkImage rt_image;
     VkColorAttachmentView image_color_view;
     VkImageView image_texture_view;
@@ -295,6 +299,30 @@ const VkCmdBuffer *
 __t_cmd_buffer(void)
 {
     return &cru_current_test->cmd_buffer;
+}
+
+const VkDynamicVpState *
+__t_dynamic_vp_state(void)
+{
+    return &cru_current_test->dynamic_vp_state;
+}
+
+const VkDynamicRsState *
+__t_dynamic_rs_state(void)
+{
+    return &cru_current_test->dynamic_rs_state;
+}
+
+const VkDynamicCbState *
+__t_dynamic_cb_state(void)
+{
+    return &cru_current_test->dynamic_cb_state;
+}
+
+const VkDynamicDsState *
+__t_dynamic_ds_state(void)
+{
+    return &cru_current_test->dynamic_ds_state;
 }
 
 const VkImage *
@@ -810,6 +838,44 @@ cru_test_start_main_thread(void *arg)
     t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_QUEUE,
                                     t_queue);
 
+    vkCreateDynamicViewportState(t->device,
+        &(VkDynamicVpStateCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_DYNAMIC_VP_STATE_CREATE_INFO,
+            .viewportAndScissorCount = 1,
+            .pViewports = (VkViewport[]) {
+                {
+                    .originX = 0,
+                    .originY = 0,
+                    .width = t->width,
+                    .height = t->height,
+                    .minDepth = 0,
+                    .maxDepth = 1
+                },
+            },
+            .pScissors = (VkRect[]) {
+                {{ 0, 0 }, { t->width, t->height }},
+            },
+        }, &t->dynamic_vp_state);
+
+    vkCreateDynamicRasterState(t_device,
+        &(VkDynamicRsStateCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_DYNAMIC_RS_STATE_CREATE_INFO,
+            .pointSize = 1.0,
+            .lineWidth = 1.0,
+        }, &t->dynamic_rs_state);
+
+    vkCreateDynamicColorBlendState(t_device,
+        &(VkDynamicCbStateCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_DYNAMIC_CB_STATE_CREATE_INFO,
+        }, &t->dynamic_cb_state);
+
+    vkCreateDynamicDepthStencilState(t_device,
+        &(VkDynamicDsStateCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_DYNAMIC_DS_STATE_CREATE_INFO,
+            .minDepth = -1.0,
+            .maxDepth = 1.0,
+        }, &t->dynamic_ds_state);
+
     vkCreateCommandBuffer(t_device,
         &(VkCmdBufferCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_CREATE_INFO,
@@ -825,6 +891,15 @@ cru_test_start_main_thread(void *arg)
             .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_BEGIN_INFO,
             .flags = 0,
         });
+
+    vkCmdBindDynamicStateObject(t->cmd_buffer, VK_STATE_BIND_POINT_VIEWPORT,
+                                t->dynamic_vp_state);
+    vkCmdBindDynamicStateObject(t->cmd_buffer, VK_STATE_BIND_POINT_RASTER,
+                                t->dynamic_rs_state);
+    vkCmdBindDynamicStateObject(t->cmd_buffer, VK_STATE_BIND_POINT_COLOR_BLEND,
+                                t->dynamic_cb_state);
+    vkCmdBindDynamicStateObject(t->cmd_buffer, VK_STATE_BIND_POINT_DEPTH_STENCIL,
+                                t->dynamic_ds_state);
 
     if (!t->def->no_image) {
         assert(t_width > 0);
