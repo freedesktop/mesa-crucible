@@ -330,43 +330,6 @@ test(void)
 
     memcpy(map + 1024, vertex_data, sizeof(vertex_data));
 
-    VkDynamicVpState vp_state;
-    vkCreateDynamicViewportState(t_device,
-        &(VkDynamicVpStateCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_DYNAMIC_VP_STATE_CREATE_INFO,
-            .viewportAndScissorCount = 2,
-            .pViewports = (VkViewport[]) {
-                {
-                    .originX = 0,
-                    .originY = 0,
-                    .width = t_width,
-                    .height = t_height,
-                    .minDepth = 0,
-                    .maxDepth = 1
-                },
-                {
-                    .originX = -10,
-                    .originY = -10,
-                    .width = 20,
-                    .height = 20,
-                    .minDepth = -1,
-                    .maxDepth = 1,
-                },
-            },
-            .pScissors = (VkRect[]) {
-                {{  0,  0 }, {t_width, t_height}},
-                {{ 10, 10 }, {236, 236 }},
-            },
-        },
-        &vp_state);
-
-    VkDynamicRsState rs_state;
-    vkCreateDynamicRasterState(t_device,
-        &(VkDynamicRsStateCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_DYNAMIC_RS_STATE_CREATE_INFO,
-        },
-        &rs_state);
-
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER, image_buffer,
                             /*index*/ 0, image_mem, 0);
 
@@ -535,10 +498,6 @@ test(void)
     vkCmdBindDescriptorSets(t_cmd_buffer,
                             VK_PIPELINE_BIND_POINT_GRAPHICS, 1, 1,
                             &set[1], 0, NULL);
-    vkCmdBindDynamicStateObject(t_cmd_buffer,
-                                VK_STATE_BIND_POINT_VIEWPORT, vp_state);
-    vkCmdBindDynamicStateObject(t_cmd_buffer,
-                                VK_STATE_BIND_POINT_RASTER, rs_state);
     vkCmdDraw(t_cmd_buffer, 0, 3, 0, 1);
     vkCmdEndRenderPass(t_cmd_buffer, pass);
 }
