@@ -34,63 +34,8 @@
  */
 
 static void
-test_lots_of_surface_state(void)
+test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
 {
-    static const char vs_source[] = GLSL(330,
-        layout(location = 0) in vec4 a_position;
-        out vec4 v_color;
-        void main()
-        {
-            gl_Position = a_position;
-        }
-    );
-
-    VkShader vs;
-    vkCreateShader(t_device,
-        &(VkShaderCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
-            .codeSize = sizeof(vs_source),
-            .pCode = vs_source,
-            .flags = 0,
-        },
-        &vs);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_SHADER, vs);
-
-    /* The fragment shader takes 12 UBOs */
-    static const char fs_source[] = GLSL(330,
-        out vec4 f_color;
-        layout(set = 0, binding =  0) uniform block0  { float f; } u0;
-        layout(set = 0, binding =  1) uniform block1  { float f; } u1;
-        layout(set = 0, binding =  2) uniform block2  { float f; } u2;
-        layout(set = 0, binding =  3) uniform block3  { float f; } u3;
-        layout(set = 0, binding =  4) uniform block4  { float f; } u4;
-        layout(set = 0, binding =  5) uniform block5  { float f; } u5;
-        layout(set = 0, binding =  6) uniform block6  { float f; } u6;
-        layout(set = 0, binding =  7) uniform block7  { float f; } u7;
-        layout(set = 0, binding =  8) uniform block8  { float f; } u8;
-        layout(set = 0, binding =  9) uniform block9  { float f; } u9;
-        layout(set = 0, binding = 10) uniform block10 { float f; } u10;
-        layout(set = 0, binding = 11) uniform block11 { float f; } u11;
-        void main()
-        {
-            float zero = u0.f + u1.f + u2.f + u3.f + u4.f + u5.f;
-            float one = u6.f + u7.f + u8.f + u9.f + u10.f + u11.f;
-
-            f_color = vec4(zero, one, zero, one);
-        }
-    );
-
-    VkShader fs;
-    vkCreateShader(t_device,
-        &(VkShaderCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
-            .codeSize = sizeof(fs_source),
-            .pCode = fs_source,
-            .flags = 0,
-        },
-        &fs);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_SHADER, fs);
-
     /* Create the descriptor set layout. */
     VkDescriptorSetLayout set_layout;
     vkCreateDescriptorSetLayout(t_device,
@@ -101,7 +46,7 @@ test_lots_of_surface_state(void)
                 {
                     .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
                     .count = 12,
-                    .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+                    .stageFlags = (1 << ubo_stage),
                     .pImmutableSamplers = NULL,
                 },
             },
@@ -347,11 +292,12 @@ test_lots_of_surface_state(void)
         });
 
     for (int i = 0; i < 1024; i++) {
+        uint32_t offsets[12];
+
         /* Compute the offsets and the extra data value.  These are
          * computed so that the sum of the first 6 UBO entries will be zero
          * and the sum of the second 6 will be one.
          */
-        uint32_t offsets[12];
         float sum = 0;
         for (int j = 0; j < 5; j++) {
             int idx = rand() % 1024;
@@ -374,16 +320,6 @@ test_lots_of_surface_state(void)
         ubo_map[1024 + i * 2 + 1] = 1 - sum;
         offsets[11] = (1024 + i * 2 + 1) * sizeof(float);
 
-        sum = 0;
-        for (int j = 0; j < 6; j++)
-            sum += ubo_map[offsets[j] / sizeof(float)];
-        assert(abs(sum) < 0.000001);
-
-        sum = 0;
-        for (int j = 6; j < 12; j++)
-            sum += ubo_map[offsets[j] / sizeof(float)];
-        assert(abs(1 - sum) < 0.000001);
-
         vkCmdBindDescriptorSets(t_cmd_buffer,
                                 VK_PIPELINE_BIND_POINT_GRAPHICS, 0, 1,
                                 &set, 12, offsets);
@@ -394,9 +330,138 @@ test_lots_of_surface_state(void)
     vkCmdEndRenderPass(t_cmd_buffer, pass);
 }
 
+static void
+test_lots_of_surface_state_vs(void)
+{
+    static const char vs_source[] = GLSL(330,
+        layout(location = 0) in vec4 a_position;
+        out vec4 v_color;
+        layout(set = 0, binding =  0) uniform block0  { float f; } u0;
+        layout(set = 0, binding =  1) uniform block1  { float f; } u1;
+        layout(set = 0, binding =  2) uniform block2  { float f; } u2;
+        layout(set = 0, binding =  3) uniform block3  { float f; } u3;
+        layout(set = 0, binding =  4) uniform block4  { float f; } u4;
+        layout(set = 0, binding =  5) uniform block5  { float f; } u5;
+        layout(set = 0, binding =  6) uniform block6  { float f; } u6;
+        layout(set = 0, binding =  7) uniform block7  { float f; } u7;
+        layout(set = 0, binding =  8) uniform block8  { float f; } u8;
+        layout(set = 0, binding =  9) uniform block9  { float f; } u9;
+        layout(set = 0, binding = 10) uniform block10 { float f; } u10;
+        layout(set = 0, binding = 11) uniform block11 { float f; } u11;
+        void main()
+        {
+            float zero = u0.f + u1.f + u2.f + u3.f + u4.f + u5.f;
+            float one = u6.f + u7.f + u8.f + u9.f + u10.f + u11.f;
+
+            v_color = vec4(zero, one, zero, one);
+            gl_Position = a_position;
+        }
+    );
+
+    VkShader vs;
+    vkCreateShader(t_device,
+        &(VkShaderCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
+            .codeSize = sizeof(vs_source),
+            .pCode = vs_source,
+            .flags = 0,
+        },
+        &vs);
+    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_SHADER, vs);
+
+    /* The fragment shader takes 12 UBOs */
+    static const char fs_source[] = GLSL(330,
+        in vec4 v_color;
+        out vec4 f_color;
+        void main()
+        {
+            f_color = v_color;
+        }
+    );
+
+    VkShader fs;
+    vkCreateShader(t_device,
+        &(VkShaderCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
+            .codeSize = sizeof(fs_source),
+            .pCode = fs_source,
+            .flags = 0,
+        },
+        &fs);
+    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_SHADER, fs);
+
+
+    test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_VERTEX);
+}
+
 cru_define_test {
-    .name = "stress.lots-of-surface-state",
-    .start = test_lots_of_surface_state,
+    .name = "stress.lots-of-surface-state.vs",
+    .start = test_lots_of_surface_state_vs,
     .image_filename = "32x32-green.ref.png",
-    .skip = false,
+};
+
+static void
+test_lots_of_surface_state_fs(void)
+{
+    static const char vs_source[] = GLSL(330,
+        layout(location = 0) in vec4 a_position;
+        void main()
+        {
+            gl_Position = a_position;
+        }
+    );
+
+    VkShader vs;
+    vkCreateShader(t_device,
+        &(VkShaderCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
+            .codeSize = sizeof(vs_source),
+            .pCode = vs_source,
+            .flags = 0,
+        },
+        &vs);
+    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_SHADER, vs);
+
+    /* The fragment shader takes 12 UBOs */
+    static const char fs_source[] = GLSL(330,
+        out vec4 f_color;
+        layout(set = 0, binding =  0) uniform block0  { float f; } u0;
+        layout(set = 0, binding =  1) uniform block1  { float f; } u1;
+        layout(set = 0, binding =  2) uniform block2  { float f; } u2;
+        layout(set = 0, binding =  3) uniform block3  { float f; } u3;
+        layout(set = 0, binding =  4) uniform block4  { float f; } u4;
+        layout(set = 0, binding =  5) uniform block5  { float f; } u5;
+        layout(set = 0, binding =  6) uniform block6  { float f; } u6;
+        layout(set = 0, binding =  7) uniform block7  { float f; } u7;
+        layout(set = 0, binding =  8) uniform block8  { float f; } u8;
+        layout(set = 0, binding =  9) uniform block9  { float f; } u9;
+        layout(set = 0, binding = 10) uniform block10 { float f; } u10;
+        layout(set = 0, binding = 11) uniform block11 { float f; } u11;
+        void main()
+        {
+            float zero = u0.f + u1.f + u2.f + u3.f + u4.f + u5.f;
+            float one = u6.f + u7.f + u8.f + u9.f + u10.f + u11.f;
+
+            f_color = vec4(zero, one, zero, one);
+        }
+    );
+
+    VkShader fs;
+    vkCreateShader(t_device,
+        &(VkShaderCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
+            .codeSize = sizeof(fs_source),
+            .pCode = fs_source,
+            .flags = 0,
+        },
+        &fs);
+    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_SHADER, fs);
+
+    test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_FRAGMENT);
+}
+
+cru_define_test {
+    .name = "stress.lots-of-surface-state.fs",
+    .start = test_lots_of_surface_state_fs,
+    .image_filename = "32x32-green.ref.png",
 };
