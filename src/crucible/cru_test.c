@@ -835,8 +835,7 @@ cru_test_start_main_thread(void *arg)
     t_cleanup_push_vk_device(t_device);
 
     vkGetDeviceQueue(t_device, 0, 0, &t->queue);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_QUEUE,
-                                    t_queue);
+    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_QUEUE, t_queue);
 
     vkCreateDynamicViewportState(t->device,
         &(VkDynamicVpStateCreateInfo) {
@@ -923,8 +922,7 @@ cru_test_start_main_thread(void *arg)
                 .flags = 0,
             },
             &t->rt_image);
-        t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_IMAGE,
-                                 t_image);
+        t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_IMAGE, t_image);
 
         VkMemoryRequirements rt_mem_reqs;
         size = sizeof(rt_mem_reqs);

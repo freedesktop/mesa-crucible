@@ -124,8 +124,7 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
             .layout = pipeline_layout
         },
         pipeline);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_PIPELINE,
-                                    *pipeline);
+    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_PIPELINE, *pipeline);
 }
 
 static void
@@ -201,8 +200,7 @@ test(void)
             .flags = 0
             },
         &buffer);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_BUFFER,
-                                    buffer);
+    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_BUFFER, buffer);
 
     VkMemoryRequirements buffer_reqs;
     size_t buffer_reqs_size = sizeof(buffer_reqs);
