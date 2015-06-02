@@ -240,17 +240,6 @@ test(void)
         },
         &mem);
 
-    size_t image_mem_size = ib_reqs.size;
-    VkDeviceMemory image_mem;
-    vkAllocMemory(t_device,
-        &(VkMemoryAllocInfo) {
-            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO,
-            .allocationSize = image_mem_size,
-            .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT,
-            .memPriority = VK_MEMORY_PRIORITY_NORMAL,
-        },
-        &image_mem);
-
     void *map;
     vkMapMemory(t_device, mem, 0, mem_size, 0, &map);
     memset(map, 192, mem_size);
@@ -314,7 +303,7 @@ test(void)
     memcpy(map + 1024, vertex_data, sizeof(vertex_data));
 
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER, image_buffer,
-                            /*index*/ 0, image_mem, 0);
+                            /*index*/ 0, mem, 0);
 
     const uint32_t texture_width = 16, texture_height = 16;
 
