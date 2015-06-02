@@ -871,7 +871,7 @@ cru_test_start_main_thread(void *arg)
     vkCreateDynamicDepthStencilState(t_device,
         &(VkDynamicDsStateCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_DYNAMIC_DS_STATE_CREATE_INFO,
-            .minDepth = -1.0,
+            .minDepth = 0.0,
             .maxDepth = 1.0,
         }, &t->dynamic_ds_state);
 
