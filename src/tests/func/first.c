@@ -496,7 +496,8 @@ test(void)
     vkCmdBindDescriptorSets(t_cmd_buffer,
                             VK_PIPELINE_BIND_POINT_GRAPHICS, 1, 1,
                             &set[1], 0, NULL);
-    vkCmdDraw(t_cmd_buffer, 0, 3, 0, 1);
+    vkCmdDraw(t_cmd_buffer, /*firstVertex*/ 0, /*vertexCount*/ 3,
+              /*firstInstance*/ 0, /*instanceCount*/ 1);
     vkCmdEndRenderPass(t_cmd_buffer, pass);
 }
 
