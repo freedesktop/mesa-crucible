@@ -267,9 +267,6 @@ test(void)
     vkMapMemory(t_device, mem, 0, mem_size, 0, &map);
     memset(map, 192, mem_size);
 
-    void *image_map;
-    vkMapMemory(t_device, image_mem, 0, image_mem_size, 0, &image_map);
-
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER, buffer,
                             /*index*/ 0, mem, 128);
 
