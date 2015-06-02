@@ -202,12 +202,6 @@ test(void)
         &buffer);
     t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_BUFFER, buffer);
 
-    VkMemoryRequirements buffer_reqs;
-    size_t buffer_reqs_size = sizeof(buffer_reqs);
-    vkGetObjectInfo(t_device, VK_OBJECT_TYPE_BUFFER, buffer,
-                    VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                    &buffer_reqs_size, &buffer_reqs);
-
     VkBuffer vertex_buffer;
     vkCreateBuffer(t_device,
         &(VkBufferCreateInfo) {
@@ -217,12 +211,6 @@ test(void)
             .flags = 0,
         },
         &vertex_buffer);
-
-    VkMemoryRequirements vb_reqs;
-    size_t vb_reqs_size = sizeof(vb_reqs);
-    vkGetObjectInfo(t_device, VK_OBJECT_TYPE_BUFFER, vertex_buffer,
-                    VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                    &vb_reqs_size, &vb_reqs);
 
     VkBuffer image_buffer;
     vkCreateBuffer(t_device,
