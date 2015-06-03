@@ -55,6 +55,7 @@ bin_crucible_SOURCES = \
 	src/crucible/cru_slist.c \
 	src/crucible/cru_test.c \
 	src/crucible/cru_vk_pipeline.c \
+	src/crucible/qonos.c \
 	src/crucible/string.c \
 	src/crucible/xalloc.c \
 	src/tests/example/basic.c \
