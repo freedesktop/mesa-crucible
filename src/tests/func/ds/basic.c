@@ -229,17 +229,11 @@ test(void)
                   },
                   &ds);
 
-    VkMemoryRequirements vb_requirements;
-    size_t size = sizeof(vb_requirements);
-    vkGetObjectInfo(t_device, VK_OBJECT_TYPE_BUFFER, vertex_buffer,
-                    VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                    &size, &vb_requirements);
+    VkMemoryRequirements vb_requirements =
+       qoBufferGetMemoryRequirements(t_device, vertex_buffer);
 
-    VkMemoryRequirements ds_requirements;
-    size = sizeof(ds_requirements);
-    vkGetObjectInfo(t_device, VK_OBJECT_TYPE_IMAGE, ds,
-                    VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                    &size, &ds_requirements);
+    VkMemoryRequirements ds_requirements =
+       qoImageGetMemoryRequirements(t_device, ds);
 
     size_t mem_size =
         align_u32(vb_requirements.size, 4096) + 

@@ -118,11 +118,8 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
         },
         &ubo);
 
-    VkMemoryRequirements ubo_reqs;
-    size_t ubo_reqs_size = sizeof(ubo_reqs);
-    vkGetObjectInfo(t_device, VK_OBJECT_TYPE_BUFFER, ubo,
-                    VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                    &ubo_reqs_size, &ubo_reqs);
+    VkMemoryRequirements ubo_reqs =
+       qoBufferGetMemoryRequirements(t_device, ubo);
 
     VkBuffer vbo;
     vkCreateBuffer(t_device,
@@ -134,11 +131,8 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
         },
         &vbo);
 
-    VkMemoryRequirements vbo_reqs;
-    size_t vbo_reqs_size = sizeof(vbo_reqs);
-    vkGetObjectInfo(t_device, VK_OBJECT_TYPE_BUFFER, vbo,
-                    VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                    &vbo_reqs_size, &vbo_reqs);
+    VkMemoryRequirements vbo_reqs =
+       qoBufferGetMemoryRequirements(t_device, vbo);
 
     size_t mem_size = ubo_reqs.size + vbo_reqs.size;
 
@@ -215,36 +209,27 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
 
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
-    VkDynamicVpState vp_state;
-    vkCreateDynamicViewportState(t_device,
-        &(VkDynamicVpStateCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_DYNAMIC_VP_STATE_CREATE_INFO,
-            .viewportAndScissorCount = 1,
-            .pViewports = (VkViewport[]) {
-                {
-                    .originX = 0,
-                    .originY = 0,
-                    .width = t_width,
-                    .height = t_height,
-                    .minDepth = 0,
-                    .maxDepth = 1
-                },
-            },
-            .pScissors = (VkRect[]) {
-                {{  0,  0 }, {t_width, t_height}},
+    VkDynamicVpState vp_state = qoCreateDynamicViewportState(t_device,
+        .viewportAndScissorCount = 1,
+        .pViewports = (VkViewport[]) {
+            {
+                .originX = 0,
+                .originY = 0,
+                .width = t_width,
+                .height = t_height,
+                .minDepth = 0,
+                .maxDepth = 1
             },
         },
-        &vp_state);
+        .pScissors = (VkRect[]) {
+            {{  0,  0 }, {t_width, t_height}},
+        },
+    );
     vkCmdBindDynamicStateObject(t_cmd_buffer,
                                 VK_STATE_BIND_POINT_VIEWPORT, vp_state);
 
-    VkDynamicRsState rs_state;
-    vkCreateDynamicRasterState(t_device,
-        &(VkDynamicRsStateCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_DYNAMIC_RS_STATE_CREATE_INFO,
-            .pointSize = 1.0,
-        },
-        &rs_state);
+    VkDynamicRsState rs_state =
+        qoCreateDynamicRasterState(t_device, .pointSize = 1.0);
     vkCmdBindDynamicStateObject(t_cmd_buffer,
                                 VK_STATE_BIND_POINT_RASTER, rs_state);
 

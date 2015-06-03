@@ -36,11 +36,8 @@ get_timestamp(void)
                            },
                    &buffer);
 
-    VkMemoryRequirements buffer_requirements;
-    size_t size = sizeof(buffer_requirements);
-    vkGetObjectInfo(t_device, VK_OBJECT_TYPE_BUFFER, buffer,
-                    VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                    &size, &buffer_requirements);
+    VkMemoryRequirements buffer_requirements =
+       qoBufferGetMemoryRequirements(t_device, buffer);
 
     VkDeviceMemory mem;
     vkAllocMemory(t_device,

@@ -222,11 +222,8 @@ test(void)
         },
         &image_buffer);
 
-    VkMemoryRequirements ib_reqs;
-    size_t ib_reqs_size = sizeof(ib_reqs);
-    vkGetObjectInfo(t_device, VK_OBJECT_TYPE_BUFFER, image_buffer,
-                    VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                    &ib_reqs_size, &ib_reqs);
+    VkMemoryRequirements ib_reqs =
+        qoBufferGetMemoryRequirements(t_device, image_buffer);
 
     size_t mem_size = ib_reqs.size + 2048 + 16 * 16 * 4;
 

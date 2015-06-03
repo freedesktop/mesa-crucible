@@ -216,23 +216,11 @@ test(void)
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           1, set_layout, set, &set_count);
 
-    VkBuffer buffer;
-    vkCreateBuffer(t_device,
-        &(VkBufferCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-            .size = 4096,
-            .usage = VK_BUFFER_USAGE_GENERAL,
-            .flags = 0
-        },
-        &buffer);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_BUFFER,
-                             buffer);
+    VkBuffer buffer = qoCreateBuffer(t_device, .size = 4096,
+                                     .usage = VK_BUFFER_USAGE_GENERAL);
 
-    VkMemoryRequirements buffer_reqs;
-    size_t buffer_reqs_size = sizeof(buffer_reqs);
-    vkGetObjectInfo(t_device, VK_OBJECT_TYPE_BUFFER, buffer,
-                    VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                    &buffer_reqs_size, &buffer_reqs);
+    VkMemoryRequirements buffer_reqs =
+       qoBufferGetMemoryRequirements(t_device, buffer);
 
     VkDeviceMemory mem;
     vkAllocMemory(t_device,
@@ -268,7 +256,7 @@ test(void)
             .viewType = VK_BUFFER_VIEW_TYPE_RAW,
             .format = VK_FORMAT_R32G32B32A32_SFLOAT,
             .offset = 0,
-            .range = sizeof(color)
+            .range = sizeof(color),
         },
         &buffer_view);
 
@@ -283,40 +271,25 @@ test(void)
 
     memcpy(map + vertex_offset, vertex_data, sizeof(vertex_data));
 
-    VkDynamicVpState vp_state;
-    vkCreateDynamicViewportState(t_device,
-        &(VkDynamicVpStateCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_DYNAMIC_VP_STATE_CREATE_INFO,
-            .viewportAndScissorCount = 1,
-            .pViewports = (VkViewport[]) {
-                {
-                    .originX = 0,
-                    .originY = 0,
-                    .width = t_width,
-                    .height = t_height,
-                    .minDepth = 0,
-                    .maxDepth = 1
-                },
-            },
-            .pScissors = (VkRect[]) {
-                {{  0,  0 }, {t_width, t_height}},
+    VkDynamicVpState vp_state = qoCreateDynamicViewportState(t_device,
+        .viewportAndScissorCount = 1,
+        .pViewports = (VkViewport[]) {
+            {
+                .originX = 0,
+                .originY = 0,
+                .width = t_width,
+                .height = t_height,
+                .minDepth = 0,
+                .maxDepth = 1
             },
         },
-        &vp_state);
-
-    VkDynamicRsState rs_state;
-    vkCreateDynamicRasterState(t_device,
-        &(VkDynamicRsStateCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_DYNAMIC_RS_STATE_CREATE_INFO,
+        .pScissors = (VkRect[]) {
+            {{  0,  0 }, {t_width, t_height}},
         },
-        &rs_state);
+    );
 
-    VkDynamicCbState cb_state;
-    vkCreateDynamicColorBlendState(t_device,
-                                   &(VkDynamicCbStateCreateInfo) {
-                                       .sType = VK_STRUCTURE_TYPE_DYNAMIC_CB_STATE_CREATE_INFO
-                                   },
-                                   &cb_state);
+    VkDynamicRsState rs_state = qoCreateDynamicRasterState(t_device);
+    VkDynamicCbState cb_state = qoCreateDynamicColorBlendState(t_device);
 
     vkUpdateDescriptors(t_device,
         set[0], 1,

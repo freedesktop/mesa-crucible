@@ -27,22 +27,13 @@ test_large_copy(void)
     //  We'll test copying 1000k buffers
     const int buffer_size = 1024000;
 
-    VkBufferCreateInfo buffer_info = {
-        .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-        .size = buffer_size,
-        .usage = VK_BUFFER_USAGE_GENERAL,
-        .flags = 0
-    };
+    VkBuffer buffer1 = qoCreateBuffer(t_device, .size = buffer_size,
+                                      .usage = VK_BUFFER_USAGE_GENERAL);
+    VkBuffer buffer2 = qoCreateBuffer(t_device, .size = buffer_size,
+                                      .usage = VK_BUFFER_USAGE_GENERAL);
 
-    VkBuffer buffer1, buffer2;
-    vkCreateBuffer(t_device, &buffer_info, &buffer1);
-    vkCreateBuffer(t_device, &buffer_info, &buffer2);
-
-    VkMemoryRequirements buffer_requirements;
-    size_t size = sizeof(buffer_requirements);
-    vkGetObjectInfo(t_device, VK_OBJECT_TYPE_BUFFER, buffer1,
-                         VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                         &size, &buffer_requirements);
+    VkMemoryRequirements buffer_requirements =
+       qoBufferGetMemoryRequirements(t_device, buffer1);
 
     const int memory_size = buffer_requirements.size * 2;
 

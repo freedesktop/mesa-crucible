@@ -52,8 +52,6 @@ static const VkBufferImageCopy copy = {
 static void
 setup_src(struct src *src)
 {
-    size_t size;
-
     const uint32_t width = t_width;
     const uint32_t height = t_height;
 
@@ -78,11 +76,8 @@ setup_src(struct src *src)
        &image);
     t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_IMAGE, image);
 
-    VkMemoryRequirements mem_reqs;
-    size = sizeof(mem_reqs);
-    vkGetObjectInfo(t_device, VK_OBJECT_TYPE_IMAGE, image,
-                    VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                    &size, &mem_reqs);
+    VkMemoryRequirements mem_reqs =
+       qoImageGetMemoryRequirements(t_device, image);
 
     VkDeviceMemory mem;
     vkAllocMemory(t_device,
@@ -141,11 +136,8 @@ setup_dest(struct dest *dest)
         &buffer);
     t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_BUFFER, buffer);
 
-    VkMemoryRequirements mem_reqs;
-    size_t mem_reqs_size = sizeof(mem_reqs);
-    vkGetObjectInfo(t_device, VK_OBJECT_TYPE_BUFFER, buffer,
-                    VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                    &mem_reqs_size, &mem_reqs);
+    VkMemoryRequirements mem_reqs =
+       qoBufferGetMemoryRequirements(t_device, buffer);
 
     VkDeviceMemory mem;
     vkAllocMemory(t_device,

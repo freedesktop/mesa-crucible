@@ -30,6 +30,7 @@
 #include <crucible/cru_misc.h>
 #include <crucible/cru_refcount.h>
 #include <crucible/cru_slist.h>
+#include <crucible/qonos.h>
 #include <crucible/string.h>
 #include <crucible/xalloc.h>
 
@@ -519,21 +520,11 @@ t_compare_image(void)
     assert(t->width > 0);
     assert(t->height > 0);
 
-    VkBuffer buffer;
-    vkCreateBuffer(t_device,
-        &(VkBufferCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-            .size = 4 * t_width * t_height,
-            .usage = VK_BUFFER_USAGE_TRANSFER_DESTINATION_BIT,
-            .flags = 0
-        },
-        &buffer);
+    VkBuffer buffer = qoCreateBuffer(t->device, .size = 4 * t_width * t_height,
+                                     .usage = VK_BUFFER_USAGE_TRANSFER_DESTINATION_BIT);
 
-    VkMemoryRequirements buffer_reqs;
-    size_t buffer_reqs_size = sizeof(buffer_reqs);
-    vkGetObjectInfo(t_device, VK_OBJECT_TYPE_BUFFER, buffer,
-                    VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                    &buffer_reqs_size, &buffer_reqs);
+    VkMemoryRequirements buffer_reqs =
+       qoBufferGetMemoryRequirements(t->device, buffer);
 
     size_t mem_size = buffer_reqs.size;
 
@@ -792,7 +783,6 @@ static void *
 cru_test_start_main_thread(void *arg)
 {
     cru_test_t *t = arg;
-    size_t size;
     VkResult res;
 
     assert(t->phase == CRU_TEST_PHASE_SETUP);
@@ -843,43 +833,25 @@ cru_test_start_main_thread(void *arg)
     vkGetDeviceQueue(t_device, 0, 0, &t->queue);
     t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_QUEUE, t_queue);
 
-    vkCreateDynamicViewportState(t->device,
-        &(VkDynamicVpStateCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_DYNAMIC_VP_STATE_CREATE_INFO,
-            .viewportAndScissorCount = 1,
-            .pViewports = (VkViewport[]) {
-                {
-                    .originX = 0,
-                    .originY = 0,
-                    .width = t->width,
-                    .height = t->height,
-                    .minDepth = 0,
-                    .maxDepth = 1
-                },
+    t->dynamic_vp_state = qoCreateDynamicViewportState(t->device,
+        .viewportAndScissorCount = 1,
+        .pViewports = (VkViewport[]) {
+            {
+                .originX = 0,
+                .originY = 0,
+                .width = t->width,
+                .height = t->height,
+                .minDepth = 0,
+                .maxDepth = 1
             },
-            .pScissors = (VkRect[]) {
-                {{ 0, 0 }, { t->width, t->height }},
-            },
-        }, &t->dynamic_vp_state);
-
-    vkCreateDynamicRasterState(t_device,
-        &(VkDynamicRsStateCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_DYNAMIC_RS_STATE_CREATE_INFO,
-            .pointSize = 1.0,
-            .lineWidth = 1.0,
-        }, &t->dynamic_rs_state);
-
-    vkCreateDynamicColorBlendState(t_device,
-        &(VkDynamicCbStateCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_DYNAMIC_CB_STATE_CREATE_INFO,
-        }, &t->dynamic_cb_state);
-
-    vkCreateDynamicDepthStencilState(t_device,
-        &(VkDynamicDsStateCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_DYNAMIC_DS_STATE_CREATE_INFO,
-            .minDepth = 0.0,
-            .maxDepth = 1.0,
-        }, &t->dynamic_ds_state);
+        },
+        .pScissors = (VkRect[]) {
+            {{ 0, 0 }, { t->width, t->height }},
+        },
+    );
+    t->dynamic_rs_state = qoCreateDynamicRasterState(t_device);
+    t->dynamic_cb_state = qoCreateDynamicColorBlendState(t_device);
+    t->dynamic_ds_state = qoCreateDynamicDepthStencilState(t_device);
 
     vkCreateCommandBuffer(t_device,
         &(VkCmdBufferCreateInfo) {
@@ -930,11 +902,8 @@ cru_test_start_main_thread(void *arg)
             &t->rt_image);
         t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_IMAGE, t_image);
 
-        VkMemoryRequirements rt_mem_reqs;
-        size = sizeof(rt_mem_reqs);
-        vkGetObjectInfo(t_device, VK_OBJECT_TYPE_IMAGE, t_image,
-                        VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                        &size, &rt_mem_reqs);
+        VkMemoryRequirements rt_mem_reqs =
+           qoImageGetMemoryRequirements(t->device, t->rt_image);
 
         VkDeviceMemory rt_mem;
         vkAllocMemory(t_device,
