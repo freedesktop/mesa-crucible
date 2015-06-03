@@ -201,10 +201,6 @@ test(void)
     VkBuffer vertex_buffer;
     VkDeviceMemory mem;
     void *vertex_map;
-    VkDynamicVpState vp_state;
-    VkDynamicRsState rs_state;
-    VkDynamicDsState ds_state;
-    VkDynamicCbState cb_state;
     VkDepthStencilView ds_view;
     VkFramebuffer framebuffer;
     VkRenderPass pass;
@@ -270,44 +266,6 @@ test(void)
 
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_IMAGE,
                             ds, 0, mem, offset);
-
-    vkCreateDynamicViewportState(t_device,
-        &(VkDynamicVpStateCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_DYNAMIC_VP_STATE_CREATE_INFO,
-            .viewportAndScissorCount = 1,
-            .pViewports = (VkViewport[]) {
-                {
-                    .originX = 0,
-                    .originY = 0,
-                    .width = t_width,
-                    .height = t_height,
-                    .minDepth = -1,
-                    .maxDepth = 1
-                },
-            },
-            .pScissors = (VkRect[]) {
-                { {  0,  0 }, { t_width, t_height } },
-            }
-        },
-        &vp_state);
-
-    vkCreateDynamicRasterState(t_device,
-                               &(VkDynamicRsStateCreateInfo) {
-                                   .sType = VK_STRUCTURE_TYPE_DYNAMIC_RS_STATE_CREATE_INFO,
-                               },
-                               &rs_state);
-
-    vkCreateDynamicDepthStencilState(t_device,
-                                     &(VkDynamicDsStateCreateInfo) {
-                                         .sType = VK_STRUCTURE_TYPE_DYNAMIC_DS_STATE_CREATE_INFO,
-                                     },
-                                     &ds_state);
-
-    vkCreateDynamicColorBlendState(t_device,
-                                   &(VkDynamicCbStateCreateInfo) {
-                                       .sType = VK_STRUCTURE_TYPE_DYNAMIC_CB_STATE_CREATE_INFO
-                                   },
-                                   &cb_state);
 
     vkCreateDepthStencilView(t_device,
                              &(VkDepthStencilViewCreateInfo) {
@@ -396,15 +354,6 @@ test(void)
                            (VkDeviceSize[]) { 0, 6 * 4 * sizeof(float) });
 
    vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-
-   vkCmdBindDynamicStateObject(t_cmd_buffer,
-                               VK_STATE_BIND_POINT_VIEWPORT, vp_state);
-   vkCmdBindDynamicStateObject(t_cmd_buffer,
-                               VK_STATE_BIND_POINT_RASTER, rs_state);
-   vkCmdBindDynamicStateObject(t_cmd_buffer,
-                               VK_STATE_BIND_POINT_DEPTH_STENCIL, ds_state);
-   vkCmdBindDynamicStateObject(t_cmd_buffer,
-                               VK_STATE_BIND_POINT_COLOR_BLEND, cb_state);
 
    vkCmdDraw(t_cmd_buffer, 0, 3, 0, 1);
    vkCmdDraw(t_cmd_buffer, 3, 3, 1, 1);
