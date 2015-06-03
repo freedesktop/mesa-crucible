@@ -767,19 +767,6 @@ fail_create_cleanup_stack:
 }
 
 static void *
-t_vk_alloc(void *user_data, size_t size, size_t alignment,
-           VkSystemAllocType type)
-{
-    return xmalloc(size);
-}
-
-static void
-t_vk_free(void* user_data, void* mem)
-{
-    free(mem);
-}
-
-static void *
 cru_test_start_main_thread(void *arg)
 {
     cru_test_t *t = arg;
@@ -796,10 +783,6 @@ cru_test_start_main_thread(void *arg)
     vkCreateInstance(
         &(VkInstanceCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-            .pAllocCb = &(VkAllocCallbacks) {
-                .pfnAlloc = t_vk_alloc,
-                .pfnFree = t_vk_free,
-            },
             .pAppInfo = &(VkApplicationInfo) {
                 .pAppName = "crucible",
                 .apiVersion = 1,
