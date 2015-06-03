@@ -211,32 +211,23 @@ test(void)
     VkFramebuffer framebuffer;
     VkRenderPass pass;
 
-    vkCreateBuffer(t_device,
-                   &(VkBufferCreateInfo) {
-                       .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-                       .size = 4096,
-                       .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
-                           VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                       .flags = 0
-                   },
-                   &buffer);
+    buffer = qoCreateBuffer(t_device, .size = 4096,
+                            .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
+                                     VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 
-    VkMemoryRequirements requirements;
-    size_t size = sizeof(requirements);
-    vkGetObjectInfo(t_device, VK_OBJECT_TYPE_BUFFER, buffer,
-                    VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                    &size, &requirements);
+    VkMemoryRequirements requirements =
+        qoBufferGetMemoryRequirements(t_device, buffer);
 
     vkAllocMemory(t_device,
                   &(VkMemoryAllocInfo) {
                       .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO,
-                      .allocationSize = size,
+                      .allocationSize = requirements.size,
                       .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT,
                       .memPriority = VK_MEMORY_PRIORITY_NORMAL
                   },
                   &mem);
 
-    vkMapMemory(t_device, mem, 0, size, 0, &map);
+    vkMapMemory(t_device, mem, 0, requirements.size, 0, &map);
 
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER,
                             buffer, 0, mem, 0);
