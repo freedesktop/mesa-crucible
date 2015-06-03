@@ -62,6 +62,7 @@ bin_crucible_SOURCES = \
 	src/tests/example/messages.c \
 	src/tests/func/copy/copy-buffer.c \
 	src/tests/func/desc/dynamic.c \
+	src/tests/func/draw_indexed.c \
 	src/tests/func/ds/basic.c \
 	src/tests/func/query/timestamp.c \
 	src/tests/func/first.c \
