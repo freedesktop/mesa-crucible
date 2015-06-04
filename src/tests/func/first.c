@@ -107,24 +107,16 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
         },
     };
 
-    struct cru_GraphicsPipelineCreateInfo cru_info = {
-        .sType = CRU_STRUCTURE_TYPE_PIPELINE_CREATE_INFO,
-        .pNext = &vi_create_info,
-
-        .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
-        .vertex_shader = vs,
-        .fragment_shader = fs,
-    };
-
-    cru_CreateGraphicsPipeline(t_device,
-        &(VkGraphicsPipelineCreateInfo) {
+    *pipeline = qoCreateGraphicsPipeline(t_device,
+        (&(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-            .pNext = &cru_info,
+            .pNext = &vi_create_info,
             .flags = 0,
             .layout = pipeline_layout
-        },
-        pipeline);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_PIPELINE, *pipeline);
+        }),
+        .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+        .vertexShader = vs,
+        .fragmentShader = fs);
 }
 
 static void

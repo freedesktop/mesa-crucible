@@ -87,25 +87,16 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
         },
     };
 
-    struct cru_GraphicsPipelineCreateInfo cru_info = {
-        .sType = CRU_STRUCTURE_TYPE_PIPELINE_CREATE_INFO,
-        .pNext = &vi_create_info,
-
-        .topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST,
-        .vertex_shader = vs,
-        .fragment_shader = fs,
-    };
-
-    VkPipeline pipeline;
-    cru_CreateGraphicsPipeline(t_device,
-        &(VkGraphicsPipelineCreateInfo) {
+    VkPipeline pipeline = qoCreateGraphicsPipeline(t_device,
+        (&(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-            .pNext = &cru_info,
+            .pNext = &vi_create_info,
             .flags = 0,
             .layout = pipeline_layout
-        },
-        &pipeline);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_PIPELINE, pipeline);
+        }),
+        .topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST,
+        .vertexShader = vs,
+        .fragmentShader = fs);
 
     /* Create the UBO and vertex buffer and their associated memory */
     VkBuffer ubo;

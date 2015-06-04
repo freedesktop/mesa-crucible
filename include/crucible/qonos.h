@@ -214,11 +214,29 @@ VkDynamicDsStateCreateInfo qoCreateDynamicDepthStencilState(VkDevice dev, ...);
         })
 #endif
 
+#ifdef DOXYGEN
+VkPipeline qoCreateGraphicsPipeline(VkDevice dev, const VkGraphicsPipelineCreateInfo *pCreateInfo, ...);
+#else
+#define qoCreateGraphicsPipeline(dev, pCreateInfo, ...) \
+    __qoCreateGraphicsPipeline(dev, pCreateInfo, \
+        &(struct __qoCreateGraphicsPipeline_extra) { \
+            .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, \
+            ##__VA_ARGS__, \
+        })
+#endif
+
+struct __qoCreateGraphicsPipeline_extra {
+    VkPrimitiveTopology topology;
+    VkShader vertexShader;
+    VkShader fragmentShader;
+};
+
 VkBuffer __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info);
 VkDynamicVpState __qoCreateDynamicViewportState(VkDevice dev, const VkDynamicVpStateCreateInfo *info);
 VkDynamicRsState __qoCreateDynamicRasterState(VkDevice dev, const VkDynamicRsStateCreateInfo *info);
 VkDynamicCbState __qoCreateDynamicColorBlendState(VkDevice dev, const VkDynamicCbStateCreateInfo *info);
 VkDynamicDsState __qoCreateDynamicDepthStencilState(VkDevice dev, const VkDynamicDsStateCreateInfo *info);
+VkPipeline __qoCreateGraphicsPipeline(VkDevice dev, const VkGraphicsPipelineCreateInfo *info, const struct __qoCreateGraphicsPipeline_extra *extra);
 
 #ifdef __cplusplus
 }

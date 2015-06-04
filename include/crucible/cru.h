@@ -30,7 +30,6 @@
 #include <crucible/cru_refcount.h>
 #include <crucible/cru_slist.h>
 #include <crucible/cru_test.h>
-#include <crucible/cru_vk_helpers.h>
 #include <crucible/qonos.h>
 #include <crucible/string.h>
 #include <crucible/xalloc.h>
