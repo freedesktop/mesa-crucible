@@ -235,16 +235,8 @@ test(void)
 
     printf("mem size %ld\n", mem_size);
 
-    vkAllocMemory(t_device,
-                  &(VkMemoryAllocInfo) {
-                      .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO,
-                      .allocationSize = mem_size,
-                      .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT,
-                      .memPriority = VK_MEMORY_PRIORITY_NORMAL
-                  },
-                  &mem);
-
-    vkMapMemory(t_device, mem, 0, mem_size, 0, &vertex_map);
+    mem = qoAllocMemory(t_device, .allocationSize = mem_size);
+    vertex_map = qoMapMemory(t_device, mem, 0, mem_size, 0);
     memset(vertex_map, 0, mem_size);
 
     uint32_t offset = 0;

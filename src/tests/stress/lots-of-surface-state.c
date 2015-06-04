@@ -115,18 +115,8 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
 
     size_t mem_size = ubo_reqs.size + vbo_reqs.size;
 
-    VkDeviceMemory mem;
-    vkAllocMemory(t_device,
-        &(VkMemoryAllocInfo) {
-            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO,
-            .allocationSize = mem_size,
-            .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT,
-            .memPriority = VK_MEMORY_PRIORITY_NORMAL,
-        },
-        &mem);
-
-    void *map;
-    vkMapMemory(t_device, mem, 0, mem_size, 0, &map);
+    VkDeviceMemory mem = qoAllocMemory(t_device, .allocationSize = mem_size);
+    void *map = qoMapMemory(t_device, mem, 0, mem_size, 0);
 
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER, ubo,
                             /*index*/ 0, mem, 0);
@@ -134,8 +124,6 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER, vbo,
                             /*index*/ 0, mem, ubo_reqs.size);
     float *vbo_map = map + ubo_reqs.size;
-
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DEVICE_MEMORY, mem);
 
     /* Fill the VBO with 2D coordinates. One per pixel in a 32x32 image */
     for (int x = 0; x < 32; x++) {

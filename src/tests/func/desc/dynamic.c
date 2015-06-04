@@ -222,18 +222,9 @@ test(void)
     VkMemoryRequirements buffer_reqs =
        qoBufferGetMemoryRequirements(t_device, buffer);
 
-    VkDeviceMemory mem;
-    vkAllocMemory(t_device,
-        &(VkMemoryAllocInfo) {
-            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO,
-            .allocationSize = buffer_reqs.size,
-            .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT,
-            .memPriority = VK_MEMORY_PRIORITY_NORMAL,
-        },
-        &mem);
-
-    void *map;
-    vkMapMemory(t_device, mem, 0, 4096, 0, &map);
+    VkDeviceMemory mem = qoAllocMemory(t_device,
+                                       .allocationSize = buffer_reqs.size);
+    void *map = qoMapMemory(t_device, mem, 0, 4096, 0);
     memset(map, 192, 4096);
 
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER, buffer,

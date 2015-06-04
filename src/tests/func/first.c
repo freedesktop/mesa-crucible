@@ -199,18 +199,8 @@ test(void)
 
     size_t mem_size = ib_reqs.size + 2048 + 16 * 16 * 4;
 
-    VkDeviceMemory mem;
-    vkAllocMemory(t_device,
-        &(VkMemoryAllocInfo) {
-            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO,
-            .allocationSize = mem_size,
-            .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT,
-            .memPriority = VK_MEMORY_PRIORITY_NORMAL,
-        },
-        &mem);
-
-    void *map;
-    vkMapMemory(t_device, mem, 0, mem_size, 0, &map);
+    VkDeviceMemory mem = qoAllocMemory(t_device, .allocationSize = mem_size);
+    void *map = qoMapMemory(t_device, mem, 0, mem_size, 0);
     memset(map, 192, mem_size);
 
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER, buffer,

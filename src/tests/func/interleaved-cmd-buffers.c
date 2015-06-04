@@ -79,19 +79,9 @@ setup_src(struct src *src)
     VkMemoryRequirements mem_reqs =
        qoImageGetMemoryRequirements(t_device, image);
 
-    VkDeviceMemory mem;
-    vkAllocMemory(t_device,
-        &(VkMemoryAllocInfo) {
-            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO,
-            .allocationSize = mem_reqs.size,
-            .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT,
-            .memPriority = VK_MEMORY_PRIORITY_NORMAL,
-        },
-        &mem);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DEVICE_MEMORY, mem);
-
-    void *vk_map;
-    vkMapMemory(t_device, mem, 0, mem_reqs.size, 0, &vk_map);
+    VkDeviceMemory mem = qoAllocMemory(t_device,
+                                       .allocationSize = mem_reqs.size);
+    void *vk_map = qoMapMemory(t_device, mem, 0, mem_reqs.size, 0);
 
     // Copy refeference image into the Vulkan image.
     void *ref_map = cru_image_map(t_ref_image(), CRU_IMAGE_MAP_ACCESS_READ);
@@ -131,18 +121,9 @@ setup_dest(struct dest *dest)
     VkMemoryRequirements mem_reqs =
        qoBufferGetMemoryRequirements(t_device, buffer);
 
-    VkDeviceMemory mem;
-    vkAllocMemory(t_device,
-        &(VkMemoryAllocInfo) {
-            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO,
-            .allocationSize = mem_reqs.size,
-            .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT,
-            .memPriority = VK_MEMORY_PRIORITY_NORMAL,
-        },
-        &mem);
-
-    void *map;
-    vkMapMemory(t_device, mem, 0, mem_reqs.size, 0, &map);
+    VkDeviceMemory mem = qoAllocMemory(t_device,
+                                       .allocationSize = mem_reqs.size);
+    void *map = qoMapMemory(t_device, mem, 0, mem_reqs.size, 0);
 
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER, buffer,
                             /*index*/ 0, mem, 0);

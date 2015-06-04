@@ -37,17 +37,8 @@ test_large_copy(void)
 
     const int memory_size = buffer_requirements.size * 2;
 
-    VkDeviceMemory mem;
-    vkAllocMemory(t_device,
-        &(VkMemoryAllocInfo) {
-            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO,
-            .allocationSize = memory_size,
-            .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT,
-            .memPriority = VK_MEMORY_PRIORITY_NORMAL
-        }, &mem);
-
-    void *map;
-    vkMapMemory(t_device, mem, 0, buffer_requirements.size * 2, 0, &map);
+    VkDeviceMemory mem = qoAllocMemory(t_device, .allocationSize = memory_size);
+    void *map = qoMapMemory(t_device, mem, 0, buffer_requirements.size * 2, 0);
 
     // Fill the first buffer_size of the memory with a pattern
     uint32_t *map32 = map;
@@ -133,9 +124,6 @@ test_large_copy(void)
                   "buffer mismatch at dword %d: found 0x%x, "
                   "expected 0x%x", i, map32_2[i], map32[i]);
     }
-
-    vkUnmapMemory(t_device, mem);
-    vkFreeMemory(t_device, mem);
 }
 
 cru_define_test {

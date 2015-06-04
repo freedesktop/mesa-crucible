@@ -218,16 +218,8 @@ test(void)
     VkMemoryRequirements requirements =
         qoBufferGetMemoryRequirements(t_device, buffer);
 
-    vkAllocMemory(t_device,
-                  &(VkMemoryAllocInfo) {
-                      .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO,
-                      .allocationSize = requirements.size,
-                      .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT,
-                      .memPriority = VK_MEMORY_PRIORITY_NORMAL
-                  },
-                  &mem);
-
-    vkMapMemory(t_device, mem, 0, requirements.size, 0, &map);
+    mem = qoAllocMemory(t_device, .allocationSize = requirements.size);
+    map = qoMapMemory(t_device, mem, 0, requirements.size, 0);
 
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER,
                             buffer, 0, mem, 0);

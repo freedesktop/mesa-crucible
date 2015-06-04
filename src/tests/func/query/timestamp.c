@@ -33,17 +33,9 @@ get_timestamp(void)
        qoBufferGetMemoryRequirements(t_device, buffer);
 
     VkDeviceMemory mem;
-    vkAllocMemory(t_device,
-                  &(VkMemoryAllocInfo) {
-                      .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO,
-                          .allocationSize = buffer_requirements.size,
-                          .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT,
-                          .memPriority = VK_MEMORY_PRIORITY_NORMAL
-                          },
-                  &mem);
+    mem = qoAllocMemory(t_device, .allocationSize = buffer_requirements.size);
 
-    void *map;
-    vkMapMemory(t_device, mem, 0, buffer_requirements.size, 0, &map);
+    void *map = qoMapMemory(t_device, mem, 0, buffer_requirements.size, 0);
     memset(map, 0x11, buffer_requirements.size);
 
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER,
@@ -83,7 +75,6 @@ get_timestamp(void)
     retval = results[0];
 
     vkUnmapMemory(t_device, mem);
-    vkFreeMemory(t_device, mem);
 
     return retval;
 }
