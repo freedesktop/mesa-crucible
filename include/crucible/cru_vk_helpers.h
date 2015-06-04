@@ -21,42 +21,8 @@
 
 #pragma once
 
-#include <crucible/vk_wrapper.h>
 #include <stdbool.h>
-
-#define CRU_DEFAULT_PIPELINE_IA_STATE_CREATE_INFO               \
-    .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO,   \
-    .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,            \
-    .disableVertexReuse = false,                                \
-    .primitiveRestartEnable = false,                            \
-    .primitiveRestartIndex = 0
-
-#define CRU_DEFAULT_PIPELINE_RS_STATE_CREATE_INFO               \
-    .sType = VK_STRUCTURE_TYPE_PIPELINE_RS_STATE_CREATE_INFO,   \
-    .depthClipEnable = false,                                   \
-    .rasterizerDiscardEnable = false,                           \
-    .fillMode = VK_FILL_MODE_SOLID,                             \
-    .cullMode = VK_CULL_MODE_NONE,                              \
-    .frontFace = VK_FRONT_FACE_CCW
-
-#define CRU_DEFAULT_PIPELINE_MS_STATE_CREATE_INFO               \
-    .sType = VK_STRUCTURE_TYPE_PIPELINE_MS_STATE_CREATE_INFO,   \
-    .samples = 1,                                               \
-    .multisampleEnable = false,                                 \
-    .sampleMask = 0xffffffff
-
-#define CRU_DEFAULT_PIPELINE_CB_ATTACHMENT_STATE                \
-    .blendEnable = false,                                       \
-    .format = VK_FORMAT_R8G8B8A8_UNORM,                         \
-    .channelWriteMask = (VK_CHANNEL_R_BIT | VK_CHANNEL_G_BIT |  \
-                         VK_CHANNEL_B_BIT | VK_CHANNEL_A_BIT)
-
-#define CRU_DEFAULT_PIPELINE_CB_STATE_CREATE_INFO               \
-    .sType = VK_STRUCTURE_TYPE_PIPELINE_CB_STATE_CREATE_INFO,   \
-    .attachmentCount = 1,                                       \
-    .pAttachments = (VkPipelineCbAttachmentState []) {          \
-       { CRU_DEFAULT_PIPELINE_CB_ATTACHMENT_STATE },            \
-    }
+#include <crucible/qonos.h>
 
 #define CRU_STRUCTURE_TYPE_PIPELINE_CREATE_INFO 107684
 

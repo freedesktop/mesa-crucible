@@ -67,7 +67,7 @@ cru_CreateGraphicsPipeline(VkDevice device,
 
     if (!find_struct_in_chain(pCreateInfo, PIPELINE_IA_STATE_CREATE_INFO)) {
         ia_info = (VkPipelineIaStateCreateInfo) {
-            CRU_DEFAULT_PIPELINE_IA_STATE_CREATE_INFO,
+            QO_PIPELINE_IA_STATE_CREATE_INFO_DEFAULTS,
             .pNext = pipeline_info.pNext,
         };
         if (cru_info)
@@ -77,7 +77,7 @@ cru_CreateGraphicsPipeline(VkDevice device,
 
     if (!find_struct_in_chain(pCreateInfo, PIPELINE_RS_STATE_CREATE_INFO)) {
         rs_info = (VkPipelineRsStateCreateInfo) {
-            CRU_DEFAULT_PIPELINE_RS_STATE_CREATE_INFO,
+            QO_PIPELINE_RS_STATE_CREATE_INFO_DEFAULTS,
             .pNext = pipeline_info.pNext,
         };
         pipeline_info.pNext = &rs_info;
@@ -85,7 +85,7 @@ cru_CreateGraphicsPipeline(VkDevice device,
 
     if (!find_struct_in_chain(pCreateInfo, PIPELINE_MS_STATE_CREATE_INFO)) {
         ms_info = (VkPipelineMsStateCreateInfo) {
-            CRU_DEFAULT_PIPELINE_MS_STATE_CREATE_INFO,
+            QO_PIPELINE_MS_STATE_CREATE_INFO_DEFAULTS,
             .pNext = pipeline_info.pNext,
         };
         pipeline_info.pNext = &ms_info;
@@ -93,7 +93,7 @@ cru_CreateGraphicsPipeline(VkDevice device,
 
     if (!find_struct_in_chain(pCreateInfo, PIPELINE_CB_STATE_CREATE_INFO)) {
         cb_info = (VkPipelineCbStateCreateInfo) {
-            CRU_DEFAULT_PIPELINE_CB_STATE_CREATE_INFO,
+            QO_PIPELINE_CB_STATE_CREATE_INFO_DEFAULTS,
             .pNext = pipeline_info.pNext,
         };
         pipeline_info.pNext = &cb_info;
