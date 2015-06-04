@@ -222,14 +222,17 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
         case CRU_CLEANUP_CMD_VK_INSTANCE: {
             CMD_GET(struct cmd_vk_instance);
             vkDestroyInstance(cmd->instance);
+            break;
         }
         case CRU_CLEANUP_CMD_VK_DEVICE: {
             CMD_GET(struct cmd_vk_device);
             vkDestroyDevice(cmd->device);
+            break;
         }
         case CRU_CLEANUP_CMD_VK_OBJECT: {
             CMD_GET(struct cmd_vk_object);
             vkDestroyObject(cmd->device, cmd->obj_type, cmd->obj);
+            break;
         }
     }
 
