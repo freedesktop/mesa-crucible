@@ -205,14 +205,8 @@ test(void)
     VkFramebuffer framebuffer;
     VkRenderPass pass;
 
-    vkCreateBuffer(t_device,
-                   &(VkBufferCreateInfo) {
-                       .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-                       .size = 4096,
-                       .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                       .flags = 0
-                   },
-                   &vertex_buffer);
+    vertex_buffer = qoCreateBuffer(t_device, .size = 4096,
+                                   .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
     vkCreateImage(t_device,
                   &(VkImageCreateInfo) {

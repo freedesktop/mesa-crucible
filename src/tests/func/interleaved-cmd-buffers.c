@@ -125,16 +125,8 @@ setup_dest(struct dest *dest)
             .flags = 0,
         });
 
-    VkBuffer buffer;
-    vkCreateBuffer(t_device,
-        &(VkBufferCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-            .size = 4 * t_width * t_height,
-            .usage = VK_BUFFER_USAGE_GENERAL,
-            .flags = 0
-            },
-        &buffer);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_BUFFER, buffer);
+    VkBuffer buffer = qoCreateBuffer(t_device, .size = 4 * t_width * t_height,
+                                     .usage = VK_BUFFER_USAGE_GENERAL);
 
     VkMemoryRequirements mem_reqs =
        qoBufferGetMemoryRequirements(t_device, buffer);

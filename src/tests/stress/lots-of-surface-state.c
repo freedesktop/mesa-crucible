@@ -99,28 +99,16 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
         .fragmentShader = fs);
 
     /* Create the UBO and vertex buffer and their associated memory */
-    VkBuffer ubo;
-    vkCreateBuffer(t_device,
-        &(VkBufferCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-            .size = 1024 * 3 * sizeof(float),
-            .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            .flags = 0
-        },
-        &ubo);
+    VkBuffer ubo =
+        qoCreateBuffer(t_device, .size = 1024 * 3 * sizeof(float),
+                       .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 
     VkMemoryRequirements ubo_reqs =
        qoBufferGetMemoryRequirements(t_device, ubo);
 
-    VkBuffer vbo;
-    vkCreateBuffer(t_device,
-        &(VkBufferCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-            .size = 32 * 32 * 2 * sizeof(float),
-            .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-            .flags = 0,
-        },
-        &vbo);
+    VkBuffer vbo =
+        qoCreateBuffer(t_device, .size = 32 * 32 * 2 * sizeof(float),
+                       .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
     VkMemoryRequirements vbo_reqs =
        qoBufferGetMemoryRequirements(t_device, vbo);
@@ -147,8 +135,6 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
                             /*index*/ 0, mem, ubo_reqs.size);
     float *vbo_map = map + ubo_reqs.size;
 
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_BUFFER, ubo);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_BUFFER, vbo);
     t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DEVICE_MEMORY, mem);
 
     /* Fill the VBO with 2D coordinates. One per pixel in a 32x32 image */

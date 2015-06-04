@@ -183,36 +183,16 @@ test(void)
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           2, set_layout, set, &set_count);
 
-    VkBuffer buffer;
-    vkCreateBuffer(t_device,
-        &(VkBufferCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-            .size = 1024,
-            .usage = VK_BUFFER_USAGE_GENERAL,
-            .flags = 0
-            },
-        &buffer);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_BUFFER, buffer);
+    VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024,
+                                     .usage = VK_BUFFER_USAGE_GENERAL);
 
-    VkBuffer vertex_buffer;
-    vkCreateBuffer(t_device,
-        &(VkBufferCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-            .size = 1024,
-            .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-            .flags = 0,
-        },
-        &vertex_buffer);
+    VkBuffer vertex_buffer =
+        qoCreateBuffer(t_device, .size = 1024,
+                       .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
-    VkBuffer image_buffer;
-    vkCreateBuffer(t_device,
-        &(VkBufferCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-            .size = 4 * t_width * t_height,
-            .usage = VK_BUFFER_USAGE_TRANSFER_DESTINATION_BIT,
-            .flags = 0
-        },
-        &image_buffer);
+    VkBuffer image_buffer =
+        qoCreateBuffer(t_device, .size = 4 * t_width * t_height,
+                       .usage = VK_BUFFER_USAGE_TRANSFER_DESTINATION_BIT);
 
     VkMemoryRequirements ib_reqs =
         qoBufferGetMemoryRequirements(t_device, image_buffer);

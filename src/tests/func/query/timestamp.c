@@ -26,15 +26,8 @@
 static uint64_t
 get_timestamp(void)
 {
-    VkBuffer buffer;
-    vkCreateBuffer(t_device,
-                   &(VkBufferCreateInfo) {
-                       .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-                           .size = 1024,
-                           .usage = VK_BUFFER_USAGE_GENERAL,
-                           .flags = 0
-                           },
-                   &buffer);
+    VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024,
+                                     .usage = VK_BUFFER_USAGE_GENERAL);
 
     VkMemoryRequirements buffer_requirements =
        qoBufferGetMemoryRequirements(t_device, buffer);
@@ -82,7 +75,6 @@ get_timestamp(void)
 
     vkQueueWaitIdle(t_queue);
 
-    vkDestroyObject(t_device, VK_OBJECT_TYPE_BUFFER, buffer);
     vkDestroyObject(t_device, VK_OBJECT_TYPE_COMMAND_BUFFER, cmdBuffer);
 
     uint64_t *results = map, retval;
