@@ -197,10 +197,7 @@ cru_test_create(const cru_test_def_t *def)
     t->result = CRU_TEST_RESULT_PASS;
     t->ref_image_filename = STRING_INIT;
     t->no_dump = true;
-
-    // Disable the cleanup handlers because they consitently crash Mesa.
-    // TODO: Enable cleanup after Mesa is fixed.
-    t->no_cleanup = true;
+    t->no_cleanup = false;
 
     if (t->def->samples > 0) {
         cru_loge("%s: multisample tests not yet supported", t->def->name);
