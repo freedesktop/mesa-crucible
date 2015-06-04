@@ -69,6 +69,11 @@ struct cmd_vk_device {
     VkDevice device;
 };
 
+struct cmd_vk_device_memory {
+    VkDevice device;
+    VkDeviceMemory device_memory;
+};
+
 struct cmd_vk_instance {
    VkInstance instance;
 };
@@ -167,6 +172,18 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
             CMD_SET(device);
             break;
         }
+        case CRU_CLEANUP_CMD_VK_DEVICE_MEMORY: {
+            CMD_CREATE(struct cmd_vk_device_memory);
+            CMD_SET(device);
+            CMD_SET(device_memory);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_MEMORY_MAP: {
+            CMD_CREATE(struct cmd_vk_device_memory);
+            CMD_SET(device);
+            CMD_SET(device_memory);
+            break;
+        }
         case CRU_CLEANUP_CMD_VK_OBJECT: {
             CMD_CREATE(struct cmd_vk_object);
             CMD_SET(device);
@@ -227,6 +244,16 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
         case CRU_CLEANUP_CMD_VK_DEVICE: {
             CMD_GET(struct cmd_vk_device);
             vkDestroyDevice(cmd->device);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_DEVICE_MEMORY: {
+            CMD_GET(struct cmd_vk_device_memory);
+            vkFreeMemory(cmd->device, cmd->device_memory);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_MEMORY_MAP: {
+            CMD_GET(struct cmd_vk_device_memory);
+            vkUnmapMemory(cmd->device, cmd->device_memory);
             break;
         }
         case CRU_CLEANUP_CMD_VK_OBJECT: {

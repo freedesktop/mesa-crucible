@@ -41,6 +41,8 @@ enum cru_cleanup_cmd {
     CRU_CLEANUP_CMD_CRU_IMAGE,
     CRU_CLEANUP_CMD_VK_INSTANCE,
     CRU_CLEANUP_CMD_VK_DEVICE,
+    CRU_CLEANUP_CMD_VK_DEVICE_MEMORY,
+    CRU_CLEANUP_CMD_VK_MEMORY_MAP,
     CRU_CLEANUP_CMD_VK_OBJECT,
 };
 
@@ -70,6 +72,8 @@ static inline void cru_cleanup_push_cru_cleanup_stack(cru_cleanup_stack_t *c, cr
 static inline void cru_cleanup_push_cru_image(cru_cleanup_stack_t *c, cru_image_t *x)                                           { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_CRU_IMAGE, x); }
 static inline void cru_cleanup_push_vk_instance(cru_cleanup_stack_t *c, VkInstance x)                                           { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_INSTANCE, x); }
 static inline void cru_cleanup_push_vk_device(cru_cleanup_stack_t *c, VkDevice x)                                               { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DEVICE, x); }
+static inline void cru_cleanup_push_vk_device_memory(cru_cleanup_stack_t *c, VkDevice d, VkDeviceMemory m)                      { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DEVICE_MEMORY, d, m); }
+static inline void cru_cleanup_push_vk_memory_map(cru_cleanup_stack_t *c, VkDevice d, VkDeviceMemory m)                         { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_MEMORY_MAP, d, m); }
 static inline void cru_cleanup_push_vk_object(cru_cleanup_stack_t *c, VkDevice dev, VkObjectType obj_type, VkObject obj)        { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_OBJECT, dev, obj_type, obj); }
 
 #ifdef __cplusplus
