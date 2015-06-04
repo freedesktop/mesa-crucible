@@ -32,21 +32,31 @@
 /// struct parameter of type VkFooCreateInfo, then in the signature of its
 /// Qonos wrapper, qoCreateFoo(), the struct is expanded to inline named
 /// parameters. The wrapper assigns a sensible default value to each named
-/// parameter.
-///
-/// To provide finer control of vkCreateFoo's wrapping, Qonos defines two
-/// additional functions: qoCreateFooS() and qoFooCreateInfo(). Unlike
-/// qoCreateFoo(), the signature of qoCreateFooS() contains the info struct
-/// parameter. Function qoFooCreateInfo() creates the info struct, populated
-/// with the same default values as qoCreateFoo().
+/// parameter. The default values are defined by macro
+/// QO_FOO_CREATE_INFO_DEFAULTS.
 ///
 /// For example, the following are approximately equivalent:
 ///
 ///     // Example 1
-///     //
+///     // Create state using qoCreateDynamicDepthStencilState. We need only
+///     // set a named parameter if it deviates from its default value.
+///     VkDynamicDsState state =
+///         qoCreateDynamicDepthStencilState(device, .stencilWriteMask = 0x17);
+///
+///     // Example 2:
+///     // Create state using vkCreateDynamicDepthStencilState, but use
+///     // QO_DYNAMIC_DS_STATE_CREATE_INFO_DEFAULTS to set sensible defaults.
+///     VkDynamicDsState state;
+///     VkDynamicDsStateCreateInfo info = {
+///         QO_DYNAMIC_DS_STATE_CREATE_INFO_DEFAULTS,
+///         .stencilWriteMask = 0x17,
+///     };
+///     vkCreateDynamicDepthStencilState(device, &info, &state);
+///
+///     // Example 3:
 ///     // Create state using the raw Vulkan API.
-///     VkDynamicDsState state1;
-///     VkDynamicDsStateCreateInfo info1 = {
+///     VkDynamicDsState state;
+///     VkDynamicDsStateCreateInfo info = {
 ///             .sType = VK_STRUCTURE_TYPE_DYNAMIC_DS_STATE_CREATE_INFO,
 ///             .minDepth = 0.0f,           // OpenGL default
 ///             .maxDepth = 1.0f,           // OpenGL default
@@ -55,23 +65,24 @@
 ///             .stencilFrontRef = 0,       // OpenGL default
 ///             .stencilBackRef = 0,        // OpenGL default
 ///     };
-///     vkCreateDynamicDepthStencilState(device, &info1, &state1);
+///     vkCreateDynamicDepthStencilState(device, &info, &state);
 ///
-///     // Example 2
-///     //
-///     // Create state using qoCreateDynamicDepthStencilState. We need only
-///     // set a named parameter if it deviates from its default value.
-///     VkDynamicDsState state2 =
-///         qoCreateDynamicDepthStencilState(device, .stencilWriteMask = 0x17);
 ///
-///     // Example 3
-///     //
-///     // Create state using functions qoDynamicDsStateCreateInfo and
-///     // qoCreateDynamicDepthStencilStateS. As for
-///     // qoCreateDynamicDepthStencilState, we need only set a named parameter if
-///     // it deviates from its default value.
-///     VkDynamicDsStateCreateInfo info3 = qoDynamicDsStateCreateInfo(.stencilWriteMask = 0x17);
-///     VkDynamicDsState state3 = qoCreateDynamicDepthStencilStateS(device, &info3);
+/// \section Implementation Details: Trailing commas
+///
+/// A syntax error occurs if a comma follows the last argument of a function call.
+/// For example:
+///
+///     ok:     printf("%d + %d == %d\n", 1, 2, 3);
+///     error:  printf("%d + %d == %d\n", 1, 2, 3,);
+///
+/// Observe that the definitions of the variadic function macros in this header
+/// expand `...` to `##__VA_ARGS,`. The trailing comma is significant.  It
+/// ensures that, just as for real function calls, a syntax error occurs if
+/// a comma follows the last argument passed to the macro.
+///
+///     ok:     qoCreateBuffer(dev, .size=4096);
+///     error:  qoCreateBuffer(dev, .size=4096,);
 
 #pragma once
 
@@ -81,84 +92,99 @@
 extern "C" {
 #endif
 
+#define QO_BUFFER_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO
+
+#define QO_DYNAMIC_VP_STATE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_DYNAMIC_VP_STATE_CREATE_INFO, \
+    .viewportAndScissorCount = 0
+
+#define QO_DYNAMIC_RS_STATE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_DYNAMIC_RS_STATE_CREATE_INFO, \
+    .depthBias = 0.0f, \
+    .depthBiasClamp = 0.0f, \
+    .slopeScaledDepthBias = 0.0f, \
+    .pointSize = 1.0f, \
+    .pointFadeThreshold = 1.0f, \
+    .lineWidth = 1.0f
+
+#define QO_DYNAMIC_CB_STATE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_DYNAMIC_CB_STATE_CREATE_INFO, \
+    .blendConst = {0.0f, 0.0f, 0.0f, 0.0f} /* default in OpenGL ES 3.1 */
+
+#define QO_DYNAMIC_DS_STATE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_DYNAMIC_DS_STATE_CREATE_INFO, \
+    .minDepth = 0.0f,       /* default in OpenGL ES 3.1 */ \
+    .maxDepth = 1.0f,       /* default in OpenGL ES 3.1 */ \
+    .stencilReadMask = ~0,  /* default in OpenGL ES 3.1 */ \
+    .stencilWriteMask = ~0, /* default in OpenGL ES 3.1 */ \
+    .stencilFrontRef = 0,   /* default in OpenGL ES 3.1 */ \
+    .stencilBackRef = 0     /* default in OpenGL ES 3.1 */
+
 VkMemoryRequirements qoObjectGetMemoryRequirements(VkDevice dev, VkObjectType obj_type, VkObject obj);
 VkMemoryRequirements qoBufferGetMemoryRequirements(VkDevice dev, VkBuffer buffer);
 VkMemoryRequirements qoImageGetMemoryRequirements(VkDevice dev, VkImage image);
-VkBuffer qoCreateBufferS(VkDevice dev, const VkBufferCreateInfo *info);
-VkDynamicVpState qoCreateDynamicViewportStateS(VkDevice dev, const VkDynamicVpStateCreateInfo *info);
-VkDynamicRsState qoCreateDynamicRasterStateS(VkDevice dev, const VkDynamicRsStateCreateInfo *info);
-VkDynamicCbState qoCreateDynamicColorBlendStateS(VkDevice dev, const VkDynamicCbStateCreateInfo *info);
-VkDynamicDsState qoCreateDynamicDepthStencilStateS(VkDevice dev, const VkDynamicDsStateCreateInfo *info);
-
-#define qoCreateBuffer(dev, ...) qoCreateBufferS(dev, &qoBufferCreateInfo(__VA_ARGS__))
-#define qoCreateDynamicViewportState(dev, ...) qoCreateDynamicViewportStateS(dev, &qoDynamicVpStateCreateInfo(__VA_ARGS__))
-#define qoCreateDynamicRasterState(dev, ...) qoCreateDynamicRasterStateS(dev, &qoDynamicRsStateCreateInfo(__VA_ARGS__))
-#define qoCreateDynamicColorBlendState(dev, ...) qoCreateDynamicColorBlendStateS(dev, &qoDynamicCbStateCreateInfo(__VA_ARGS__))
-#define qoCreateDynamicDepthStencilState(dev, ...) qoCreateDynamicDepthStencilStateS(dev, &qoDynamicDsStateCreateInfo(__VA_ARGS__))
 
 #ifdef DOXYGEN
-VkBufferCreateInfo qoBufferCreateInfo(...);
+VkBuffer qoCreateBuffer(VkDevice dev, ...);
 #else
-#define qoBufferCreateInfo(...) \
-  ((VkBufferCreateInfo) { \
-            .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO, \
-            __VA_ARGS__  \
-  })
+#define qoCreateBuffer(dev, ...) \
+    __qoCreateBuffer(dev, \
+        &(VkBufferCreateInfo) { \
+            QO_BUFFER_CREATE_INFO_DEFAULTS, \
+            ##__VA_ARGS__ , \
+        })
 #endif
 
 #ifdef DOXYGEN
-VkDynamicVpStateCreateInfo qoDynamicVpStateCreateInfo(...);
+VkDynamicVpStateCreateInfo qoCreateDynamicVpState(VkDevice dev, ...);
 #else
-#define qoDynamicVpStateCreateInfo(...) \
-    ((VkDynamicVpStateCreateInfo) { \
-        .sType = VK_STRUCTURE_TYPE_DYNAMIC_VP_STATE_CREATE_INFO, \
-        .viewportAndScissorCount = 0, \
-        __VA_ARGS__ \
-     })
+#define qoCreateDynamicViewportState(dev, ...) \
+    __qoCreateDynamicViewportState(dev, \
+        &(VkDynamicVpStateCreateInfo) { \
+            QO_DYNAMIC_VP_STATE_CREATE_INFO_DEFAULTS, \
+            ##__VA_ARGS__, \
+        })
 #endif
 
 #ifdef DOXYGEN
-VkDynamicRsStateCreateInfo qoDynamicRsStateCreateInfo(...);
+VkDynamicRsStateCreateInfo qoCreateDynamicRasterState(VkDevice dev, ...);
 #else
-#define qoDynamicRsStateCreateInfo(...) \
-    ((VkDynamicRsStateCreateInfo) { \
-        .sType = VK_STRUCTURE_TYPE_DYNAMIC_RS_STATE_CREATE_INFO, \
-        .depthBias = 0.0f, \
-        .depthBiasClamp = 0.0f, \
-        .slopeScaledDepthBias = 0.0f, \
-        .pointSize = 1.0f, \
-        .pointFadeThreshold = 1.0f, \
-        .lineWidth = 1.0f, \
-        __VA_ARGS__ \
-     })
+#define qoCreateDynamicRasterState(dev, ...) \
+    __qoCreateDynamicRasterState(dev, \
+        &(VkDynamicRsStateCreateInfo) { \
+            QO_DYNAMIC_RS_STATE_CREATE_INFO_DEFAULTS, \
+            ##__VA_ARGS__, \
+        })
 #endif
 
 #ifdef DOXYGEN
-VkDynamicCbStateCreateInfo qoDynamicCbStateCreateInfo(...);
+VkDynamicCbStateCreateInfo qoCreateDynamicColorBlendState(VkDevice dev, ...);
 #else
-#define qoDynamicCbStateCreateInfo(...) \
-    ((VkDynamicCbStateCreateInfo) { \
-        .sType = VK_STRUCTURE_TYPE_DYNAMIC_CB_STATE_CREATE_INFO, \
-        .blendConst = {0.0f, 0.0f, 0.0f, 0.0f}, /* default in OpenGL ES 3.1 */ \
-        __VA_ARGS__ \
-     })
+#define qoCreateDynamicColorBlendState(dev, ...) \
+    __qoCreateDynamicColorBlendState(dev, \
+        &(VkDynamicCbStateCreateInfo) { \
+            QO_DYNAMIC_CB_STATE_CREATE_INFO_DEFAULTS, \
+            ##__VA_ARGS__, \
+        })
 #endif
 
 #ifdef DOXYGEN
-VkDynamicDsStateCreateInfo qoDynamicDsStateCreateInfo(...);
+VkDynamicDsStateCreateInfo qoCreateDynamicDepthStencilState(VkDevice dev, ...);
 #else
-#define qoDynamicDsStateCreateInfo(...) \
-    ((VkDynamicDsStateCreateInfo) { \
-        .sType = VK_STRUCTURE_TYPE_DYNAMIC_DS_STATE_CREATE_INFO, \
-        .minDepth = 0.0f,       /* default in OpenGL ES 3.1 */ \
-        .maxDepth = 1.0f,       /* default in OpenGL ES 3.1 */ \
-        .stencilReadMask = ~0,  /* default in OpenGL ES 3.1 */ \
-        .stencilWriteMask = ~0, /* default in OpenGL ES 3.1 */ \
-        .stencilFrontRef = 0,   /* default in OpenGL ES 3.1 */ \
-        .stencilBackRef = 0,    /* default in OpenGL ES 3.1 */ \
-        __VA_ARGS__ \
-     })
+#define qoCreateDynamicDepthStencilState(dev, ...) \
+    __qoCreateDynamicDepthStencilState(dev, \
+        &(VkDynamicDsStateCreateInfo) { \
+            QO_DYNAMIC_DS_STATE_CREATE_INFO_DEFAULTS, \
+            ##__VA_ARGS__, \
+        })
 #endif
+
+VkBuffer __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info);
+VkDynamicVpState __qoCreateDynamicViewportState(VkDevice dev, const VkDynamicVpStateCreateInfo *info);
+VkDynamicRsState __qoCreateDynamicRasterState(VkDevice dev, const VkDynamicRsStateCreateInfo *info);
+VkDynamicCbState __qoCreateDynamicColorBlendState(VkDevice dev, const VkDynamicCbStateCreateInfo *info);
+VkDynamicDsState __qoCreateDynamicDepthStencilState(VkDevice dev, const VkDynamicDsStateCreateInfo *info);
 
 #ifdef __cplusplus
 }

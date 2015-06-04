@@ -827,7 +827,7 @@ cru_test_start_main_thread(void *arg)
         },
         .pScissors = (VkRect[]) {
             {{ 0, 0 }, { t->width, t->height }},
-        },
+        }
     );
     t->dynamic_rs_state = qoCreateDynamicRasterState(t_device);
     t->dynamic_cb_state = qoCreateDynamicColorBlendState(t_device);

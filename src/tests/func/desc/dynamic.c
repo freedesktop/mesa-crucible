@@ -285,7 +285,7 @@ test(void)
         },
         .pScissors = (VkRect[]) {
             {{  0,  0 }, {t_width, t_height}},
-        },
+        }
     );
 
     VkDynamicRsState rs_state = qoCreateDynamicRasterState(t_device);

@@ -55,7 +55,7 @@ qoImageGetMemoryRequirements(VkDevice dev, VkImage image)
 }
 
 VkBuffer
-qoCreateBufferS(VkDevice dev, const VkBufferCreateInfo *info)
+__qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info)
 {
     VkBuffer buffer;
     VkResult result;
@@ -72,8 +72,8 @@ qoCreateBufferS(VkDevice dev, const VkBufferCreateInfo *info)
 }
 
 VkDynamicVpState
-qoCreateDynamicViewportStateS(VkDevice dev,
-                              const VkDynamicVpStateCreateInfo *info)
+__qoCreateDynamicViewportState(VkDevice dev,
+                               const VkDynamicVpStateCreateInfo *info)
 {
     VkDynamicVpState state;
     VkResult result;
@@ -90,8 +90,8 @@ qoCreateDynamicViewportStateS(VkDevice dev,
 }
 
 VkDynamicRsState
-qoCreateDynamicRasterStateS(VkDevice dev,
-                           const VkDynamicRsStateCreateInfo *info)
+__qoCreateDynamicRasterState(VkDevice dev,
+                             const VkDynamicRsStateCreateInfo *info)
 {
     VkDynamicRsState state;
     VkResult result;
@@ -108,8 +108,8 @@ qoCreateDynamicRasterStateS(VkDevice dev,
 }
 
 VkDynamicCbState
-qoCreateDynamicColorBlendStateS(VkDevice dev,
-                                const VkDynamicCbStateCreateInfo *info)
+__qoCreateDynamicColorBlendState(VkDevice dev,
+                                  const VkDynamicCbStateCreateInfo *info)
 {
     VkDynamicCbState state;
     VkResult result;
@@ -126,8 +126,8 @@ qoCreateDynamicColorBlendStateS(VkDevice dev,
 }
 
 VkDynamicDsState
-qoCreateDynamicDepthStencilStateS(VkDevice dev,
-                                  const VkDynamicDsStateCreateInfo *info)
+__qoCreateDynamicDepthStencilState(VkDevice dev,
+                                   const VkDynamicDsStateCreateInfo *info)
 {
     VkDynamicDsState state;
     VkResult result;

@@ -223,7 +223,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
         },
         .pScissors = (VkRect[]) {
             {{  0,  0 }, {t_width, t_height}},
-        },
+        }
     );
     vkCmdBindDynamicStateObject(t_cmd_buffer,
                                 VK_STATE_BIND_POINT_VIEWPORT, vp_state);
