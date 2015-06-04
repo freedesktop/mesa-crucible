@@ -54,6 +54,42 @@ qoImageGetMemoryRequirements(VkDevice dev, VkImage image)
     return qoObjectGetMemoryRequirements(dev, VK_OBJECT_TYPE_IMAGE, image);
 }
 
+VkDeviceMemory
+__qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info)
+{
+    VkDeviceMemory memory;
+    VkResult result;
+
+    result = vkAllocMemory(dev, info, &memory);
+
+    if (t_is_current()) {
+        t_assert(result == VK_SUCCESS);
+        t_assert(memory);
+        t_cleanup_push_vk_device_memory(dev, memory);
+    }
+
+    return memory;
+}
+
+void *
+qoMapMemory(VkDevice dev, VkDeviceMemory mem,
+            VkDeviceSize offset, VkDeviceSize size,
+            VkMemoryMapFlags flags)
+{
+    void *map;
+    VkResult result;
+
+    result = vkMapMemory(dev, mem, offset, size, flags, &map);
+
+    if (t_is_current()) {
+        t_assert(result == VK_SUCCESS);
+        t_assert(map);
+        t_cleanup_push_vk_memory_map(dev, mem);
+    }
+
+    return map;
+}
+
 VkBuffer
 __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info)
 {

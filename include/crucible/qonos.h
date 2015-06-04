@@ -92,6 +92,12 @@
 extern "C" {
 #endif
 
+#define QO_MEMORY_ALLOC_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO, \
+    .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | \
+                VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT, \
+    .memPriority = VK_MEMORY_PRIORITY_NORMAL
+
 #define QO_BUFFER_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO
 
@@ -158,6 +164,21 @@ extern "C" {
 VkMemoryRequirements qoObjectGetMemoryRequirements(VkDevice dev, VkObjectType obj_type, VkObject obj);
 VkMemoryRequirements qoBufferGetMemoryRequirements(VkDevice dev, VkBuffer buffer);
 VkMemoryRequirements qoImageGetMemoryRequirements(VkDevice dev, VkImage image);
+
+#ifdef DOXYGEN
+VkDeviceMemory qoAllocMemory(VkDevice dev, ...);
+#else
+#define qoAllocMemory(dev, ...) \
+    __qoAllocMemory(dev, \
+        &(VkMemoryAllocInfo) { \
+            QO_MEMORY_ALLOC_INFO_DEFAULTS, \
+            ##__VA_ARGS__ , \
+        })
+#endif
+
+void *qoMapMemory(VkDevice dev, VkDeviceMemory mem,
+                  VkDeviceSize offset, VkDeviceSize size,
+                  VkMemoryMapFlags flags);
 
 #ifdef DOXYGEN
 VkBuffer qoCreateBuffer(VkDevice dev, ...);
@@ -231,6 +252,7 @@ struct __qoCreateGraphicsPipeline_extra {
     VkShader fragmentShader;
 };
 
+VkDeviceMemory __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info);
 VkBuffer __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info);
 VkDynamicVpState __qoCreateDynamicViewportState(VkDevice dev, const VkDynamicVpStateCreateInfo *info);
 VkDynamicRsState __qoCreateDynamicRasterState(VkDevice dev, const VkDynamicRsStateCreateInfo *info);
