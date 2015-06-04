@@ -101,7 +101,7 @@ __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info)
     if (t_is_current()) {
         t_assert(result == VK_SUCCESS);
         t_assert(buffer);
-        t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_BUFFER, buffer);
+        t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_BUFFER, buffer);
     }
 
     return buffer;
@@ -119,7 +119,7 @@ __qoCreateDynamicViewportState(VkDevice dev,
     if (t_is_current()) {
         t_assert(result == VK_SUCCESS);
         t_assert(state);
-        t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DYNAMIC_VP_STATE, state);
+        t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DYNAMIC_VP_STATE, state);
     }
 
     return state;
@@ -137,7 +137,7 @@ __qoCreateDynamicRasterState(VkDevice dev,
     if (t_is_current()) {
         t_assert(result == VK_SUCCESS);
         t_assert(state);
-        t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DYNAMIC_RS_STATE, state);
+        t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DYNAMIC_RS_STATE, state);
     }
 
     return state;
@@ -155,7 +155,7 @@ __qoCreateDynamicColorBlendState(VkDevice dev,
     if (t_is_current()) {
         t_assert(result == VK_SUCCESS);
         t_assert(state);
-        t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DYNAMIC_CB_STATE, state);
+        t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DYNAMIC_CB_STATE, state);
     }
 
     return state;
@@ -173,7 +173,7 @@ __qoCreateDynamicDepthStencilState(VkDevice dev,
     if (t_is_current()) {
         t_assert(result == VK_SUCCESS);
         t_assert(state);
-        t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DYNAMIC_DS_STATE, state);
+        t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DYNAMIC_DS_STATE, state);
     }
 
     return state;
