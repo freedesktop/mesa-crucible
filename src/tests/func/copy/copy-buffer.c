@@ -125,8 +125,6 @@ test_large_copy(void)
 
     vkQueueWaitIdle(t_queue);
 
-    vkDestroyObject(t_device, VK_OBJECT_TYPE_BUFFER, buffer1);
-    vkDestroyObject(t_device, VK_OBJECT_TYPE_BUFFER, buffer2);
     vkDestroyObject(t_device, VK_OBJECT_TYPE_COMMAND_BUFFER, cmdBuffer);
 
     uint32_t *map32_2 = map + buffer_requirements.size;
