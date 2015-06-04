@@ -161,6 +161,9 @@ extern "C" {
     .stencilFrontRef = 0,   /* default in OpenGL ES 3.1 */ \
     .stencilBackRef = 0     /* default in OpenGL ES 3.1 */
 
+#define QO_SHADER_CREATE_INFO_DEFAULTS \
+    .sType =VK_STRUCTURE_TYPE_SHADER_CREATE_INFO
+
 VkMemoryRequirements qoObjectGetMemoryRequirements(VkDevice dev, VkObjectType obj_type, VkObject obj);
 VkMemoryRequirements qoBufferGetMemoryRequirements(VkDevice dev, VkBuffer buffer);
 VkMemoryRequirements qoImageGetMemoryRequirements(VkDevice dev, VkImage image);
@@ -246,6 +249,17 @@ VkPipeline qoCreateGraphicsPipeline(VkDevice dev, const VkGraphicsPipelineCreate
         })
 #endif
 
+#ifdef DOXYGEN
+VkShader qoCreateShader(VkDevice dev, ...);
+#else
+#define qoCreateShader(dev, ...) \
+    __qoCreateShader(dev, \
+        &(VkShaderCreateInfo) { \
+            QO_SHADER_CREATE_INFO_DEFAULTS, \
+            ##__VA_ARGS__, \
+        })
+#endif
+
 struct __qoCreateGraphicsPipeline_extra {
     VkPrimitiveTopology topology;
     VkShader vertexShader;
@@ -259,6 +273,7 @@ VkDynamicRsState __qoCreateDynamicRasterState(VkDevice dev, const VkDynamicRsSta
 VkDynamicCbState __qoCreateDynamicColorBlendState(VkDevice dev, const VkDynamicCbStateCreateInfo *info);
 VkDynamicDsState __qoCreateDynamicDepthStencilState(VkDevice dev, const VkDynamicDsStateCreateInfo *info);
 VkPipeline __qoCreateGraphicsPipeline(VkDevice dev, const VkGraphicsPipelineCreateInfo *info, const struct __qoCreateGraphicsPipeline_extra *extra);
+VkShader __qoCreateShader(VkDevice dev, const VkShaderCreateInfo *info);
 
 #ifdef __cplusplus
 }

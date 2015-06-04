@@ -178,3 +178,20 @@ __qoCreateDynamicDepthStencilState(VkDevice dev,
 
     return state;
 }
+
+VkShader
+__qoCreateShader(VkDevice dev, const VkShaderCreateInfo *info)
+{
+    VkShader shader;
+    VkResult result;
+
+    result = vkCreateShader(dev, info, &shader);
+
+    if (t_is_current()) {
+        t_assert(result == VK_SUCCESS);
+        t_assert(shader);
+        t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_SHADER, shader);
+    }
+
+    return shader;
+}
