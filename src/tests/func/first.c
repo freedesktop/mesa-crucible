@@ -55,25 +55,10 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
         }
     );
 
-    VkShader vs;
-    vkCreateShader(t_device,
-        &(VkShaderCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
-            .codeSize = sizeof(vs_source),
-            .pCode = vs_source,
-            .flags = 0,
-        },
-        &vs);
-
-    VkShader fs;
-    vkCreateShader(t_device,
-        &(VkShaderCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
-            .codeSize = sizeof(fs_source),
-            .pCode = fs_source,
-            .flags = 0,
-        },
-        &fs);
+    VkShader vs = qoCreateShader(t_device, .pCode = vs_source,
+                                 .codeSize = sizeof(vs_source));
+    VkShader fs = qoCreateShader(t_device, .pCode = fs_source,
+                                 .codeSize = sizeof(fs_source));
 
     VkPipelineVertexInputCreateInfo vi_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_CREATE_INFO,

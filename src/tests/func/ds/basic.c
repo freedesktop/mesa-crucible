@@ -70,25 +70,10 @@ test_create_solid_color_pipeline(void)
                  f_color = v_color;
              });
 
-    VkShader vs;
-    vkCreateShader(t_device,
-                   &(VkShaderCreateInfo) {
-                       .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
-                           .codeSize = sizeof(vs_source),
-                           .pCode = vs_source,
-                           .flags = 0,
-                           },
-                   &vs);
-
-    VkShader fs;
-    vkCreateShader(t_device,
-                   &(VkShaderCreateInfo) {
-                       .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
-                           .codeSize = sizeof(fs_source),
-                           .pCode = fs_source,
-                           .flags = 0,
-                           },
-                   &fs);
+    VkShader vs = qoCreateShader(t_device, .pCode = vs_source,
+                                 .codeSize = sizeof(vs_source));
+    VkShader fs = qoCreateShader(t_device, .pCode = fs_source,
+                                 .codeSize = sizeof(fs_source));
 
     VkPipelineShaderStageCreateInfo vs_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
@@ -186,9 +171,6 @@ test_create_solid_color_pipeline(void)
                                  .layout = VK_NULL_HANDLE
                              },
                              &pipeline);
-
-    vkDestroyObject(t_device, VK_OBJECT_TYPE_SHADER, fs);
-    vkDestroyObject(t_device, VK_OBJECT_TYPE_SHADER, vs);
 
     return pipeline;
 }

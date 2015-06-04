@@ -308,17 +308,6 @@ test_lots_of_surface_state_vs(void)
         }
     );
 
-    VkShader vs;
-    vkCreateShader(t_device,
-        &(VkShaderCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
-            .codeSize = sizeof(vs_source),
-            .pCode = vs_source,
-            .flags = 0,
-        },
-        &vs);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_SHADER, vs);
-
     /* The fragment shader takes 12 UBOs */
     static const char fs_source[] = GLSL(330,
         in vec4 v_color;
@@ -329,17 +318,10 @@ test_lots_of_surface_state_vs(void)
         }
     );
 
-    VkShader fs;
-    vkCreateShader(t_device,
-        &(VkShaderCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
-            .codeSize = sizeof(fs_source),
-            .pCode = fs_source,
-            .flags = 0,
-        },
-        &fs);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_SHADER, fs);
-
+    VkShader vs = qoCreateShader(t_device, .pCode = vs_source,
+                                 .codeSize = sizeof(vs_source));
+    VkShader fs = qoCreateShader(t_device, .pCode = fs_source,
+                                 .codeSize = sizeof(fs_source));
 
     test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_VERTEX);
 }
@@ -361,16 +343,8 @@ test_lots_of_surface_state_fs(void)
         }
     );
 
-    VkShader vs;
-    vkCreateShader(t_device,
-        &(VkShaderCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
-            .codeSize = sizeof(vs_source),
-            .pCode = vs_source,
-            .flags = 0,
-        },
-        &vs);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_SHADER, vs);
+    VkShader vs = qoCreateShader(t_device, .pCode = vs_source,
+                                 .codeSize = sizeof(vs_source));
 
     /* The fragment shader takes 12 UBOs */
     static const char fs_source[] = GLSL(330,
@@ -396,16 +370,8 @@ test_lots_of_surface_state_fs(void)
         }
     );
 
-    VkShader fs;
-    vkCreateShader(t_device,
-        &(VkShaderCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
-            .codeSize = sizeof(fs_source),
-            .pCode = fs_source,
-            .flags = 0,
-        },
-        &fs);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_SHADER, fs);
+    VkShader fs = qoCreateShader(t_device, .pCode = fs_source,
+                                 .codeSize = sizeof(fs_source));
 
     test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_FRAGMENT);
 }
