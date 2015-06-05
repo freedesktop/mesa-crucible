@@ -70,6 +70,9 @@ bin_crucible_SOURCES = \
 	src/tests/func/interleaved-cmd-buffers.c \
 	src/tests/stress/lots-of-surface-state.c
 
+%-spirv.h: %.c misc/glsl_scraper.py
+	$(AM_V_GEN) $(PYTHON2) $(srcdir)/misc/glsl_scraper.py --glsl-only -o $@ $<
+
 bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread -lpng16
 
 man1_MANS = \
