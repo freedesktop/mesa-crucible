@@ -37,10 +37,7 @@ static void
 test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
 {
     /* Create the descriptor set layout. */
-    VkDescriptorSetLayout set_layout;
-    vkCreateDescriptorSetLayout(t_device,
-        &(VkDescriptorSetLayoutCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+    VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
             .count = 1,
             .pBinding = (VkDescriptorSetLayoutBinding[]) {
                 {
@@ -49,11 +46,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
                     .stageFlags = (1 << ubo_stage),
                     .pImmutableSamplers = NULL,
                 },
-            },
-        },
-        &set_layout);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT,
-                             set_layout);
+            });
 
     VkPipelineLayout pipeline_layout;
     vkCreatePipelineLayout(t_device,

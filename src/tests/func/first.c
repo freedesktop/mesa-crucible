@@ -108,9 +108,8 @@ static void
 test(void)
 {
     VkDescriptorSetLayout set_layout[2];
-    vkCreateDescriptorSetLayout(t_device,
-        &(VkDescriptorSetLayoutCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+
+    set_layout[0] = qoCreateDescriptorSetLayout(t_device,
             .count = 3,
             .pBinding = (VkDescriptorSetLayoutBinding[]) {
                 {
@@ -131,13 +130,9 @@ test(void)
                     .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
                     .pImmutableSamplers = NULL,
                 },
-            },
-        },
-        &set_layout[0]);
+            });
 
-    vkCreateDescriptorSetLayout(t_device,
-        &(VkDescriptorSetLayoutCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+    set_layout[1] = qoCreateDescriptorSetLayout(t_device,
             .count = 1,
             .pBinding = (VkDescriptorSetLayoutBinding[]) {
                 {
@@ -146,9 +141,7 @@ test(void)
                     .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
                     .pImmutableSamplers = NULL,
                 },
-            },
-        },
-        &set_layout[1]);
+            });
 
     VkPipelineLayout pipeline_layout;
     vkCreatePipelineLayout(t_device,
