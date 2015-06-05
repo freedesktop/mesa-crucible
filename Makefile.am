@@ -70,6 +70,13 @@ bin_crucible_SOURCES = \
 	src/tests/func/interleaved-cmd-buffers.c \
 	src/tests/stress/lots-of-surface-state.c
 
+BUILT_SOURCES = \
+	src/tests/func/desc/dynamic-spirv.h \
+	src/tests/func/draw_indexed-spirv.h \
+	src/tests/func/ds/basic-spirv.h \
+	src/tests/func/first-spirv.h \
+	src/tests/stress/lots-of-surface-state-spirv.h
+
 %-spirv.h: %.c misc/glsl_scraper.py
 	$(AM_V_GEN) $(PYTHON2) $(srcdir)/misc/glsl_scraper.py --glsl-only -o $@ $<
 

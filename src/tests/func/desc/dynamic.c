@@ -33,6 +33,8 @@
 
 #include <crucible/cru.h>
 
+#include "dynamic-spirv.h"
+
 static void
 create_pipeline(VkDevice device, VkPipeline *pipeline,
                 VkPipelineLayout pipeline_layout)
@@ -45,7 +47,7 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
         .primitiveRestartIndex = 0
     };
 
-    static const char vs_source[] = GLSL(330,
+    VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
         layout(set = 0, binding = 0) uniform block1 {
             vec4 color;
@@ -59,7 +61,7 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
         }
     );
 
-    static const char fs_source[] = GLSL(330,
+    VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
         out vec4 f_color;
         flat in vec4 v_color;
         void main()
@@ -67,11 +69,6 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
             f_color = v_color;
         }
     );
-
-    VkShader vs = qoCreateShader(t_device, .pCode = vs_source,
-                                 .codeSize = sizeof(vs_source));
-    VkShader fs = qoCreateShader(t_device, .pCode = fs_source,
-                                 .codeSize = sizeof(fs_source));
 
     VkPipelineShaderStageCreateInfo vs_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,

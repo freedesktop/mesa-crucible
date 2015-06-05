@@ -21,11 +21,13 @@
 
 #include <crucible/cru.h>
 
+#include "first-spirv.h"
+
 static void
 create_pipeline(VkDevice device, VkPipeline *pipeline,
                 VkPipelineLayout pipeline_layout)
 {
-    static const char vs_source[] = GLSL(330,
+    VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
         layout(location = 1) in vec4 a_color;
         layout(set = 0, binding = 0) uniform block1 {
@@ -45,7 +47,7 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
         }
     );
 
-    static const char fs_source[] = GLSL(330,
+    VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
         out vec4 f_color;
         in vec4 v_color;
         layout(set = 0, binding = 0) uniform sampler2D tex;
@@ -54,11 +56,6 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
             f_color = v_color + texture2D(tex, vec2(0.1, 0.1));
         }
     );
-
-    VkShader vs = qoCreateShader(t_device, .pCode = vs_source,
-                                 .codeSize = sizeof(vs_source));
-    VkShader fs = qoCreateShader(t_device, .pCode = fs_source,
-                                 .codeSize = sizeof(fs_source));
 
     VkPipelineVertexInputCreateInfo vi_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_CREATE_INFO,

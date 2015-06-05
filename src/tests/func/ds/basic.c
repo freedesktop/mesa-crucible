@@ -33,6 +33,8 @@
 
 #include <crucible/cru.h>
 
+#include "basic-spirv.h"
+
 static inline uint32_t
 align_u32(uint32_t value, uint32_t alignment)
 {
@@ -50,30 +52,25 @@ test_create_solid_color_pipeline(void)
         .primitiveRestartIndex = 0
     };
 
-    static const char vs_source[] =
-        GLSL(330,
-             layout(location = 0) in vec4 a_position;
-             layout(location = 1) in vec4 a_color;
-             out vec4 v_color;
-             void main()
-             {
-                 gl_Position = a_position;
-                 v_color = a_color;
-             });
+    VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
+        layout(location = 0) in vec4 a_position;
+        layout(location = 1) in vec4 a_color;
+        out vec4 v_color;
+        void main()
+        {
+            gl_Position = a_position;
+            v_color = a_color;
+        }
+    );
 
-    static const char fs_source[] =
-        GLSL(330,
-             out vec4 f_color;
-             in vec4 v_color;
-             void main()
-             {
-                 f_color = v_color;
-             });
-
-    VkShader vs = qoCreateShader(t_device, .pCode = vs_source,
-                                 .codeSize = sizeof(vs_source));
-    VkShader fs = qoCreateShader(t_device, .pCode = fs_source,
-                                 .codeSize = sizeof(fs_source));
+    VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
+        out vec4 f_color;
+        in vec4 v_color;
+        void main()
+        {
+            f_color = v_color;
+        }
+    );
 
     VkPipelineShaderStageCreateInfo vs_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,

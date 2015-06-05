@@ -24,6 +24,8 @@
 #include <crucible/cru.h>
 #include <stdio.h>
 
+#include "lots-of-surface-state-spirv.h"
+
 /* This file implements a test that pokes a particular aspect of the Intel
  * open-source vulkan driver.  In particular, the Intel hardware has a
  * maximum 16 bits in which to store the binding table offsets so all
@@ -269,7 +271,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
 static void
 test_lots_of_surface_state_vs(void)
 {
-    static const char vs_source[] = GLSL(330,
+    VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
         out vec4 v_color;
         layout(set = 0, binding =  0) uniform block0  { float f; } u0;
@@ -294,8 +296,7 @@ test_lots_of_surface_state_vs(void)
         }
     );
 
-    /* The fragment shader takes 12 UBOs */
-    static const char fs_source[] = GLSL(330,
+    VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
         in vec4 v_color;
         out vec4 f_color;
         void main()
@@ -303,11 +304,6 @@ test_lots_of_surface_state_vs(void)
             f_color = v_color;
         }
     );
-
-    VkShader vs = qoCreateShader(t_device, .pCode = vs_source,
-                                 .codeSize = sizeof(vs_source));
-    VkShader fs = qoCreateShader(t_device, .pCode = fs_source,
-                                 .codeSize = sizeof(fs_source));
 
     test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_VERTEX);
 }
@@ -321,7 +317,7 @@ cru_define_test {
 static void
 test_lots_of_surface_state_fs(void)
 {
-    static const char vs_source[] = GLSL(330,
+    VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
         void main()
         {
@@ -329,11 +325,8 @@ test_lots_of_surface_state_fs(void)
         }
     );
 
-    VkShader vs = qoCreateShader(t_device, .pCode = vs_source,
-                                 .codeSize = sizeof(vs_source));
-
     /* The fragment shader takes 12 UBOs */
-    static const char fs_source[] = GLSL(330,
+    VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
         out vec4 f_color;
         layout(set = 0, binding =  0) uniform block0  { float f; } u0;
         layout(set = 0, binding =  1) uniform block1  { float f; } u1;
@@ -355,9 +348,6 @@ test_lots_of_surface_state_fs(void)
             f_color = vec4(zero, one, zero, one);
         }
     );
-
-    VkShader fs = qoCreateShader(t_device, .pCode = fs_source,
-                                 .codeSize = sizeof(fs_source));
 
     test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_FRAGMENT);
 }
