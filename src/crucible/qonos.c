@@ -215,6 +215,23 @@ __qoCreateDynamicDepthStencilState(VkDevice dev,
     return state;
 }
 
+VkImage
+__qoCreateImage(VkDevice dev, const VkImageCreateInfo *info)
+{
+    VkImage image;
+    VkResult result;
+
+    result = vkCreateImage(dev, info, &image);
+
+    if (t_is_current()) {
+        t_assert(result == VK_SUCCESS);
+        t_assert(image);
+        t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_IMAGE, image);
+    }
+
+    return image;
+}
+
 VkShader
 __qoCreateShader(VkDevice dev, const VkShaderCreateInfo *info)
 {
