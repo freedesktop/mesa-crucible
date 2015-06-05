@@ -126,6 +126,23 @@ __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info)
     return buffer;
 }
 
+VkBufferView
+__qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info)
+{
+    VkBufferView view;
+    VkResult result;
+
+    result = vkCreateBufferView(dev, info, &view);
+
+    if (t_is_current()) {
+        t_assert(result == VK_SUCCESS);
+        t_assert(view);
+        t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_BUFFER_VIEW, view);
+    }
+
+    return view;
+}
+
 VkDynamicVpState
 __qoCreateDynamicViewportState(VkDevice dev,
                                const VkDynamicVpStateCreateInfo *info)
