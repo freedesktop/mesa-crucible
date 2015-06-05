@@ -230,26 +230,15 @@ test(void)
 
     const uint32_t texture_width = 16, texture_height = 16;
 
-    VkImage texture;
-    vkCreateImage(t_device,
-        &(VkImageCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-            .imageType = VK_IMAGE_TYPE_2D,
-            .format = VK_FORMAT_R8G8B8A8_UNORM,
-            .extent = {
-                .width = texture_width,
-                .height = texture_height,
-                .depth = 1,
-            },
-            .mipLevels = 1,
-            .arraySize = 1,
-            .samples = 1,
-            .tiling = VK_IMAGE_TILING_LINEAR,
-            .usage = VK_IMAGE_USAGE_SAMPLED_BIT,
-            .flags = 0,
-        },
-        &texture);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_IMAGE, texture);
+    VkImage texture = qoCreateImage(t_device,
+        .format = VK_FORMAT_R8G8B8A8_UNORM,
+        .tiling = VK_IMAGE_TILING_LINEAR,
+        .usage = VK_IMAGE_USAGE_SAMPLED_BIT,
+        .extent = {
+            .width = texture_width,
+            .height = texture_height,
+            .depth = 1,
+        });
 
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_IMAGE, texture,
                             /*index*/ 0, mem, 2048 + 256 * 256 * 4);

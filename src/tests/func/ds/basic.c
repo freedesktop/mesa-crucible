@@ -190,20 +190,13 @@ test(void)
     vertex_buffer = qoCreateBuffer(t_device, .size = 4096,
                                    .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
-    vkCreateImage(t_device,
-                  &(VkImageCreateInfo) {
-                      .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-                      .imageType = VK_IMAGE_TYPE_2D,
-                      .format = VK_FORMAT_D24_UNORM,
-                      .extent = { .width = t_width, .height = t_height, .depth = 1 },
-                      .mipLevels = 1,
-                      .arraySize = 1,
-                      .samples = 1,
-                      .tiling = VK_IMAGE_TILING_OPTIMAL,
-                      .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_BIT,
-                      .flags = 0,
-                  },
-                  &ds);
+    ds = qoCreateImage(t_device, .format = VK_FORMAT_D24_UNORM,
+                       .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_BIT,
+                       .extent = {
+                            .width = t_width,
+                            .height = t_height,
+                            .depth = 1,
+                        });
 
     VkMemoryRequirements vb_requirements =
        qoBufferGetMemoryRequirements(t_device, vertex_buffer);

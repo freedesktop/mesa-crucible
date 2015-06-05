@@ -55,26 +55,15 @@ setup_src(struct src *src)
     const uint32_t width = t_width;
     const uint32_t height = t_height;
 
-    VkImage image;
-    vkCreateImage(t_device,
-        &(VkImageCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-            .imageType = VK_IMAGE_TYPE_2D,
-            .format = VK_FORMAT_R8G8B8A8_UNORM,
-            .extent = {
-               .width = width,
-               .height = height,
-               .depth = 1,
-           },
-           .mipLevels = 1,
-           .arraySize = 1,
-           .samples = 1,
-           .tiling = VK_IMAGE_TILING_LINEAR,
-           .usage = VK_IMAGE_USAGE_GENERAL,
-           .flags = 0,
+    VkImage image = qoCreateImage(t_device,
+        .format = VK_FORMAT_R8G8B8A8_UNORM,
+        .extent = {
+           .width = width,
+           .height = height,
+           .depth = 1,
        },
-       &image);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_IMAGE, image);
+       .tiling = VK_IMAGE_TILING_LINEAR,
+       .usage = VK_IMAGE_USAGE_GENERAL);
 
     VkMemoryRequirements mem_reqs =
        qoImageGetMemoryRequirements(t_device, image);

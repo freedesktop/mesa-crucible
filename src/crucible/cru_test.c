@@ -862,25 +862,14 @@ cru_test_start_main_thread(void *arg)
         assert(t_width > 0);
         assert(t_height > 0);
 
-        vkCreateImage(t_device,
-            &(VkImageCreateInfo) {
-                .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-                .imageType = VK_IMAGE_TYPE_2D,
-                .format = VK_FORMAT_R8G8B8A8_UNORM,
-                .extent = {
-                    .width = t_width,
-                    .height = t_height,
-                    .depth = 1,
-                },
-                .mipLevels = 1,
-                .arraySize = 1,
-                .samples = 1,
-                .tiling = VK_IMAGE_TILING_OPTIMAL,
-                .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-                .flags = 0,
+        t->rt_image = qoCreateImage(t_device,
+            .format = VK_FORMAT_R8G8B8A8_UNORM,
+            .extent = {
+                .width = t_width,
+                .height = t_height,
+                .depth = 1,
             },
-            &t->rt_image);
-        t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_IMAGE, t_image);
+            .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
 
         VkMemoryRequirements rt_mem_reqs =
            qoImageGetMemoryRequirements(t->device, t->rt_image);
