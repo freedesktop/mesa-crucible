@@ -90,6 +90,25 @@ qoMapMemory(VkDevice dev, VkDeviceMemory mem,
     return map;
 }
 
+VkDescriptorSetLayout
+__qoCreateDescriptorSetLayout(VkDevice dev,
+                              const VkDescriptorSetLayoutCreateInfo *info)
+{
+    VkDescriptorSetLayout layout;
+    VkResult result;
+
+    result = vkCreateDescriptorSetLayout(dev, info, &layout);
+
+    if (t_is_current()) {
+        t_assert(result == VK_SUCCESS);
+        t_assert(layout);
+        t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT,
+                                 layout);
+    }
+
+    return layout;
+}
+
 VkBuffer
 __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info)
 {

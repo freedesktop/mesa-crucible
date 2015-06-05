@@ -101,6 +101,9 @@ extern "C" {
 #define QO_BUFFER_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO
 
+#define QO_DESCRIPTOR_SET_LAYOUT_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO
+
 #define QO_PIPELINE_IA_STATE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO, \
     .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, \
@@ -195,6 +198,17 @@ VkBuffer qoCreateBuffer(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
+VkDescriptorSetLayout __qoCreateDescriptorSetLayout(VkDevice dev, const VkDescriptorSetLayoutCreateInfo *info);
+#else
+#define qoCreateDescriptorSetLayout(dev, ...) \
+    __qoCreateDescriptorSetLayout(dev, \
+        &(VkDescriptorSetLayoutCreateInfo) { \
+            QO_DESCRIPTOR_SET_LAYOUT_CREATE_INFO_DEFAULTS, \
+            ##__VA_ARGS__, \
+        })
+#endif
+
+#ifdef DOXYGEN
 VkDynamicVpStateCreateInfo qoCreateDynamicVpState(VkDevice dev, ...);
 #else
 #define qoCreateDynamicViewportState(dev, ...) \
@@ -268,6 +282,7 @@ struct __qoCreateGraphicsPipeline_extra {
 
 VkDeviceMemory __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info);
 VkBuffer __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info);
+VkDescriptorSetLayout __qoCreateDescriptorSetLayout(VkDevice dev, const VkDescriptorSetLayoutCreateInfo *info);
 VkDynamicVpState __qoCreateDynamicViewportState(VkDevice dev, const VkDynamicVpStateCreateInfo *info);
 VkDynamicRsState __qoCreateDynamicRasterState(VkDevice dev, const VkDynamicRsStateCreateInfo *info);
 VkDynamicCbState __qoCreateDynamicColorBlendState(VkDevice dev, const VkDynamicCbStateCreateInfo *info);
