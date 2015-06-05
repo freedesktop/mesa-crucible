@@ -221,17 +221,12 @@ test(void)
         {  0.3,  0.3, 0.0, 0.0 },
     };
     memcpy(map, color, sizeof(color));
-    VkBufferView buffer_view;
-    vkCreateBufferView(t_device,
-        &(VkBufferViewCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO,
-            .buffer = buffer,
-            .viewType = VK_BUFFER_VIEW_TYPE_RAW,
-            .format = VK_FORMAT_R32G32B32A32_SFLOAT,
-            .offset = 0,
-            .range = sizeof(color),
-        },
-        &buffer_view);
+
+    VkBufferView buffer_view = qoCreateBufferView(t_device,
+        .buffer = buffer,
+        .viewType = VK_BUFFER_VIEW_TYPE_RAW,
+        .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+        .range = sizeof(color));
 
     uint32_t vertex_offset = 1024;
     static const float vertex_data[] = {

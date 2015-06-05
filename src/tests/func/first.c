@@ -190,39 +190,25 @@ test(void)
         0.0, 0.0, 0.5, 0.5
     };
     memcpy(map + 128 + 16, color, sizeof(color));
+
     VkBufferView buffer_view[3];
-    vkCreateBufferView(t_device,
-        &(VkBufferViewCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO,
-            .buffer = buffer,
-            .viewType = VK_BUFFER_VIEW_TYPE_RAW,
-            .format = VK_FORMAT_R32G32B32A32_SFLOAT,
-            .offset = 16,
-            .range = 64
-        },
-        &buffer_view[0]);
+    buffer_view[0] = qoCreateBufferView(t_device,
+        .buffer = buffer,
+        .viewType = VK_BUFFER_VIEW_TYPE_RAW,
+        .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+        .offset = 16, .range = 64);
 
-    vkCreateBufferView(t_device,
-        &(VkBufferViewCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO,
-            .buffer = buffer,
-            .viewType = VK_BUFFER_VIEW_TYPE_RAW,
-            .format = VK_FORMAT_R32G32B32A32_SFLOAT,
-            .offset = 32,
-            .range = 64
-        },
-        &buffer_view[1]);
+    buffer_view[1] = qoCreateBufferView(t_device,
+        .buffer = buffer,
+        .viewType = VK_BUFFER_VIEW_TYPE_RAW,
+        .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+        .offset = 32, .range = 64);
 
-    vkCreateBufferView(t_device,
-        &(VkBufferViewCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO,
-            .buffer = buffer,
-            .viewType = VK_BUFFER_VIEW_TYPE_RAW,
-            .format = VK_FORMAT_R32G32B32A32_SFLOAT,
-            .offset = 48,
-            .range = 64,
-        },
-        &buffer_view[2]);
+    buffer_view[2] = qoCreateBufferView(t_device,
+        .buffer = buffer,
+        .viewType = VK_BUFFER_VIEW_TYPE_RAW,
+        .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+        .offset = 48, .range = 64);
 
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER,
                             vertex_buffer, /*index*/ 0, mem, 1024);

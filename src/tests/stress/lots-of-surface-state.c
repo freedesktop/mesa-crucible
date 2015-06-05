@@ -195,18 +195,11 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
                            (VkBuffer[]) { vbo },
                            (VkDeviceSize[]) { 0 });
 
-    VkBufferView ubo_view;
-    vkCreateBufferView(t_device,
-        &(VkBufferViewCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO,
-            .buffer = ubo,
-            .viewType = VK_BUFFER_VIEW_TYPE_RAW,
-            .format = VK_FORMAT_R32_SFLOAT,
-            .offset = 0,
-            .range = ubo_reqs.size,
-        },
-        &ubo_view);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_BUFFER_VIEW, ubo_view);
+    VkBufferView ubo_view = qoCreateBufferView(t_device,
+        .buffer = ubo,
+        .viewType = VK_BUFFER_VIEW_TYPE_RAW,
+        .format = VK_FORMAT_R32_SFLOAT,
+        .range = ubo_reqs.size);
 
     VkDescriptorSet set;
     uint32_t set_count = 1;
