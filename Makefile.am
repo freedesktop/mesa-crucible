@@ -97,4 +97,4 @@ man: $(man1_MANS)
 %.1: %.1.txt
 	$(AM_V_GEN)$(A2X) --format manpage $^
 
-CLEANFILES = $(man1_MANS)
+CLEANFILES = $(man1_MANS) $(BUILT_SOURCES)
