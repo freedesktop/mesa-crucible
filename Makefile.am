@@ -71,6 +71,7 @@ bin_crucible_SOURCES = \
 	src/tests/stress/lots-of-surface-state.c
 
 BUILT_SOURCES = \
+	src/crucible/qonos_pipeline-spirv.h \
 	src/tests/func/desc/dynamic-spirv.h \
 	src/tests/func/draw_indexed-spirv.h \
 	src/tests/func/ds/basic-spirv.h \

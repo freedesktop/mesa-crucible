@@ -23,6 +23,8 @@
 #include <crucible/cru_test.h>
 #include <assert.h>
 
+#include "qonos_pipeline-spirv.h"
+
 struct vk_struct {
     VkStructureType sType;
     const struct vk_struct *pNext;
@@ -115,14 +117,64 @@ __qoCreateGraphicsPipeline(VkDevice device,
         }
     }
 
+    VkPipelineVertexInputCreateInfo vi_info = {
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_CREATE_INFO,
+        .bindingCount = 2,
+        .pVertexBindingDescriptions = (VkVertexInputBindingDescription[]) {
+            {
+                .binding = 0,
+                .strideInBytes = 8,
+                .stepRate = VK_VERTEX_INPUT_STEP_RATE_VERTEX
+            },
+            {
+                .binding = 1,
+                .strideInBytes = 16,
+                .stepRate = VK_VERTEX_INPUT_STEP_RATE_INSTANCE
+            }
+        },
+        .attributeCount = 2,
+        .pVertexAttributeDescriptions = (VkVertexInputAttributeDescription[]) {
+            {
+                .location = 0,
+                .binding = 0,
+                .format = VK_FORMAT_R32G32_SFLOAT,
+                .offsetInBytes = 0
+            },
+            {
+                .location = 1,
+                .binding = 1,
+                .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+                .offsetInBytes = 0
+            }
+        }
+    };
+
+    if (!find_struct_in_chain(pCreateInfo, PIPELINE_VERTEX_INPUT_CREATE_INFO)) {
+        /* They should be using one of our shaders if they use this */
+        assert(!has_vs || !has_fs);
+        vi_info.pNext = pipeline_info.pNext,
+        pipeline_info.pNext = &vi_info;
+    }
+
     if (!has_vs) {
-        assert(extra->vertexShader);
+        VkShader default_vs = extra->vertexShader ? extra->vertexShader :
+            qoCreateShaderGLSL(t_device, VERTEX,
+                layout(location = 0) in vec4 a_position;
+                layout(location = 1) in vec4 a_color;
+                out vec4 v_color;
+                void main()
+                {
+                    gl_Position = a_position;
+                    v_color = a_color;
+                }
+            );
+
         vs_info = (VkPipelineShaderStageCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
             .pNext = pipeline_info.pNext,
             .shader = {
                 .stage = VK_SHADER_STAGE_VERTEX,
-                .shader = extra->vertexShader,
+                .shader = default_vs,
                 .linkConstBufferCount = 0,
                 .pLinkConstBufferInfo = NULL,
                 .pSpecializationInfo = NULL,
@@ -132,13 +184,22 @@ __qoCreateGraphicsPipeline(VkDevice device,
     }
 
     if (!has_fs) {
-        assert(extra->fragmentShader);
+        VkShader default_fs = extra->fragmentShader ? extra->fragmentShader :
+            qoCreateShaderGLSL(t_device, FRAGMENT,
+                out vec4 f_color;
+                in vec4 v_color;
+                void main()
+                {
+                    f_color = v_color;
+                }
+            );
+
         fs_info = (VkPipelineShaderStageCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
             .pNext = pipeline_info.pNext,
             .shader = {
                 .stage = VK_SHADER_STAGE_FRAGMENT,
-                .shader = extra->fragmentShader,
+                .shader = default_fs,
                 .linkConstBufferCount = 0,
                 .pLinkConstBufferInfo = NULL,
                 .pSpecializationInfo = NULL,
