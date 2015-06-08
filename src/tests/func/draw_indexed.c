@@ -41,145 +41,6 @@ align_u32(uint32_t value, uint32_t alignment)
    return (value + alignment - 1) & ~(alignment - 1);
 }
 
-#define CRU_PIPELINE_DEFAULTS \
-    .primitiveRestartEnable = false
-
-struct cru_pipeline_template {
-    bool primitiveRestartEnable;
-    uint32_t primitiveRestartIndex;
-};
-
-static VkPipeline
-test_create_solid_color_pipeline(struct cru_pipeline_template *t)
-{
-    VkPipelineIaStateCreateInfo ia_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO,
-        .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
-        .disableVertexReuse = false,
-        .primitiveRestartEnable = t->primitiveRestartEnable,
-        .primitiveRestartIndex = t->primitiveRestartIndex
-    };
-
-    VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
-        layout(location = 0) in vec4 a_position;
-        layout(location = 1) in vec4 a_color;
-        out vec4 v_color;
-        void main()
-        {
-            gl_Position = a_position + vec4(0, a_color.a, 0, 0);
-            v_color = vec4(a_color.rgb, 1.0);
-        }
-    );
-
-    VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
-        out vec4 f_color;
-        in vec4 v_color;
-        void main()
-        {
-            f_color = v_color;
-        }
-    );
-
-    VkPipelineShaderStageCreateInfo vs_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-        .pNext = &ia_create_info,
-        .shader = {
-            .stage = VK_SHADER_STAGE_VERTEX,
-            .shader = vs,
-            .linkConstBufferCount = 0,
-            .pLinkConstBufferInfo = NULL,
-            .pSpecializationInfo = NULL
-        }
-    };
-
-    VkPipelineShaderStageCreateInfo fs_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-        .pNext = &vs_create_info,
-        .shader = {
-            .stage = VK_SHADER_STAGE_FRAGMENT,
-            .shader = fs,
-            .linkConstBufferCount = 0,
-            .pLinkConstBufferInfo = NULL,
-            .pSpecializationInfo = NULL
-        }
-    };
-
-    VkPipelineVertexInputCreateInfo vi_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_CREATE_INFO,
-        .pNext = &fs_create_info,
-        .bindingCount = 2,
-        .pVertexBindingDescriptions = (VkVertexInputBindingDescription[]) {
-            {
-                .binding = 0,
-                .strideInBytes = 8,
-                .stepRate = VK_VERTEX_INPUT_STEP_RATE_VERTEX
-            },
-            {
-                .binding = 1,
-                .strideInBytes = 16,
-                .stepRate = VK_VERTEX_INPUT_STEP_RATE_INSTANCE
-            }
-        },
-        .attributeCount = 2,
-        .pVertexAttributeDescriptions = (VkVertexInputAttributeDescription[]) {
-            {
-                .location = 0,
-                .binding = 0,
-                .format = VK_FORMAT_R32G32_SFLOAT,
-                .offsetInBytes = 0
-            },
-            {
-                .location = 1,
-                .binding = 1,
-                .format = VK_FORMAT_R32G32B32A32_SFLOAT,
-                .offsetInBytes = 0
-            }
-        }
-    };
-
-    VkPipelineRsStateCreateInfo rs_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_RS_STATE_CREATE_INFO,
-        .pNext = &vi_create_info,
-
-        .depthClipEnable = true,
-        .rasterizerDiscardEnable = false,
-        .fillMode = VK_FILL_MODE_SOLID,
-        .cullMode = VK_CULL_MODE_NONE,
-        .frontFace = VK_FRONT_FACE_CCW
-    };
-
-    VkPipelineDsStateCreateInfo ds_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_DS_STATE_CREATE_INFO,
-        .pNext = &rs_create_info,
-        .format = VK_FORMAT_UNDEFINED,
-        .depthTestEnable = false,
-        .depthWriteEnable = false,
-        .depthCompareOp = VK_COMPARE_OP_GREATER
-    };
-
-    VkPipelineCbStateCreateInfo cb_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_CB_STATE_CREATE_INFO,
-        .pNext = &ds_create_info,
-        .attachmentCount = 1,
-        .pAttachments = (VkPipelineCbAttachmentState []) {
-            { .channelWriteMask = VK_CHANNEL_A_BIT |
-              VK_CHANNEL_R_BIT | VK_CHANNEL_G_BIT | VK_CHANNEL_B_BIT },
-        }
-    };
-
-    VkPipeline pipeline;
-    vkCreateGraphicsPipeline(t_device,
-                             &(VkGraphicsPipelineCreateInfo) {
-                                 .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-                                 .pNext = &cb_create_info,
-                                 .flags = 0,
-                                 .layout = VK_NULL_HANDLE
-                             },
-                             &pipeline);
-
-    return pipeline;
-}
-
 static void
 test(void)
 {
@@ -252,17 +113,46 @@ test(void)
                        },
                        &pass);
 
-    struct cru_pipeline_template t0 = {
-        CRU_PIPELINE_DEFAULTS,
-    };
-    pipeline = test_create_solid_color_pipeline(&t0);
+    VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
+        layout(location = 0) in vec4 a_position;
+        layout(location = 1) in vec4 a_color;
+        out vec4 v_color;
+        void main()
+        {
+            gl_Position = a_position + vec4(0, a_color.a, 0, 0);
+            v_color = vec4(a_color.rgb, 1.0);
+        }
+    );
 
-    struct cru_pipeline_template t1 = {
-        CRU_PIPELINE_DEFAULTS,
-        .primitiveRestartEnable = true,
-        .primitiveRestartIndex  = 104
+    VkPipelineIaStateCreateInfo ia_create_info = {
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO,
+        .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+        .disableVertexReuse = false,
+        .primitiveRestartEnable = false,
+        .primitiveRestartIndex = 0,
     };
-    restart_pipeline = test_create_solid_color_pipeline(&t1);
+
+    pipeline = qoCreateGraphicsPipeline(t_device,
+        (&(VkGraphicsPipelineCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+            .pNext = &ia_create_info,
+        }),
+        .vertexShader = vs);
+
+    VkPipelineIaStateCreateInfo restart_ia_create_info = {
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO,
+        .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+        .disableVertexReuse = false,
+        .primitiveRestartEnable = true,
+        .primitiveRestartIndex = 104,
+    };
+
+    restart_pipeline = qoCreateGraphicsPipeline(t_device,
+        (&(VkGraphicsPipelineCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+            .pNext = &restart_ia_create_info,
+        }),
+        .vertexShader = vs);
 
     static const struct {
         float vertices[256][2];
