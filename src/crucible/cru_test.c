@@ -525,18 +525,8 @@ t_compare_image(void)
 
     size_t mem_size = buffer_reqs.size;
 
-    VkDeviceMemory mem;
-    vkAllocMemory(t_device,
-        &(VkMemoryAllocInfo) {
-            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO,
-            .allocationSize = mem_size,
-            .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT,
-            .memPriority = VK_MEMORY_PRIORITY_NORMAL,
-        },
-        &mem);
-
-    void *map;
-    vkMapMemory(t_device, mem, 0, mem_size, 0, &map);
+    VkDeviceMemory mem = qoAllocMemory(t_device, .allocationSize = mem_size);
+    void *map = qoMapMemory(t_device, mem, 0, mem_size, 0);
 
     vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER, buffer,
                             /*index*/ 0, mem, /*offset*/ 0);
