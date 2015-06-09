@@ -148,6 +148,8 @@ test(void)
             .pSetLayouts = set_layout,
         },
         &pipeline_layout);
+    t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_PIPELINE_LAYOUT,
+                             pipeline_layout);
 
     VkPipeline pipeline;
     create_pipeline(t_device, &pipeline, pipeline_layout);
