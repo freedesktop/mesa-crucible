@@ -38,7 +38,7 @@
 static inline uint32_t
 align_u32(uint32_t value, uint32_t alignment)
 {
-   return (value + alignment - 1) & ~(alignment - 1);
+    return (value + alignment - 1) & ~(alignment - 1);
 }
 
 static VkPipeline
@@ -305,12 +305,12 @@ test(void)
                            (VkBuffer[]) { vertex_buffer, vertex_buffer },
                            (VkDeviceSize[]) { 0, 6 * 4 * sizeof(float) });
 
-   vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+    vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
-   vkCmdDraw(t_cmd_buffer, 0, 3, 0, 1);
-   vkCmdDraw(t_cmd_buffer, 3, 3, 1, 1);
+    vkCmdDraw(t_cmd_buffer, 0, 3, 0, 1);
+    vkCmdDraw(t_cmd_buffer, 3, 3, 1, 1);
 
-   vkCmdEndRenderPass(t_cmd_buffer, pass);
+    vkCmdEndRenderPass(t_cmd_buffer, pass);
 }
 
 cru_define_test {
