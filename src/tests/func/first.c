@@ -148,7 +148,7 @@ test(void)
             .pSetLayouts = set_layout,
         },
         &pipeline_layout);
-    t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_PIPELINE_LAYOUT,
+    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_PIPELINE_LAYOUT,
                              pipeline_layout);
 
     VkPipeline pipeline;
