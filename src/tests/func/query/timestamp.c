@@ -74,8 +74,6 @@ get_timestamp(void)
     printf("bottom timestamp:    %20ld  (%016lx)\n", results[1], results[1]);
     retval = results[0];
 
-    vkUnmapMemory(t_device, mem);
-
     return retval;
 }
 
