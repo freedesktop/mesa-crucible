@@ -159,6 +159,8 @@ test(void)
     vkAllocDescriptorSets(t_device, /*pool*/ 0,
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           2, set_layout, set, &set_count);
+    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DESCRIPTOR_SET, set[0]);
+    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DESCRIPTOR_SET, set[1]);
 
     VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024,
                                      .usage = VK_BUFFER_USAGE_GENERAL);
@@ -265,6 +267,7 @@ test(void)
             .minLod = 0
         },
         &tex_view);
+    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_IMAGE_VIEW, tex_view);
 
     VkSampler sampler;
     vkCreateSampler(t_device,
@@ -284,6 +287,7 @@ test(void)
             .borderColor = VK_BORDER_COLOR_TRANSPARENT_BLACK,
            },
        &sampler);
+    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_SAMPLER, sampler);
 
    vkUpdateDescriptors(t_device,
         set[0], 3,
@@ -365,6 +369,7 @@ test(void)
             .depthStencilFormat = VK_FORMAT_UNDEFINED,
         },
         &pass);
+    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_RENDER_PASS, pass);
 
     vkCmdBeginRenderPass(t_cmd_buffer,
         &(VkRenderPassBegin) {
