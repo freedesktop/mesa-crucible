@@ -935,6 +935,9 @@ cru_test_start_main_thread(void *arg)
     if (!t->def->no_image)
         t_compare_image();
 
+    // Don't prematurely end the test before the test has completed executing.
+    vkQueueWaitIdle(t->queue);
+
     // The framework must cancel the test when the test's start function
     // returns. Otherwise, cru_test_wait() will deadlock waiting for test
     // cancellation unless the test created a subthread that cancels later.
