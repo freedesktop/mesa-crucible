@@ -43,14 +43,7 @@ get_timestamp(void)
                             0, /* allocation index; for objects which need to bind to multiple mems */
                             mem, 0);
 
-    VkCmdBuffer cmdBuffer;
-    vkCreateCommandBuffer(t_device,
-                          &(VkCmdBufferCreateInfo) {
-                              .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_CREATE_INFO,
-                                  .queueNodeIndex = 0,
-                                  .flags = 0
-                                  },
-                          &cmdBuffer);
+    VkCmdBuffer cmdBuffer = qoCreateCommandBuffer(t_device);
 
     vkBeginCommandBuffer(cmdBuffer,
                          &(VkCmdBufferBeginInfo) {
@@ -66,8 +59,6 @@ get_timestamp(void)
     vkQueueSubmit(t_queue, 1, &cmdBuffer, 0);
 
     vkQueueWaitIdle(t_queue);
-
-    vkDestroyObject(t_device, VK_OBJECT_TYPE_COMMAND_BUFFER, cmdBuffer);
 
     uint64_t *results = map, retval;
     printf("top timestamp:       %20ld  (%016lx)\n", results[0], results[0]);

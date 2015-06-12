@@ -822,16 +822,7 @@ cru_test_start_main_thread(void *arg)
     t->dynamic_rs_state = qoCreateDynamicRasterState(t_device);
     t->dynamic_cb_state = qoCreateDynamicColorBlendState(t_device);
     t->dynamic_ds_state = qoCreateDynamicDepthStencilState(t_device);
-
-    vkCreateCommandBuffer(t_device,
-        &(VkCmdBufferCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_CREATE_INFO,
-            .queueNodeIndex = 0,
-            .flags = 0,
-         },
-        &t->cmd_buffer);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_COMMAND_BUFFER,
-                                    t_cmd_buffer);
+    t->cmd_buffer = qoCreateCommandBuffer(t_device);
 
     vkBeginCommandBuffer(t_cmd_buffer,
         &(VkCmdBufferBeginInfo) {

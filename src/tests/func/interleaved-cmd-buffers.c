@@ -88,15 +88,7 @@ setup_src(struct src *src)
 static void
 setup_dest(struct dest *dest)
 {
-    VkCmdBuffer cmd;
-    vkCreateCommandBuffer(t_device,
-        &(VkCmdBufferCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_CREATE_INFO,
-            .queueNodeIndex = 0,
-            .flags = 0,
-         },
-        &cmd);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_COMMAND_BUFFER, cmd);
+    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device);
 
     vkBeginCommandBuffer(cmd,
         &(VkCmdBufferBeginInfo) {
