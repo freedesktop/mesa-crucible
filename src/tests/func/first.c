@@ -389,6 +389,8 @@ test(void)
     vkCmdDraw(t_cmd_buffer, /*firstVertex*/ 0, /*vertexCount*/ 3,
               /*firstInstance*/ 0, /*instanceCount*/ 1);
     vkCmdEndRenderPass(t_cmd_buffer, pass);
+    qoEndCommandBuffer(t_cmd_buffer);
+    vkQueueSubmit(t_queue, 1, &t_cmd_buffer, 0);
 }
 
 cru_define_test {

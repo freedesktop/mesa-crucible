@@ -216,6 +216,8 @@ test(void)
    vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 4, 1);
 
    vkCmdEndRenderPass(t_cmd_buffer, pass);
+   qoEndCommandBuffer(t_cmd_buffer);
+   vkQueueSubmit(t_queue, 1, &t_cmd_buffer, 0);
 }
 
 cru_define_test {

@@ -546,10 +546,12 @@ t_compare_image(void)
         },
     };
 
-    vkCmdCopyImageToBuffer(t_cmd_buffer, t_image,
+    VkCmdBuffer cmd = qoCreateCommandBuffer(t->device);
+    qoBeginCommandBuffer(cmd);
+    vkCmdCopyImageToBuffer(cmd, t_image,
                            VK_IMAGE_LAYOUT_GENERAL, buffer, 1, &copy);
-    qoEndCommandBuffer(t_cmd_buffer);
-    vkQueueSubmit(t_queue, 1, &t_cmd_buffer, 0);
+    qoEndCommandBuffer(cmd);
+    vkQueueSubmit(t_queue, 1, &cmd, 0);
     vkQueueWaitIdle(t_queue);
 
     cru_image_t *actual_image =
