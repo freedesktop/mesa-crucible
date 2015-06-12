@@ -167,6 +167,9 @@ extern "C" {
     .stencilFrontRef = 0,   /* default in OpenGL ES 3.1 */ \
     .stencilBackRef = 0     /* default in OpenGL ES 3.1 */
 
+#define QO_CMD_BUFFER_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_CREATE_INFO
+
 #define QO_IMAGE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO, \
     .imageType = VK_IMAGE_TYPE_2D, \
@@ -276,6 +279,17 @@ VkDynamicDsStateCreateInfo qoCreateDynamicDepthStencilState(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
+VkCmdBuffer qoCreateCommandBuffer(VkDevice dev, ...);
+#else
+#define qoCreateCommandBuffer(dev, ...) \
+    __qoCreateCommandBuffer(dev, \
+        &(VkCmdBufferCreateInfo) { \
+            QO_CMD_BUFFER_CREATE_INFO_DEFAULTS, \
+            ##__VA_ARGS__, \
+        })
+#endif
+
+#ifdef DOXYGEN
 VkPipeline qoCreateGraphicsPipeline(VkDevice dev, const VkGraphicsPipelineCreateInfo *pCreateInfo, ...);
 #else
 #define qoCreateGraphicsPipeline(dev, pCreateInfo, ...) \
@@ -322,6 +336,7 @@ VkDynamicVpState __qoCreateDynamicViewportState(VkDevice dev, const VkDynamicVpS
 VkDynamicRsState __qoCreateDynamicRasterState(VkDevice dev, const VkDynamicRsStateCreateInfo *info);
 VkDynamicCbState __qoCreateDynamicColorBlendState(VkDevice dev, const VkDynamicCbStateCreateInfo *info);
 VkDynamicDsState __qoCreateDynamicDepthStencilState(VkDevice dev, const VkDynamicDsStateCreateInfo *info);
+VkCmdBuffer __qoCreateCommandBuffer(VkDevice dev, const VkCmdBufferCreateInfo *info);
 VkPipeline __qoCreateGraphicsPipeline(VkDevice dev, const VkGraphicsPipelineCreateInfo *info, const struct __qoCreateGraphicsPipeline_extra *extra);
 VkImage __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info);
 VkShader __qoCreateShader(VkDevice dev, const VkShaderCreateInfo *info);

@@ -215,6 +215,23 @@ __qoCreateDynamicDepthStencilState(VkDevice dev,
     return state;
 }
 
+VkCmdBuffer
+__qoCreateCommandBuffer(VkDevice dev, const VkCmdBufferCreateInfo *info)
+{
+    VkCmdBuffer cmd;
+    VkResult result;
+
+    result = vkCreateCommandBuffer(dev, info, &cmd);
+
+    if (t_is_current()) {
+        t_assert(result == VK_SUCCESS);
+        t_assert(cmd);
+        t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_COMMAND_BUFFER, cmd);
+    }
+
+    return cmd;
+}
+
 VkImage
 __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info)
 {
