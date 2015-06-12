@@ -32,6 +32,7 @@ enum cru_image_type {
 
 struct cru_image {
    uint32_t format;
+   uint32_t cpp;
    uint32_t width;
    uint32_t height;
    bool read_only;

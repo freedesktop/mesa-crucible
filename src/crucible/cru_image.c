@@ -164,6 +164,7 @@ cru_image_init(cru_image_t *image, enum cru_image_type type,
     }
 
     image->format = format;
+    image->cpp = 4; // RGBA8
     image->width = width;
     image->height = height;
     image->type = type;
@@ -185,6 +186,8 @@ cru_image_check_compatible(const char *func,
         // Maybe one day we'll want to support more formats.
         cru_loge("%s: image formats differ", func);
         return false;
+    } else {
+        assert(a->cpp == b->cpp);
     }
 
     if (a->width != b->width) {
@@ -375,6 +378,8 @@ cru_image_compare_rect(cru_image_t *a, uint32_t a_x, uint32_t a_y,
         // Maybe one day we'll want to support more formats.
         cru_loge("%s: image formats differ", __func__);
         goto cleanup;
+    } else {
+        assert(a->cpp == b->cpp);
     }
 
     if (a_x + width > a->width || a_y + height > a->height ||
