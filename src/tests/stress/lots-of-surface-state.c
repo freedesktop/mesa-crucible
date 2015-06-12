@@ -58,8 +58,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
             .pSetLayouts = &set_layout,
         },
         &pipeline_layout);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_PIPELINE_LAYOUT,
-                             pipeline_layout);
+    t_cleanup_push_vk_pipeline_layout(t_device, pipeline_layout);
 
     VkPipelineVertexInputCreateInfo vi_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_CREATE_INFO,
@@ -208,7 +207,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
     vkAllocDescriptorSets(t_device, /*pool*/ 0,
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           1, &set_layout, &set, &set_count);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DESCRIPTOR_SET, set);
+    t_cleanup_push_vk_descriptor_set(t_device, set);
 
     VkBufferViewAttachInfo attach_info[12];
     for (int i = 0; i < 12; i++)

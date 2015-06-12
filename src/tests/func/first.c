@@ -148,8 +148,7 @@ test(void)
             .pSetLayouts = set_layout,
         },
         &pipeline_layout);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_PIPELINE_LAYOUT,
-                             pipeline_layout);
+    t_cleanup_push_vk_pipeline_layout(t_device, pipeline_layout);
 
     VkPipeline pipeline;
     create_pipeline(t_device, &pipeline, pipeline_layout);
@@ -159,8 +158,8 @@ test(void)
     vkAllocDescriptorSets(t_device, /*pool*/ 0,
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           2, set_layout, set, &set_count);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DESCRIPTOR_SET, set[0]);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DESCRIPTOR_SET, set[1]);
+    t_cleanup_push_vk_descriptor_set(t_device, set[0]);
+    t_cleanup_push_vk_descriptor_set(t_device, set[1]);
 
     VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024,
                                      .usage = VK_BUFFER_USAGE_GENERAL);
@@ -267,7 +266,7 @@ test(void)
             .minLod = 0
         },
         &tex_view);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_IMAGE_VIEW, tex_view);
+    t_cleanup_push_vk_image_view(t_device, tex_view);
 
     VkSampler sampler;
     vkCreateSampler(t_device,
@@ -287,7 +286,7 @@ test(void)
             .borderColor = VK_BORDER_COLOR_TRANSPARENT_BLACK,
            },
        &sampler);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_SAMPLER, sampler);
+    t_cleanup_push_vk_sampler(t_device, sampler);
 
    vkUpdateDescriptors(t_device,
         set[0], 3,
@@ -369,7 +368,7 @@ test(void)
             .depthStencilFormat = VK_FORMAT_UNDEFINED,
         },
         &pass);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_RENDER_PASS, pass);
+    t_cleanup_push_vk_render_pass(t_device, pass);
 
     vkCmdBeginRenderPass(t_cmd_buffer,
         &(VkRenderPassBegin) {

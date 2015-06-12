@@ -787,8 +787,7 @@ cru_test_start_main_thread(void *arg)
                                      &t->physical_device);
     t_assert(res == VK_SUCCESS);
     t_assert(physical_device_count == 1);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_PHYSICAL_DEVICE,
-                             t_physical_device);
+    t_cleanup_push_vk_physical_device(t_device, t->physical_device);
 
     vkCreateDevice(t->physical_device,
         &(VkDeviceCreateInfo) {
@@ -803,7 +802,7 @@ cru_test_start_main_thread(void *arg)
     t_cleanup_push_vk_device(t_device);
 
     vkGetDeviceQueue(t_device, 0, 0, &t->queue);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_QUEUE, t_queue);
+    t_cleanup_push_vk_queue(t->device, t->queue);
 
     t->dynamic_vp_state = qoCreateDynamicViewportState(t->device,
         .viewportAndScissorCount = 1,
@@ -861,8 +860,7 @@ cru_test_start_main_thread(void *arg)
                 .memPriority = VK_MEMORY_PRIORITY_NORMAL,
             },
             &rt_mem);
-        t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DEVICE_MEMORY,
-                                 rt_mem);
+        t_cleanup_push_vk_device_memory(t_device, rt_mem);
 
         vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_IMAGE, t_image,
                                 /*allocationIndex*/ 0, rt_mem,
@@ -880,9 +878,7 @@ cru_test_start_main_thread(void *arg)
                 .msaaResolveSubResource = {0},
             },
             &t->image_color_view);
-        t_cleanup_push_vk_object(t_device,
-                                 VK_OBJECT_TYPE_COLOR_ATTACHMENT_VIEW,
-                                 t_image_color_view);
+        t_cleanup_push_vk_color_attachment_view(t_device, t_image_color_view);
 
         vkCreateImageView(t_device,
             &(VkImageViewCreateInfo) {
@@ -906,9 +902,7 @@ cru_test_start_main_thread(void *arg)
                 .minLod = 0,
             },
             &t->image_texture_view);
-        t_cleanup_push_vk_object(t_device,
-                                 VK_OBJECT_TYPE_IMAGE_VIEW,
-                                 t_image_texture_view);
+        t_cleanup_push_vk_image_view(t->device, t->image_texture_view);
 
         vkCreateFramebuffer(t_device,
             &(VkFramebufferCreateInfo) {
@@ -927,8 +921,7 @@ cru_test_start_main_thread(void *arg)
                 .layers = 1,
             },
             &t->framebuffer);
-        t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_FRAMEBUFFER,
-                                 t_framebuffer);
+        t_cleanup_push_vk_framebuffer(t_device, t_framebuffer);
     }
 
     t->phase = CRU_TEST_PHASE_MAIN;

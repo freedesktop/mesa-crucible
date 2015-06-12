@@ -150,8 +150,7 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
             .layout = pipeline_layout
         },
         pipeline);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_PIPELINE,
-                                    *pipeline);
+    t_cleanup_push_vk_pipeline(t_device, *pipeline);
 }
 
 #define HEX_COLOR(v)                            \

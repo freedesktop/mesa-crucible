@@ -71,9 +71,7 @@ test(void)
             .pSetLayouts = &set_layout,
         },
         &pipeline_layout);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_PIPELINE_LAYOUT,
-                             pipeline_layout);
-
+    t_cleanup_push_vk_pipeline_layout(t_device, pipeline_layout);
 
     VkShader cs = qoCreateShaderGLSL(
         t_device, COMPUTE,
@@ -104,7 +102,7 @@ test(void)
     vkAllocDescriptorSets(t_device, /*pool*/ 0,
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           1, &set_layout, &set, &set_count);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_DESCRIPTOR_SET, set);
+    t_cleanup_push_vk_descriptor_set(t_device, set);
 
     VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024,
                                      .usage = VK_BUFFER_USAGE_GENERAL);
@@ -138,7 +136,7 @@ test(void)
             .borderColor = VK_BORDER_COLOR_TRANSPARENT_BLACK,
            },
        &sampler);
-    t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_SAMPLER, sampler);
+    t_cleanup_push_vk_sampler(t_device, sampler);
 
    vkUpdateDescriptors(t_device,
         set, 2,

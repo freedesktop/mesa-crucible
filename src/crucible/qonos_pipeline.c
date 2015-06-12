@@ -213,7 +213,7 @@ __qoCreateGraphicsPipeline(VkDevice device,
     if (t_is_current()) {
         t_assert(result == VK_SUCCESS);
         t_assert(pipeline);
-        t_cleanup_push_vk_object(t_device, VK_OBJECT_TYPE_PIPELINE, pipeline);
+        t_cleanup_push_vk_pipeline(t_device, pipeline);
     }
 
     return pipeline;
