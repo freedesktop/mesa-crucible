@@ -49,9 +49,6 @@ struct cru_image {
    bool (*unmap_pixels)(cru_image_t *image);
 };
 
-/// All image code assumes VK_FORMAT_R8G8B8A8_UNORM.
-static const uint8_t cru_image_pixel_size = 4;
-
 // file: cru_image.c
 bool cru_image_init(cru_image_t *image, enum cru_image_type type, VkFormat format, uint32_t width, uint32_t height, bool read_only);
 char *cru_image_get_abspath(const char *filename);

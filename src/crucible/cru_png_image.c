@@ -118,7 +118,7 @@ cru_png_image_copy_to_pixels(cru_image_t *image, cru_image_t *dest)
 
     const uint32_t width = image->width;
     const uint32_t height = image->height;
-    const uint32_t stride = width * cru_image_pixel_size;
+    const uint32_t stride = width * image->cpp;
     uint8_t *dest_pixels = NULL;
     uint8_t *dest_rows[height];
 
@@ -208,8 +208,7 @@ cru_png_image_map_pixels(cru_image_t *image, uint32_t access)
         return kpng_image->map.pixels;
     }
 
-    pixels = xmalloc(width * height * cru_image_pixel_size);
-
+    pixels = xmalloc(image->cpp * width * height);
     pixel_image = cru_image_from_pixels(pixels, image->format, width, height);
     if (!pixel_image)
         goto fail;

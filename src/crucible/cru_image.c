@@ -224,7 +224,7 @@ cru_image_write_file(cru_image_t *image, const char *filename)
     char *abspath = NULL;
     const uint32_t src_width = image->width;
     const uint32_t src_height = image->height;
-    const uint32_t src_stride = src_width * cru_image_pixel_size;
+    const uint32_t src_stride = image->cpp * src_width;
     uint8_t *src_pixels = NULL;
     uint8_t *src_rows[src_height];
 
@@ -313,7 +313,7 @@ cru_image_copy_pixels_to_pixels(cru_image_t *dest, cru_image_t *src)
 
     // src and dest must have the same size. Should be checked earlier with
     // cru_image_check_compatible().
-    image_size = src->width * src->height * cru_image_pixel_size;
+    image_size = src->cpp * src->width * src->height;
 
     memcpy(dest, src, image_size);
     result = true;
@@ -388,7 +388,7 @@ cru_image_compare_rect(cru_image_t *a, uint32_t a_x, uint32_t a_y,
         goto cleanup;
     }
 
-    const uint32_t cpp = cru_image_pixel_size;
+    const uint32_t cpp = a->cpp;
     const uint32_t row_size = cpp * width;
     const uint32_t a_stride = cpp * a->width;
     const uint32_t b_stride = cpp * b->width;
