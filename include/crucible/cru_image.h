@@ -74,6 +74,9 @@ cru_image_t *cru_image_load_file(const char *filename) cru_malloclike;
 bool cru_image_write_file(cru_image_t *image, const char *filename);
 bool cru_image_copy(cru_image_t *dest, cru_image_t *src);
 bool cru_image_compare(cru_image_t *a, cru_image_t *b);
+bool cru_image_compare_rect(cru_image_t *a, uint32_t a_x, uint32_t a_y,
+                            cru_image_t *b, uint32_t b_x, uint32_t b_y,
+                            uint32_t width, uint32_t height);
 
 /// \brief Map the image to an array of pixels.
 ///

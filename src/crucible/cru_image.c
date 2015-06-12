@@ -351,34 +351,73 @@ cru_image_copy(cru_image_t *dest, cru_image_t *src)
 bool
 cru_image_compare(cru_image_t *a, cru_image_t *b)
 {
-    bool result = false;
-    uint8_t *a_pixels = NULL;
-    uint8_t *b_pixels = NULL;
-    uint32_t image_size;
-
-    if (!cru_image_check_compatible(__func__, a, b))
+    if (a->width != b->width || a->height != b->height) {
+        cru_loge("%s: image dimensions differ", __func__);
         return false;
+    }
 
-    a_pixels = a->map_pixels(a, CRU_IMAGE_MAP_ACCESS_READ);
-    if (!a_pixels)
+    return cru_image_compare_rect(a, 0, 0, b, 0, 0, a->width, a->height);
+}
+
+bool
+cru_image_compare_rect(cru_image_t *a, uint32_t a_x, uint32_t a_y,
+                       cru_image_t *b, uint32_t b_x, uint32_t b_y,
+                       uint32_t width, uint32_t height)
+{
+    bool result = false;
+    void *a_map = NULL;
+    void *b_map = NULL;
+
+    if (a == b)
+        return true;
+
+    if (a->format != b->format) {
+        // Maybe one day we'll want to support more formats.
+        cru_loge("%s: image formats differ", __func__);
+        goto cleanup;
+    }
+
+    if (a_x + width > a->width || a_y + height > a->height ||
+        b_x + width > b->width || b_y + height > b->height) {
+        cru_loge("%s: rect exceeds image dimensions", __func__);
+        goto cleanup;
+    }
+
+    const uint32_t cpp = cru_image_pixel_size;
+    const uint32_t row_size = cpp * width;
+    const uint32_t a_stride = cpp * a->width;
+    const uint32_t b_stride = cpp * b->width;
+
+    a_map = a->map_pixels(a, CRU_IMAGE_MAP_ACCESS_READ);
+    if (!a_map)
         goto cleanup;
 
-    b_pixels = b->map_pixels(b, CRU_IMAGE_MAP_ACCESS_READ);
-    if (!b_pixels)
+    b_map = b->map_pixels(b, CRU_IMAGE_MAP_ACCESS_READ);
+    if (!b_map)
         goto cleanup;
-
-    image_size = a->width * a->height * cru_image_pixel_size;
 
     // FINISHME: Support a configurable tolerance.
     // FINISHME: Support dumping the diff to file.
-    if (memcmp(a_pixels, b_pixels, image_size) == 0)
-        result = true;
+    for (uint32_t y = 0; y < height; ++y) {
+        const void *a_row = a_map + ((a_y + y) * a_stride + a_x * cpp);
+        const void *b_row = b_map + ((b_y + y) * b_stride + b_x * cpp);
+
+        if (memcmp(a_row, b_row, row_size) != 0) {
+            cru_loge("%s: diff found in row %u of rect", __func__, y);
+            result = false;
+            goto cleanup;
+        }
+    }
+
+    result = true;
 
 cleanup:
-    if (a_pixels)
+    if (a_map)
         a->unmap_pixels(a);
-    if (b_pixels)
+
+    if (b_map)
         b->unmap_pixels(b);
+
     return result;
 }
 
