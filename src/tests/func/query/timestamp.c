@@ -44,17 +44,10 @@ get_timestamp(void)
                             mem, 0);
 
     VkCmdBuffer cmdBuffer = qoCreateCommandBuffer(t_device);
-
-    vkBeginCommandBuffer(cmdBuffer,
-                         &(VkCmdBufferBeginInfo) {
-                             .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_BEGIN_INFO,
-                                 .flags = 0
-                                 });
-
+    qoBeginCommandBuffer(cmdBuffer);
     vkCmdWriteTimestamp(cmdBuffer, VK_TIMESTAMP_TYPE_TOP, buffer, 0);
     vkCmdWriteTimestamp(cmdBuffer, VK_TIMESTAMP_TYPE_BOTTOM, buffer, 8);
-
-    vkEndCommandBuffer(cmdBuffer);
+    qoEndCommandBuffer(cmdBuffer);
 
     vkQueueSubmit(t_queue, 1, &cmdBuffer, 0);
 

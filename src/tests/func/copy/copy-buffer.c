@@ -59,12 +59,7 @@ test_large_copy(void)
                             mem, buffer_requirements.size);
 
     VkCmdBuffer cmdBuffer = qoCreateCommandBuffer(t_device);
-
-    vkBeginCommandBuffer(cmdBuffer,
-        &(VkCmdBufferBeginInfo) {
-            .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_BEGIN_INFO,
-            .flags = 0
-        });
+    qoBeginCommandBuffer(cmdBuffer);
 
     vkCmdPipelineBarrier(cmdBuffer, VK_WAIT_EVENT_TOP_OF_PIPE, 0, NULL, 2,
         (const void * []) {
@@ -104,7 +99,7 @@ test_large_copy(void)
             },
         });
 
-    vkEndCommandBuffer(cmdBuffer);
+    qoEndCommandBuffer(cmdBuffer);
 
     vkQueueSubmit(t_queue, 1, &cmdBuffer, 0);
 

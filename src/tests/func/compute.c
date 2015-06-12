@@ -172,7 +172,7 @@ test(void)
 
     vkCmdDispatch(t_cmd_buffer, 8, 2, 2);
 
-    vkEndCommandBuffer(t_cmd_buffer);
+    qoEndCommandBuffer(t_cmd_buffer);
     vkQueueSubmit(t_queue, 1, &t_cmd_buffer, 0);
     vkQueueWaitIdle(t_queue);
 }

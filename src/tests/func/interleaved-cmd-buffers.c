@@ -144,13 +144,13 @@ test_end1_submit1_end2_submit2(void)
 
     vkCmdCopyImageToBuffer(dest1.cmd, src.vk_image, VK_IMAGE_LAYOUT_GENERAL,
                            dest1.buffer, 1, &copy);
-    vkEndCommandBuffer(dest1.cmd);
+    qoEndCommandBuffer(dest1.cmd);
     vkQueueSubmit(t_queue, 1, &dest1.cmd, 0);
     vkQueueWaitIdle(t_queue);
 
     vkCmdCopyImageToBuffer(dest2.cmd, src.vk_image, VK_IMAGE_LAYOUT_GENERAL,
                            dest2.buffer, 1, &copy);
-    vkEndCommandBuffer(dest2.cmd);
+    qoEndCommandBuffer(dest2.cmd);
     vkQueueSubmit(t_queue, 1, &dest2.cmd, 0);
     vkQueueWaitIdle(t_queue);
 
@@ -170,11 +170,11 @@ test_end1_end2_submit1_submit2(void)
 
     vkCmdCopyImageToBuffer(dest1.cmd, src.vk_image, VK_IMAGE_LAYOUT_GENERAL,
                            dest1.buffer, 1, &copy);
-    vkEndCommandBuffer(dest1.cmd);
+    qoEndCommandBuffer(dest1.cmd);
 
     vkCmdCopyImageToBuffer(dest2.cmd, src.vk_image, VK_IMAGE_LAYOUT_GENERAL,
                            dest2.buffer, 1, &copy);
-    vkEndCommandBuffer(dest2.cmd);
+    qoEndCommandBuffer(dest2.cmd);
 
     vkQueueSubmit(t_queue, 1, &dest1.cmd, 0);
     vkQueueSubmit(t_queue, 1, &dest2.cmd, 0);

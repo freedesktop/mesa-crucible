@@ -548,7 +548,7 @@ t_compare_image(void)
 
     vkCmdCopyImageToBuffer(t_cmd_buffer, t_image,
                            VK_IMAGE_LAYOUT_GENERAL, buffer, 1, &copy);
-    vkEndCommandBuffer(t_cmd_buffer);
+    qoEndCommandBuffer(t_cmd_buffer);
     vkQueueSubmit(t_queue, 1, &t_cmd_buffer, 0);
     vkQueueWaitIdle(t_queue);
 
@@ -824,12 +824,7 @@ cru_test_start_main_thread(void *arg)
     t->dynamic_ds_state = qoCreateDynamicDepthStencilState(t_device);
     t->cmd_buffer = qoCreateCommandBuffer(t_device);
 
-    vkBeginCommandBuffer(t_cmd_buffer,
-        &(VkCmdBufferBeginInfo) {
-            .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_BEGIN_INFO,
-            .flags = 0,
-        });
-
+    qoBeginCommandBuffer(t_cmd_buffer);
     vkCmdBindDynamicStateObject(t->cmd_buffer, VK_STATE_BIND_POINT_VIEWPORT,
                                 t->dynamic_vp_state);
     vkCmdBindDynamicStateObject(t->cmd_buffer, VK_STATE_BIND_POINT_RASTER,
