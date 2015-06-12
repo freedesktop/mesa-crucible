@@ -232,6 +232,36 @@ __qoCreateCommandBuffer(VkDevice dev, const VkCmdBufferCreateInfo *info)
     return cmd;
 }
 
+VkResult
+__qoBeginCommandBuffer(VkCmdBuffer cmd, const VkCmdBufferBeginInfo *info)
+{
+    VkResult result;
+
+    result = vkBeginCommandBuffer(cmd, info);
+
+    if (t_is_current()) {
+        t_assert(result == VK_SUCCESS);
+    }
+
+    return result;
+}
+
+VkResult
+__qoEndCommandBuffer(VkCmdBuffer cmd)
+{
+    VkResult result;
+
+    result = vkEndCommandBuffer(cmd);
+
+    if (t_is_current()) {
+        t_assert(result == VK_SUCCESS);
+    }
+
+    return result;
+}
+
+VkResult __qoEndCommandBuffer(VkCmdBuffer cmd);
+
 VkImage
 __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info)
 {

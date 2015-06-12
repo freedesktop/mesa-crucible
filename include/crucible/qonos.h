@@ -170,6 +170,9 @@ extern "C" {
 #define QO_CMD_BUFFER_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_CREATE_INFO
 
+#define QO_CMD_BUFFER_BEGIN_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_BEGIN_INFO
+
 #define QO_IMAGE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO, \
     .imageType = VK_IMAGE_TYPE_2D, \
@@ -290,6 +293,23 @@ VkCmdBuffer qoCreateCommandBuffer(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
+VkResult qoBeginCommandBuffer(VkCmdBuffer cmd, ...);
+#else
+#define qoBeginCommandBuffer(cmd, ...) \
+    __qoBeginCommandBuffer(cmd, \
+        &(VkCmdBufferBeginInfo) { \
+            QO_CMD_BUFFER_BEGIN_INFO_DEFAULTS, \
+            ##__VA_ARGS__, \
+    })
+#endif
+
+#ifdef DOXYGEN
+VkResult qoEndCommandBuffer(VkCmdBuffer cmd);
+#else
+#define qoEndCommandBuffer(cmd) __qoEndCommandBuffer(cmd)
+#endif
+
+#ifdef DOXYGEN
 VkPipeline qoCreateGraphicsPipeline(VkDevice dev, const VkGraphicsPipelineCreateInfo *pCreateInfo, ...);
 #else
 #define qoCreateGraphicsPipeline(dev, pCreateInfo, ...) \
@@ -337,6 +357,9 @@ VkDynamicRsState __qoCreateDynamicRasterState(VkDevice dev, const VkDynamicRsSta
 VkDynamicCbState __qoCreateDynamicColorBlendState(VkDevice dev, const VkDynamicCbStateCreateInfo *info);
 VkDynamicDsState __qoCreateDynamicDepthStencilState(VkDevice dev, const VkDynamicDsStateCreateInfo *info);
 VkCmdBuffer __qoCreateCommandBuffer(VkDevice dev, const VkCmdBufferCreateInfo *info);
+VkResult __qoBeginCommandBuffer(VkCmdBuffer cmd, const VkCmdBufferBeginInfo *info);
+VkResult __qoEndCommandBuffer(VkCmdBuffer cmd);
+
 VkPipeline __qoCreateGraphicsPipeline(VkDevice dev, const VkGraphicsPipelineCreateInfo *info, const struct __qoCreateGraphicsPipeline_extra *extra);
 VkImage __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info);
 VkShader __qoCreateShader(VkDevice dev, const VkShaderCreateInfo *info);
