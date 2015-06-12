@@ -67,6 +67,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/ds/basic.c \
 	src/tests/func/query/timestamp.c \
 	src/tests/func/first.c \
+	src/tests/func/compute.c \
 	src/tests/func/interleaved-cmd-buffers.c \
 	src/tests/stress/lots-of-surface-state.c
 
@@ -76,6 +77,7 @@ BUILT_SOURCES = \
 	src/tests/func/draw_indexed-spirv.h \
 	src/tests/func/ds/basic-spirv.h \
 	src/tests/func/first-spirv.h \
+	src/tests/func/compute-spirv.h \
 	src/tests/stress/lots-of-surface-state-spirv.h
 
 %-spirv.h: %.c misc/glsl_scraper.py
