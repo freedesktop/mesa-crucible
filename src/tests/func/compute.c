@@ -174,7 +174,6 @@ test(void)
 
     qoEndCommandBuffer(t_cmd_buffer);
     vkQueueSubmit(t_queue, 1, &t_cmd_buffer, 0);
-    vkQueueWaitIdle(t_queue);
 }
 
 cru_define_test {
