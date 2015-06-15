@@ -189,6 +189,16 @@ VkMemoryRequirements qoObjectGetMemoryRequirements(VkDevice dev, VkObjectType ob
 VkMemoryRequirements qoBufferGetMemoryRequirements(VkDevice dev, VkBuffer buffer);
 VkMemoryRequirements qoImageGetMemoryRequirements(VkDevice dev, VkImage image);
 
+VkResult qoQueueBindObjectMemory(VkQueue queue, VkObjectType obj_type,
+                                 VkObject obj, uint32_t allocation_index,
+                                 VkDeviceMemory mem, VkDeviceSize offset);
+VkResult qoQueueBindBufferMemory(VkQueue queue, VkBuffer buffer,
+                                 uint32_t allocation_index,
+                                 VkDeviceMemory mem, VkDeviceSize offset);
+VkResult qoQueueBindImageMemory(VkQueue queue, VkImage image,
+                                uint32_t allocation_index,
+                                VkDeviceMemory mem, VkDeviceSize offset);
+
 #ifdef DOXYGEN
 VkDeviceMemory qoAllocMemory(VkDevice dev, ...);
 #else

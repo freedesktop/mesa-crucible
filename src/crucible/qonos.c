@@ -54,6 +54,41 @@ qoImageGetMemoryRequirements(VkDevice dev, VkImage image)
     return qoObjectGetMemoryRequirements(dev, VK_OBJECT_TYPE_IMAGE, image);
 }
 
+VkResult
+qoQueueBindObjectMemory(VkQueue queue, VkObjectType obj_type, VkObject obj,
+                        uint32_t allocation_index, VkDeviceMemory mem,
+                        VkDeviceSize offset)
+{
+    VkResult result;
+
+    result = vkQueueBindObjectMemory(queue, obj_type, obj, allocation_index,
+                                     mem, offset);
+
+    if (t_is_current()) {
+        t_assert(result == VK_SUCCESS);
+    }
+
+    return result;
+}
+
+VkResult
+qoQueueBindBufferMemory(VkQueue queue, VkBuffer buffer,
+                        uint32_t allocation_index, VkDeviceMemory mem,
+                        VkDeviceSize offset)
+{
+    return qoQueueBindObjectMemory(queue, VK_OBJECT_TYPE_BUFFER, buffer,
+                                   allocation_index, mem, offset);
+}
+
+VkResult
+qoQueueBindImageMemory(VkQueue queue, VkImage image,
+                       uint32_t allocation_index, VkDeviceMemory mem,
+                       VkDeviceSize offset)
+{
+    return qoQueueBindObjectMemory(queue, VK_OBJECT_TYPE_IMAGE, image,
+                                   allocation_index, mem, offset);
+}
+
 VkDeviceMemory
 __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info)
 {
