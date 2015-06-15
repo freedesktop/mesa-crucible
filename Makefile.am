@@ -69,6 +69,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/first.c \
 	src/tests/func/compute.c \
 	src/tests/func/interleaved-cmd-buffers.c \
+	src/tests/func/miptree/miptree.c \
 	src/tests/stress/lots-of-surface-state.c
 
 BUILT_SOURCES = \
@@ -78,10 +79,15 @@ BUILT_SOURCES = \
 	src/tests/func/ds/basic-spirv.h \
 	src/tests/func/first-spirv.h \
 	src/tests/func/compute-spirv.h \
+	src/tests/func/miptree/miptree-spirv.h \
+	src/tests/func/miptree/miptree_gen.c \
 	src/tests/stress/lots-of-surface-state-spirv.h
 
 %-spirv.h: %.c misc/glsl_scraper.py
 	$(AM_V_GEN) $(PYTHON2) $(srcdir)/misc/glsl_scraper.py --glsl-only -o $@ $<
+
+%_gen.c: %_gen.py
+	$(AM_V_GEN) $(PYTHON3) $<
 
 bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread -lpng16
 
