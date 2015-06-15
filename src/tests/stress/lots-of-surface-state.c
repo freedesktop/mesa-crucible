@@ -112,11 +112,10 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
     VkDeviceMemory mem = qoAllocMemory(t_device, .allocationSize = mem_size);
     void *map = qoMapMemory(t_device, mem, 0, mem_size, 0);
 
-    vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER, ubo,
-                            /*index*/ 0, mem, 0);
+    qoQueueBindBufferMemory(t_queue, ubo, /*index*/ 0, mem, 0);
+
     float *ubo_map = map;
-    vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER, vbo,
-                            /*index*/ 0, mem, ubo_reqs.size);
+    qoQueueBindBufferMemory(t_queue, vbo, /*index*/ 0, mem, ubo_reqs.size);
     float *vbo_map = map + ubo_reqs.size;
 
     /* Fill the VBO with 2D coordinates. One per pixel in a 32x32 image */

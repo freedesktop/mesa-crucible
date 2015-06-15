@@ -108,8 +108,7 @@ test(void)
                                      .usage = VK_BUFFER_USAGE_GENERAL);
 
     VkDeviceMemory mem = qoAllocMemory(t_device, .allocationSize = 4096);
-    vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER, buffer,
-                            /*index*/ 0, mem, 0);
+    qoQueueBindBufferMemory(t_queue, buffer, /*index*/ 0, mem, 0);
 
     VkBufferView buffer_view;
     buffer_view = qoCreateBufferView(t_device,

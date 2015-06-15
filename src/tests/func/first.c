@@ -181,8 +181,7 @@ test(void)
     void *map = qoMapMemory(t_device, mem, 0, mem_size, 0);
     memset(map, 192, mem_size);
 
-    vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER, buffer,
-                            /*index*/ 0, mem, 128);
+    qoQueueBindBufferMemory(t_queue, buffer, /*index*/ 0, mem, 128);
 
     static const float color[12] = {
         0.0, 0.2, 0.0, 0.0,
@@ -210,8 +209,7 @@ test(void)
         .format = VK_FORMAT_R32G32B32A32_SFLOAT,
         .offset = 48, .range = 64);
 
-    vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER,
-                            vertex_buffer, /*index*/ 0, mem, 1024);
+    qoQueueBindBufferMemory(t_queue, vertex_buffer, /*index*/ 0, mem, 1024);
 
     static const float vertex_data[] = {
         // Triangle coordinates
@@ -225,8 +223,7 @@ test(void)
 
     memcpy(map + 1024, vertex_data, sizeof(vertex_data));
 
-    vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER, image_buffer,
-                            /*index*/ 0, mem, 0);
+    qoQueueBindBufferMemory(t_queue, image_buffer, /*index*/ 0, mem, 0);
 
     const uint32_t texture_width = 16, texture_height = 16;
 
@@ -240,8 +237,8 @@ test(void)
             .depth = 1,
         });
 
-    vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_IMAGE, texture,
-                            /*index*/ 0, mem, 2048 + 256 * 256 * 4);
+    qoQueueBindImageMemory(t_queue, texture, /*index*/ 0, mem,
+                           2048 + 256 * 256 * 4);
 
     VkImageView tex_view;
     vkCreateImageView(t_device,

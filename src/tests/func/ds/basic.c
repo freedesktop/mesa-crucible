@@ -81,12 +81,10 @@ test(void)
     memset(vertex_map, 0, mem_size);
 
     uint32_t offset = 0;
-    vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER,
-                            vertex_buffer, 0, mem, offset);
+    qoQueueBindBufferMemory(t_queue, vertex_buffer, 0, mem, offset);
     offset = align_u32(offset + vb_requirements.size, 4096);
 
-    vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_IMAGE,
-                            ds, 0, mem, offset);
+    qoQueueBindImageMemory(t_queue, ds, 0, mem, offset);
 
     vkCreateDepthStencilView(t_device,
                              &(VkDepthStencilViewCreateInfo) {

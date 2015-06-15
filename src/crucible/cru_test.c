@@ -528,8 +528,7 @@ t_compare_image(void)
     VkDeviceMemory mem = qoAllocMemory(t_device, .allocationSize = mem_size);
     void *map = qoMapMemory(t_device, mem, 0, mem_size, 0);
 
-    vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_BUFFER, buffer,
-                            /*index*/ 0, mem, /*offset*/ 0);
+    qoQueueBindBufferMemory(t_queue, buffer, /*index*/ 0, mem, /*offset*/ 0);
 
     VkBufferImageCopy copy = {
         .bufferOffset = 0,
@@ -862,9 +861,8 @@ cru_test_start_main_thread(void *arg)
             &rt_mem);
         t_cleanup_push_vk_device_memory(t_device, rt_mem);
 
-        vkQueueBindObjectMemory(t_queue, VK_OBJECT_TYPE_IMAGE, t_image,
-                                /*allocationIndex*/ 0, rt_mem,
-                                /*offset*/ 0);
+        qoQueueBindImageMemory(t_queue, t_image, /*allocationIndex*/ 0,
+                               rt_mem, /*offset*/ 0);
 
         vkCreateColorAttachmentView(t_device,
             &(VkColorAttachmentViewCreateInfo) {
