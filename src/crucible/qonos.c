@@ -34,10 +34,7 @@ qoObjectGetMemoryRequirements(VkDevice dev, VkObjectType obj_type,
     result = vkGetObjectInfo(dev, obj_type, obj,
                              VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
                              &mem_reqs_size, &mem_reqs);
-
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-    }
+    t_assert(result == VK_SUCCESS);
 
     return mem_reqs;
 }
@@ -63,10 +60,7 @@ qoQueueBindObjectMemory(VkQueue queue, VkObjectType obj_type, VkObject obj,
 
     result = vkQueueBindObjectMemory(queue, obj_type, obj, allocation_index,
                                      mem, offset);
-
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-    }
+    t_assert(result == VK_SUCCESS);
 
     return result;
 }
@@ -97,11 +91,9 @@ __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info)
 
     result = vkAllocMemory(dev, info, &memory);
 
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-        t_assert(memory);
-        t_cleanup_push_vk_device_memory(dev, memory);
-    }
+    t_assert(result == VK_SUCCESS);
+    t_assert(memory);
+    t_cleanup_push_vk_device_memory(dev, memory);
 
     return memory;
 }
@@ -116,11 +108,9 @@ qoMapMemory(VkDevice dev, VkDeviceMemory mem,
 
     result = vkMapMemory(dev, mem, offset, size, flags, &map);
 
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-        t_assert(map);
-        t_cleanup_push_vk_memory_map(dev, mem);
-    }
+    t_assert(result == VK_SUCCESS);
+    t_assert(map);
+    t_cleanup_push_vk_memory_map(dev, mem);
 
     return map;
 }
@@ -134,11 +124,9 @@ __qoCreateDescriptorSetLayout(VkDevice dev,
 
     result = vkCreateDescriptorSetLayout(dev, info, &layout);
 
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-        t_assert(layout);
-        t_cleanup_push_vk_descriptor_set_layout(dev, layout);
-    }
+    t_assert(result == VK_SUCCESS);
+    t_assert(layout);
+    t_cleanup_push_vk_descriptor_set_layout(dev, layout);
 
     return layout;
 }
@@ -151,11 +139,9 @@ __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info)
 
     result = vkCreateBuffer(dev, info, &buffer);
 
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-        t_assert(buffer);
-        t_cleanup_push_vk_buffer(dev, buffer);
-    }
+    t_assert(result == VK_SUCCESS);
+    t_assert(buffer);
+    t_cleanup_push_vk_buffer(dev, buffer);
 
     return buffer;
 }
@@ -168,11 +154,9 @@ __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info)
 
     result = vkCreateBufferView(dev, info, &view);
 
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-        t_assert(view);
-        t_cleanup_push_vk_buffer_view(dev, view);
-    }
+    t_assert(result == VK_SUCCESS);
+    t_assert(view);
+    t_cleanup_push_vk_buffer_view(dev, view);
 
     return view;
 }
@@ -186,11 +170,9 @@ __qoCreateDynamicViewportState(VkDevice dev,
 
     result = vkCreateDynamicViewportState(dev, info, &state);
 
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-        t_assert(state);
-        t_cleanup_push_vk_dynamic_vp_state(dev, state);
-    }
+    t_assert(result == VK_SUCCESS);
+    t_assert(state);
+    t_cleanup_push_vk_dynamic_vp_state(dev, state);
 
     return state;
 }
@@ -204,11 +186,9 @@ __qoCreateDynamicRasterState(VkDevice dev,
 
     result = vkCreateDynamicRasterState(dev, info, &state);
 
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-        t_assert(state);
-        t_cleanup_push_vk_dynamic_rs_state(dev, state);
-    }
+    t_assert(result == VK_SUCCESS);
+    t_assert(state);
+    t_cleanup_push_vk_dynamic_rs_state(dev, state);
 
     return state;
 }
@@ -222,11 +202,9 @@ __qoCreateDynamicColorBlendState(VkDevice dev,
 
     result = vkCreateDynamicColorBlendState(dev, info, &state);
 
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-        t_assert(state);
-        t_cleanup_push_vk_dynamic_cb_state(dev, state);
-    }
+    t_assert(result == VK_SUCCESS);
+    t_assert(state);
+    t_cleanup_push_vk_dynamic_cb_state(dev, state);
 
     return state;
 }
@@ -240,11 +218,9 @@ __qoCreateDynamicDepthStencilState(VkDevice dev,
 
     result = vkCreateDynamicDepthStencilState(dev, info, &state);
 
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-        t_assert(state);
-        t_cleanup_push_vk_dynamic_ds_state(dev, state);
-    }
+    t_assert(result == VK_SUCCESS);
+    t_assert(state);
+    t_cleanup_push_vk_dynamic_ds_state(dev, state);
 
     return state;
 }
@@ -257,11 +233,9 @@ __qoCreateCommandBuffer(VkDevice dev, const VkCmdBufferCreateInfo *info)
 
     result = vkCreateCommandBuffer(dev, info, &cmd);
 
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-        t_assert(cmd);
-        t_cleanup_push_vk_command_buffer(dev, cmd);
-    }
+    t_assert(result == VK_SUCCESS);
+    t_assert(cmd);
+    t_cleanup_push_vk_command_buffer(dev, cmd);
 
     return cmd;
 }
@@ -272,10 +246,7 @@ __qoBeginCommandBuffer(VkCmdBuffer cmd, const VkCmdBufferBeginInfo *info)
     VkResult result;
 
     result = vkBeginCommandBuffer(cmd, info);
-
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-    }
+    t_assert(result == VK_SUCCESS);
 
     return result;
 }
@@ -286,10 +257,7 @@ __qoEndCommandBuffer(VkCmdBuffer cmd)
     VkResult result;
 
     result = vkEndCommandBuffer(cmd);
-
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-    }
+    t_assert(result == VK_SUCCESS);
 
     return result;
 }
@@ -304,11 +272,9 @@ __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info)
 
     result = vkCreateImage(dev, info, &image);
 
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-        t_assert(image);
-        t_cleanup_push_vk_image(dev, image);
-    }
+    t_assert(result == VK_SUCCESS);
+    t_assert(image);
+    t_cleanup_push_vk_image(dev, image);
 
     return image;
 }
@@ -321,11 +287,9 @@ __qoCreateShader(VkDevice dev, const VkShaderCreateInfo *info)
 
     result = vkCreateShader(dev, info, &shader);
 
-    if (t_is_current()) {
-        t_assert(result == VK_SUCCESS);
-        t_assert(shader);
-        t_cleanup_push_vk_shader(dev, shader);
-    }
+    t_assert(result == VK_SUCCESS);
+    t_assert(shader);
+    t_cleanup_push_vk_shader(dev, shader);
 
     return shader;
 }
