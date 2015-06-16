@@ -191,13 +191,16 @@ test(void)
     };
 
     pipeline = qoCreateGraphicsPipeline(t_device,
-        (&(VkGraphicsPipelineCreateInfo) {
+        &(QoExtraGraphicsPipelineCreateInfo) {
+            QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS,
+            .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+            .pNext =
+        &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .pNext = &ds_create_info,
             .flags = 0,
             .layout = VK_NULL_HANDLE
-        }),
-        .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP);
+        }});
 
     static const float vertex_data[] = {
         /* First triangle coordinates */

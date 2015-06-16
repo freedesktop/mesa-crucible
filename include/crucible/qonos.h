@@ -92,6 +92,16 @@
 extern "C" {
 #endif
 
+typedef struct QoExtraGraphicsPipelineCreateInfo_ {
+    VkGraphicsPipelineCreateInfo *pNext;
+    VkPrimitiveTopology topology;
+    VkShader vertexShader;
+    VkShader fragmentShader;
+} QoExtraGraphicsPipelineCreateInfo;
+
+#define QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS \
+    .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST
+
 #define QO_MEMORY_ALLOC_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO, \
     .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | \
@@ -320,17 +330,6 @@ VkResult qoEndCommandBuffer(VkCmdBuffer cmd);
 #endif
 
 #ifdef DOXYGEN
-VkPipeline qoCreateGraphicsPipeline(VkDevice dev, const VkGraphicsPipelineCreateInfo *pCreateInfo, ...);
-#else
-#define qoCreateGraphicsPipeline(dev, pCreateInfo, ...) \
-    __qoCreateGraphicsPipeline(dev, pCreateInfo, \
-        &(struct __qoCreateGraphicsPipeline_extra) { \
-            .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, \
-            ##__VA_ARGS__, \
-        })
-#endif
-
-#ifdef DOXYGEN
 VkImage qoCreateImage(VkDevice dev, ...);
 #else
 #define qoCreateImage(dev, ...) \
@@ -352,12 +351,6 @@ VkShader qoCreateShader(VkDevice dev, ...);
         })
 #endif
 
-struct __qoCreateGraphicsPipeline_extra {
-    VkPrimitiveTopology topology;
-    VkShader vertexShader;
-    VkShader fragmentShader;
-};
-
 VkDeviceMemory __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info);
 VkBuffer __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info);
 VkBufferView __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info);
@@ -370,7 +363,7 @@ VkCmdBuffer __qoCreateCommandBuffer(VkDevice dev, const VkCmdBufferCreateInfo *i
 VkResult __qoBeginCommandBuffer(VkCmdBuffer cmd, const VkCmdBufferBeginInfo *info);
 VkResult __qoEndCommandBuffer(VkCmdBuffer cmd);
 
-VkPipeline __qoCreateGraphicsPipeline(VkDevice dev, const VkGraphicsPipelineCreateInfo *info, const struct __qoCreateGraphicsPipeline_extra *extra);
+VkPipeline qoCreateGraphicsPipeline(VkDevice dev, const QoExtraGraphicsPipelineCreateInfo *info);
 VkImage __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info);
 VkShader __qoCreateShader(VkDevice dev, const VkShaderCreateInfo *info);
 

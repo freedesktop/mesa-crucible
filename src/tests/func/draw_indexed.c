@@ -131,11 +131,14 @@ test(void)
     };
 
     pipeline = qoCreateGraphicsPipeline(t_device,
-        (&(VkGraphicsPipelineCreateInfo) {
+        &(QoExtraGraphicsPipelineCreateInfo) {
+            QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS,
+            .vertexShader = vs,
+            .pNext =
+        &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .pNext = &ia_create_info,
-        }),
-        .vertexShader = vs);
+        }});
 
     VkPipelineIaStateCreateInfo restart_ia_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO,
@@ -146,11 +149,14 @@ test(void)
     };
 
     restart_pipeline = qoCreateGraphicsPipeline(t_device,
-        (&(VkGraphicsPipelineCreateInfo) {
+        &(QoExtraGraphicsPipelineCreateInfo) {
+            QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS,
+            .vertexShader = vs,
+            .pNext =
+        &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .pNext = &restart_ia_create_info,
-        }),
-        .vertexShader = vs);
+        }});
 
     static const struct {
         float vertices[256][2];

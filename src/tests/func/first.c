@@ -90,15 +90,17 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
     };
 
     *pipeline = qoCreateGraphicsPipeline(t_device,
-        (&(VkGraphicsPipelineCreateInfo) {
+        &(QoExtraGraphicsPipelineCreateInfo) {
+            .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+            .vertexShader = vs,
+            .fragmentShader = fs,
+            .pNext =
+        &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .pNext = &vi_create_info,
             .flags = 0,
             .layout = pipeline_layout
-        }),
-        .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
-        .vertexShader = vs,
-        .fragmentShader = fs);
+        }});
 }
 
 static void

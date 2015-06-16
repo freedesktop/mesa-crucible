@@ -48,15 +48,11 @@ _find_struct_in_chain(const void *start, VkStructureType sType)
 #define next_shader_info(chain) \
     find_struct_in_chain((chain), PIPELINE_SHADER_STAGE_CREATE_INFO)
 
-
 VkPipeline
-__qoCreateGraphicsPipeline(VkDevice device,
-                           const VkGraphicsPipelineCreateInfo *pCreateInfo,
-                           const struct __qoCreateGraphicsPipeline_extra *extra)
+qoCreateGraphicsPipeline(VkDevice device,
+                         const QoExtraGraphicsPipelineCreateInfo *extra)
 {
-    // We need to make a copy so that we can change the pNext pointer
-    VkGraphicsPipelineCreateInfo pipeline_info = *pCreateInfo;
-
+    VkGraphicsPipelineCreateInfo pipeline_info;
     VkPipelineIaStateCreateInfo ia_info;
     VkPipelineRsStateCreateInfo rs_info;
     VkPipelineMsStateCreateInfo ms_info;
@@ -66,7 +62,18 @@ __qoCreateGraphicsPipeline(VkDevice device,
     VkPipeline pipeline;
     VkResult result;
 
-    if (!find_struct_in_chain(pCreateInfo, PIPELINE_IA_STATE_CREATE_INFO)) {
+    if (extra->pNext) {
+        // We must make a copy so that we can change the pNext pointer.
+        pipeline_info = *(extra->pNext);
+    } else {
+        pipeline_info = (VkGraphicsPipelineCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+            .pNext = NULL,
+        };
+    };
+
+    if (!find_struct_in_chain(pipeline_info.pNext,
+                              PIPELINE_IA_STATE_CREATE_INFO)) {
         ia_info = (VkPipelineIaStateCreateInfo) {
             QO_PIPELINE_IA_STATE_CREATE_INFO_DEFAULTS,
             .topology = extra->topology,
@@ -75,7 +82,8 @@ __qoCreateGraphicsPipeline(VkDevice device,
         pipeline_info.pNext = &ia_info;
     }
 
-    if (!find_struct_in_chain(pCreateInfo, PIPELINE_RS_STATE_CREATE_INFO)) {
+    if (!find_struct_in_chain(pipeline_info.pNext,
+                              PIPELINE_RS_STATE_CREATE_INFO)) {
         rs_info = (VkPipelineRsStateCreateInfo) {
             QO_PIPELINE_RS_STATE_CREATE_INFO_DEFAULTS,
             .pNext = pipeline_info.pNext,
@@ -83,7 +91,8 @@ __qoCreateGraphicsPipeline(VkDevice device,
         pipeline_info.pNext = &rs_info;
     }
 
-    if (!find_struct_in_chain(pCreateInfo, PIPELINE_MS_STATE_CREATE_INFO)) {
+    if (!find_struct_in_chain(pipeline_info.pNext,
+                              PIPELINE_MS_STATE_CREATE_INFO)) {
         ms_info = (VkPipelineMsStateCreateInfo) {
             QO_PIPELINE_MS_STATE_CREATE_INFO_DEFAULTS,
             .pNext = pipeline_info.pNext,
@@ -91,7 +100,8 @@ __qoCreateGraphicsPipeline(VkDevice device,
         pipeline_info.pNext = &ms_info;
     }
 
-    if (!find_struct_in_chain(pCreateInfo, PIPELINE_CB_STATE_CREATE_INFO)) {
+    if (!find_struct_in_chain(pipeline_info.pNext,
+                              PIPELINE_CB_STATE_CREATE_INFO)) {
         cb_info = (VkPipelineCbStateCreateInfo) {
             QO_PIPELINE_CB_STATE_CREATE_INFO_DEFAULTS,
             .pNext = pipeline_info.pNext,
@@ -149,7 +159,8 @@ __qoCreateGraphicsPipeline(VkDevice device,
         }
     };
 
-    if (!find_struct_in_chain(pCreateInfo, PIPELINE_VERTEX_INPUT_CREATE_INFO)) {
+    if (!find_struct_in_chain(pipeline_info.pNext,
+                              PIPELINE_VERTEX_INPUT_CREATE_INFO)) {
         /* They should be using one of our shaders if they use this */
         assert(!has_vs || !has_fs);
         vi_info.pNext = pipeline_info.pNext,
