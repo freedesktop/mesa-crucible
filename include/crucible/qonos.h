@@ -192,6 +192,23 @@ typedef struct QoExtraGraphicsPipelineCreateInfo_ {
     .arraySize = 1, \
     .samples = 1
 
+#define QO_IMAGE_VIEW_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO, \
+    .minLod = 0.0f, \
+    .channels = { \
+        VK_CHANNEL_SWIZZLE_R, \
+        VK_CHANNEL_SWIZZLE_G, \
+        VK_CHANNEL_SWIZZLE_B, \
+        VK_CHANNEL_SWIZZLE_A, \
+    }, \
+    .subresourceRange = { \
+        .aspect = VK_IMAGE_ASPECT_COLOR, \
+        .baseMipLevel = 0, \
+        .mipLevels = 1, \
+        .baseArraySlice = 0, \
+        .arraySize = 1, \
+    }
+
 #define QO_COLOR_ATTACHMENT_VIEW_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_COLOR_ATTACHMENT_VIEW_CREATE_INFO, \
     .mipLevel = 0, \

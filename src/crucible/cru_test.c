@@ -864,43 +864,14 @@ cru_test_start_main_thread(void *arg)
         qoQueueBindImageMemory(t_queue, t_image, /*allocationIndex*/ 0,
                                rt_mem, /*offset*/ 0);
 
-        vkCreateColorAttachmentView(t_device,
-            &(VkColorAttachmentViewCreateInfo) {
-                .sType = VK_STRUCTURE_TYPE_COLOR_ATTACHMENT_VIEW_CREATE_INFO,
-                .image = t_image,
-                .format = VK_FORMAT_R8G8B8A8_UNORM,
-                .mipLevel = 0,
-                .baseArraySlice = 0,
-                .arraySize = 1,
-                .msaaResolveImage = 0,
-                .msaaResolveSubResource = {0},
-            },
-            &t->image_color_view);
-        t_cleanup_push_vk_color_attachment_view(t_device, t_image_color_view);
+        t->image_color_view = qoCreateColorAttachmentView(t_device,
+            .image = t->rt_image,
+            .format = VK_FORMAT_R8G8B8A8_UNORM);
 
-        vkCreateImageView(t_device,
-            &(VkImageViewCreateInfo) {
-                .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-                .image = t_image,
-                .viewType = VK_IMAGE_VIEW_TYPE_2D,
-                .format = VK_FORMAT_R8G8B8A8_UNORM,
-                .channels = {
-                    VK_CHANNEL_SWIZZLE_R,
-                    VK_CHANNEL_SWIZZLE_G,
-                    VK_CHANNEL_SWIZZLE_B,
-                    VK_CHANNEL_SWIZZLE_A,
-                },
-                .subresourceRange = {
-                    .aspect = VK_IMAGE_ASPECT_COLOR,
-                    .baseMipLevel = 0,
-                    .mipLevels = 1,
-                    .baseArraySlice = 0,
-                    .arraySize = 1,
-                },
-                .minLod = 0,
-            },
-            &t->image_texture_view);
-        t_cleanup_push_vk_image_view(t->device, t->image_texture_view);
+        t->image_texture_view = qoCreateImageView(t_device,
+            .image = t_image,
+            .viewType = VK_IMAGE_VIEW_TYPE_2D,
+            .format = VK_FORMAT_R8G8B8A8_UNORM);
 
         vkCreateFramebuffer(t_device,
             &(VkFramebufferCreateInfo) {

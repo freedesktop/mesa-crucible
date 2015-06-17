@@ -242,30 +242,10 @@ test(void)
     qoQueueBindImageMemory(t_queue, texture, /*index*/ 0, mem,
                            2048 + 256 * 256 * 4);
 
-    VkImageView tex_view;
-    vkCreateImageView(t_device,
-        &(VkImageViewCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-            .image = texture,
-            .viewType = VK_IMAGE_VIEW_TYPE_2D,
-            .format = VK_FORMAT_R8G8B8A8_UNORM,
-            .channels = {
-                VK_CHANNEL_SWIZZLE_R,
-                VK_CHANNEL_SWIZZLE_G,
-                VK_CHANNEL_SWIZZLE_B,
-                VK_CHANNEL_SWIZZLE_A
-            },
-            .subresourceRange = {
-                .aspect = VK_IMAGE_ASPECT_COLOR,
-                .baseMipLevel = 0,
-                .mipLevels = 1,
-                .baseArraySlice = 0,
-                .arraySize = 1
-            },
-            .minLod = 0
-        },
-        &tex_view);
-    t_cleanup_push_vk_image_view(t_device, tex_view);
+    VkImageView tex_view = qoCreateImageView(t_device,
+        .image = texture,
+        .viewType = VK_IMAGE_VIEW_TYPE_2D,
+        .format = VK_FORMAT_R8G8B8A8_UNORM);
 
     VkSampler sampler;
     vkCreateSampler(t_device,

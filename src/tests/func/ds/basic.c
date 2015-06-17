@@ -49,7 +49,6 @@ test(void)
     VkBuffer vertex_buffer;
     VkDeviceMemory mem;
     void *vertex_map;
-    VkDepthStencilView ds_view;
     VkFramebuffer framebuffer;
     VkRenderPass pass;
 
@@ -86,17 +85,8 @@ test(void)
 
     qoQueueBindImageMemory(t_queue, ds, 0, mem, offset);
 
-    vkCreateDepthStencilView(t_device,
-                             &(VkDepthStencilViewCreateInfo) {
-                                 .sType = VK_STRUCTURE_TYPE_DEPTH_STENCIL_VIEW_CREATE_INFO,
-                                 .image = ds,
-                                 .mipLevel = 0,
-                                 .baseArraySlice = 0,
-                                 .arraySize = 1,
-                                 .msaaResolveImage = 0,
-                                 .msaaResolveSubResource = { 0, }
-                             },
-                             &ds_view);
+    VkDepthStencilView ds_view = qoCreateDepthStencilView(t_device, .image = ds);
+
     vkCreateFramebuffer(t_device,
                         &(VkFramebufferCreateInfo) {
                             .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
