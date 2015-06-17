@@ -279,6 +279,51 @@ __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info)
     return image;
 }
 
+VkImageView
+__qoCreateImageView(VkDevice dev, const VkImageViewCreateInfo *info)
+{
+    VkImageView view;
+    VkResult result;
+
+    result = vkCreateImageView(dev, info, &view);
+
+    t_assert(result == VK_SUCCESS);
+    t_assert(view);
+    t_cleanup_push_vk_image_view(dev, view);
+
+    return view;
+}
+
+VkColorAttachmentView
+__qoCreateColorAttachmentView(VkDevice dev, const VkColorAttachmentViewCreateInfo *info)
+{
+    VkColorAttachmentView view;
+    VkResult result;
+
+    result = vkCreateColorAttachmentView(dev, info, &view);
+
+    t_assert(result == VK_SUCCESS);
+    t_assert(view);
+    t_cleanup_push_vk_color_attachment_view(dev, view);
+
+    return view;
+}
+
+VkDepthStencilView
+__qoCreateDepthStencilView(VkDevice dev, const VkDepthStencilViewCreateInfo *info)
+{
+    VkDepthStencilView view;
+    VkResult result;
+
+    result = vkCreateDepthStencilView(dev, info, &view);
+
+    t_assert(result == VK_SUCCESS);
+    t_assert(view);
+    t_cleanup_push_vk_depth_stencil_view(dev, view);
+
+    return view;
+}
+
 VkShader
 __qoCreateShader(VkDevice dev, const VkShaderCreateInfo *info)
 {
