@@ -50,15 +50,9 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
                 },
             });
 
-    VkPipelineLayout pipeline_layout;
-    vkCreatePipelineLayout(t_device,
-        &(VkPipelineLayoutCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-            .descriptorSetCount = 1,
-            .pSetLayouts = &set_layout,
-        },
-        &pipeline_layout);
-    t_cleanup_push_vk_pipeline_layout(t_device, pipeline_layout);
+    VkPipelineLayout pipeline_layout = qoCreatePipelineLayout(t_device,
+        .descriptorSetCount = 1,
+        .pSetLayouts = &set_layout);
 
     VkPipelineVertexInputCreateInfo vi_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_CREATE_INFO,

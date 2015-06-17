@@ -176,14 +176,9 @@ test(void)
                 },
             });
 
-    VkPipelineLayout pipeline_layout;
-    vkCreatePipelineLayout(t_device,
-        &(VkPipelineLayoutCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-            .descriptorSetCount = 1,
-            .pSetLayouts = set_layout,
-        },
-        &pipeline_layout);
+    VkPipelineLayout pipeline_layout = qoCreatePipelineLayout(t_device,
+        .descriptorSetCount = 1,
+        .pSetLayouts = set_layout);
 
     VkPipeline pipeline;
     create_pipeline(t_device, &pipeline, pipeline_layout);
