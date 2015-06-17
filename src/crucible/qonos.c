@@ -115,6 +115,21 @@ qoMapMemory(VkDevice dev, VkDeviceMemory mem,
     return map;
 }
 
+VkPipelineLayout
+__qoCreatePipelineLayout(VkDevice dev, const VkPipelineLayoutCreateInfo *info)
+{
+    VkPipelineLayout pipeline_layout;
+    VkResult result;
+
+    result = vkCreatePipelineLayout(dev, info, &pipeline_layout);
+
+    t_assert(result == VK_SUCCESS);
+    t_assert(pipeline_layout);
+    t_cleanup_push_vk_pipeline_layout(dev, pipeline_layout);
+
+    return pipeline_layout;
+}
+
 VkDescriptorSetLayout
 __qoCreateDescriptorSetLayout(VkDevice dev,
                               const VkDescriptorSetLayoutCreateInfo *info)
