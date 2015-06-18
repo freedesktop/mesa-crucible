@@ -292,6 +292,21 @@ __qoEndCommandBuffer(VkCmdBuffer cmd)
     return result;
 }
 
+VkFramebuffer
+__qoCreateFramebuffer(VkDevice dev, const VkFramebufferCreateInfo *info)
+{
+    VkResult result;
+    VkFramebuffer fb;
+
+    result = vkCreateFramebuffer(dev, info, &fb);
+
+    t_assert(result == VK_SUCCESS);
+    t_assert(fb);
+    t_cleanup_push_vk_framebuffer(dev, fb);
+
+    return fb;
+}
+
 VkResult __qoEndCommandBuffer(VkCmdBuffer cmd);
 
 VkImage
