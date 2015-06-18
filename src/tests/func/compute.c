@@ -111,25 +111,19 @@ test(void)
         .format = VK_FORMAT_R32G32B32A32_SFLOAT,
         .offset = 0, .range = 64);
 
-    VkSampler sampler;
-    vkCreateSampler(t_device,
-        &(VkSamplerCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-            .magFilter = VK_TEX_FILTER_LINEAR,
-            .minFilter = VK_TEX_FILTER_LINEAR,
-            .mipMode = VK_TEX_MIPMAP_MODE_NEAREST,
-            .addressU = VK_TEX_ADDRESS_CLAMP,
-            .addressV = VK_TEX_ADDRESS_CLAMP,
-            .addressW = VK_TEX_ADDRESS_CLAMP,
-            .mipLodBias = 0,
-            .maxAnisotropy = 0,
-            .compareOp = VK_COMPARE_OP_GREATER,
-            .minLod = 0,
-            .maxLod = 5,
-            .borderColor = VK_BORDER_COLOR_TRANSPARENT_BLACK,
-           },
-       &sampler);
-    t_cleanup_push_vk_sampler(t_device, sampler);
+    VkSampler sampler = qoCreateSampler(t_device,
+        .magFilter = VK_TEX_FILTER_LINEAR,
+        .minFilter = VK_TEX_FILTER_LINEAR,
+        .mipMode = VK_TEX_MIPMAP_MODE_NEAREST,
+        .addressU = VK_TEX_ADDRESS_CLAMP,
+        .addressV = VK_TEX_ADDRESS_CLAMP,
+        .addressW = VK_TEX_ADDRESS_CLAMP,
+        .mipLodBias = 0,
+        .maxAnisotropy = 0,
+        .compareOp = VK_COMPARE_OP_GREATER,
+        .minLod = 0,
+        .maxLod = 5,
+        .borderColor = VK_BORDER_COLOR_TRANSPARENT_BLACK);
 
    vkUpdateDescriptors(t_device,
         set, 2,
