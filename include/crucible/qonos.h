@@ -199,6 +199,15 @@ typedef struct QoExtraGraphicsPipelineCreateInfo_ {
     .sampleCount = 1, \
     .layers = 1
 
+#define QO_RENDER_PASS_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO, \
+    .colorAttachmentCount = 1, \
+    .sampleCount = 1, \
+    .layers = 1, \
+    .extent = {0}, \
+    .depthStencilFormat = VK_FORMAT_UNDEFINED, \
+    .depthStencilLayout = 0
+
 #define QO_IMAGE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO, \
     .imageType = VK_IMAGE_TYPE_2D, \
@@ -412,6 +421,17 @@ VkFramebuffer qoCreateFramebuffer(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
+VkRenderPass qoCreateRenderPass(dev, ...);
+#else
+#define qoCreateRenderPass(dev, ...) \
+    __qoCreateRenderPass(dev, \
+        &(VkRenderPassCreateInfo) { \
+            QO_RENDER_PASS_CREATE_INFO_DEFAULTS, \
+            ##__VA_ARGS__, \
+    })
+#endif
+
+#ifdef DOXYGEN
 VkImage qoCreateImage(VkDevice dev, ...);
 #else
 #define qoCreateImage(dev, ...) \
@@ -480,6 +500,7 @@ VkCmdBuffer __qoCreateCommandBuffer(VkDevice dev, const VkCmdBufferCreateInfo *i
 VkResult __qoBeginCommandBuffer(VkCmdBuffer cmd, const VkCmdBufferBeginInfo *info);
 VkResult __qoEndCommandBuffer(VkCmdBuffer cmd);
 VkFramebuffer __qoCreateFramebuffer(VkDevice dev, const VkFramebufferCreateInfo *info);
+VkRenderPass __qoCreateRenderPass(VkDevice dev, const VkRenderPassCreateInfo *info);
 
 VkPipeline qoCreateGraphicsPipeline(VkDevice dev, const QoExtraGraphicsPipelineCreateInfo *info);
 VkImage __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info);

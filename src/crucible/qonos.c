@@ -307,6 +307,21 @@ __qoCreateFramebuffer(VkDevice dev, const VkFramebufferCreateInfo *info)
     return fb;
 }
 
+VkRenderPass
+__qoCreateRenderPass(VkDevice dev, const VkRenderPassCreateInfo *info)
+{
+    VkResult result;
+    VkRenderPass pass;
+
+    result = vkCreateRenderPass(dev, info, &pass);
+
+    t_assert(result == VK_SUCCESS);
+    t_assert(pass);
+    t_cleanup_push_vk_render_pass(dev, pass);
+
+    return pass;
+}
+
 VkResult __qoEndCommandBuffer(VkCmdBuffer cmd);
 
 VkImage
