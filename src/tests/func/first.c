@@ -149,13 +149,10 @@ test(void)
     VkPipeline pipeline;
     create_pipeline(t_device, &pipeline, pipeline_layout);
 
-    uint32_t set_count = 1;
     VkDescriptorSet set[2];
-    vkAllocDescriptorSets(t_device, /*pool*/ 0,
+    qoAllocDescriptorSets(t_device, /*pool*/ 0,
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
-                          2, set_layout, set, &set_count);
-    t_cleanup_push_vk_descriptor_set(t_device, set[0]);
-    t_cleanup_push_vk_descriptor_set(t_device, set[1]);
+                          2, set_layout, set);
 
     VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024,
                                      .usage = VK_BUFFER_USAGE_GENERAL);

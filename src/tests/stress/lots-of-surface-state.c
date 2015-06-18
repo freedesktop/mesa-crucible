@@ -189,11 +189,9 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
         .range = ubo_reqs.size);
 
     VkDescriptorSet set;
-    uint32_t set_count = 1;
-    vkAllocDescriptorSets(t_device, /*pool*/ 0,
+    qoAllocDescriptorSets(t_device, /*pool*/ 0,
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
-                          1, &set_layout, &set, &set_count);
-    t_cleanup_push_vk_descriptor_set(t_device, set);
+                          1, &set_layout, &set);
 
     VkBufferViewAttachInfo attach_info[12];
     for (int i = 0; i < 12; i++)
