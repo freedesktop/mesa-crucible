@@ -130,6 +130,21 @@ __qoCreatePipelineLayout(VkDevice dev, const VkPipelineLayoutCreateInfo *info)
     return pipeline_layout;
 }
 
+VkSampler
+__qoCreateSampler(VkDevice dev, const VkSamplerCreateInfo *info)
+{
+    VkResult result;
+    VkSampler sampler;
+
+    result = vkCreateSampler(dev, info, &sampler);
+
+    t_assert(result == VK_SUCCESS);
+    t_assert(sampler);
+    t_cleanup_push_vk_sampler(dev, sampler);
+
+    return sampler;
+}
+
 VkDescriptorSetLayout
 __qoCreateDescriptorSetLayout(VkDevice dev,
                               const VkDescriptorSetLayoutCreateInfo *info)

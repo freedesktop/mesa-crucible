@@ -119,6 +119,9 @@ typedef struct QoExtraGraphicsPipelineCreateInfo_ {
     .descriptorSetCount = 0, \
     .pSetLayouts = NULL
 
+#define QO_SAMPLER_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO
+
 #define QO_DESCRIPTOR_SET_LAYOUT_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO
 
@@ -296,6 +299,17 @@ VkPipelineLayout qoCreatePipelineLayout(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
+VkSampler qoCreateSampler(VkDevice dev, ...);
+#else
+#define qoCreateSampler(dev, ...) \
+    __qoCreateSampler(dev, \
+        &(VkSamplerCreateInfo) { \
+            QO_SAMPLER_CREATE_INFO_DEFAULTS, \
+            ##__VA_ARGS__, \
+        })
+#endif
+
+#ifdef DOXYGEN
 VkDescriptorSetLayout __qoCreateDescriptorSetLayout(VkDevice dev, const VkDescriptorSetLayoutCreateInfo *info);
 #else
 #define qoCreateDescriptorSetLayout(dev, ...) \
@@ -437,6 +451,7 @@ VkDeviceMemory __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info);
 VkBuffer __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info);
 VkBufferView __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info);
 VkPipelineLayout __qoCreatePipelineLayout(VkDevice dev, const VkPipelineLayoutCreateInfo *info);
+VkSampler __qoCreateSampler(VkDevice dev, const VkSamplerCreateInfo *info);
 VkDescriptorSetLayout __qoCreateDescriptorSetLayout(VkDevice dev, const VkDescriptorSetLayoutCreateInfo *info);
 VkDynamicVpState __qoCreateDynamicViewportState(VkDevice dev, const VkDynamicVpStateCreateInfo *info);
 VkDynamicRsState __qoCreateDynamicRasterState(VkDevice dev, const VkDynamicRsStateCreateInfo *info);
