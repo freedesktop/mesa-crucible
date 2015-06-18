@@ -83,6 +83,18 @@ qoQueueBindImageMemory(VkQueue queue, VkImage image,
                                    allocation_index, mem, offset);
 }
 
+VkResult
+qoQueueSubmit(VkQueue queue, uint32_t cmdBufferCount,
+              const VkCmdBuffer *cmdBuffers, VkFence fence)
+{
+    VkResult result;
+
+    result = vkQueueSubmit(queue, cmdBufferCount, cmdBuffers, fence);
+    t_assert(result == VK_SUCCESS);
+
+    return result;
+}
+
 VkDeviceMemory
 __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info)
 {
