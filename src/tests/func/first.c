@@ -313,29 +313,18 @@ test(void)
             },
         });
 
-    VkRenderPass pass;
-    vkCreateRenderPass(t_device,
-        &(VkRenderPassCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-            .renderArea = {{0, 0}, {t_width, t_height}},
-            .colorAttachmentCount = 1,
-            .extent = { },
-            .sampleCount = 1,
-            .layers = 1,
-            .pColorFormats = (VkFormat[]) { VK_FORMAT_R8G8B8A8_UNORM },
-            .pColorLayouts = (VkImageLayout[]) { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-            .pColorLoadOps = (VkAttachmentLoadOp[]) { VK_ATTACHMENT_LOAD_OP_CLEAR },
-            .pColorStoreOps = (VkAttachmentStoreOp[]) { VK_ATTACHMENT_STORE_OP_STORE },
-            .pColorLoadClearValues = (VkClearColor[]) {
-                {
-                    .color = { .floatColor = { 1.0, 0.0, 0.0, 1.0 } },
-                    .useRawValue = false,
-                },
+    VkRenderPass pass = qoCreateRenderPass(t_device,
+        .renderArea = {{0, 0}, {t_width, t_height}},
+        .pColorFormats = (VkFormat[]) { VK_FORMAT_R8G8B8A8_UNORM },
+        .pColorLayouts = (VkImageLayout[]) { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
+        .pColorLoadOps = (VkAttachmentLoadOp[]) { VK_ATTACHMENT_LOAD_OP_CLEAR },
+        .pColorStoreOps = (VkAttachmentStoreOp[]) { VK_ATTACHMENT_STORE_OP_STORE },
+        .pColorLoadClearValues = (VkClearColor[]) {
+            {
+                .color = { .floatColor = { 1.0, 0.0, 0.0, 1.0 } },
+                .useRawValue = false,
             },
-            .depthStencilFormat = VK_FORMAT_UNDEFINED,
-        },
-        &pass);
-    t_cleanup_push_vk_render_pass(t_device, pass);
+        });
 
     vkCmdBeginRenderPass(t_cmd_buffer,
         &(VkRenderPassBegin) {

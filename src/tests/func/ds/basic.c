@@ -49,7 +49,6 @@ test(void)
     VkBuffer vertex_buffer;
     VkDeviceMemory mem;
     void *vertex_map;
-    VkRenderPass pass;
 
     vertex_buffer = qoCreateBuffer(t_device, .size = 4096,
                                    .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
@@ -100,28 +99,23 @@ test(void)
         .width = t_width,
         .height = t_height);
 
-    vkCreateRenderPass(t_device,
-                       &(VkRenderPassCreateInfo) {
-                           .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-                           .renderArea = { { 0, 0 }, { t_width, t_height } },
-                           .colorAttachmentCount = 1,
-                           .extent = { },
-                           .sampleCount = 1,
-                           .layers = 1,
-                           .pColorFormats = (VkFormat[]) { VK_FORMAT_R8G8B8A8_UNORM },
-                           .pColorLayouts = (VkImageLayout[]) { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-                           .pColorLoadOps = (VkAttachmentLoadOp[]) { VK_ATTACHMENT_LOAD_OP_CLEAR },
-                           .pColorStoreOps = (VkAttachmentStoreOp[]) { VK_ATTACHMENT_STORE_OP_STORE },
-                           .pColorLoadClearValues = (VkClearColor[]) {
-                               { .color = { .floatColor = { 0.2, 0.2, 0.2, 1.0 } }, .useRawValue = false }
-                           },
-                           .depthStencilFormat = VK_FORMAT_D24_UNORM,
-                           .depthStencilLayout = 0,
-                           .depthLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-                           .depthLoadClearValue = 0.5,
-                           .depthStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-                       },
-                       &pass);
+    VkRenderPass pass = qoCreateRenderPass(t_device,
+        .renderArea = { { 0, 0 }, { t_width, t_height } },
+        .pColorFormats = (VkFormat[]) { VK_FORMAT_R8G8B8A8_UNORM },
+        .pColorLayouts = (VkImageLayout[]) { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
+        .pColorLoadOps = (VkAttachmentLoadOp[]) { VK_ATTACHMENT_LOAD_OP_CLEAR },
+        .pColorStoreOps = (VkAttachmentStoreOp[]) { VK_ATTACHMENT_STORE_OP_STORE },
+        .pColorLoadClearValues = (VkClearColor[]) {
+            {
+                .color = { .floatColor = { 0.2, 0.2, 0.2, 1.0 } },
+                .useRawValue = false,
+            },
+        },
+        .depthStencilFormat = VK_FORMAT_D24_UNORM,
+        .depthStencilLayout = 0,
+        .depthLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+        .depthLoadClearValue = 0.5,
+        .depthStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
 
     VkPipelineVertexInputCreateInfo vi_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_CREATE_INFO,

@@ -48,7 +48,6 @@ test(void)
     VkBuffer buffer;
     VkDeviceMemory mem;
     void *map;
-    VkRenderPass pass;
 
     buffer = qoCreateBuffer(t_device, .size = 4096,
                             .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
@@ -79,28 +78,18 @@ test(void)
         f                                       \
     }
 
-    vkCreateRenderPass(t_device,
-                       &(VkRenderPassCreateInfo) {
-                           .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-                           .renderArea = { { 0, 0 }, { t_width, t_height } },
-                           .colorAttachmentCount = 1,
-                           .extent = { },
-                           .sampleCount = 1,
-                           .layers = 1,
-                           .pColorFormats = (VkFormat[]) { VK_FORMAT_R8G8B8A8_UNORM },
-                           .pColorLayouts = (VkImageLayout[]) { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-                           .pColorLoadOps = (VkAttachmentLoadOp[]) { VK_ATTACHMENT_LOAD_OP_CLEAR },
-                           .pColorStoreOps = (VkAttachmentStoreOp[]) { VK_ATTACHMENT_STORE_OP_STORE },
-                           .pColorLoadClearValues = (VkClearColor[]) {
-                               { .color = { .floatColor = HEX_COLOR(0x522a27, 1.0) }, .useRawValue = false }
-                           },
-                           .depthStencilFormat = VK_FORMAT_UNDEFINED,
-                           .depthStencilLayout = 0,
-                           .depthLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-                           .depthLoadClearValue = 0.5,
-                           .depthStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-                       },
-                       &pass);
+    VkRenderPass pass = qoCreateRenderPass(t_device,
+        .renderArea = { { 0, 0 }, { t_width, t_height } },
+        .pColorFormats = (VkFormat[]) { VK_FORMAT_R8G8B8A8_UNORM },
+        .pColorLayouts = (VkImageLayout[]) { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
+        .pColorLoadOps = (VkAttachmentLoadOp[]) { VK_ATTACHMENT_LOAD_OP_CLEAR },
+        .pColorStoreOps = (VkAttachmentStoreOp[]) { VK_ATTACHMENT_STORE_OP_STORE },
+        .pColorLoadClearValues = (VkClearColor[]) {
+            {
+                .color = { .floatColor = HEX_COLOR(0x522a27, 1.0) },
+                .useRawValue = false,
+            },
+        });
 
     VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
