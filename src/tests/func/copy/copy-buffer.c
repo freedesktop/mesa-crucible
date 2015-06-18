@@ -94,9 +94,7 @@ test_large_copy(void)
         });
 
     qoEndCommandBuffer(cmdBuffer);
-
-    vkQueueSubmit(t_queue, 1, &cmdBuffer, 0);
-
+    qoQueueSubmit(t_queue, 1, &cmdBuffer, 0);
     vkQueueWaitIdle(t_queue);
 
     uint32_t *map32_2 = map + buffer_requirements.size;

@@ -550,7 +550,7 @@ t_compare_image(void)
     vkCmdCopyImageToBuffer(cmd, t_image,
                            VK_IMAGE_LAYOUT_GENERAL, buffer, 1, &copy);
     qoEndCommandBuffer(cmd);
-    vkQueueSubmit(t_queue, 1, &cmd, 0);
+    qoQueueSubmit(t_queue, 1, &cmd, 0);
     vkQueueWaitIdle(t_queue);
 
     cru_image_t *actual_image =
