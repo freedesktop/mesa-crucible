@@ -49,7 +49,6 @@ test(void)
     VkBuffer vertex_buffer;
     VkDeviceMemory mem;
     void *vertex_map;
-    VkFramebuffer framebuffer;
     VkRenderPass pass;
 
     vertex_buffer = qoCreateBuffer(t_device, .size = 4096,
@@ -87,26 +86,19 @@ test(void)
 
     VkDepthStencilView ds_view = qoCreateDepthStencilView(t_device, .image = ds);
 
-    vkCreateFramebuffer(t_device,
-                        &(VkFramebufferCreateInfo) {
-                            .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-                                .colorAttachmentCount = 1,
-                                .pColorAttachments = (VkColorAttachmentBindInfo[]) {
-                                {
-                                    .view = t_image_color_view,
-                                    .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
-                                }
-                            },
-                            .pDepthStencilAttachment = &(VkDepthStencilBindInfo) {
-                                .view = ds_view,
-                                .layout = 0
-                            },
-                            .sampleCount = 1,
-                            .width = t_width,
-                            .height = t_height,
-                            .layers = 1
-                        },
-                        &framebuffer);
+    VkFramebuffer framebuffer = qoCreateFramebuffer(t_device,
+        .pColorAttachments = (VkColorAttachmentBindInfo[]) {
+            {
+                .view = t_image_color_view,
+                .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+            },
+        },
+        .pDepthStencilAttachment = &(VkDepthStencilBindInfo) {
+            .view = ds_view,
+            .layout = 0
+        },
+        .width = t_width,
+        .height = t_height);
 
     vkCreateRenderPass(t_device,
                        &(VkRenderPassCreateInfo) {

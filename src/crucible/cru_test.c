@@ -873,24 +873,15 @@ cru_test_start_main_thread(void *arg)
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
             .format = VK_FORMAT_R8G8B8A8_UNORM);
 
-        vkCreateFramebuffer(t_device,
-            &(VkFramebufferCreateInfo) {
-                .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-                .colorAttachmentCount = 1,
-                .pColorAttachments = (VkColorAttachmentBindInfo[]) {
-                    {
-                        .view = t_image_color_view,
-                        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                    },
+        t->framebuffer = qoCreateFramebuffer(t_device,
+            .pColorAttachments = (VkColorAttachmentBindInfo[]) {
+                {
+                    .view = t->image_color_view,
+                    .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
                 },
-                .pDepthStencilAttachment = NULL,
-                .sampleCount = 1,
-                .width = t_width,
-                .height = t_height,
-                .layers = 1,
             },
-            &t->framebuffer);
-        t_cleanup_push_vk_framebuffer(t_device, t_framebuffer);
+            .width = t->width,
+            .height = t->height);
     }
 
     t->phase = CRU_TEST_PHASE_MAIN;

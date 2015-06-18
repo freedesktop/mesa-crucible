@@ -48,7 +48,6 @@ test(void)
     VkBuffer buffer;
     VkDeviceMemory mem;
     void *map;
-    VkFramebuffer framebuffer;
     VkRenderPass pass;
 
     buffer = qoCreateBuffer(t_device, .size = 4096,
@@ -62,23 +61,15 @@ test(void)
     map = qoMapMemory(t_device, mem, 0, requirements.size, 0);
     qoQueueBindBufferMemory(t_queue, buffer, 0, mem, 0);
 
-    vkCreateFramebuffer(t_device,
-                        &(VkFramebufferCreateInfo) {
-                            .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-                                .colorAttachmentCount = 1,
-                                .pColorAttachments = (VkColorAttachmentBindInfo[]) {
-                                {
-                                    .view = t_image_color_view,
-                                    .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
-                                }
-                            },
-                            .pDepthStencilAttachment = NULL,
-                            .sampleCount = 1,
-                            .width = t_width,
-                            .height = t_height,
-                            .layers = 1
-                        },
-                        &framebuffer);
+    VkFramebuffer framebuffer = qoCreateFramebuffer(t_device,
+        .width = t_width,
+        .height = t_height,
+        .pColorAttachments = (VkColorAttachmentBindInfo[]) {
+            {
+                .view = t_image_color_view,
+                .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+            },
+        });
 
 #define HEX_COLOR(v, f)                         \
     {                                           \
