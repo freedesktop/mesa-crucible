@@ -493,6 +493,10 @@ VkBufferView __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *in
 VkPipelineLayout __qoCreatePipelineLayout(VkDevice dev, const VkPipelineLayoutCreateInfo *info);
 VkSampler __qoCreateSampler(VkDevice dev, const VkSamplerCreateInfo *info);
 VkDescriptorSetLayout __qoCreateDescriptorSetLayout(VkDevice dev, const VkDescriptorSetLayoutCreateInfo *info);
+VkResult qoAllocDescriptorSets(VkDevice dev, VkDescriptorPool descriptorPool,
+                               VkDescriptorSetUsage usage, uint32_t count,
+                               const VkDescriptorSetLayout *layouts,
+                               VkDescriptorSet *sets);
 VkDynamicVpState __qoCreateDynamicViewportState(VkDevice dev, const VkDynamicVpStateCreateInfo *info);
 VkDynamicRsState __qoCreateDynamicRasterState(VkDevice dev, const VkDynamicRsStateCreateInfo *info);
 VkDynamicCbState __qoCreateDynamicColorBlendState(VkDevice dev, const VkDynamicCbStateCreateInfo *info);

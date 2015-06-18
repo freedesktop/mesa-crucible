@@ -173,6 +173,27 @@ __qoCreateDescriptorSetLayout(VkDevice dev,
     return layout;
 }
 
+VkResult
+qoAllocDescriptorSets(VkDevice dev, VkDescriptorPool descriptorPool,
+                      VkDescriptorSetUsage usage, uint32_t count,
+                      const VkDescriptorSetLayout *layouts,
+                      VkDescriptorSet *sets)
+{
+    VkResult result;
+    uint32_t out_count = 0;
+
+    result = vkAllocDescriptorSets(dev, descriptorPool, usage, count, layouts,
+                                   sets, &out_count);
+    t_assert(result == VK_SUCCESS);
+    t_assert(out_count == count);
+
+    for (uint32_t i = 0; i < count; ++i) {
+        t_cleanup_push_vk_descriptor_set(dev, sets[i]);
+    }
+
+    return result;
+}
+
 VkBuffer
 __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info)
 {
