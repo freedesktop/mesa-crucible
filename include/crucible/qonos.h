@@ -327,7 +327,7 @@ VkSampler qoCreateSampler(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
-VkDescriptorSetLayout __qoCreateDescriptorSetLayout(VkDevice dev, const VkDescriptorSetLayoutCreateInfo *info);
+VkDescriptorSetLayout qoCreateDescriptorSetLayout(VkDevice dev, ...);
 #else
 #define qoCreateDescriptorSetLayout(dev, ...) \
     __qoCreateDescriptorSetLayout(dev, \
