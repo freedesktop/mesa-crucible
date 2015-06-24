@@ -84,7 +84,7 @@ BUILT_SOURCES = \
 	src/tests/stress/lots-of-surface-state-spirv.h
 
 %-spirv.h: %.c misc/glsl_scraper.py
-	$(AM_V_GEN) $(PYTHON2) $(srcdir)/misc/glsl_scraper.py --glsl-only -o $@ $<
+	$(AM_V_GEN) $(PYTHON2) $(srcdir)/misc/glsl_scraper.py --with-glslang=$(GLSLANG) -o $@ $<
 
 %_gen.c: %_gen.py
 	$(AM_V_GEN) $(PYTHON3) $<

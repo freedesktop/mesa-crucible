@@ -52,6 +52,10 @@ AC_SUBST([MINIGBM_LDFLAGS])
 
 AC_CHECK_PROGS([PYTHON2], [python2 python])
 
+AC_ARG_VAR([GLSLANG], [path to glslang executable])
+AC_SUBST([GLSLANG])
+AC_CHECK_PROGS([GLSLANG], [glslang glslangValidator])
+
 AC_ARG_VAR([ASCIIDOC], [path to asciidoc executable])
 AC_SUBST([ASCIIDOC])
 AC_CHECK_PROGS([ASCIIDOC], [asciidoc])
