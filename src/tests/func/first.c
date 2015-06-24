@@ -53,7 +53,7 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
         layout(set = 0, binding = 0) uniform sampler2D tex;
         void main()
         {
-            f_color = v_color + texture2D(tex, vec2(0.1, 0.1));
+            f_color = v_color + texture(tex, vec2(0.1, 0.1));
         }
     );
 
