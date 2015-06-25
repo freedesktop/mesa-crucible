@@ -55,6 +55,9 @@ AC_CHECK_PROGS([PYTHON2], [python2 python])
 AC_ARG_VAR([GLSLANG], [path to glslang executable])
 AC_SUBST([GLSLANG])
 AC_CHECK_PROGS([GLSLANG], [glslang glslangValidator])
+if test "x$GLSLANG" = "x"; then
+    AC_MSG_ERROR([failed to find glslang or glslangValidator])
+fi
 
 AC_ARG_VAR([ASCIIDOC], [path to asciidoc executable])
 AC_SUBST([ASCIIDOC])
