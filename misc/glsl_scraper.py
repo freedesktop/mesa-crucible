@@ -31,6 +31,8 @@ class Shader:
         else:
             assert False
 
+        self.dwords = None
+
     def add_text(self, s):
         self.stream.write(s)
 
@@ -57,7 +59,7 @@ class Shader:
             out = open('glslang.out', 'r')
             sys.stderr.write(out.read())
             out.close()
-            exit(1)
+            return False
 
         def dwords(f):
             while True:
@@ -73,6 +75,8 @@ class Shader:
 
         os.remove(glsl_fname)
         os.remove(spirv_fname)
+
+        return True
 
     def _dump_glsl_code(self, f, var_name):
         # First dump the GLSL source as strings
@@ -101,7 +105,7 @@ class Shader:
 
         self._dump_glsl_code(f, var_prefix + '_glsl_src')
 
-        if not glsl_only:
+        if self.dwords and not glsl_only:
             self._dump_spirv_code(f, var_prefix + '_spir_v_src')
 
         f.write(dedent("""\
@@ -110,7 +114,7 @@ class Shader:
                 .pGlsl = {0}_glsl_src,
             """.format(var_prefix)))
 
-        if not glsl_only:
+        if self.dwords and not glsl_only:
             f.write(dedent("""\
                 .spirvSize = sizeof({0}_spir_v_src),
                 .pSpirv = {0}_spir_v_src,
@@ -251,7 +255,15 @@ if not glsl_only:
         os.chdir(tmpdir)
 
         for shader in parser.shaders:
-            shader.compile()
+            success = shader.compile()
+
+            # If any compile fails, we set glsl_only and bail.  This way
+            # the entire fill will either support SPIR-V or not.  If we did
+            # it per-shader, then we could have problems with linking a
+            # pipeline that's half GLSL and half SPIR-V.
+            if not success:
+                glsl_only = True
+                break
 
         os.chdir(current_dir)
     finally:
