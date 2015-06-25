@@ -71,6 +71,9 @@ struct cru_test {
     /// Don't run the cleanup commands in cru_test::cleanup_stacks.
     bool no_cleanup;
 
+    /// Try and use SPIR-V shaders when available
+    bool use_spir_v;
+
     string_t ref_image_filename;
     cru_image_t *image;
 
@@ -198,6 +201,7 @@ cru_test_create(const cru_test_def_t *def)
     t->ref_image_filename = STRING_INIT;
     t->no_dump = true;
     t->no_cleanup = false;
+    t->use_spir_v = false;
 
     if (t->def->samples > 0) {
         cru_loge("%s: multisample tests not yet supported", t->def->name);
@@ -267,6 +271,15 @@ cru_test_disable_cleanup(cru_test_t *t)
 
     t->no_cleanup = true;
     return true;
+}
+
+void
+cru_test_enable_spir_v(cru_test_t *t)
+{
+    assert(t->phase == CRU_TEST_PHASE_PRESTART);
+    assert(!cru_current_test);
+
+    t->use_spir_v = true;
 }
 
 const VkInstance *
@@ -363,6 +376,12 @@ __t_width(void)
 {
     t_assert(!cru_current_test->def->no_image);
     return &cru_current_test->width;
+}
+
+const bool *
+__t_use_spir_v(void)
+{
+    return &cru_current_test->use_spir_v;
 }
 
 const char *

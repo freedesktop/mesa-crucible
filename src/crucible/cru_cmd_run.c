@@ -35,6 +35,7 @@ enum {
 static int opt_flag;
 static int opt_no_cleanup = 0;
 static int opt_dump = 0;
+static int opt_use_spir_v = 0;
 static int opt_all_tests = 1;
 
 // From man:getopt(3) :
@@ -52,6 +53,7 @@ static const struct option longopts[] = {
     {"no-cleanup",    no_argument,       &opt_no_cleanup, true},
     {"dump",          no_argument,       &opt_dump,       true},
     {"no-dump",       no_argument,       &opt_dump,       false},
+    {"use-spir-v",    no_argument,       &opt_use_spir_v, true},
     {0},
 };
 
@@ -143,6 +145,9 @@ run_single_test(const cru_test_def_t *def)
 
     if (opt_no_cleanup)
         cru_test_disable_cleanup(test);
+
+    if (opt_use_spir_v)
+        cru_test_enable_spir_v(test);
 
     cru_test_start(test);
     cru_test_wait(test);

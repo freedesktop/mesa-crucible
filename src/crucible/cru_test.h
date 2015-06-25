@@ -33,6 +33,7 @@ void cru_test_destroy(cru_test_t *test);
 void cru_test_enable_dump(cru_test_t *t, bool enable);
 bool cru_test_enable_bootstrap(cru_test_t *test, uint32_t image_width, uint32_t image_height);
 bool cru_test_disable_cleanup(cru_test_t *test);
+void cru_test_enable_spir_v(cru_test_t *t);
 void cru_test_start(cru_test_t *test);
 void cru_test_wait(cru_test_t *test);
 cru_test_result_t cru_test_get_result(cru_test_t *test);

@@ -30,6 +30,9 @@ OPTIONS
 --dump, --no-dump [default: disabled]::
     Dump (or disable dumping) test images into Crucible's data directory.
 
+--use-spir-v::
+    Use SPIR-V shaders when available.
+
 EXAMPLES
 --------
 * Run all tests (except example tests).

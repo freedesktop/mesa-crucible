@@ -190,6 +190,7 @@ void t_dump_image_fv(cru_image_t *image, const char *format, va_list va);
 #define t_width (*__t_width())
 #define t_height (*__t_height())
 cru_image_t *t_ref_image(void);
+#define t_use_spir_v (*__t_use_spir_v())
 /// \}
 
 const char *__t_name(void);
@@ -209,6 +210,7 @@ const VkImageView *__t_image_texture_view(void);
 const VkFramebuffer *__t_framebuffer(void);
 const uint32_t *__t_height(void);
 const uint32_t *__t_width(void);
+const bool * __t_use_spir_v(void);
 
 /// Create a new test thread.
 ///

@@ -427,11 +427,16 @@ __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
         .sType =VK_STRUCTURE_TYPE_SHADER_CREATE_INFO
     };
 
-    if (info->glslSize > 0) {
+    if (t_use_spir_v && info->spirvSize > 0) {
+        assert(info->pSpirv != NULL);
+        vk_info.codeSize = info->spirvSize;
+        vk_info.pCode = info->pSpirv;
+    } else if (info->glslSize > 0) {
+        assert(info->pGlsl != NULL);
         vk_info.codeSize = info->glslSize;
         vk_info.pCode = info->pGlsl;
     } else {
-        assert(info->spirvSize > 0);
+        assert(info->spirvSize > 0 && info->pSpirv != NULL);
         vk_info.codeSize = info->spirvSize;
         vk_info.pCode = info->pSpirv;
     }
