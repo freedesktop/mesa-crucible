@@ -261,16 +261,16 @@ with open_file(outfname, 'w') as outfile:
         #define __QO_GLSL_SRC_VAR(_line) __QO_GLSL_SRC_VAR2(_line)
 
         #define qoShaderCreateInfoGLSL(stage, ...)                      \\
-                ((VkShaderCreateInfo) {                                 \\
+                ((QoShaderCreateInfo) {                                 \\
                     .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,      \\
-                    .codeSize = sizeof(__QO_GLSL_SRC_VAR(__LINE__)),    \\
-                    .pCode = __QO_GLSL_SRC_VAR(__LINE__),               \\
+                    .glslSize = sizeof(__QO_GLSL_SRC_VAR(__LINE__)),    \\
+                    .pGlsl = __QO_GLSL_SRC_VAR(__LINE__),               \\
                 })
 
         #define qoCreateShaderGLSL(dev, stage, ...)                         \\
             qoCreateShader((dev),                                           \\
-                           .codeSize = sizeof(__QO_GLSL_SRC_VAR(__LINE__)), \\
-                           .pCode = __QO_GLSL_SRC_VAR(__LINE__))
+                           .glslSize = sizeof(__QO_GLSL_SRC_VAR(__LINE__)), \\
+                           .pGlsl = __QO_GLSL_SRC_VAR(__LINE__))
         """))
 
     for shader in parser.shaders:

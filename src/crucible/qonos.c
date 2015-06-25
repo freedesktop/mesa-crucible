@@ -418,12 +418,25 @@ __qoCreateDepthStencilView(VkDevice dev, const VkDepthStencilViewCreateInfo *inf
 }
 
 VkShader
-__qoCreateShader(VkDevice dev, const VkShaderCreateInfo *info)
+__qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
 {
     VkShader shader;
     VkResult result;
 
-    result = vkCreateShader(dev, info, &shader);
+    VkShaderCreateInfo vk_info = {
+        .sType =VK_STRUCTURE_TYPE_SHADER_CREATE_INFO
+    };
+
+    if (info->glslSize > 0) {
+        vk_info.codeSize = info->glslSize;
+        vk_info.pCode = info->pGlsl;
+    } else {
+        assert(info->spirvSize > 0);
+        vk_info.codeSize = info->spirvSize;
+        vk_info.pCode = info->pSpirv;
+    }
+
+    result = vkCreateShader(dev, &vk_info, &shader);
 
     t_assert(result == VK_SUCCESS);
     t_assert(shader);

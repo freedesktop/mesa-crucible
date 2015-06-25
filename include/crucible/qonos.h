@@ -99,6 +99,14 @@ typedef struct QoExtraGraphicsPipelineCreateInfo_ {
     VkShader fragmentShader;
 } QoExtraGraphicsPipelineCreateInfo;
 
+typedef struct QoShaderCreateInfo_ {
+    void *pNext;
+    size_t spirvSize;
+    const void *pSpirv;
+    size_t glslSize;
+    const char *pGlsl;
+} QoShaderCreateInfo;
+
 #define QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS \
     .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST
 
@@ -480,8 +488,8 @@ VkShader qoCreateShader(VkDevice dev, ...);
 #else
 #define qoCreateShader(dev, ...) \
     __qoCreateShader(dev, \
-        &(VkShaderCreateInfo) { \
-            QO_SHADER_CREATE_INFO_DEFAULTS, \
+        &(QoShaderCreateInfo) { \
+            .pNext = NULL, \
             ##__VA_ARGS__, \
         })
 #endif
@@ -512,7 +520,7 @@ VkImage __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info);
 VkImageView __qoCreateImageView(VkDevice dev, const VkImageViewCreateInfo *info);
 VkColorAttachmentView __qoCreateColorAttachmentView(VkDevice dev, const VkColorAttachmentViewCreateInfo *info);
 VkDepthStencilView __qoCreateDepthStencilView(VkDevice dev, const VkDepthStencilViewCreateInfo *info);
-VkShader __qoCreateShader(VkDevice dev, const VkShaderCreateInfo *info);
+VkShader __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info);
 
 #ifdef __cplusplus
 }
