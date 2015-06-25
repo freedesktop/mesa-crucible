@@ -74,12 +74,9 @@ class Shader:
         os.remove(glsl_fname)
         os.remove(spirv_fname)
 
-    def dump_c_code(self, f, glsl_only = False):
-        f.write('\n\n')
-        var_prefix = '__qonos_shader{0}'.format(self.line)
-
+    def _dump_glsl_code(self, f, var_name):
         # First dump the GLSL source as strings
-        f.write('static const char {0}_glsl_src[] ='.format(var_prefix))
+        f.write('static const char {0}[] ='.format(var_name))
         f.write('\n__QO_SPIRV_' + self.stage)
         f.write('\n"#version 330\\n"')
         for line in self.glsl_source().splitlines():
@@ -88,11 +85,8 @@ class Shader:
             f.write('\n"{0}\\n"'.format(line))
         f.write(';\n\n')
 
-        if glsl_only:
-            return
-
-        # Now dump the SPIR-V source
-        f.write('static const uint32_t {0}_spir_v_src[] = {{'.format(var_prefix))
+    def _dump_spirv_code(self, f, var_name):
+        f.write('static const uint32_t {0}[] = {{'.format(var_name))
         line_start = 0
         while line_start < len(self.dwords):
             f.write('\n    ')
@@ -100,6 +94,15 @@ class Shader:
                 f.write(' 0x{:08x},'.format(self.dwords[i]))
             line_start += 6
         f.write('\n};\n')
+
+    def dump_c_code(self, f, glsl_only = False):
+        f.write('\n\n')
+        var_prefix = '__qonos_shader{0}'.format(self.line)
+
+        self._dump_glsl_code(f, var_prefix + '_glsl_src')
+
+        if not glsl_only:
+            self._dump_spirv_code(f, var_prefix + '_spir_v_src')
 
 token_exp = re.compile(r'(qoShaderCreateInfoGLSL|qoCreateShaderGLSL|\(|\)|,)')
 
