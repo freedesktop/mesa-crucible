@@ -54,12 +54,16 @@ class Shader:
         glsl_file.close()
 
         out = open('glslang.out', 'wb')
-        err = subprocess.call([glslang, '-V', glsl_fname], stdout=out)
+        err = subprocess.call([glslang, '-H', '-V', glsl_fname], stdout=out)
+        out.close()
+        out = open('glslang.out', 'r')
         if err != 0:
-            out = open('glslang.out', 'r')
             sys.stderr.write(out.read())
-            out.close()
             return False
+        else:
+            self.assembly = out.readlines()
+
+        out.close()
 
         def dwords(f):
             while True:
@@ -90,6 +94,19 @@ class Shader:
         f.write(';\n\n')
 
     def _dump_spirv_code(self, f, var_name):
+        f.write('/* SPIR-V Assembly:\n')
+        f.write(' *\n')
+        preamble = True
+        for line in self.assembly:
+            if preamble and line.startswith('// Module'):
+                preamble = False
+
+            if preamble:
+                continue
+
+            f.write(' * ' + line)
+        f.write(' */\n')
+
         f.write('static const uint32_t {0}[] = {{'.format(var_name))
         line_start = 0
         while line_start < len(self.dwords):
