@@ -104,6 +104,20 @@ class Shader:
         if not glsl_only:
             self._dump_spirv_code(f, var_prefix + '_spir_v_src')
 
+        f.write(dedent("""\
+            static const QoShaderCreateInfo {0}_info = {{
+                .glslSize = sizeof({0}_glsl_src),
+                .pGlsl = {0}_glsl_src,
+            """.format(var_prefix)))
+
+        if not glsl_only:
+            f.write(dedent("""\
+                .spirvSize = sizeof({0}_spir_v_src),
+                .pSpirv = {0}_spir_v_src,
+            """.format(var_prefix)))
+
+        f.write('};')
+
 token_exp = re.compile(r'(qoShaderCreateInfoGLSL|qoCreateShaderGLSL|\(|\)|,)')
 
 class Parser:
@@ -260,20 +274,14 @@ with open_file(outfname, 'w') as outfile:
         #define __QO_SPIRV_FRAGMENT            __QO_SPIRV_MAGIC "\\4\\0\\0\\0"
         #define __QO_SPIRV_COMPUTE             __QO_SPIRV_MAGIC "\\5\\0\\0\\0"
 
-        #define __QO_GLSL_SRC_VAR2(_line) __qonos_shader ## _line ## _glsl_src
-        #define __QO_GLSL_SRC_VAR(_line) __QO_GLSL_SRC_VAR2(_line)
+        #define __QO_SHADER_INFO_VAR2(_line) __qonos_shader ## _line ## _info
+        #define __QO_SHADER_INFO_VAR(_line) __QO_SHADER_INFO_VAR2(_line)
 
-        #define qoShaderCreateInfoGLSL(stage, ...)                      \\
-                ((QoShaderCreateInfo) {                                 \\
-                    .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,      \\
-                    .glslSize = sizeof(__QO_GLSL_SRC_VAR(__LINE__)),    \\
-                    .pGlsl = __QO_GLSL_SRC_VAR(__LINE__),               \\
-                })
+        #define qoShaderCreateInfoGLSL(stage, ...)  \\
+            __QO_SHADER_INFO_VAR(__LINE__)
 
-        #define qoCreateShaderGLSL(dev, stage, ...)                         \\
-            qoCreateShader((dev),                                           \\
-                           .glslSize = sizeof(__QO_GLSL_SRC_VAR(__LINE__)), \\
-                           .pGlsl = __QO_GLSL_SRC_VAR(__LINE__))
+        #define qoCreateShaderGLSL(dev, stage, ...) \\
+            __qoCreateShader((dev), &__QO_SHADER_INFO_VAR(__LINE__))
         """))
 
     for shader in parser.shaders:
