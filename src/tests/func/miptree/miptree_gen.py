@@ -31,7 +31,7 @@ params_iter = (
     Params(view, levels, array_length, upload_method, download_method)
     for view in ('2d',)
     for levels in (1, 2)
-    for array_length in (1,)
+    for array_length in (1, 2)
     for upload_method in ('copy', 'render')
     for download_method in ('copy', 'render')
 )
