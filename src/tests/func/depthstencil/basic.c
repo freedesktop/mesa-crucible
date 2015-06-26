@@ -56,7 +56,7 @@ test(void)
        qoImageGetMemoryRequirements(t_device, ds);
 
     size_t mem_size =
-        align_u32(vb_requirements.size, 4096) + 
+        align_u32(vb_requirements.size, 4096) +
         align_u32(ds_requirements.size, 4096);
 
     mem = qoAllocMemory(t_device, .allocationSize = mem_size);
@@ -204,6 +204,6 @@ test(void)
 }
 
 cru_define_test {
-    .name = "func.ds.basic",
+    .name = "func.depthstencil.basic",
     .start = test
 };
