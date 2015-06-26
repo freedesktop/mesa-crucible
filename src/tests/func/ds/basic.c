@@ -71,8 +71,6 @@ test(void)
         align_u32(vb_requirements.size, 4096) + 
         align_u32(ds_requirements.size, 4096);
 
-    printf("mem size %ld\n", mem_size);
-
     mem = qoAllocMemory(t_device, .allocationSize = mem_size);
     vertex_map = qoMapMemory(t_device, mem, 0, mem_size, 0);
     memset(vertex_map, 0, mem_size);
