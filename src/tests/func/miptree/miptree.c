@@ -156,6 +156,8 @@ miptree_calc_sizes(const char *level0_filename, uint32_t cpp,
         buffer_size += cpp * cru_minify(width, l) * cru_minify(height, l);
     }
 
+    buffer_size *= array_length;
+
     *out_width = width;
     *out_height = height;
     *out_buffer_size = buffer_size;
