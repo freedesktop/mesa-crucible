@@ -536,12 +536,33 @@ render_textures(VkFormat format, VkImageView *tex_views,
 
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device);
     qoBeginCommandBuffer(cmd);
-    vkCmdBindDynamicStateObject(cmd, VK_STATE_BIND_POINT_VIEWPORT, t_dynamic_vp_state);
     vkCmdBindDynamicStateObject(cmd, VK_STATE_BIND_POINT_RASTER, t_dynamic_rs_state);
     vkCmdBindDynamicStateObject(cmd, VK_STATE_BIND_POINT_COLOR_BLEND, t_dynamic_cb_state);
     vkCmdBindDynamicStateObject(cmd, VK_STATE_BIND_POINT_DEPTH_STENCIL, t_dynamic_ds_state);
 
     for (uint32_t i = 0; i < count; ++i) {
+        const uint32_t width = extents[i].width;
+        const uint32_t height = extents[i].height;
+
+        VkDynamicVpState vp_state = qoCreateDynamicViewportState(t_device,
+            .viewportAndScissorCount = 1,
+            .pViewports = (VkViewport[]) {
+                {
+                    .originX = 0,
+                    .originY = 0,
+                    .width = width,
+                    .height = height,
+                    .minDepth = 0,
+                    .maxDepth = 1
+                },
+            },
+            .pScissors = (VkRect[]) {
+                { {0, 0 }, {width, height} },
+            });
+
+        vkCmdBindDynamicStateObject(cmd, VK_STATE_BIND_POINT_VIEWPORT,
+                                    vp_state);
+
         VkFramebuffer fb = qoCreateFramebuffer(t_device,
             .colorAttachmentCount = 1,
             .pColorAttachments = (VkColorAttachmentBindInfo[]) {
@@ -551,12 +572,12 @@ render_textures(VkFormat format, VkImageView *tex_views,
                 },
             },
             .sampleCount = 1,
-            .width = extents[i].width,
-            .height = extents[i].height,
+            .width = width,
+            .height = height,
             .layers = 1);
 
         VkRenderPass pass = qoCreateRenderPass(t_device,
-            .renderArea = { {0, 0}, {extents[i].width, extents[i].height} },
+            .renderArea = { {0, 0}, {width, height} },
             .extent = {0},
             .colorAttachmentCount = 1,
             .sampleCount = 1,
