@@ -869,16 +869,10 @@ cru_test_start_main_thread(void *arg)
         VkMemoryRequirements rt_mem_reqs =
            qoImageGetMemoryRequirements(t->device, t->rt_image);
 
-        VkDeviceMemory rt_mem;
-        vkAllocMemory(t_device,
-            &(VkMemoryAllocInfo) {
-                .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO,
-                .allocationSize = rt_mem_reqs.size,
-                .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT,
-                .memPriority = VK_MEMORY_PRIORITY_NORMAL,
-            },
-            &rt_mem);
-        t_cleanup_push_vk_device_memory(t_device, rt_mem);
+        VkDeviceMemory rt_mem = qoAllocMemory(t->device,
+            .allocationSize = rt_mem_reqs.size,
+            .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT,
+            .memPriority = VK_MEMORY_PRIORITY_NORMAL);
 
         qoQueueBindImageMemory(t_queue, t_image, /*allocationIndex*/ 0,
                                rt_mem, /*offset*/ 0);
