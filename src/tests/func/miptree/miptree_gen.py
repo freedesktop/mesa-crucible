@@ -42,7 +42,7 @@ template = dedent("""
                 ".view-{view}.levels{levels:02}.array{array_length:02}"
                 ".upload-{upload}.download-{download}",
         .start = test,
-        .image_filename = "mandrill-512x512.png", // TODO: drop the image file
+        .no_image = true,
         .user_data = &(test_params_t) {{
             .levels = {levels},
             .array_length = {array_length},
