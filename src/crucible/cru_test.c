@@ -431,7 +431,7 @@ t_check_cancelled(void)
         pthread_exit(NULL);
 }
 
-void
+void cru_noreturn
 t_end(enum cru_test_result result)
 {
     cru_test_t *t = cru_current_test;
