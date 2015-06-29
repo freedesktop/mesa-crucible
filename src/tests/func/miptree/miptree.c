@@ -743,6 +743,8 @@ miptree_compare_images(miptree_t *mt)
 {
     cru_test_result_t result = CRU_TEST_RESULT_PASS;
 
+    vkQueueWaitIdle(t_queue);
+
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
         mipslice_t *slice = &mt->slices[i];
         const uint32_t l = slice->level;
@@ -771,7 +773,6 @@ test(void)
     mt = miptree_create(params->levels, params->array_length);
     miptree_upload(mt);
     miptree_download(mt);
-    vkQueueWaitIdle(t_queue);
     miptree_compare_images(mt);
 }
 
