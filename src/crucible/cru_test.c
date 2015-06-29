@@ -169,8 +169,8 @@ cru_test_load_image_file(void)
     t->width = cru_image_get_width(t->image);
     t->height = cru_image_get_height(t->image);
 
-    assert(t->width > 0);
-    assert(t->height > 0);
+    t_assert(t->width > 0);
+    t_assert(t->height > 0);
 }
 
 void
