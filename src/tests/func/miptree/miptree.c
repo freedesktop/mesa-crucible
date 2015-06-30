@@ -75,6 +75,7 @@ struct test_params {
 
 struct miptree {
     VkImage image;
+
     VkBuffer src_buffer;
     VkBuffer dest_buffer;
 
@@ -134,6 +135,28 @@ fill_rect_with_canary(void *pixels, VkFormat format,
         rgba[1] = 255 * peach[1];
         rgba[2] = 255 * peach[2];
         rgba[3] = 255 * peach[3];
+    }
+}
+
+/// Ensure that each mipslice's image is unique, and that each pair of images
+/// is easily distinguishable visually.
+static void
+adjust_mipslice_color(void *pixels, VkFormat format,
+                      uint32_t width, uint32_t height,
+                      uint32_t level, uint32_t num_levels,
+                      uint32_t layer, uint32_t num_layers)
+{
+    float red_scale = 1.0f - (float) level / num_levels;
+    float blue_scale = 1.0f - (float) layer / num_layers;
+
+    t_assertf(format == VK_FORMAT_R8G8B8A8_UNORM,
+              "FINISHME: format 0x%x", format);
+
+    for (uint32_t i = 0; i < width * height; ++i) {
+        uint8_t *rgba = pixels + 4 * i;
+
+        rgba[0] *= red_scale;
+        rgba[2] *= blue_scale;
     }
 }
 
@@ -241,6 +264,7 @@ miptree_create(uint32_t levels, uint32_t array_length)
     mt->num_slices = num_slices;
 
     uint32_t buffer_offset = 0;
+
     for (uint32_t l = 0; l < levels; ++l) {
         const uint32_t level_width = cru_minify(width, l);
         const uint32_t level_height = cru_minify(height, l);
@@ -298,6 +322,10 @@ miptree_create(uint32_t levels, uint32_t array_length)
                 .height = level_height,
                 .buffer_offset = buffer_offset,
             };
+
+            adjust_mipslice_color(src_pixels, format,
+                                  level_width, level_height,
+                                  l, levels, a, array_length);
 
             buffer_offset += cpp * level_width * level_height;
         }
