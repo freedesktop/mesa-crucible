@@ -162,10 +162,11 @@ adjust_mipslice_color(void *pixels, VkFormat format,
 
 static void
 miptree_calc_sizes(const char *level0_filename, uint32_t cpp,
-                   uint32_t levels, uint32_t array_length,
                    uint32_t *out_width, uint32_t *out_height,
                    size_t *out_buffer_size)
 {
+    const test_params_t *params = t_user_data;
+
     size_t buffer_size = 0;
 
     cru_image_t *level0_image = cru_image_load_file(level0_filename);
@@ -175,11 +176,11 @@ miptree_calc_sizes(const char *level0_filename, uint32_t cpp,
     uint32_t width = cru_image_get_width(level0_image);
     uint32_t height = cru_image_get_height(level0_image);
 
-    for (uint32_t l = 0; l < levels; ++l) {
+    for (uint32_t l = 0; l < params->levels; ++l) {
         buffer_size += cpp * cru_minify(width, l) * cru_minify(height, l);
     }
 
-    buffer_size *= array_length;
+    buffer_size *= params->array_length;
 
     *out_width = width;
     *out_height = height;
@@ -187,15 +188,21 @@ miptree_calc_sizes(const char *level0_filename, uint32_t cpp,
 }
 
 static miptree_t *
-miptree_create(uint32_t levels, uint32_t array_length)
+miptree_create(void)
 {
+    const test_params_t *params = t_user_data;
+
     const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
     const uint32_t cpp = 4;
+
+    const uint32_t levels = params->levels;
+    const uint32_t array_length = params->array_length;
+
     const uint32_t num_slices = levels * array_length;
 
     uint32_t width, height;
     size_t buffer_size;
-    miptree_calc_sizes(mandrill_filenames[0], cpp, levels, array_length,
+    miptree_calc_sizes(mandrill_filenames[0], cpp,
                        &width, &height, &buffer_size);
 
     // Create the image that will contain the real miptree.
@@ -817,9 +824,8 @@ static void
 test(void)
 {
     miptree_t *mt = NULL;
-    const test_params_t *params = t_user_data;
 
-    mt = miptree_create(params->levels, params->array_length);
+    mt = miptree_create();
     miptree_upload(mt);
     miptree_download(mt);
     miptree_compare_images(mt);
