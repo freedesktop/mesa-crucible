@@ -44,7 +44,7 @@
 ///     4. *Compare*. For each level and layer, compare the pixels in the
 ///        destination buffer against those in the source buffer.
 ///
-/// TODO: Test 1D, 3D, array, and cube map textures.
+/// TODO: Test 1D, 1D array, cube map, and 3D textures.
 /// TODO: Test multisampled images.
 /// TODO: Test non-square, non-power-of-two image sizes.
 
