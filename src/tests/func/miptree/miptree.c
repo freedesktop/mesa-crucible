@@ -68,6 +68,8 @@ enum miptree_download_method {
 struct test_params {
     VkImageViewType view_type;
     uint32_t levels;
+    uint32_t width;
+    uint32_t height;
     uint32_t array_length;
     enum miptree_upload_method upload_method;
     enum miptree_download_method download_method;
@@ -105,7 +107,7 @@ struct mipslice {
     uint32_t buffer_offset;
 };
 
-static const char *mandrill_filenames[] = {
+static const char *image512x512_filenames[] = {
     "mandrill-512x512.png",
     "mandrill-256x256.png",
     "mandrill-128x128.png",
@@ -160,34 +162,38 @@ adjust_mipslice_color(void *pixels, VkFormat format,
     }
 }
 
-static void
-miptree_calc_sizes(const char *level0_filename, uint32_t cpp,
-                   uint32_t *out_width, uint32_t *out_height,
-                   size_t *out_buffer_size)
+static const char *
+get_image_filename(uint32_t level)
 {
-    const test_params_t *params = t_user_data;
+    const test_params_t *p = t_user_data;
 
-    /* FINISHME: 1D, 1D array, cube map, and 3D textures */
-    t_assert(params->view_type == VK_IMAGE_VIEW_TYPE_2D);
+    if (p->width == 512 && p->height == 512) {
+        t_assert(level < ARRAY_LENGTH(image512x512_filenames));
+        return image512x512_filenames[level];
+    } else {
+        t_failf("test does support (width, height) = (%u, %u)",
+                p->width, p->height);
+    }
+}
+
+/// Calculate a buffer size that can hold all subimages of the miptree.
+static size_t
+miptree_calc_buffer_size(void)
+{
+    const test_params_t *p = t_user_data;
 
     size_t buffer_size = 0;
+    const uint32_t cpp = 4;
+    const uint32_t width = p->width;
+    const uint32_t height = p->height;
 
-    cru_image_t *level0_image = cru_image_load_file(level0_filename);
-    t_assert(level0_image);
-    t_cleanup_push(level0_image);
-
-    uint32_t width = cru_image_get_width(level0_image);
-    uint32_t height = cru_image_get_height(level0_image);
-
-    for (uint32_t l = 0; l < params->levels; ++l) {
+    for (uint32_t l = 0; l < p->levels; ++l) {
         buffer_size += cpp * cru_minify(width, l) * cru_minify(height, l);
     }
 
-    buffer_size *= params->array_length;
+    buffer_size *= p->array_length;
 
-    *out_width = width;
-    *out_height = height;
-    *out_buffer_size = buffer_size;
+    return buffer_size;
 }
 
 static miptree_t *
@@ -202,14 +208,11 @@ miptree_create(void)
     const uint32_t cpp = 4;
 
     const uint32_t levels = params->levels;
+    const uint32_t width = params->width;
+    const uint32_t height = params->height;
     const uint32_t array_length = params->array_length;
-
     const uint32_t num_slices = levels * array_length;
-
-    uint32_t width, height;
-    size_t buffer_size;
-    miptree_calc_sizes(mandrill_filenames[0], cpp,
-                       &width, &height, &buffer_size);
+    const size_t buffer_size = miptree_calc_buffer_size();
 
     // Create the image that will contain the real miptree.
     VkImage image = qoCreateImage(t_device,
@@ -282,7 +285,8 @@ miptree_create(void)
         const uint32_t level_width = cru_minify(width, l);
         const uint32_t level_height = cru_minify(height, l);
 
-        cru_image_t *file_image = cru_image_load_file(mandrill_filenames[l]);
+        const char *filename = get_image_filename(l);
+        cru_image_t *file_image = cru_image_load_file(filename);
         t_cleanup_push(file_image);
 
         t_assert(level_width == cru_image_get_width(file_image));
