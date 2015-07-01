@@ -44,7 +44,6 @@
 ///     4. *Compare*. For each level and layer, compare the pixels in the
 ///        destination buffer against those in the source buffer.
 ///
-/// TODO: Test 1D, 1D array, cube map, and 3D textures.
 /// TODO: Test multisampled images.
 /// TODO: Test non-square, non-power-of-two image sizes.
 
@@ -67,6 +66,7 @@ enum miptree_download_method {
 };
 
 struct test_params {
+    VkImageViewType view_type;
     uint32_t levels;
     uint32_t array_length;
     enum miptree_upload_method upload_method;
@@ -167,6 +167,9 @@ miptree_calc_sizes(const char *level0_filename, uint32_t cpp,
 {
     const test_params_t *params = t_user_data;
 
+    /* FINISHME: 1D, 1D array, cube map, and 3D textures */
+    t_assert(params->view_type == VK_IMAGE_VIEW_TYPE_2D);
+
     size_t buffer_size = 0;
 
     cru_image_t *level0_image = cru_image_load_file(level0_filename);
@@ -191,6 +194,9 @@ static miptree_t *
 miptree_create(void)
 {
     const test_params_t *params = t_user_data;
+
+    /* FINISHME: 1D, 1D array, cube map, and 3D textures */
+    t_assert(params->view_type == VK_IMAGE_VIEW_TYPE_2D);
 
     const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
     const uint32_t cpp = 4;

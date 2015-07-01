@@ -44,6 +44,7 @@ template = dedent("""
         .start = test,
         .no_image = true,
         .user_data = &(test_params_t) {{
+            .view_type = VK_IMAGE_VIEW_TYPE_{view_caps},
             .levels = {levels},
             .array_length = {array_length},
             .upload_method = MIPTREE_UPLOAD_METHOD_{upload_caps},
@@ -88,7 +89,7 @@ def main():
                 array_length = p.array_length,
                 upload = p.upload,
                 download = p.download,
-                view_caps = p.view.upper(),
+                view_caps = p.view.upper().replace('-', '_'),
                 upload_caps = p.upload.upper(),
                 download_caps = p.download.upper())
             out_file.write(test_def)
