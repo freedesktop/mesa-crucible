@@ -196,7 +196,7 @@ miptree_calc_buffer_size(void)
     return buffer_size;
 }
 
-static miptree_t *
+static const miptree_t *
 miptree_create(void)
 {
     const test_params_t *params = t_user_data;
@@ -352,13 +352,13 @@ miptree_create(void)
 }
 
 static void
-miptree_upload_with_copy(miptree_t *mt)
+miptree_upload_with_copy(const miptree_t *mt)
 {
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device);
     qoBeginCommandBuffer(cmd);
 
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        mipslice_t *slice = &mt->slices[i];
+        const mipslice_t *slice = &mt->slices[i];
 
         VkBufferImageCopy copy = {
             .bufferOffset = slice->buffer_offset,
@@ -384,13 +384,13 @@ miptree_upload_with_copy(miptree_t *mt)
 }
 
 static void
-miptree_download_with_copy(miptree_t *mt)
+miptree_download_with_copy(const miptree_t *mt)
 {
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device);
     qoBeginCommandBuffer(cmd);
 
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        mipslice_t *slice = &mt->slices[i];
+        const mipslice_t *slice = &mt->slices[i];
 
         VkBufferImageCopy copy = {
             .bufferOffset = slice->buffer_offset,
@@ -416,13 +416,13 @@ miptree_download_with_copy(miptree_t *mt)
 }
 
 static void
-miptree_copy_src_buffer_to_textures(miptree_t *mt, VkImage *tex_images)
+miptree_copy_src_buffer_to_textures(const miptree_t *mt, VkImage *tex_images)
 {
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device);
     qoBeginCommandBuffer(cmd);
 
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        mipslice_t *slice = &mt->slices[i];
+        const mipslice_t *slice = &mt->slices[i];
 
         VkBufferImageCopy copy = {
             .bufferOffset = slice->buffer_offset,
@@ -448,13 +448,13 @@ miptree_copy_src_buffer_to_textures(miptree_t *mt, VkImage *tex_images)
 }
 
 static void
-miptree_copy_textures_to_dest_buffer(miptree_t *mt, VkImage *tex_images)
+miptree_copy_textures_to_dest_buffer(const miptree_t *mt, VkImage *tex_images)
 {
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device);
     qoBeginCommandBuffer(cmd);
 
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        mipslice_t *slice = &mt->slices[i];
+        const mipslice_t *slice = &mt->slices[i];
 
         VkBufferImageCopy copy = {
             .bufferOffset = slice->buffer_offset,
@@ -675,10 +675,10 @@ render_textures(VkFormat format, VkImageView *tex_views,
 }
 
 static void
-miptree_create_tex_images(miptree_t *mt, VkImage *tex_images)
+miptree_create_tex_images(const miptree_t *mt, VkImage *tex_images)
 {
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        mipslice_t *slice = &mt->slices[i];
+        const mipslice_t *slice = &mt->slices[i];
 
         tex_images[i] = qoCreateImage(t_device,
             .format = mt->format,
@@ -702,7 +702,7 @@ miptree_create_tex_images(miptree_t *mt, VkImage *tex_images)
 }
 
 static void
-miptree_upload_with_render(miptree_t *mt)
+miptree_upload_with_render(const miptree_t *mt)
 {
     VkImage tex_images[mt->num_slices];
     VkImageView tex_views[mt->num_slices];
@@ -713,7 +713,7 @@ miptree_upload_with_render(miptree_t *mt)
     miptree_copy_src_buffer_to_textures(mt, tex_images);
 
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        mipslice_t *slice = &mt->slices[i];
+        const mipslice_t *slice = &mt->slices[i];
 
         extents[i].width = slice->width;
         extents[i].height = slice->height;
@@ -744,7 +744,7 @@ miptree_upload_with_render(miptree_t *mt)
 }
 
 static void
-miptree_download_with_render(miptree_t *mt)
+miptree_download_with_render(const miptree_t *mt)
 {
     VkImage tex_images[mt->num_slices];
     VkImageView tex_views[mt->num_slices];
@@ -754,7 +754,7 @@ miptree_download_with_render(miptree_t *mt)
     miptree_create_tex_images(mt, tex_images);
 
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        mipslice_t *slice = &mt->slices[i];
+        const mipslice_t *slice = &mt->slices[i];
 
         extents[i].width = slice->width;
         extents[i].height = slice->height;
@@ -775,7 +775,7 @@ miptree_download_with_render(miptree_t *mt)
 }
 
 static void
-miptree_upload(miptree_t *mt)
+miptree_upload(const miptree_t *mt)
 {
     const test_params_t *params = t_user_data;
 
@@ -790,7 +790,7 @@ miptree_upload(miptree_t *mt)
 }
 
 static void
-miptree_download(miptree_t *mt)
+miptree_download(const miptree_t *mt)
 {
     const test_params_t *params = t_user_data;
 
@@ -805,14 +805,14 @@ miptree_download(miptree_t *mt)
 }
 
 static void cru_noreturn
-miptree_compare_images(miptree_t *mt)
+miptree_compare_images(const miptree_t *mt)
 {
     cru_test_result_t result = CRU_TEST_RESULT_PASS;
 
     vkQueueWaitIdle(t_queue);
 
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        mipslice_t *slice = &mt->slices[i];
+        const mipslice_t *slice = &mt->slices[i];
         const uint32_t l = slice->level;
         const uint32_t a = slice->array_slice;
 
@@ -833,7 +833,7 @@ miptree_compare_images(miptree_t *mt)
 static void
 test(void)
 {
-    miptree_t *mt = NULL;
+    const miptree_t *mt = NULL;
 
     mt = miptree_create();
     miptree_upload(mt);
