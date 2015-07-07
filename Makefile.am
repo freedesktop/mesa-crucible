@@ -64,7 +64,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/copy/copy-buffer.c \
 	src/tests/func/depthstencil/basic.c \
 	src/tests/func/desc/dynamic.c \
-	src/tests/func/draw_indexed.c \
+	src/tests/func/draw-indexed.c \
 	src/tests/func/query/timestamp.c \
 	src/tests/func/first.c \
 	src/tests/func/compute.c \
@@ -76,7 +76,7 @@ BUILT_SOURCES = \
 	src/crucible/qonos_pipeline-spirv.h \
 	src/tests/func/depthstencil/basic-spirv.h \
 	src/tests/func/desc/dynamic-spirv.h \
-	src/tests/func/draw_indexed-spirv.h \
+	src/tests/func/draw-indexed-spirv.h \
 	src/tests/func/first-spirv.h \
 	src/tests/func/compute-spirv.h \
 	src/tests/func/miptree/miptree-spirv.h \

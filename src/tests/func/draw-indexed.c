@@ -33,7 +33,7 @@
 
 #include <crucible/cru.h>
 
-#include "draw_indexed-spirv.h"
+#include "draw-indexed-spirv.h"
 
 static inline uint32_t
 align_u32(uint32_t value, uint32_t alignment)
@@ -198,6 +198,6 @@ test(void)
 }
 
 cru_define_test {
-    .name = "func.draw_indexed",
+    .name = "func.draw-indexed",
     .start = test
 };
