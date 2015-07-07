@@ -166,7 +166,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
                 .maxDepth = 1
             },
         },
-        .pScissors = (VkRect[]) {
+        .pScissors = (VkRect2D[]) {
             {{  0,  0 }, {t_width, t_height}},
         }
     );

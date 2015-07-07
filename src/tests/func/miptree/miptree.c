@@ -601,7 +601,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
                     .maxDepth = 1
                 },
             },
-            .pScissors = (VkRect[]) {
+            .pScissors = (VkRect2D[]) {
                 { {0, 0 }, {width, height} },
             });
 

@@ -834,7 +834,7 @@ cru_test_start_main_thread(void *arg)
                 .maxDepth = 1
             },
         },
-        .pScissors = (VkRect[]) {
+        .pScissors = (VkRect2D[]) {
             {{ 0, 0 }, { t->width, t->height }},
         }
     );

@@ -240,7 +240,7 @@ test(void)
                 .maxDepth = 1
             },
         },
-        .pScissors = (VkRect[]) {
+        .pScissors = (VkRect2D[]) {
             {{  0,  0 }, {t_width, t_height}},
         }
     );
