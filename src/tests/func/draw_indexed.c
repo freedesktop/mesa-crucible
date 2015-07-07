@@ -38,7 +38,7 @@
 static inline uint32_t
 align_u32(uint32_t value, uint32_t alignment)
 {
-   return (value + alignment - 1) & ~(alignment - 1);
+    return (value + alignment - 1) & ~(alignment - 1);
 }
 
 static void
@@ -172,29 +172,29 @@ test(void)
                            (VkBuffer[]) { buffer, buffer },
                            (VkDeviceSize[]) { 0, sizeof(vertex_data.vertices) });
 
-   /* Tests uint16 index type */
-   uint16_t index_data16[] = { 50, 101, 102, 103, 104, 105, 106, 107 };
-   memcpy(map + 1024, index_data16, sizeof(index_data16));
-   vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024, VK_INDEX_TYPE_UINT16);
+    /* Tests uint16 index type */
+    uint16_t index_data16[] = { 50, 101, 102, 103, 104, 105, 106, 107 };
+    memcpy(map + 1024, index_data16, sizeof(index_data16));
+    vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024, VK_INDEX_TYPE_UINT16);
 
-   /* Tests instanced, index rendering with negative base vertex and non-zero
-    * start index. */
-   vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-   vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 0, 2);
+    /* Tests instanced, index rendering with negative base vertex and non-zero
+     * start index. */
+    vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+    vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 0, 2);
 
-   /* Tests restart index */
-   vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, restart_pipeline);
-   vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 2, 1);
+    /* Tests restart index */
+    vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, restart_pipeline);
+    vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 2, 1);
 
-   /* Tests uint32 index type */
-   uint32_t index_data32[] = { 50, 101, 102, 103, 104, 105, 106, 107 };
-   memcpy(map + 1024 + 64, index_data32, sizeof(index_data32));
-   vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024 + 64, VK_INDEX_TYPE_UINT32);
-   vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 3, 1);
+    /* Tests uint32 index type */
+    uint32_t index_data32[] = { 50, 101, 102, 103, 104, 105, 106, 107 };
+    memcpy(map + 1024 + 64, index_data32, sizeof(index_data32));
+    vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024 + 64, VK_INDEX_TYPE_UINT32);
+    vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 3, 1);
 
-   vkCmdEndRenderPass(t_cmd_buffer, pass);
-   qoEndCommandBuffer(t_cmd_buffer);
-   qoQueueSubmit(t_queue, 1, &t_cmd_buffer, 0);
+    vkCmdEndRenderPass(t_cmd_buffer, pass);
+    qoEndCommandBuffer(t_cmd_buffer);
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, 0);
 }
 
 cru_define_test {
