@@ -144,20 +144,19 @@ test(void)
     } vertex_data = {
         .vertices = {
             [100] =
-            { -0.6,  0.1 },
-            { -0.4, -0.1 },
-            { -0.2,  0.1 },
-            { -0.0, -0.1 },
-            {  0.2,  0.1 },
-            {  0.4, -0.1 },
-            {  0.6,  0.1 }
+            { -0.6,  0.2 },
+            { -0.4, -0.2 },
+            { -0.2,  0.2 },
+            { -0.0, -0.2 },
+            {  0.2,  0.2 },
+            {  0.4, -0.2 },
+            {  0.6,  0.2 }
         },
         .colors = {
-            HEX_COLOR(0xa6d49f, -0.8),
-            HEX_COLOR(0xe06d06, -0.5),
-            HEX_COLOR(0xc59849, -0.2),
-            HEX_COLOR(0x9cb380,  0.1),
-            HEX_COLOR(0xa6d49f,  0.4),
+            HEX_COLOR(0xa6d49f, -0.72),
+            HEX_COLOR(0xe06d06, -0.24),
+            HEX_COLOR(0xc59849,  0.24),
+            HEX_COLOR(0x9cb380,  0.72),
         }
     };
 
@@ -173,31 +172,25 @@ test(void)
                            (VkBuffer[]) { buffer, buffer },
                            (VkDeviceSize[]) { 0, sizeof(vertex_data.vertices) });
 
-   vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-
-   uint8_t index_data8[] = { 50, 101, 102, 103, 104, 105, 106, 107 };
-   memcpy(map + 1024, index_data8, sizeof(index_data8));
-   vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024, VK_INDEX_TYPE_UINT8);
+   /* Tests uint16 index type */
+   uint16_t index_data16[] = { 50, 101, 102, 103, 104, 105, 106, 107 };
+   memcpy(map + 1024, index_data16, sizeof(index_data16));
+   vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024, VK_INDEX_TYPE_UINT16);
 
    /* Tests instanced, index rendering with negative base vertex and non-zero
     * start index. */
+   vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
    vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 0, 2);
 
    /* Tests restart index */
    vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, restart_pipeline);
    vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 2, 1);
 
-   /* Tests uint16 index type */
-   uint16_t index_data16[] = { 50, 101, 102, 103, 104, 105, 106, 107 };
-   memcpy(map + 1024 + 64, index_data16, sizeof(index_data16));
-   vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024 + 64, VK_INDEX_TYPE_UINT16);
-   vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 3, 1);
-
    /* Tests uint32 index type */
    uint32_t index_data32[] = { 50, 101, 102, 103, 104, 105, 106, 107 };
-   memcpy(map + 1024 + 128, index_data32, sizeof(index_data32));
-   vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024 + 128, VK_INDEX_TYPE_UINT32);
-   vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 4, 1);
+   memcpy(map + 1024 + 64, index_data32, sizeof(index_data32));
+   vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024 + 64, VK_INDEX_TYPE_UINT32);
+   vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 3, 1);
 
    vkCmdEndRenderPass(t_cmd_buffer, pass);
    qoEndCommandBuffer(t_cmd_buffer);
