@@ -182,8 +182,8 @@ typedef struct QoShaderCreateInfo_ {
 
 #define QO_DYNAMIC_DS_STATE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_DYNAMIC_DS_STATE_CREATE_INFO, \
-    .minDepth = 0.0f,       /* default in OpenGL ES 3.1 */ \
-    .maxDepth = 1.0f,       /* default in OpenGL ES 3.1 */ \
+    .minDepthBounds = 0.0f, /* default in OpenGL ES 3.1 */ \
+    .maxDepthBounds = 1.0f, /* default in OpenGL ES 3.1 */ \
     .stencilReadMask = ~0,  /* default in OpenGL ES 3.1 */ \
     .stencilWriteMask = ~0, /* default in OpenGL ES 3.1 */ \
     .stencilFrontRef = 0,   /* default in OpenGL ES 3.1 */ \
