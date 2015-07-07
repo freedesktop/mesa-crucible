@@ -539,8 +539,8 @@ render_textures(VkFormat format, VkImageView *tex_views,
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .layout = pipeline_layout,
             .pNext =
-        &(VkPipelineVertexInputCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_CREATE_INFO,
+        &(VkPipelineVertexInputStateCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
             .bindingCount = 1,
             .pVertexBindingDescriptions = (VkVertexInputBindingDescription[]) {
                 {

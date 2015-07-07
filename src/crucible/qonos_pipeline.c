@@ -127,8 +127,8 @@ qoCreateGraphicsPipeline(VkDevice device,
         }
     }
 
-    VkPipelineVertexInputCreateInfo vi_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_CREATE_INFO,
+    VkPipelineVertexInputStateCreateInfo vi_info = {
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
         .bindingCount = 2,
         .pVertexBindingDescriptions = (VkVertexInputBindingDescription[]) {
             {
@@ -160,7 +160,7 @@ qoCreateGraphicsPipeline(VkDevice device,
     };
 
     if (!find_struct_in_chain(pipeline_info.pNext,
-                              PIPELINE_VERTEX_INPUT_CREATE_INFO)) {
+                              PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO)) {
         /* They should be using one of our shaders if they use this */
         assert(!has_vs || !has_fs);
         vi_info.pNext = pipeline_info.pNext,

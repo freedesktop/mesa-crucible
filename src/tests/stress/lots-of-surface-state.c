@@ -54,8 +54,8 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
         .descriptorSetCount = 1,
         .pSetLayouts = &set_layout);
 
-    VkPipelineVertexInputCreateInfo vi_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_CREATE_INFO,
+    VkPipelineVertexInputStateCreateInfo vi_create_info = {
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
         .bindingCount = 1,
         .pVertexBindingDescriptions = (VkVertexInputBindingDescription[]) {
             {

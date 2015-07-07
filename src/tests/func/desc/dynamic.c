@@ -92,8 +92,8 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
         }
     };
 
-    VkPipelineVertexInputCreateInfo vi_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_CREATE_INFO,
+    VkPipelineVertexInputStateCreateInfo vi_create_info = {
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
         .pNext = &fs_create_info,
         .bindingCount = 1,
         .pVertexBindingDescriptions = (VkVertexInputBindingDescription[]) {
