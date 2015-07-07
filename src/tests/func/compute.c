@@ -51,13 +51,13 @@ test(void)
             .pBinding = (VkDescriptorSetLayoutBinding[]) {
                 {
                     .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                    .count = 1,
+                    .arraySize = 1,
                     .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
                     .pImmutableSamplers = NULL,
                 },
                 {
                     .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
-                    .count = 1,
+                    .arraySize = 1,
                     .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
                     .pImmutableSamplers = NULL,
                 },

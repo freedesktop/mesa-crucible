@@ -44,7 +44,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
             .pBinding = (VkDescriptorSetLayoutBinding[]) {
                 {
                     .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
-                    .count = 12,
+                    .arraySize = 12,
                     .stageFlags = (1 << ubo_stage),
                     .pImmutableSamplers = NULL,
                 },

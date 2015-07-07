@@ -113,19 +113,19 @@ test(void)
             .pBinding = (VkDescriptorSetLayoutBinding[]) {
                 {
                     .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                    .count = 2,
+                    .arraySize = 2,
                     .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
                     .pImmutableSamplers = NULL,
                 },
                 {
                     .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
-                    .count = 1,
+                    .arraySize = 1,
                     .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
                     .pImmutableSamplers = NULL,
                 },
                 {
                     .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
-                    .count = 1,
+                    .arraySize = 1,
                     .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
                     .pImmutableSamplers = NULL,
                 },
@@ -136,7 +136,7 @@ test(void)
             .pBinding = (VkDescriptorSetLayoutBinding[]) {
                 {
                     .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                    .count = 1,
+                    .arraySize = 1,
                     .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
                     .pImmutableSamplers = NULL,
                 },

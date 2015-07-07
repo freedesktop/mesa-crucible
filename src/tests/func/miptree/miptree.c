@@ -518,7 +518,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
             .pBinding = (VkDescriptorSetLayoutBinding[]) {
                 {
                     .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
-                    .count = 1,
+                    .arraySize = 1,
                     .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
                 },
             }),
