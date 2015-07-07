@@ -84,11 +84,8 @@ test(void)
         .pColorLayouts = (VkImageLayout[]) { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
         .pColorLoadOps = (VkAttachmentLoadOp[]) { VK_ATTACHMENT_LOAD_OP_CLEAR },
         .pColorStoreOps = (VkAttachmentStoreOp[]) { VK_ATTACHMENT_STORE_OP_STORE },
-        .pColorLoadClearValues = (VkClearColor[]) {
-            {
-                .color = { .floatColor = HEX_COLOR(0x522a27, 1.0) },
-                .useRawValue = false,
-            },
+        .pColorLoadClearValues = (VkClearColorValue[]) {
+            { .f32 = HEX_COLOR(0x522a27, 1.0) },
         });
 
     VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,

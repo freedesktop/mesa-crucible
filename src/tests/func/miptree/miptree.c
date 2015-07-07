@@ -630,7 +630,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
             .pColorFormats = (VkFormat[]) { format },
             .pColorLayouts = (VkImageLayout[]) { VK_IMAGE_LAYOUT_GENERAL },
             .pColorLoadOps = (VkAttachmentLoadOp[]) { VK_ATTACHMENT_LOAD_OP_LOAD },
-            .pColorLoadClearValues = (VkClearColor[]) {},
+            .pColorLoadClearValues = (VkClearColorValue[]) {},
             .pColorStoreOps = (VkAttachmentStoreOp[]) { VK_ATTACHMENT_STORE_OP_STORE });
 
         vkUpdateDescriptors(t_device, sets[0], 1,

@@ -316,11 +316,8 @@ test(void)
         .pColorLayouts = (VkImageLayout[]) { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
         .pColorLoadOps = (VkAttachmentLoadOp[]) { VK_ATTACHMENT_LOAD_OP_CLEAR },
         .pColorStoreOps = (VkAttachmentStoreOp[]) { VK_ATTACHMENT_STORE_OP_STORE },
-        .pColorLoadClearValues = (VkClearColor[]) {
-            {
-                .color = { .floatColor = { 1.0, 0.0, 0.0, 1.0 } },
-                .useRawValue = false,
-            },
+        .pColorLoadClearValues = (VkClearColorValue[]) {
+            { .f32 = { 1.0, 0.0, 0.0, 1.0 } },
         });
 
     vkCmdBeginRenderPass(t_cmd_buffer,
