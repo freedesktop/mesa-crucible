@@ -42,7 +42,6 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
     VkPipelineIaStateCreateInfo ia_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO,
         .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
-        .disableVertexReuse = false,
         .primitiveRestartEnable = false,
     };
 

@@ -105,7 +105,6 @@ test(void)
     VkPipelineIaStateCreateInfo ia_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO,
         .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
-        .disableVertexReuse = false,
         .primitiveRestartEnable = false,
     };
 
@@ -122,7 +121,6 @@ test(void)
     VkPipelineIaStateCreateInfo restart_ia_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO,
         .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
-        .disableVertexReuse = false,
         .primitiveRestartEnable = true,
     };
 
