@@ -44,7 +44,6 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
         .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
         .disableVertexReuse = false,
         .primitiveRestartEnable = false,
-        .primitiveRestartIndex = 0
     };
 
     VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,

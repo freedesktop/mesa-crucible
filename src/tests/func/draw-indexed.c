@@ -107,7 +107,6 @@ test(void)
         .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
         .disableVertexReuse = false,
         .primitiveRestartEnable = false,
-        .primitiveRestartIndex = 0,
     };
 
     pipeline = qoCreateGraphicsPipeline(t_device,
@@ -125,7 +124,6 @@ test(void)
         .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
         .disableVertexReuse = false,
         .primitiveRestartEnable = true,
-        .primitiveRestartIndex = 104,
     };
 
     restart_pipeline = qoCreateGraphicsPipeline(t_device,
@@ -182,14 +180,18 @@ test(void)
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
     vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 0, 2);
 
+    uint16_t index_data16_restart[] = { 50, 101, 102, 103, ~0, 105, 106, 107 };
+    memcpy(map + 1024 + 64, index_data16_restart, sizeof(index_data16_restart));
+    vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024 + 64, VK_INDEX_TYPE_UINT16);
+
     /* Tests restart index */
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, restart_pipeline);
     vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 2, 1);
 
     /* Tests uint32 index type */
-    uint32_t index_data32[] = { 50, 101, 102, 103, 104, 105, 106, 107 };
-    memcpy(map + 1024 + 64, index_data32, sizeof(index_data32));
-    vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024 + 64, VK_INDEX_TYPE_UINT32);
+    uint32_t index_data32[] = { 50, 101, 102, 103, ~0, 105, 106, 107 };
+    memcpy(map + 1024 + 128, index_data32, sizeof(index_data32));
+    vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024 + 128, VK_INDEX_TYPE_UINT32);
     vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 3, 1);
 
     vkCmdEndRenderPass(t_cmd_buffer, pass);

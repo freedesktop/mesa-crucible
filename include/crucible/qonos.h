@@ -135,8 +135,7 @@ typedef struct QoShaderCreateInfo_ {
     .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO, \
     .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, \
     .disableVertexReuse = false, \
-    .primitiveRestartEnable = false, \
-    .primitiveRestartIndex = 0
+    .primitiveRestartEnable = false
 
 #define QO_PIPELINE_RS_STATE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_RS_STATE_CREATE_INFO, \
