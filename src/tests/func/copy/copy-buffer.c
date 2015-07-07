@@ -59,7 +59,7 @@ test_large_copy(void)
         (const void * []) {
             &(VkBufferMemoryBarrier) {
                 .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
-                .outputMask = VK_MEMORY_OUTPUT_CPU_WRITE_BIT,
+                .outputMask = VK_MEMORY_OUTPUT_HOST_WRITE_BIT,
                 .inputMask = VK_MEMORY_INPUT_TRANSFER_BIT,
                 .buffer = buffer1,
                 .offset = 0,
@@ -67,7 +67,7 @@ test_large_copy(void)
             },
             &(VkBufferMemoryBarrier) {
                 .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
-                .outputMask = VK_MEMORY_OUTPUT_CPU_WRITE_BIT,
+                .outputMask = VK_MEMORY_OUTPUT_HOST_WRITE_BIT,
                 .buffer = buffer2,
                 .offset = 0,
                 .size = buffer_size,
@@ -86,7 +86,7 @@ test_large_copy(void)
             &(VkBufferMemoryBarrier) {
                 .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
                 .outputMask = VK_MEMORY_OUTPUT_TRANSFER_BIT,
-                .inputMask = VK_MEMORY_INPUT_CPU_READ_BIT,
+                .inputMask = VK_MEMORY_INPUT_HOST_READ_BIT,
                 .buffer = buffer2,
                 .offset = 0,
                 .size = buffer_size,
