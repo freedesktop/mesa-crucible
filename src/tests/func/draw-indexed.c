@@ -192,7 +192,7 @@ test(void)
     vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024 + 128, VK_INDEX_TYPE_UINT32);
     vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 3, 1);
 
-    vkCmdEndRenderPass(t_cmd_buffer, pass);
+    vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, 0);
 }

@@ -667,7 +667,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
                                 /*dynamicOffsets*/ NULL);
         vkCmdDraw(cmd, /*firstVertex*/ 0, num_vertices,
                   /*firstInstance*/ 0, /*instanceCount*/ 1);
-        vkCmdEndRenderPass(cmd, pass);
+        vkCmdEndRenderPass(cmd);
     }
 
     qoEndCommandBuffer(cmd);

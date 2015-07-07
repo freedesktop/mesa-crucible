@@ -340,7 +340,7 @@ test(void)
                             &set[1], 0, NULL);
     vkCmdDraw(t_cmd_buffer, /*firstVertex*/ 0, /*vertexCount*/ 3,
               /*firstInstance*/ 0, /*instanceCount*/ 1);
-    vkCmdEndRenderPass(t_cmd_buffer, pass);
+    vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, 0);
 }

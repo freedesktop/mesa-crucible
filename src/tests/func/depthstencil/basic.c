@@ -198,7 +198,7 @@ test(void)
     vkCmdDraw(t_cmd_buffer, 0, 3, 0, 1);
     vkCmdDraw(t_cmd_buffer, 3, 3, 1, 1);
 
-    vkCmdEndRenderPass(t_cmd_buffer, pass);
+    vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, 0);
 }
