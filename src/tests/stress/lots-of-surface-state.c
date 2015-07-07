@@ -173,8 +173,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
     vkCmdBindDynamicStateObject(t_cmd_buffer,
                                 VK_STATE_BIND_POINT_VIEWPORT, vp_state);
 
-    VkDynamicRsState rs_state =
-        qoCreateDynamicRasterState(t_device, .pointSize = 1.0);
+    VkDynamicRsState rs_state = qoCreateDynamicRasterState(t_device);
     vkCmdBindDynamicStateObject(t_cmd_buffer,
                                 VK_STATE_BIND_POINT_RASTER, rs_state);
 

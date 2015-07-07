@@ -174,8 +174,6 @@ typedef struct QoShaderCreateInfo_ {
     .depthBias = 0.0f, \
     .depthBiasClamp = 0.0f, \
     .slopeScaledDepthBias = 0.0f, \
-    .pointSize = 1.0f, \
-    .pointFadeThreshold = 1.0f, \
     .lineWidth = 1.0f
 
 #define QO_DYNAMIC_CB_STATE_CREATE_INFO_DEFAULTS \
