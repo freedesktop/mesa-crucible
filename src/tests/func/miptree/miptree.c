@@ -247,10 +247,10 @@ miptree_create(void)
         .allocationSize = image_reqs.size);
     VkDeviceMemory src_buffer_mem = qoAllocMemory(t_device,
         .allocationSize = src_buffer_reqs.size,
-        .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT);
+        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
     VkDeviceMemory dest_buffer_mem = qoAllocMemory(t_device,
         .allocationSize = dest_buffer_reqs.size,
-        .memProps = VK_MEMORY_PROPERTY_HOST_DEVICE_COHERENT_BIT);
+        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
     void *src_buffer_map = qoMapMemory(t_device, src_buffer_mem,
                                        /*offset*/ 0, buffer_size, 0);
