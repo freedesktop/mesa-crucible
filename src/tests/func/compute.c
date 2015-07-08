@@ -121,7 +121,7 @@ test(void)
         .compareOp = VK_COMPARE_OP_GREATER,
         .minLod = 0,
         .maxLod = 5,
-        .borderColor = VK_BORDER_COLOR_TRANSPARENT_BLACK);
+        .borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK);
 
    vkUpdateDescriptors(t_device,
         set, 2,
