@@ -249,9 +249,7 @@ typedef struct QoShaderCreateInfo_ {
     .sType = VK_STRUCTURE_TYPE_DEPTH_STENCIL_VIEW_CREATE_INFO, \
     .mipLevel = 0, \
     .baseArraySlice = 0, \
-    .arraySize = 1, \
-    .msaaResolveImage = 0, \
-    .msaaResolveSubResource = {0}
+    .arraySize = 1
 
 #define QO_SHADER_CREATE_INFO_DEFAULTS \
     .sType =VK_STRUCTURE_TYPE_SHADER_CREATE_INFO
