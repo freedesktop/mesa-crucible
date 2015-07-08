@@ -189,24 +189,23 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           1, &set_layout, &set);
 
-    VkBufferViewAttachInfo attach_info[12];
+    VkDescriptorInfo desc_info[12];
     for (int i = 0; i < 12; i++)
-        attach_info[i] = (VkBufferViewAttachInfo) {
-            .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_ATTACH_INFO,
-            .view = ubo_view,
-        };
+        desc_info[i] = (VkDescriptorInfo) { .bufferView = ubo_view };
 
-   vkUpdateDescriptors(t_device, set, 1,
-        (const void * []) {
-            &(VkUpdateBuffers) {
-                .sType = VK_STRUCTURE_TYPE_UPDATE_BUFFERS,
-                .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                .arrayIndex = 0,
-                .binding = 0,
+    vkUpdateDescriptorSets(t_device,
+        1, /* writeCount */
+        (VkWriteDescriptorSet[]) {
+            {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .destSet = set,
+                .destBinding = 0,
+                .destArrayElement = 0,
                 .count = 12,
-                .pBufferViews = attach_info,
+                .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                .pDescriptors = desc_info,
             },
-        });
+        }, 0, NULL);
 
     for (int i = 0; i < 1024; i++) {
         uint32_t offsets[12];

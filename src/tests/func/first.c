@@ -251,63 +251,58 @@ test(void)
         .maxLod = 0,
         .borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK);
 
-   vkUpdateDescriptors(t_device,
-        set[0], 3,
-        (const void * []) {
-            &(VkUpdateBuffers) {
-                .sType = VK_STRUCTURE_TYPE_UPDATE_BUFFERS,
-                .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                .arrayIndex = 0,
-                .binding = 0,
+    vkUpdateDescriptorSets(t_device,
+        4, /* writeCount */
+        (VkWriteDescriptorSet[]) {
+            {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .destSet = set[0],
+                .destBinding = 0,
+                .destArrayElement = 0,
                 .count = 2,
-                .pBufferViews = (VkBufferViewAttachInfo[]) {
-                    {
-                        .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_ATTACH_INFO,
-                        .view = buffer_view[0],
-                    },
-                    {
-                        .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_ATTACH_INFO,
-                        .view = buffer_view[1],
-                    },
-                },
-            },
-            &(VkUpdateImages) {
-                .sType = VK_STRUCTURE_TYPE_UPDATE_IMAGES,
-                .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
-                .binding = 2,
-                .count = 1,
-                .pImageViews = (VkImageViewAttachInfo[]) {
-                    {
-                        .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_ATTACH_INFO,
-                        .view = tex_view,
-                        .layout = VK_IMAGE_LAYOUT_GENERAL,
-                    },
-                },
-            },
-            &(const VkUpdateSamplers) {
-                .sType = VK_STRUCTURE_TYPE_UPDATE_SAMPLERS,
-                .binding = 3,
-                .count = 1,
-                .pSamplers = (const VkSampler[]) { sampler }
-            },
-        });
-
-    vkUpdateDescriptors(t_device,
-        set[1], 1,
-        (const void * []) {
-            &(VkUpdateBuffers) {
-                .sType = VK_STRUCTURE_TYPE_UPDATE_BUFFERS,
                 .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                .arrayIndex = 0,
+                .pDescriptors = (VkDescriptorInfo[]) {
+                    { .bufferView = buffer_view[0] },
+                    { .bufferView = buffer_view[1] },
+                },
+            },
+            {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .destSet = set[0],
+                .destBinding = 2,
+                .destArrayElement = 0,
                 .count = 1,
-                .pBufferViews = (VkBufferViewAttachInfo[]) {
+                .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+                .pDescriptors = (VkDescriptorInfo[]) {
                     {
-                        .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_ATTACH_INFO,
-                        .view = buffer_view[2]
+                        .imageView = tex_view,
+                        .imageLayout = VK_IMAGE_LAYOUT_GENERAL,
                     },
                 },
             },
-        });
+            {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .destSet = set[0],
+                .destBinding = 3,
+                .destArrayElement = 0,
+                .count = 1,
+                .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
+                .pDescriptors = (VkDescriptorInfo[]) {
+                    { .sampler = sampler, },
+                },
+            },
+            {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .destSet = set[1],
+                .destBinding = 0,
+                .destArrayElement = 0,
+                .count = 1,
+                .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                .pDescriptors = (VkDescriptorInfo[]) {
+                    { .bufferView = buffer_view[2], },
+                },
+            },
+        }, 0, NULL);
 
     VkRenderPass pass = qoCreateRenderPass(t_device,
         .renderArea = {{0, 0}, {t_width, t_height}},

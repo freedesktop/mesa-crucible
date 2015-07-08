@@ -630,24 +630,24 @@ render_textures(VkFormat format, VkImageView *tex_views,
             .pColorLoadClearValues = (VkClearColorValue[]) {},
             .pColorStoreOps = (VkAttachmentStoreOp[]) { VK_ATTACHMENT_STORE_OP_STORE });
 
-        vkUpdateDescriptors(t_device, sets[0], 1,
-            (const void * []) {
-                &(VkUpdateImages) {
-                    .sType = VK_STRUCTURE_TYPE_UPDATE_IMAGES,
-                    .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
-                    .binding = 0,
-                    .arrayIndex = 0,
+        vkUpdateDescriptorSets(t_device,
+            1, /* writeCount */
+            (VkWriteDescriptorSet[]) {
+                {
+                    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                    .destSet = sets[0],
+                    .destBinding = 0,
+                    .destArrayElement = 0,
                     .count = 1,
-                    .pImageViews = (VkImageViewAttachInfo[]) {
+                    .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+                    .pDescriptors = (VkDescriptorInfo[]) {
                         {
-                            .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_ATTACH_INFO,
-                            .view = tex_views[i],
-                            .layout = VK_IMAGE_LAYOUT_GENERAL,
+                            .imageView = tex_views[i],
+                            .imageLayout = VK_IMAGE_LAYOUT_GENERAL,
                         },
                     },
                 },
-            }
-        );
+            }, 0, NULL);
 
         vkCmdBeginRenderPass(cmd,
             &(VkRenderPassBegin) {

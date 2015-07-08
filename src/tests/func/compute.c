@@ -123,29 +123,32 @@ test(void)
         .maxLod = 5,
         .borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK);
 
-   vkUpdateDescriptors(t_device,
-        set, 2,
-        (const void * []) {
-            &(VkUpdateBuffers) {
-                .sType = VK_STRUCTURE_TYPE_UPDATE_BUFFERS,
-                .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                .arrayIndex = 0,
-                .binding = 0,
+    vkUpdateDescriptorSets(t_device,
+        2, /* writeCount */
+        (VkWriteDescriptorSet[]) {
+            {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .destSet = set,
+                .destBinding = 0,
+                .destArrayElement = 0,
                 .count = 1,
-                .pBufferViews = (VkBufferViewAttachInfo[]) {
-                    {
-                        .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_ATTACH_INFO,
-                        .view = buffer_view,
-                    },
+                .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                .pDescriptors = (VkDescriptorInfo[]) {
+                    { .bufferView = buffer_view },
                 },
             },
-            &(VkUpdateSamplers) {
-                .sType = VK_STRUCTURE_TYPE_UPDATE_SAMPLERS,
-                .binding = 1,
+            {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .destSet = set,
+                .destBinding = 1,
+                .destArrayElement = 0,
                 .count = 1,
-                .pSamplers = (const VkSampler[]) { sampler }
+                .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
+                .pDescriptors = (VkDescriptorInfo[]) {
+                    { .sampler = sampler, },
+                },
             },
-        });
+        }, 0, NULL);
 
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
 

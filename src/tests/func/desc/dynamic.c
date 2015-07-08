@@ -246,23 +246,21 @@ test(void)
     VkDynamicRsState rs_state = qoCreateDynamicRasterState(t_device);
     VkDynamicCbState cb_state = qoCreateDynamicColorBlendState(t_device);
 
-    vkUpdateDescriptors(t_device,
-        set[0], 1,
-        (const void * []) {
-            &(VkUpdateBuffers) {
-                .sType = VK_STRUCTURE_TYPE_UPDATE_BUFFERS,
-                .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
-                .arrayIndex = 0,
-                .binding = 0,
+    vkUpdateDescriptorSets(t_device,
+        1, /* writeCount */
+        (VkWriteDescriptorSet[]) {
+            {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .destSet = set[0],
+                .destBinding = 0,
+                .destArrayElement = 0,
                 .count = 1,
-                .pBufferViews = (VkBufferViewAttachInfo[]) {
-                    {
-                        .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_ATTACH_INFO,
-                        .view = buffer_view,
-                    },
+                .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
+                .pDescriptors = (VkDescriptorInfo[]) {
+                    { .bufferView = buffer_view },
                 },
             },
-        });
+        }, 0, NULL);
 
     VkRenderPass pass = qoCreateRenderPass(t_device,
         .renderArea = {{0, 0}, {t_width, t_height}},
