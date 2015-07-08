@@ -662,6 +662,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
                                (VkDeviceSize[]) {vb_position_offset});
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                pipeline_layout,
                                 /*firstSet*/ 0, ARRAY_LENGTH(sets), sets,
                                 /*dynamicOffsetCount*/ 0,
                                 /*dynamicOffsets*/ NULL);

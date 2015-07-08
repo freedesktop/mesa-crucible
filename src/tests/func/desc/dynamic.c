@@ -292,19 +292,22 @@ test(void)
 
     uint32_t dynamic_offsets[1] = { 0 };
     vkCmdBindDescriptorSets(t_cmd_buffer,
-                            VK_PIPELINE_BIND_POINT_GRAPHICS, 0, 1,
+                            VK_PIPELINE_BIND_POINT_GRAPHICS,
+                            pipeline_layout, 0, 1,
                             &set[0], 1, dynamic_offsets);
     vkCmdDraw(t_cmd_buffer, 0, 4, 0, 1);
 
     dynamic_offsets[0] = 32;
     vkCmdBindDescriptorSets(t_cmd_buffer,
-                            VK_PIPELINE_BIND_POINT_GRAPHICS, 0, 1,
+                            VK_PIPELINE_BIND_POINT_GRAPHICS,
+                            pipeline_layout, 0, 1,
                             &set[0], 1, dynamic_offsets);
     vkCmdDraw(t_cmd_buffer, 0, 4, 0, 1);
 
     dynamic_offsets[0] = 64;
     vkCmdBindDescriptorSets(t_cmd_buffer,
-                            VK_PIPELINE_BIND_POINT_GRAPHICS, 0, 1,
+                            VK_PIPELINE_BIND_POINT_GRAPHICS,
+                            pipeline_layout, 0, 1,
                             &set[0], 1, dynamic_offsets);
     vkCmdDraw(t_cmd_buffer, 0, 4, 0, 1);
 

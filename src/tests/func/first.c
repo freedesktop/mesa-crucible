@@ -152,7 +152,7 @@ test(void)
     VkDescriptorSet set[2];
     qoAllocDescriptorSets(t_device, /*pool*/ 0,
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
-                          2, set_layout, set);
+                          pipeline_layout, 2, set_layout, set);
 
     VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024,
                                      .usage = VK_BUFFER_USAGE_GENERAL);
@@ -330,10 +330,12 @@ test(void)
                            (VkDeviceSize[]) { 0, 3 * 4 * sizeof(float) });
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
     vkCmdBindDescriptorSets(t_cmd_buffer,
-                            VK_PIPELINE_BIND_POINT_GRAPHICS, 0, 1,
+                            VK_PIPELINE_BIND_POINT_GRAPHICS,
+                            pipeline_layout, 0, 1,
                             &set[0], 0, NULL);
     vkCmdBindDescriptorSets(t_cmd_buffer,
-                            VK_PIPELINE_BIND_POINT_GRAPHICS, 1, 1,
+                            VK_PIPELINE_BIND_POINT_GRAPHICS,
+                            pipeline_layout, 1, 1,
                             &set[1], 0, NULL);
     vkCmdDraw(t_cmd_buffer, /*firstVertex*/ 0, /*vertexCount*/ 3,
               /*firstInstance*/ 0, /*instanceCount*/ 1);

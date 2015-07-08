@@ -238,7 +238,8 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
         offsets[11] = (1024 + i * 2 + 1) * sizeof(float);
 
         vkCmdBindDescriptorSets(t_cmd_buffer,
-                                VK_PIPELINE_BIND_POINT_GRAPHICS, 0, 1,
+                                VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                pipeline_layout, 0, 1,
                                 &set, 12, offsets);
 
         vkCmdDraw(t_cmd_buffer, i, 1, 0, 1);

@@ -150,7 +150,8 @@ test(void)
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
 
     vkCmdBindDescriptorSets(t_cmd_buffer,
-                            VK_PIPELINE_BIND_POINT_COMPUTE, 0, 1,
+                            VK_PIPELINE_BIND_POINT_COMPUTE,
+                            pipeline_layout, 0, 1,
                             &set, 0, NULL);
 
     vkCmdDispatch(t_cmd_buffer, 8, 2, 2);
