@@ -29,11 +29,8 @@ qoObjectGetMemoryRequirements(VkDevice dev, VkObjectType obj_type,
 {
     VkResult result;
     VkMemoryRequirements mem_reqs;
-    size_t mem_reqs_size = sizeof(mem_reqs);
 
-    result = vkGetObjectInfo(dev, obj_type, obj,
-                             VK_OBJECT_INFO_TYPE_MEMORY_REQUIREMENTS,
-                             &mem_reqs_size, &mem_reqs);
+    result = vkGetObjectMemoryRequirements(dev, obj_type, obj, &mem_reqs);
     t_assert(result == VK_SUCCESS);
 
     return mem_reqs;
