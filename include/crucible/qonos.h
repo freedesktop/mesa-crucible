@@ -222,7 +222,6 @@ typedef struct QoShaderCreateInfo_ {
 
 #define QO_IMAGE_VIEW_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO, \
-    .minLod = 0.0f, \
     .channels = { \
         VK_CHANNEL_SWIZZLE_R, \
         VK_CHANNEL_SWIZZLE_G, \
