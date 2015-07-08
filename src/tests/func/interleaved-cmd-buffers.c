@@ -78,8 +78,7 @@ setup_src(struct src *src)
     memcpy(vk_map, ref_map, 4 * width * height);
     t_assert(cru_image_unmap(t_ref_image()));
 
-    qoQueueBindImageMemory(t_queue, image, /*allocationIndex*/ 0, mem,
-                            /*offset*/ 0);
+    qoBindImageMemory(t_device, image, mem, /*offset*/ 0);
 
     src->vk_image = image;
 }
@@ -105,7 +104,7 @@ setup_dest(struct dest *dest)
                                        .allocationSize = mem_reqs.size);
     void *map = qoMapMemory(t_device, mem, 0, mem_reqs.size, 0);
 
-    qoQueueBindBufferMemory(t_queue, buffer, /*index*/ 0, mem, 0);
+    qoBindBufferMemory(t_device, buffer, mem, 0);
 
     cru_image_t *cru_image = cru_image_from_pixels(map, VK_FORMAT_R8G8B8A8_UNORM,
                                                    t_width, t_height);

@@ -38,9 +38,7 @@ get_timestamp(void)
     void *map = qoMapMemory(t_device, mem, 0, buffer_requirements.size, 0);
     memset(map, 0x11, buffer_requirements.size);
 
-    qoQueueBindBufferMemory(t_queue, buffer,
-                            0, /* allocation index; for objects which need to bind to multiple mems */
-                            mem, 0);
+    qoBindBufferMemory(t_device, buffer, mem, 0);
 
     VkCmdBuffer cmdBuffer = qoCreateCommandBuffer(t_device);
     qoBeginCommandBuffer(cmdBuffer);

@@ -257,12 +257,9 @@ miptree_create(void)
     void *dest_buffer_map = qoMapMemory(t_device, dest_buffer_mem,
                                         /*offset*/ 0, buffer_size, 0);
 
-    qoQueueBindImageMemory(t_queue, image, /*index*/ 0,
-                           image_mem, /*offset*/ 0);
-    qoQueueBindBufferMemory(t_queue, src_buffer, /*index*/ 0,
-                            src_buffer_mem, /*offset*/ 0);
-    qoQueueBindBufferMemory(t_queue, dest_buffer, /*index*/ 0,
-                            dest_buffer_mem, /*offset*/ 0);
+    qoBindImageMemory(t_device, image, image_mem, /*offset*/ 0);
+    qoBindBufferMemory(t_device, src_buffer, src_buffer_mem, /*offset*/ 0);
+    qoBindBufferMemory(t_device, dest_buffer, dest_buffer_mem, /*offset*/ 0);
 
     miptree_t *mt = xzalloc(sizeof(*mt) + num_slices * sizeof(mt->slices[0]));
     t_cleanup_push_callback(free, mt);
@@ -566,7 +563,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
     VkMemoryRequirements vb_reqs = qoBufferGetMemoryRequirements(t_device, vb);
     VkDeviceMemory vb_mem = qoAllocMemory(t_device,
                                           .allocationSize = vb_reqs.size);
-    qoQueueBindBufferMemory(t_queue, vb, /*index*/ 0, vb_mem, /*offset*/ 0);
+    qoBindBufferMemory(t_device, vb, vb_mem, /*offset*/ 0);
     void *vb_map = qoMapMemory(t_device, vb_mem, /*offset*/ 0,
                                vb_size, /*flags*/ 0);
 
@@ -697,8 +694,7 @@ miptree_create_tex_images(const miptree_t *mt, VkImage *tex_images)
             qoImageGetMemoryRequirements(t_device, tex_images[i]);
         VkDeviceMemory tex_mem = qoAllocMemory(t_device,
                                            .allocationSize = tex_reqs.size);
-        qoQueueBindImageMemory(t_queue, tex_images[i], /*index*/ 0,
-                               tex_mem, /*offset*/ 0);
+        qoBindImageMemory(t_device, tex_images[i], tex_mem, /*offset*/ 0);
     }
 }
 

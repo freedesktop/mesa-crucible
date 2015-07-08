@@ -197,7 +197,7 @@ test(void)
     void *map = qoMapMemory(t_device, mem, 0, 4096, 0);
     memset(map, 192, 4096);
 
-    qoQueueBindBufferMemory(t_queue, buffer, /*index*/ 0, mem, 0);
+    qoBindBufferMemory(t_device, buffer, mem, 0);
 
     static const float color[6][4] = {
         HEX_COLOR(0xfaff81),

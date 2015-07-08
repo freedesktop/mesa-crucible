@@ -49,35 +49,29 @@ qoImageGetMemoryRequirements(VkDevice dev, VkImage image)
 }
 
 VkResult
-qoQueueBindObjectMemory(VkQueue queue, VkObjectType obj_type, VkObject obj,
-                        uint32_t allocation_index, VkDeviceMemory mem,
-                        VkDeviceSize offset)
+qoBindBufferMemory(VkDevice device, VkBuffer buffer,
+                   VkDeviceMemory mem, VkDeviceSize offset)
 {
     VkResult result;
 
-    result = vkQueueBindObjectMemory(queue, obj_type, obj, allocation_index,
-                                     mem, offset);
+    result = vkBindObjectMemory(device, VK_OBJECT_TYPE_BUFFER,
+                                buffer, mem, offset);
     t_assert(result == VK_SUCCESS);
 
     return result;
 }
 
 VkResult
-qoQueueBindBufferMemory(VkQueue queue, VkBuffer buffer,
-                        uint32_t allocation_index, VkDeviceMemory mem,
-                        VkDeviceSize offset)
+qoBindImageMemory(VkDevice device, VkImage image,
+                  VkDeviceMemory mem, VkDeviceSize offset)
 {
-    return qoQueueBindObjectMemory(queue, VK_OBJECT_TYPE_BUFFER, buffer,
-                                   allocation_index, mem, offset);
-}
+    VkResult result;
 
-VkResult
-qoQueueBindImageMemory(VkQueue queue, VkImage image,
-                       uint32_t allocation_index, VkDeviceMemory mem,
-                       VkDeviceSize offset)
-{
-    return qoQueueBindObjectMemory(queue, VK_OBJECT_TYPE_IMAGE, image,
-                                   allocation_index, mem, offset);
+    result = vkBindObjectMemory(device, VK_OBJECT_TYPE_IMAGE,
+                                image, mem, offset);
+    t_assert(result == VK_SUCCESS);
+
+    return result;
 }
 
 VkResult

@@ -58,7 +58,7 @@ test(void)
 
     mem = qoAllocMemory(t_device, .allocationSize = requirements.size);
     map = qoMapMemory(t_device, mem, 0, requirements.size, 0);
-    qoQueueBindBufferMemory(t_queue, buffer, 0, mem, 0);
+    qoBindBufferMemory(t_device, buffer, mem, 0);
 
     VkFramebuffer framebuffer = qoCreateFramebuffer(t_device,
         .width = t_width,

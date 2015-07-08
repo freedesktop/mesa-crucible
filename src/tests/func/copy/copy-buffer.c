@@ -48,9 +48,8 @@ test_large_copy(void)
     // Fill the rest with 0
     memset((char *)map + buffer_size, 0, memory_size - buffer_size);
 
-    qoQueueBindBufferMemory(t_queue, buffer1, /*allocation index*/ 0, mem, 0);
-    qoQueueBindBufferMemory(t_queue, buffer2, /*allocation index*/ 0,
-                            mem, buffer_requirements.size);
+    qoBindBufferMemory(t_device, buffer1, mem, 0);
+    qoBindBufferMemory(t_device, buffer2, mem, buffer_requirements.size);
 
     VkCmdBuffer cmdBuffer = qoCreateCommandBuffer(t_device);
     qoBeginCommandBuffer(cmdBuffer);

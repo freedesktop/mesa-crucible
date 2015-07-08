@@ -174,7 +174,7 @@ test(void)
     void *map = qoMapMemory(t_device, mem, 0, mem_size, 0);
     memset(map, 192, mem_size);
 
-    qoQueueBindBufferMemory(t_queue, buffer, /*index*/ 0, mem, 128);
+    qoBindBufferMemory(t_device, buffer, mem, 128);
 
     static const float color[12] = {
         0.0, 0.2, 0.0, 0.0,
@@ -202,7 +202,7 @@ test(void)
         .format = VK_FORMAT_R32G32B32A32_SFLOAT,
         .offset = 48, .range = 64);
 
-    qoQueueBindBufferMemory(t_queue, vertex_buffer, /*index*/ 0, mem, 1024);
+    qoBindBufferMemory(t_device, vertex_buffer, mem, 1024);
 
     static const float vertex_data[] = {
         // Triangle coordinates
@@ -216,7 +216,7 @@ test(void)
 
     memcpy(map + 1024, vertex_data, sizeof(vertex_data));
 
-    qoQueueBindBufferMemory(t_queue, image_buffer, /*index*/ 0, mem, 0);
+    qoBindBufferMemory(t_device, image_buffer, mem, 0);
 
     const uint32_t texture_width = 16, texture_height = 16;
 
@@ -230,8 +230,7 @@ test(void)
             .depth = 1,
         });
 
-    qoQueueBindImageMemory(t_queue, texture, /*index*/ 0, mem,
-                           2048 + 256 * 256 * 4);
+    qoBindImageMemory(t_device, texture, mem, 2048 + 256 * 256 * 4);
 
     VkImageView tex_view = qoCreateImageView(t_device,
         .image = texture,

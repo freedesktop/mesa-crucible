@@ -64,10 +64,10 @@ test(void)
     memset(vertex_map, 0, mem_size);
 
     uint32_t offset = 0;
-    qoQueueBindBufferMemory(t_queue, vertex_buffer, 0, mem, offset);
+    qoBindBufferMemory(t_device, vertex_buffer, mem, offset);
     offset = align_u32(offset + vb_requirements.size, 4096);
 
-    qoQueueBindImageMemory(t_queue, ds, 0, mem, offset);
+    qoBindImageMemory(t_device, ds, mem, offset);
 
     VkDepthStencilView ds_view = qoCreateDepthStencilView(t_device, .image = ds);
 
