@@ -190,7 +190,7 @@ test(void)
                                      .usage = VK_BUFFER_USAGE_GENERAL);
 
     VkMemoryRequirements buffer_reqs =
-       qoBufferGetMemoryRequirements(t_device, buffer);
+       qoGetBufferMemoryRequirements(t_device, buffer);
 
     VkDeviceMemory mem = qoAllocMemory(t_device,
                                        .allocationSize = buffer_reqs.size);

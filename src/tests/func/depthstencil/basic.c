@@ -50,10 +50,10 @@ test(void)
                         });
 
     VkMemoryRequirements vb_requirements =
-       qoBufferGetMemoryRequirements(t_device, vertex_buffer);
+       qoGetBufferMemoryRequirements(t_device, vertex_buffer);
 
     VkMemoryRequirements ds_requirements =
-       qoImageGetMemoryRequirements(t_device, ds);
+       qoGetImageMemoryRequirements(t_device, ds);
 
     size_t mem_size =
         align_u32(vb_requirements.size, 4096) +

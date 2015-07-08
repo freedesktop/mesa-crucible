@@ -255,9 +255,8 @@ typedef struct QoShaderCreateInfo_ {
 #define QO_SHADER_CREATE_INFO_DEFAULTS \
     .sType =VK_STRUCTURE_TYPE_SHADER_CREATE_INFO
 
-VkMemoryRequirements qoObjectGetMemoryRequirements(VkDevice dev, VkObjectType obj_type, VkObject obj);
-VkMemoryRequirements qoBufferGetMemoryRequirements(VkDevice dev, VkBuffer buffer);
-VkMemoryRequirements qoImageGetMemoryRequirements(VkDevice dev, VkImage image);
+VkMemoryRequirements qoGetBufferMemoryRequirements(VkDevice dev, VkBuffer buffer);
+VkMemoryRequirements qoGetImageMemoryRequirements(VkDevice dev, VkImage image);
 
 VkResult qoBindBufferMemory(VkDevice device, VkBuffer buffer,
                             VkDeviceMemory mem, VkDeviceSize offset);

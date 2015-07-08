@@ -23,9 +23,9 @@
 
 #include "cru_test.h"
 
-VkMemoryRequirements
-qoObjectGetMemoryRequirements(VkDevice dev, VkObjectType obj_type,
-                              VkObject obj)
+static VkMemoryRequirements
+ObjectGetMemoryRequirements(VkDevice dev, VkObjectType obj_type,
+                            VkObject obj)
 {
     VkResult result;
     VkMemoryRequirements mem_reqs;
@@ -37,15 +37,15 @@ qoObjectGetMemoryRequirements(VkDevice dev, VkObjectType obj_type,
 }
 
 VkMemoryRequirements
-qoBufferGetMemoryRequirements(VkDevice dev, VkBuffer buffer)
+qoGetBufferMemoryRequirements(VkDevice dev, VkBuffer buffer)
 {
-    return qoObjectGetMemoryRequirements(dev, VK_OBJECT_TYPE_BUFFER, buffer);
+    return ObjectGetMemoryRequirements(dev, VK_OBJECT_TYPE_BUFFER, buffer);
 }
 
 VkMemoryRequirements
-qoImageGetMemoryRequirements(VkDevice dev, VkImage image)
+qoGetImageMemoryRequirements(VkDevice dev, VkImage image)
 {
-    return qoObjectGetMemoryRequirements(dev, VK_OBJECT_TYPE_IMAGE, image);
+    return ObjectGetMemoryRequirements(dev, VK_OBJECT_TYPE_IMAGE, image);
 }
 
 VkResult

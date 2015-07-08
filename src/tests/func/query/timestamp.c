@@ -30,7 +30,7 @@ get_timestamp(void)
                                      .usage = VK_BUFFER_USAGE_GENERAL);
 
     VkMemoryRequirements buffer_requirements =
-       qoBufferGetMemoryRequirements(t_device, buffer);
+       qoGetBufferMemoryRequirements(t_device, buffer);
 
     VkDeviceMemory mem;
     mem = qoAllocMemory(t_device, .allocationSize = buffer_requirements.size);

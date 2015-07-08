@@ -237,11 +237,11 @@ miptree_create(void)
         .usage = VK_BUFFER_USAGE_TRANSFER_SOURCE_BIT);
 
     VkMemoryRequirements image_reqs =
-        qoImageGetMemoryRequirements(t_device, image);
+        qoGetImageMemoryRequirements(t_device, image);
     VkMemoryRequirements src_buffer_reqs =
-        qoBufferGetMemoryRequirements(t_device, src_buffer);
+        qoGetBufferMemoryRequirements(t_device, src_buffer);
     VkMemoryRequirements dest_buffer_reqs =
-        qoBufferGetMemoryRequirements(t_device, dest_buffer);
+        qoGetBufferMemoryRequirements(t_device, dest_buffer);
 
     VkDeviceMemory image_mem = qoAllocMemory(t_device,
         .allocationSize = image_reqs.size);
@@ -560,7 +560,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
     size_t vb_size = sizeof(position_data);
     VkBuffer vb = qoCreateBuffer(t_device, .size = vb_size,
                                  .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-    VkMemoryRequirements vb_reqs = qoBufferGetMemoryRequirements(t_device, vb);
+    VkMemoryRequirements vb_reqs = qoGetBufferMemoryRequirements(t_device, vb);
     VkDeviceMemory vb_mem = qoAllocMemory(t_device,
                                           .allocationSize = vb_reqs.size);
     qoBindBufferMemory(t_device, vb, vb_mem, /*offset*/ 0);
@@ -691,7 +691,7 @@ miptree_create_tex_images(const miptree_t *mt, VkImage *tex_images)
             .usage = VK_IMAGE_USAGE_TRANSFER_DESTINATION_BIT |
                      VK_IMAGE_USAGE_SAMPLED_BIT);
         VkMemoryRequirements tex_reqs =
-            qoImageGetMemoryRequirements(t_device, tex_images[i]);
+            qoGetImageMemoryRequirements(t_device, tex_images[i]);
         VkDeviceMemory tex_mem = qoAllocMemory(t_device,
                                            .allocationSize = tex_reqs.size);
         qoBindImageMemory(t_device, tex_images[i], tex_mem, /*offset*/ 0);

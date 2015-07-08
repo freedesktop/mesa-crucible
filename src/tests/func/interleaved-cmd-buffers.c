@@ -66,7 +66,7 @@ setup_src(struct src *src)
        .usage = VK_IMAGE_USAGE_GENERAL);
 
     VkMemoryRequirements mem_reqs =
-       qoImageGetMemoryRequirements(t_device, image);
+       qoGetImageMemoryRequirements(t_device, image);
 
     VkDeviceMemory mem = qoAllocMemory(t_device,
                                        .allocationSize = mem_reqs.size);
@@ -98,7 +98,7 @@ setup_dest(struct dest *dest)
                                      .usage = VK_BUFFER_USAGE_GENERAL);
 
     VkMemoryRequirements mem_reqs =
-       qoBufferGetMemoryRequirements(t_device, buffer);
+       qoGetBufferMemoryRequirements(t_device, buffer);
 
     VkDeviceMemory mem = qoAllocMemory(t_device,
                                        .allocationSize = mem_reqs.size);

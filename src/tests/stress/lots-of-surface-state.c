@@ -95,14 +95,14 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
                        .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 
     VkMemoryRequirements ubo_reqs =
-       qoBufferGetMemoryRequirements(t_device, ubo);
+       qoGetBufferMemoryRequirements(t_device, ubo);
 
     VkBuffer vbo =
         qoCreateBuffer(t_device, .size = 32 * 32 * 2 * sizeof(float),
                        .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
     VkMemoryRequirements vbo_reqs =
-       qoBufferGetMemoryRequirements(t_device, vbo);
+       qoGetBufferMemoryRequirements(t_device, vbo);
 
     size_t mem_size = ubo_reqs.size + vbo_reqs.size;
 

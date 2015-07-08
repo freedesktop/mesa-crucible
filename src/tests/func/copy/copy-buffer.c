@@ -33,7 +33,7 @@ test_large_copy(void)
                                       .usage = VK_BUFFER_USAGE_GENERAL);
 
     VkMemoryRequirements buffer_requirements =
-       qoBufferGetMemoryRequirements(t_device, buffer1);
+       qoGetBufferMemoryRequirements(t_device, buffer1);
 
     const int memory_size = buffer_requirements.size * 2;
 

@@ -166,7 +166,7 @@ test(void)
                        .usage = VK_BUFFER_USAGE_TRANSFER_DESTINATION_BIT);
 
     VkMemoryRequirements ib_reqs =
-        qoBufferGetMemoryRequirements(t_device, image_buffer);
+        qoGetBufferMemoryRequirements(t_device, image_buffer);
 
     size_t mem_size = ib_reqs.size + 2048 + 16 * 16 * 4;
 

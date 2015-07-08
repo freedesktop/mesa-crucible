@@ -54,7 +54,7 @@ test(void)
                                      VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 
     VkMemoryRequirements requirements =
-        qoBufferGetMemoryRequirements(t_device, buffer);
+        qoGetBufferMemoryRequirements(t_device, buffer);
 
     mem = qoAllocMemory(t_device, .allocationSize = requirements.size);
     map = qoMapMemory(t_device, mem, 0, requirements.size, 0);

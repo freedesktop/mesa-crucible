@@ -540,7 +540,7 @@ t_compare_image(void)
                                      .usage = VK_BUFFER_USAGE_TRANSFER_DESTINATION_BIT);
 
     VkMemoryRequirements buffer_reqs =
-       qoBufferGetMemoryRequirements(t->device, buffer);
+       qoGetBufferMemoryRequirements(t->device, buffer);
 
     size_t mem_size = buffer_reqs.size;
 
@@ -867,7 +867,7 @@ cru_test_start_main_thread(void *arg)
             .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
 
         VkMemoryRequirements rt_mem_reqs =
-           qoImageGetMemoryRequirements(t->device, t->rt_image);
+           qoGetImageMemoryRequirements(t->device, t->rt_image);
 
         VkDeviceMemory rt_mem = qoAllocMemory(t->device,
             .allocationSize = rt_mem_reqs.size,
