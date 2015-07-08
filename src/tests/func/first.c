@@ -152,7 +152,7 @@ test(void)
     VkDescriptorSet set[2];
     qoAllocDescriptorSets(t_device, /*pool*/ 0,
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
-                          pipeline_layout, 2, set_layout, set);
+                          2, set_layout, set);
 
     VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024,
                                      .usage = VK_BUFFER_USAGE_GENERAL);
