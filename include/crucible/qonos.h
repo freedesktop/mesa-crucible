@@ -188,7 +188,8 @@ typedef struct QoShaderCreateInfo_ {
     .stencilBackRef = 0     /* default in OpenGL ES 3.1 */
 
 #define QO_CMD_BUFFER_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_CREATE_INFO
+    .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_CREATE_INFO, \
+    .level = VK_CMD_BUFFER_LEVEL_PRIMARY
 
 #define QO_CMD_BUFFER_BEGIN_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_BEGIN_INFO
