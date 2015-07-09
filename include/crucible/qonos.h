@@ -146,8 +146,7 @@ typedef struct QoShaderCreateInfo_ {
 
 #define QO_PIPELINE_MS_STATE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_MS_STATE_CREATE_INFO, \
-    .samples = 1, \
-    .multisampleEnable = false, \
+    .rasterSamples = 1, \
     .sampleMask = 0xffffffff
 
 #define QO_PIPELINE_CB_ATTACHMENT_STATE_DEFAULTS \
