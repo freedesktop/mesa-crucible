@@ -187,6 +187,7 @@ void t_dump_image_fv(cru_image_t *image, const char *format, va_list va);
 #define t_image_color_view (*__t_image_color_view())
 #define t_image_texture_view (*__t_image_texture_view())
 #define t_framebuffer (*__t_framebuffer())
+#define t_pipeline_cache (*__t_pipeline_cache())
 #define t_width (*__t_width())
 #define t_height (*__t_height())
 cru_image_t *t_ref_image(void);
@@ -208,6 +209,7 @@ const VkImage *__t_image(void);
 const VkColorAttachmentView *__t_image_color_view(void);
 const VkImageView *__t_image_texture_view(void);
 const VkFramebuffer *__t_framebuffer(void);
+const VkPipelineCache *__t_pipeline_cache(void);
 const uint32_t *__t_height(void);
 const uint32_t *__t_width(void);
 const bool * __t_use_spir_v(void);
@@ -261,6 +263,8 @@ static inline void t_cleanup_push_vk_image_view(VkDevice dev, VkImageView x)    
 static inline void t_cleanup_push_vk_color_attachment_view(VkDevice dev, VkColorAttachmentView x)        { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_COLOR_ATTACHMENT_VIEW, x); }
 static inline void t_cleanup_push_vk_depth_stencil_view(VkDevice dev, VkDepthStencilView x)              { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DEPTH_STENCIL_VIEW, x); }
 static inline void t_cleanup_push_vk_shader(VkDevice dev, VkShader x)                                    { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_SHADER, x); }
+static inline void t_cleanup_push_vk_shader_module(VkDevice dev, VkShader x)                             { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_SHADER_MODULE, x); }
+static inline void t_cleanup_push_vk_pipeline_cache(VkDevice dev, VkRenderPass x)                        { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_PIPELINE_CACHE, x); }
 static inline void t_cleanup_push_vk_pipeline(VkDevice dev, VkPipeline x)                                { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_PIPELINE, x); }
 static inline void t_cleanup_push_vk_pipeline_layout(VkDevice dev, VkPipelineLayout x)                   { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_PIPELINE_LAYOUT, x); }
 static inline void t_cleanup_push_vk_sampler(VkDevice dev, VkSampler x)                                  { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_SAMPLER, x); }

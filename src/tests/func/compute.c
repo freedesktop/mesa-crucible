@@ -78,8 +78,7 @@ test(void)
     );
 
     VkPipeline pipeline;
-    vkCreateComputePipeline(
-        t_device,
+    vkCreateComputePipelines(t_device, t_pipeline_cache, 1,
         &(VkComputePipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
             .pNext = NULL,

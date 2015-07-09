@@ -95,6 +95,7 @@ struct cru_test {
     VkColorAttachmentView image_color_view;
     VkImageView image_texture_view;
     VkFramebuffer framebuffer;
+    VkPipelineCache pipeline_cache;
 };
 
 struct cru_test_thread_arg {
@@ -362,6 +363,12 @@ __t_framebuffer(void)
 {
     t_assert(!cru_current_test->def->no_image);
     return &cru_current_test->framebuffer;
+}
+
+const VkPipelineCache *
+__t_pipeline_cache(void)
+{
+    return &cru_current_test->pipeline_cache;
 }
 
 const uint32_t *
@@ -821,6 +828,15 @@ cru_test_start_main_thread(void *arg)
 
     vkGetDeviceQueue(t_device, 0, 0, &t->queue);
     t_cleanup_push_vk_queue(t->device, t->queue);
+
+    res = vkCreatePipelineCache(t->device,
+        &(VkPipelineCacheCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO,
+            .initialSize = 0,
+            .initialData = NULL,
+            .maxSize = UINT32_MAX,
+        }, &t->pipeline_cache);
+    t_cleanup_push_vk_pipeline_cache(t_device, t->pipeline_cache);
 
     t->dynamic_vp_state = qoCreateDynamicViewportState(t->device,
         .viewportAndScissorCount = 1,

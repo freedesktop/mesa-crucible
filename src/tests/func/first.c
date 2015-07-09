@@ -89,7 +89,7 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
         },
     };
 
-    *pipeline = qoCreateGraphicsPipeline(t_device,
+    *pipeline = qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
             .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
             .vertexShader = vs,
@@ -97,7 +97,7 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
             .pNext =
         &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-            .pNext = &vi_create_info,
+            .pVertexInputState = &vi_create_info,
             .flags = 0,
             .layout = pipeline_layout
         }});

@@ -525,7 +525,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
         .descriptorSetCount = ARRAY_LENGTH(set_layouts),
         .pSetLayouts = set_layouts);
 
-    VkPipeline pipeline = qoCreateGraphicsPipeline(t_device,
+    VkPipeline pipeline = qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
             QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS,
             .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN,
@@ -535,27 +535,27 @@ render_textures(VkFormat format, VkImageView *tex_views,
         &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .layout = pipeline_layout,
-            .pNext =
-        &(VkPipelineVertexInputStateCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-            .bindingCount = 1,
-            .pVertexBindingDescriptions = (VkVertexInputBindingDescription[]) {
-                {
-                    .binding = 0,
-                    .strideInBytes = num_position_components * sizeof(float),
-                    .stepRate = VK_VERTEX_INPUT_STEP_RATE_VERTEX,
+            .pVertexInputState = &(VkPipelineVertexInputStateCreateInfo) {
+                .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+                .bindingCount = 1,
+                .pVertexBindingDescriptions = (VkVertexInputBindingDescription[]) {
+                    {
+                        .binding = 0,
+                        .strideInBytes = num_position_components * sizeof(float),
+                        .stepRate = VK_VERTEX_INPUT_STEP_RATE_VERTEX,
+                    },
+                },
+                .attributeCount = 1,
+                .pVertexAttributeDescriptions = (VkVertexInputAttributeDescription[]) {
+                    {
+                        .location = 0,
+                        .binding = 0,
+                        .format = VK_FORMAT_R32G32_SFLOAT,
+                        .offsetInBytes = 0,
+                    },
                 },
             },
-            .attributeCount = 1,
-            .pVertexAttributeDescriptions = (VkVertexInputAttributeDescription[]) {
-                {
-                    .location = 0,
-                    .binding = 0,
-                    .format = VK_FORMAT_R32G32_SFLOAT,
-                    .offsetInBytes = 0,
-                },
-            },
-        }}});
+        }});
 
     size_t vb_size = sizeof(position_data);
     VkBuffer vb = qoCreateBuffer(t_device, .size = vb_size,

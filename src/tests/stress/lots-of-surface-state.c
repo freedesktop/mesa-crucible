@@ -75,7 +75,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
         },
     };
 
-    VkPipeline pipeline = qoCreateGraphicsPipeline(t_device,
+    VkPipeline pipeline = qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
             QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS,
             .topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST,
@@ -84,7 +84,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
             .pNext =
         &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-            .pNext = &vi_create_info,
+            .pVertexInputState = &vi_create_info,
             .flags = 0,
             .layout = pipeline_layout
         }});

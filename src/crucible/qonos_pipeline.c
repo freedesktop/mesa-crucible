@@ -22,34 +22,13 @@
 #include <crucible/qonos.h>
 #include <crucible/cru_test.h>
 #include <assert.h>
+#include <string.h>
 
 #include "qonos_pipeline-spirv.h"
 
-struct vk_struct {
-    VkStructureType sType;
-    const struct vk_struct *pNext;
-};
-
-static const void *
-_find_struct_in_chain(const void *start, VkStructureType sType)
-{
-    for (const struct vk_struct *s = start; s; s = s->pNext) {
-        if (s->sType == sType)
-            return s;
-    }
-
-    return NULL;
-}
-
-// Less typing!
-#define find_struct_in_chain(chain, type) \
-    _find_struct_in_chain((chain), VK_STRUCTURE_TYPE_##type)
-
-#define next_shader_info(chain) \
-    find_struct_in_chain((chain), PIPELINE_SHADER_STAGE_CREATE_INFO)
-
 VkPipeline
 qoCreateGraphicsPipeline(VkDevice device,
+                         VkPipelineCache pipeline_cache,
                          const QoExtraGraphicsPipelineCreateInfo *extra)
 {
     VkGraphicsPipelineCreateInfo pipeline_info;
@@ -57,8 +36,7 @@ qoCreateGraphicsPipeline(VkDevice device,
     VkPipelineRsStateCreateInfo rs_info;
     VkPipelineMsStateCreateInfo ms_info;
     VkPipelineCbStateCreateInfo cb_info;
-    VkPipelineShaderStageCreateInfo vs_info;
-    VkPipelineShaderStageCreateInfo fs_info;
+    VkPipelineShaderStageCreateInfo stage_info[VK_SHADER_STAGE_NUM];
     VkPipeline pipeline;
     VkResult result;
 
@@ -72,50 +50,39 @@ qoCreateGraphicsPipeline(VkDevice device,
         };
     };
 
-    if (!find_struct_in_chain(pipeline_info.pNext,
-                              PIPELINE_IA_STATE_CREATE_INFO)) {
+    if (pipeline_info.pIaState == NULL) {
         ia_info = (VkPipelineIaStateCreateInfo) {
             QO_PIPELINE_IA_STATE_CREATE_INFO_DEFAULTS,
             .topology = extra->topology,
-            .pNext = pipeline_info.pNext,
         };
-        pipeline_info.pNext = &ia_info;
+        pipeline_info.pIaState = &ia_info;
     }
 
-    if (!find_struct_in_chain(pipeline_info.pNext,
-                              PIPELINE_RS_STATE_CREATE_INFO)) {
+    if (pipeline_info.pRsState == NULL) {
         rs_info = (VkPipelineRsStateCreateInfo) {
             QO_PIPELINE_RS_STATE_CREATE_INFO_DEFAULTS,
-            .pNext = pipeline_info.pNext,
         };
-        pipeline_info.pNext = &rs_info;
+        pipeline_info.pRsState = &rs_info;
     }
 
-    if (!find_struct_in_chain(pipeline_info.pNext,
-                              PIPELINE_MS_STATE_CREATE_INFO)) {
+    if (pipeline_info.pMsState == NULL) {
         ms_info = (VkPipelineMsStateCreateInfo) {
             QO_PIPELINE_MS_STATE_CREATE_INFO_DEFAULTS,
-            .pNext = pipeline_info.pNext,
         };
-        pipeline_info.pNext = &ms_info;
+        pipeline_info.pMsState = &ms_info;
     }
 
-    if (!find_struct_in_chain(pipeline_info.pNext,
-                              PIPELINE_CB_STATE_CREATE_INFO)) {
+    if (pipeline_info.pCbState == NULL) {
         cb_info = (VkPipelineCbStateCreateInfo) {
             QO_PIPELINE_CB_STATE_CREATE_INFO_DEFAULTS,
-            .pNext = pipeline_info.pNext,
         };
-        pipeline_info.pNext = &cb_info;
+        pipeline_info.pCbState = &cb_info;
     }
 
     // Look for vertex or fragment shaders in the chain
     bool has_fs = false, has_vs = false;
-    const VkPipelineShaderStageCreateInfo *shader_info;
-    for (shader_info = next_shader_info(pipeline_info.pNext);
-         shader_info != NULL;
-         shader_info = next_shader_info(shader_info->pNext)) {
-        switch (shader_info->shader.stage) {
+    for (unsigned i = 0; i < pipeline_info.stageCount; i++) {
+        switch (pipeline_info.pStages[i].stage) {
         case VK_SHADER_STAGE_VERTEX:
             has_vs = true;
             break;
@@ -159,12 +126,18 @@ qoCreateGraphicsPipeline(VkDevice device,
         }
     };
 
-    if (!find_struct_in_chain(pipeline_info.pNext,
-                              PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO)) {
+    if (pipeline_info.pVertexInputState == NULL) {
         /* They should be using one of our shaders if they use this */
         assert(!has_vs || !has_fs);
-        vi_info.pNext = pipeline_info.pNext,
-        pipeline_info.pNext = &vi_info;
+        pipeline_info.pVertexInputState = &vi_info;
+    }
+
+    if (!has_vs || !has_fs) {
+        /* Make a copy of the shader stages so that we can modify it */
+        assert(pipeline_info.stageCount < VK_SHADER_STAGE_NUM);
+        memcpy(stage_info, pipeline_info.pStages,
+               pipeline_info.stageCount * sizeof(*pipeline_info.pStages));
+        pipeline_info.pStages = stage_info;
     }
 
     if (!has_vs) {
@@ -180,18 +153,13 @@ qoCreateGraphicsPipeline(VkDevice device,
                 }
             );
 
-        vs_info = (VkPipelineShaderStageCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-            .pNext = pipeline_info.pNext,
-            .shader = {
+        stage_info[pipeline_info.stageCount++] =
+            (VkPipelineShaderStageCreateInfo) {
+                .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
                 .stage = VK_SHADER_STAGE_VERTEX,
                 .shader = default_vs,
-                .linkConstBufferCount = 0,
-                .pLinkConstBufferInfo = NULL,
                 .pSpecializationInfo = NULL,
-            }
-        };
-        pipeline_info.pNext = &vs_info;
+            };
     }
 
     if (!has_fs) {
@@ -205,21 +173,17 @@ qoCreateGraphicsPipeline(VkDevice device,
                 }
             );
 
-        fs_info = (VkPipelineShaderStageCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-            .pNext = pipeline_info.pNext,
-            .shader = {
+        stage_info[pipeline_info.stageCount++] =
+            (VkPipelineShaderStageCreateInfo) {
+                .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
                 .stage = VK_SHADER_STAGE_FRAGMENT,
                 .shader = default_fs,
-                .linkConstBufferCount = 0,
-                .pLinkConstBufferInfo = NULL,
                 .pSpecializationInfo = NULL,
-            }
-        };
-        pipeline_info.pNext = &fs_info;
+            };
     }
 
-    result = vkCreateGraphicsPipeline(device, &pipeline_info, &pipeline);
+    result = vkCreateGraphicsPipelines(device, pipeline_cache,
+                                       1, &pipeline_info, &pipeline);
 
     t_assert(result == VK_SUCCESS);
     t_assert(pipeline);

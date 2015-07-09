@@ -501,7 +501,9 @@ VkResult __qoEndCommandBuffer(VkCmdBuffer cmd);
 VkFramebuffer __qoCreateFramebuffer(VkDevice dev, const VkFramebufferCreateInfo *info);
 VkRenderPass __qoCreateRenderPass(VkDevice dev, const VkRenderPassCreateInfo *info);
 
-VkPipeline qoCreateGraphicsPipeline(VkDevice dev, const QoExtraGraphicsPipelineCreateInfo *info);
+VkPipeline qoCreateGraphicsPipeline(VkDevice dev,
+                                    VkPipelineCache pipeline_cache,
+                                    const QoExtraGraphicsPipelineCreateInfo *info);
 VkImage __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info);
 VkImageView __qoCreateImageView(VkDevice dev, const VkImageViewCreateInfo *info);
 VkColorAttachmentView __qoCreateColorAttachmentView(VkDevice dev, const VkColorAttachmentViewCreateInfo *info);

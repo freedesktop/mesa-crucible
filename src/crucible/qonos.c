@@ -411,28 +411,41 @@ __qoCreateDepthStencilView(VkDevice dev, const VkDepthStencilViewCreateInfo *inf
 VkShader
 __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
 {
+    VkShaderModule module;
     VkShader shader;
     VkResult result;
 
-    VkShaderCreateInfo vk_info = {
-        .sType =VK_STRUCTURE_TYPE_SHADER_CREATE_INFO
+    VkShaderModuleCreateInfo module_info = {
+        .sType =VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO
     };
 
     if (t_use_spir_v && info->spirvSize > 0) {
         assert(info->pSpirv != NULL);
-        vk_info.codeSize = info->spirvSize;
-        vk_info.pCode = info->pSpirv;
+        module_info.codeSize = info->spirvSize;
+        module_info.pCode = info->pSpirv;
     } else if (info->glslSize > 0) {
         assert(info->pGlsl != NULL);
-        vk_info.codeSize = info->glslSize;
-        vk_info.pCode = info->pGlsl;
+        module_info.codeSize = info->glslSize;
+        module_info.pCode = info->pGlsl;
     } else {
         assert(info->spirvSize > 0 && info->pSpirv != NULL);
-        vk_info.codeSize = info->spirvSize;
-        vk_info.pCode = info->pSpirv;
+        module_info.codeSize = info->spirvSize;
+        module_info.pCode = info->pSpirv;
     }
 
-    result = vkCreateShader(dev, &vk_info, &shader);
+    result = vkCreateShaderModule(dev, &module_info, &module);
+
+    t_assert(result == VK_SUCCESS);
+    t_assert(module);
+    t_cleanup_push_vk_shader_module(dev, module);
+
+    result = vkCreateShader(dev,
+        &(VkShaderCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
+            .module = module,
+            .pName = "main",
+            .flags = 0,
+        }, &shader);
 
     t_assert(result == VK_SUCCESS);
     t_assert(shader);

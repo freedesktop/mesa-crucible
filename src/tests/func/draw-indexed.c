@@ -99,36 +99,32 @@ test(void)
         }
     );
 
-    VkPipelineIaStateCreateInfo ia_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO,
-        .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
-        .primitiveRestartEnable = false,
-    };
-
-    pipeline = qoCreateGraphicsPipeline(t_device,
+    pipeline = qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
             QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS,
             .vertexShader = vs,
             .pNext =
         &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-            .pNext = &ia_create_info,
+            .pIaState = &(VkPipelineIaStateCreateInfo) {
+                .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO,
+                .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+                .primitiveRestartEnable = false,
+            },
         }});
 
-    VkPipelineIaStateCreateInfo restart_ia_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO,
-        .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
-        .primitiveRestartEnable = true,
-    };
-
-    restart_pipeline = qoCreateGraphicsPipeline(t_device,
+    restart_pipeline = qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
             QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS,
             .vertexShader = vs,
             .pNext =
         &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-            .pNext = &restart_ia_create_info,
+            .pIaState = &(VkPipelineIaStateCreateInfo) {
+                .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO,
+                .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+                .primitiveRestartEnable = true,
+            },
         }});
 
     static const struct {

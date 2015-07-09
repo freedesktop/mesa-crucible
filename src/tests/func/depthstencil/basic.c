@@ -132,31 +132,26 @@ test(void)
         }
     };
 
-    VkPipelineRsStateCreateInfo rs_create_info = {
-        QO_PIPELINE_RS_STATE_CREATE_INFO_DEFAULTS,
-        .pNext = &vi_create_info,
-
-        .depthClipEnable = true,
-        .rasterizerDiscardEnable = false,
-    };
-
-    VkPipelineDsStateCreateInfo ds_create_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_DS_STATE_CREATE_INFO,
-        .pNext = &rs_create_info,
-        .format = VK_FORMAT_D24_UNORM,
-        .depthTestEnable = true,
-        .depthWriteEnable = true,
-        .depthCompareOp = VK_COMPARE_OP_GREATER
-    };
-
-    pipeline = qoCreateGraphicsPipeline(t_device,
+    pipeline = qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
             QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS,
             .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
             .pNext =
         &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-            .pNext = &ds_create_info,
+            .pVertexInputState = &vi_create_info,
+            .pRsState = &(VkPipelineRsStateCreateInfo) {
+                QO_PIPELINE_RS_STATE_CREATE_INFO_DEFAULTS,
+                .depthClipEnable = true,
+                .rasterizerDiscardEnable = false,
+            },
+            .pDsState = &(VkPipelineDsStateCreateInfo) {
+                .sType = VK_STRUCTURE_TYPE_PIPELINE_DS_STATE_CREATE_INFO,
+                .format = VK_FORMAT_D24_UNORM,
+                .depthTestEnable = true,
+                .depthWriteEnable = true,
+                .depthCompareOp = VK_COMPARE_OP_GREATER
+            },
             .flags = 0,
             .layout = VK_NULL_HANDLE
         }});
