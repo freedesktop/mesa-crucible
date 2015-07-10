@@ -108,9 +108,6 @@ struct cru_test_def {
         __attribute__((__section__("cru_test_defs"))) \
         __attribute__((__used__)) =
 
-/// Is a test running in this thread?
-bool t_is_current(void);
-
 void t_end(cru_test_result_t result) cru_noreturn;
 void t_pass(void) cru_noreturn;
 

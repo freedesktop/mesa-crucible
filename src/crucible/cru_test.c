@@ -403,12 +403,6 @@ __t_user_data(void)
     return cru_current_test->def->user_data;
 }
 
-bool
-t_is_current(void)
-{
-    return cru_current_test != NULL;
-}
-
 cru_image_t *
 t_ref_image(void)
 {
