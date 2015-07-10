@@ -794,7 +794,6 @@ static void *
 cru_test_start_main_thread(void *arg)
 {
     cru_test_t *t = arg;
-    VkResult res;
 
     assert(t->phase == CRU_TEST_PHASE_SETUP);
     cru_test_setup_thread(t);
@@ -832,15 +831,7 @@ cru_test_start_main_thread(void *arg)
     vkGetDeviceQueue(t_device, 0, 0, &t->queue);
     t_cleanup_push_vk_queue(t->device, t->queue);
 
-    res = vkCreatePipelineCache(t->device,
-        &(VkPipelineCacheCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO,
-            .initialSize = 0,
-            .initialData = NULL,
-            .maxSize = UINT32_MAX,
-        }, &t->pipeline_cache);
-    t_assert(res == VK_SUCCESS);
-    t_cleanup_push_vk_pipeline_cache(t_device, t->pipeline_cache);
+    t->pipeline_cache = qoCreatePipelineCache(t->device);
 
     t->dynamic_vp_state = qoCreateDynamicViewportState(t->device,
         .viewportAndScissorCount = 1,
