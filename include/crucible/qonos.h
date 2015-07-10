@@ -119,6 +119,12 @@ typedef struct QoShaderCreateInfo_ {
 #define QO_BUFFER_VIEW_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO
 
+#define QO_PIPELINE_CACHE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO, \
+    .initialSize = 0, \
+    .initialData = NULL, \
+    .maxSize = UINT32_MAX
+
 #define QO_PIPELINE_LAYOUT_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO, \
     .descriptorSetCount = 0, \
@@ -337,6 +343,17 @@ VkBufferView qoCreateBufferView(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
+VkPipelineCacheCreateInfo qoCreatePipelineCache(VkDevice dev, ...);
+#else
+#define qoCreatePipelineCache(dev, ...) \
+    __qoCreatePipelineCache(dev, \
+        &(VkPipelineCacheCreateInfo) { \
+            QO_PIPELINE_CACHE_CREATE_INFO_DEFAULTS, \
+            ##__VA_ARGS__, \
+    })
+#endif
+
+#ifdef DOXYGEN
 VkPipelineLayout qoCreatePipelineLayout(VkDevice dev, ...);
 #else
 #define qoCreatePipelineLayout(dev, ...) \
@@ -526,6 +543,7 @@ VkDeviceMemory __qoAllocBufferMemory(VkDevice dev, VkBuffer buffer, const VkMemo
 VkDeviceMemory __qoAllocImageMemory(VkDevice dev, VkImage image, const VkMemoryAllocInfo *override_info);
 VkBuffer __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info);
 VkBufferView __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info);
+VkPipelineCache __qoCreatePipelineCache(VkDevice dev, const VkPipelineCacheCreateInfo *info);
 VkPipelineLayout __qoCreatePipelineLayout(VkDevice dev, const VkPipelineLayoutCreateInfo *info);
 VkSampler __qoCreateSampler(VkDevice dev, const VkSamplerCreateInfo *info);
 VkDescriptorSetLayout __qoCreateDescriptorSetLayout(VkDevice dev, const VkDescriptorSetLayoutCreateInfo *info);

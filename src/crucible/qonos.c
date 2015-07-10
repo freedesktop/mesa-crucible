@@ -166,6 +166,21 @@ qoMapMemory(VkDevice dev, VkDeviceMemory mem,
     return map;
 }
 
+VkPipelineCache
+__qoCreatePipelineCache(VkDevice dev, const VkPipelineCacheCreateInfo *info)
+{
+    VkPipelineCache pipeline_cache;
+    VkResult result;
+
+    result = vkCreatePipelineCache(dev, info, &pipeline_cache);
+
+    t_assert(result == VK_SUCCESS);
+    t_assert(pipeline_cache);
+    t_cleanup_push_vk_pipeline_cache(dev, pipeline_cache);
+
+    return pipeline_cache;
+}
+
 VkPipelineLayout
 __qoCreatePipelineLayout(VkDevice dev, const VkPipelineLayoutCreateInfo *info)
 {
