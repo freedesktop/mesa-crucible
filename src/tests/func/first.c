@@ -166,7 +166,6 @@ test(void)
 
     VkDeviceMemory mem = qoAllocMemory(t_device, .allocationSize = mem_size);
     void *map = qoMapMemory(t_device, mem, 0, mem_size, 0);
-    memset(map, 192, mem_size);
 
     qoBindBufferMemory(t_device, buffer, mem, 128);
 
@@ -237,7 +236,19 @@ test(void)
             .depth = 1,
         });
 
-    qoBindImageMemory(t_device, texture, mem, 2048 + 256 * 256 * 4);
+    VkMemoryRequirements texture_reqs =
+        qoGetImageMemoryRequirements(t_device, texture);
+
+    VkDeviceMemory texture_mem = qoAllocMemory(t_device,
+        .allocationSize = texture_reqs.size,
+        .memProps = 0);
+
+    qoBindImageMemory(t_device, texture, texture_mem, /*offset*/ 0);
+
+    // Initialize texture data
+    memset(qoMapMemory(t_device, texture_mem, /*offset*/ 0,
+                       texture_reqs.size, /*flags*/ 0),
+           192, texture_reqs.size);
 
     VkImageView tex_view = qoCreateImageView(t_device,
         .image = texture,
