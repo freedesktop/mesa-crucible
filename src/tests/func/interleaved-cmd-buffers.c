@@ -69,7 +69,9 @@ setup_src(struct src *src)
        qoGetImageMemoryRequirements(t_device, image);
 
     VkDeviceMemory mem = qoAllocMemory(t_device,
-                                       .allocationSize = mem_reqs.size);
+        .allocationSize = mem_reqs.size,
+        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
     void *vk_map = qoMapMemory(t_device, mem, 0, mem_reqs.size, 0);
 
     // Copy refeference image into the Vulkan image.
@@ -101,7 +103,9 @@ setup_dest(struct dest *dest)
        qoGetBufferMemoryRequirements(t_device, buffer);
 
     VkDeviceMemory mem = qoAllocMemory(t_device,
-                                       .allocationSize = mem_reqs.size);
+        .allocationSize = mem_reqs.size,
+        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
     void *map = qoMapMemory(t_device, mem, 0, mem_reqs.size, 0);
 
     qoBindBufferMemory(t_device, buffer, mem, 0);

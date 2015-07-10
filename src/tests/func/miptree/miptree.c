@@ -562,7 +562,8 @@ render_textures(VkFormat format, VkImageView *tex_views,
                                  .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
     VkMemoryRequirements vb_reqs = qoGetBufferMemoryRequirements(t_device, vb);
     VkDeviceMemory vb_mem = qoAllocMemory(t_device,
-                                          .allocationSize = vb_reqs.size);
+        .allocationSize = vb_reqs.size,
+        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
     qoBindBufferMemory(t_device, vb, vb_mem, /*offset*/ 0);
     void *vb_map = qoMapMemory(t_device, vb_mem, /*offset*/ 0,
                                vb_size, /*flags*/ 0);

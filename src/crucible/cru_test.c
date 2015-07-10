@@ -545,7 +545,10 @@ t_compare_image(void)
 
     size_t mem_size = buffer_reqs.size;
 
-    VkDeviceMemory mem = qoAllocMemory(t_device, .allocationSize = mem_size);
+    VkDeviceMemory mem = qoAllocMemory(t_device,
+        .allocationSize = mem_size,
+        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
     void *map = qoMapMemory(t_device, mem, 0, mem_size, 0);
 
     qoBindBufferMemory(t_device, buffer, mem, /*offset*/ 0);

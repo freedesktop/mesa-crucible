@@ -32,8 +32,9 @@ get_timestamp(void)
     VkMemoryRequirements buffer_requirements =
        qoGetBufferMemoryRequirements(t_device, buffer);
 
-    VkDeviceMemory mem;
-    mem = qoAllocMemory(t_device, .allocationSize = buffer_requirements.size);
+    VkDeviceMemory mem = qoAllocMemory(t_device,
+        .allocationSize = buffer_requirements.size,
+        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
     void *map = qoMapMemory(t_device, mem, 0, buffer_requirements.size, 0);
     memset(map, 0x11, buffer_requirements.size);

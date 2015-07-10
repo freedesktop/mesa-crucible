@@ -56,7 +56,9 @@ test(void)
     VkMemoryRequirements requirements =
         qoGetBufferMemoryRequirements(t_device, buffer);
 
-    mem = qoAllocMemory(t_device, .allocationSize = requirements.size);
+    mem = qoAllocMemory(t_device,
+            .allocationSize = requirements.size,
+            .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
     map = qoMapMemory(t_device, mem, 0, requirements.size, 0);
     qoBindBufferMemory(t_device, buffer, mem, 0);
 

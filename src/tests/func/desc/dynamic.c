@@ -140,7 +140,9 @@ test(void)
        qoGetBufferMemoryRequirements(t_device, buffer);
 
     VkDeviceMemory mem = qoAllocMemory(t_device,
-                                       .allocationSize = buffer_reqs.size);
+        .allocationSize = buffer_reqs.size,
+        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
     void *map = qoMapMemory(t_device, mem, 0, 4096, 0);
     memset(map, 192, 4096);
 

@@ -37,7 +37,10 @@ test_large_copy(void)
 
     const int memory_size = buffer_requirements.size * 2;
 
-    VkDeviceMemory mem = qoAllocMemory(t_device, .allocationSize = memory_size);
+    VkDeviceMemory mem = qoAllocMemory(t_device,
+        .allocationSize = memory_size,
+        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
     void *map = qoMapMemory(t_device, mem, 0, buffer_requirements.size * 2, 0);
 
     // Fill the first buffer_size of the memory with a pattern
