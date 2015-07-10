@@ -89,31 +89,39 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
             .layout = pipeline_layout
         }});
 
-    /* Create the UBO and vertex buffer and their associated memory */
+    size_t ubo_size = 1024 * 3 * sizeof(float);
+
     VkBuffer ubo =
-        qoCreateBuffer(t_device, .size = 1024 * 3 * sizeof(float),
+        qoCreateBuffer(t_device, .size = ubo_size,
                        .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 
     VkMemoryRequirements ubo_reqs =
        qoGetBufferMemoryRequirements(t_device, ubo);
 
+    VkDeviceMemory ubo_mem = qoAllocMemory(t_device,
+        .allocationSize = ubo_reqs.size);
+
+    float *const ubo_map = qoMapMemory(t_device, ubo_mem, /*offset*/ 0,
+                                       ubo_size, /*flags*/ 0);
+
+    qoBindBufferMemory(t_device, ubo, ubo_mem, /*offset*/ 0);
+
+    size_t vbo_size = 32 * 32 * 2 * sizeof(float);
+
     VkBuffer vbo =
-        qoCreateBuffer(t_device, .size = 32 * 32 * 2 * sizeof(float),
+        qoCreateBuffer(t_device, .size = vbo_size,
                        .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
     VkMemoryRequirements vbo_reqs =
        qoGetBufferMemoryRequirements(t_device, vbo);
 
-    size_t mem_size = ubo_reqs.size + vbo_reqs.size;
+    VkDeviceMemory vbo_mem = qoAllocMemory(t_device,
+        .allocationSize = vbo_reqs.size);
 
-    VkDeviceMemory mem = qoAllocMemory(t_device, .allocationSize = mem_size);
-    void *map = qoMapMemory(t_device, mem, 0, mem_size, 0);
+    float *const vbo_map = qoMapMemory(t_device, vbo_mem, /*offset*/ 0,
+                                       vbo_size, /*flags*/ 0);
 
-    qoBindBufferMemory(t_device, ubo, mem, 0);
-
-    float *ubo_map = map;
-    qoBindBufferMemory(t_device, vbo, mem, ubo_reqs.size);
-    float *vbo_map = map + ubo_reqs.size;
+    qoBindBufferMemory(t_device, vbo, vbo_mem, /*offset*/ 0);
 
     /* Fill the VBO with 2D coordinates. One per pixel in a 32x32 image */
     for (int x = 0; x < 32; x++) {
