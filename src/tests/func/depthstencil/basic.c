@@ -169,7 +169,7 @@ test(void)
 
     qoBindBufferMemory(t_device, vertex_buffer, vertex_mem, /*offset*/ 0);
 
-    memcpy(qoMapMemory(t_device, vertex_buffer, /*offset*/ 0,
+    memcpy(qoMapMemory(t_device, vertex_mem, /*offset*/ 0,
                        sizeof(vertex_data), /*flags*/ 0),
            vertex_data, sizeof(vertex_data));
 
