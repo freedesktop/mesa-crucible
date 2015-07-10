@@ -154,46 +154,40 @@ test(void)
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           2, set_layout, set);
 
-    VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024,
-                                     .usage = VK_BUFFER_USAGE_GENERAL);
-
-    // [chadv] I have no idea why this size is needed, but the test fails
-    // without it.  The reason must be buried somewhere in a hardcoded value
-    // elsewhere in the test.
-    size_t mystery_size = 262144;
-
-    size_t mem_size = mystery_size + 2048 + 16 * 16 * 4;
-
-    VkDeviceMemory mem = qoAllocMemory(t_device, .allocationSize = mem_size);
-    void *map = qoMapMemory(t_device, mem, 0, mem_size, 0);
-
-    qoBindBufferMemory(t_device, buffer, mem, 128);
-
-    static const float color[12] = {
+    static const float uniform_data[12] = {
         0.0, 0.2, 0.0, 0.0,
         0.0, 0.0, 0.5, 0.0,
         0.0, 0.0, 0.5, 0.5
     };
-    memcpy(map + 128 + 16, color, sizeof(color));
+
+    VkBuffer uniform_buffer = qoCreateBuffer(t_device,
+        .size = sizeof(uniform_data),
+        .usage = VK_BUFFER_USAGE_GENERAL);
+
+    VkMemoryRequirements uniform_mem_reqs =
+        qoGetBufferMemoryRequirements(t_device, uniform_buffer);
+
+    VkDeviceMemory uniform_mem = qoAllocMemory(t_device,
+        .allocationSize = uniform_mem_reqs.size,
+        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
+    qoBindBufferMemory(t_device, uniform_buffer,
+                       uniform_mem, /*offset*/ 0);
+
+    memcpy(qoMapMemory(t_device, uniform_mem, /*offset*/ 0,
+                       sizeof(uniform_data), /*flags*/ 0),
+           uniform_data,
+           sizeof(uniform_data));
 
     VkBufferView buffer_view[3];
-    buffer_view[0] = qoCreateBufferView(t_device,
-        .buffer = buffer,
-        .viewType = VK_BUFFER_VIEW_TYPE_RAW,
-        .format = VK_FORMAT_R32G32B32A32_SFLOAT,
-        .offset = 16, .range = 64);
-
-    buffer_view[1] = qoCreateBufferView(t_device,
-        .buffer = buffer,
-        .viewType = VK_BUFFER_VIEW_TYPE_RAW,
-        .format = VK_FORMAT_R32G32B32A32_SFLOAT,
-        .offset = 32, .range = 64);
-
-    buffer_view[2] = qoCreateBufferView(t_device,
-        .buffer = buffer,
-        .viewType = VK_BUFFER_VIEW_TYPE_RAW,
-        .format = VK_FORMAT_R32G32B32A32_SFLOAT,
-        .offset = 48, .range = 64);
+    for (int i = 0; i < ARRAY_LENGTH(buffer_view); ++i) {
+        buffer_view[i] = qoCreateBufferView(t_device,
+            .buffer = uniform_buffer,
+            .viewType = VK_BUFFER_VIEW_TYPE_RAW,
+            .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+            .offset = 4 * sizeof(float) * i,
+            .range = 64);
+    }
 
     static const float vertex_data[] = {
         // Triangle coordinates
