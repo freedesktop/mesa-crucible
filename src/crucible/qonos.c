@@ -23,6 +23,16 @@
 
 #include "cru_test.h"
 
+void
+qoEnumeratePhysicalDevices(VkInstance instance, uint32_t *count,
+                           VkPhysicalDevice *physical_devices)
+{
+    VkResult result;
+
+    result = vkEnumeratePhysicalDevices(instance, count, physical_devices);
+    t_assert(result == VK_SUCCESS);
+}
+
 static VkMemoryRequirements
 ObjectGetMemoryRequirements(VkDevice dev, VkObjectType obj_type,
                             VkObject obj)
