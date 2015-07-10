@@ -33,41 +33,23 @@ static void
 test(void)
 {
     VkPipeline pipeline;
-    VkImage ds;
-    VkBuffer vertex_buffer;
-    VkDeviceMemory mem;
-    void *vertex_map;
 
-    vertex_buffer = qoCreateBuffer(t_device, .size = 4096,
-                                   .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-
-    ds = qoCreateImage(t_device, .format = VK_FORMAT_D24_UNORM,
-                       .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_BIT,
-                       .extent = {
-                            .width = t_width,
-                            .height = t_height,
-                            .depth = 1,
-                        });
-
-    VkMemoryRequirements vb_requirements =
-       qoGetBufferMemoryRequirements(t_device, vertex_buffer);
+    VkImage ds = qoCreateImage(t_device,
+        .format = VK_FORMAT_D24_UNORM,
+        .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_BIT,
+        .extent = {
+            .width = t_width,
+            .height = t_height,
+            .depth = 1,
+        });
 
     VkMemoryRequirements ds_requirements =
        qoGetImageMemoryRequirements(t_device, ds);
 
-    size_t mem_size =
-        align_u32(vb_requirements.size, 4096) +
-        align_u32(ds_requirements.size, 4096);
+    VkDeviceMemory ds_mem = qoAllocMemory(t_device,
+        .allocationSize = ds_requirements.size);
 
-    mem = qoAllocMemory(t_device, .allocationSize = mem_size);
-    vertex_map = qoMapMemory(t_device, mem, 0, mem_size, 0);
-    memset(vertex_map, 0, mem_size);
-
-    uint32_t offset = 0;
-    qoBindBufferMemory(t_device, vertex_buffer, mem, offset);
-    offset = align_u32(offset + vb_requirements.size, 4096);
-
-    qoBindImageMemory(t_device, ds, mem, offset);
+    qoBindImageMemory(t_device, ds, ds_mem, /*offset*/ 0);
 
     VkDepthStencilView ds_view = qoCreateDepthStencilView(t_device, .image = ds);
 
@@ -173,7 +155,23 @@ test(void)
         /* Second triangle color */
         0.2,  0.2, 1.0, 1.0,
     };
-    memcpy(vertex_map, vertex_data, sizeof(vertex_data));
+
+    VkBuffer vertex_buffer = qoCreateBuffer(t_device,
+        .size = sizeof(vertex_data),
+        .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+
+    VkMemoryRequirements vertex_mem_reqs =
+       qoGetBufferMemoryRequirements(t_device, vertex_buffer);
+
+    VkDeviceMemory vertex_mem = qoAllocMemory(t_device,
+        .allocationSize = vertex_mem_reqs.size,
+        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
+    qoBindBufferMemory(t_device, vertex_buffer, vertex_mem, /*offset*/ 0);
+
+    memcpy(qoMapMemory(t_device, vertex_buffer, /*offset*/ 0,
+                       sizeof(vertex_data), /*flags*/ 0),
+           vertex_data, sizeof(vertex_data));
 
     vkCmdBeginRenderPass(t_cmd_buffer,
                          &(VkRenderPassBegin) {
