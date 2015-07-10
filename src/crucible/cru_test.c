@@ -830,6 +830,7 @@ cru_test_start_main_thread(void *arg)
             .initialData = NULL,
             .maxSize = UINT32_MAX,
         }, &t->pipeline_cache);
+    t_assert(res == VK_SUCCESS);
     t_cleanup_push_vk_pipeline_cache(t_device, t->pipeline_cache);
 
     t->dynamic_vp_state = qoCreateDynamicViewportState(t->device,
