@@ -741,6 +741,21 @@ __t_assertfv(const char *file, int line, bool cond, const char *cond_string,
 }
 
 static void
+cru_test_init_physical_device(cru_test_t *t)
+{
+    // Crucible uses only the first physical device.
+    // FINISHME: Add a command-line option to use non-default physical device.
+
+    uint32_t count = 0;
+    qoEnumeratePhysicalDevices(t_instance, &count, NULL);
+    t_assertf(count > 0, "failed to enumerate any physical devices");
+
+    count = 1;
+    qoEnumeratePhysicalDevices(t_instance, &count, &t->physical_device);
+    t_assertf(count == 1, "enumerated %u physical devices, expected 1", count);
+}
+
+static void
 cru_test_setup_thread(cru_test_t *t)
 {
     assert(t);
@@ -799,14 +814,7 @@ cru_test_start_main_thread(void *arg)
         &t->instance);
     t_cleanup_push_vk_instance(t_instance);
 
-    // Crucible uses only the first physical device.
-    // FINISHME: Add command-line options to use non-default physical devices.
-    uint32_t physical_device_count = 1;
-    res = vkEnumeratePhysicalDevices(t_instance, &physical_device_count,
-                                     &t->physical_device);
-    t_assert(res == VK_SUCCESS);
-    t_assert(physical_device_count == 1);
-    t_cleanup_push_vk_physical_device(t_device, t->physical_device);
+    cru_test_init_physical_device(t);
 
     vkCreateDevice(t->physical_device,
         &(VkDeviceCreateInfo) {
