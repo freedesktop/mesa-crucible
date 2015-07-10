@@ -111,6 +111,23 @@ __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info)
     return memory;
 }
 
+VkDeviceMemory
+__qoAllocBufferMemory(VkDevice dev, VkBuffer buffer,
+                      const VkMemoryAllocInfo *override_info)
+{
+    VkMemoryRequirements mem_reqs =
+        qoGetBufferMemoryRequirements(dev, buffer);
+
+    VkMemoryAllocInfo info = *override_info;
+
+    if (info.allocationSize == 0)
+        info.allocationSize = mem_reqs.size;
+
+    t_assert(info.allocationSize >= mem_reqs.size);
+
+    return __qoAllocMemory(dev, &info);
+}
+
 void *
 qoMapMemory(VkDevice dev, VkDeviceMemory mem,
             VkDeviceSize offset, VkDeviceSize size,
