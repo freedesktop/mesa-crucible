@@ -165,7 +165,7 @@ test(void)
         .usage = VK_BUFFER_USAGE_GENERAL);
 
     VkDeviceMemory uniform_mem = qoAllocBufferMemory(t_device, uniform_buffer,
-        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        .memoryTypeIndex = t_mem_type_index_for_mmap);
 
     qoBindBufferMemory(t_device, uniform_buffer,
                        uniform_mem, /*offset*/ 0);
@@ -200,7 +200,7 @@ test(void)
         .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
     VkDeviceMemory vertex_mem = qoAllocBufferMemory(t_device, vertex_buffer,
-        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        .memoryTypeIndex = t_mem_type_index_for_mmap);
 
     memcpy(qoMapMemory(t_device, vertex_mem, /*offset*/ 0,
                        sizeof(vertex_data), /*flags*/ 0),
@@ -227,7 +227,7 @@ test(void)
 
     VkDeviceMemory texture_mem = qoAllocMemoryFromRequirements(t_device,
         &texture_reqs,
-        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        .memoryTypeIndex = t_mem_type_index_for_mmap);
 
     qoBindImageMemory(t_device, texture, texture_mem, /*offset*/ 0);
 

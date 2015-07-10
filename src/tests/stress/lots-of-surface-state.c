@@ -96,7 +96,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
                        .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 
     VkDeviceMemory ubo_mem = qoAllocBufferMemory(t_device, ubo,
-        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        .memoryTypeIndex = t_mem_type_index_for_mmap);
 
     float *const ubo_map = qoMapMemory(t_device, ubo_mem, /*offset*/ 0,
                                        ubo_size, /*flags*/ 0);
@@ -110,7 +110,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
                        .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
     VkDeviceMemory vbo_mem = qoAllocBufferMemory(t_device, vbo,
-        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        .memoryTypeIndex = t_mem_type_index_for_mmap);
 
     float *const vbo_map = qoMapMemory(t_device, vbo_mem, /*offset*/ 0,
                                        vbo_size, /*flags*/ 0);

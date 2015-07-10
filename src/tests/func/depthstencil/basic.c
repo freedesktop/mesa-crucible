@@ -43,7 +43,8 @@ test(void)
             .depth = 1,
         });
 
-    VkDeviceMemory ds_mem = qoAllocImageMemory(t_device, ds);
+    VkDeviceMemory ds_mem = qoAllocImageMemory(t_device, ds,
+        .memoryTypeIndex = t_mem_type_index_for_device_access);
 
     qoBindImageMemory(t_device, ds, ds_mem, /*offset*/ 0);
 
@@ -157,7 +158,7 @@ test(void)
         .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
     VkDeviceMemory vertex_mem = qoAllocBufferMemory(t_device, vertex_buffer,
-        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        .memoryTypeIndex = t_mem_type_index_for_mmap);
 
     qoBindBufferMemory(t_device, vertex_buffer, vertex_mem, /*offset*/ 0);
 

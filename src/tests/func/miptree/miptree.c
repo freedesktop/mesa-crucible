@@ -236,11 +236,12 @@ miptree_create(void)
         .size = buffer_size,
         .usage = VK_BUFFER_USAGE_TRANSFER_SOURCE_BIT);
 
-    VkDeviceMemory image_mem = qoAllocImageMemory(t_device, image);
+    VkDeviceMemory image_mem = qoAllocImageMemory(t_device, image,
+        .memoryTypeIndex = t_mem_type_index_for_device_access);
     VkDeviceMemory src_buffer_mem = qoAllocBufferMemory(t_device, src_buffer,
-        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        .memoryTypeIndex = t_mem_type_index_for_mmap);
     VkDeviceMemory dest_buffer_mem = qoAllocBufferMemory(t_device, dest_buffer,
-        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        .memoryTypeIndex = t_mem_type_index_for_mmap);
 
     void *src_buffer_map = qoMapMemory(t_device, src_buffer_mem,
                                        /*offset*/ 0, buffer_size, 0);
@@ -551,7 +552,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
     VkBuffer vb = qoCreateBuffer(t_device, .size = vb_size,
                                  .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
     VkDeviceMemory vb_mem = qoAllocBufferMemory(t_device, vb,
-        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        .memoryTypeIndex = t_mem_type_index_for_mmap);
     qoBindBufferMemory(t_device, vb, vb_mem, /*offset*/ 0);
     void *vb_map = qoMapMemory(t_device, vb_mem, /*offset*/ 0,
                                vb_size, /*flags*/ 0);
@@ -680,7 +681,8 @@ miptree_create_tex_images(const miptree_t *mt, VkImage *tex_images)
             .usage = VK_IMAGE_USAGE_TRANSFER_DESTINATION_BIT |
                      VK_IMAGE_USAGE_SAMPLED_BIT);
 
-        VkDeviceMemory tex_mem = qoAllocImageMemory(t_device, tex_images[i]);
+        VkDeviceMemory tex_mem = qoAllocImageMemory(t_device, tex_images[i],
+            .memoryTypeIndex = t_mem_type_index_for_device_access);
 
         qoBindImageMemory(t_device, tex_images[i], tex_mem, /*offset*/ 0);
     }

@@ -168,11 +168,33 @@ void t_dump_image_f(cru_image_t *image, const char *format, ...)
 void t_dump_image_fv(cru_image_t *image, const char *format, va_list va);
 
 /// \defgroup Test data
+///
+/// Crucible provides some default Vulkan memory heaps, described below. On
+/// UMA systems, the default-provided heaps may be identical, because the
+/// Vulkan implementation may expose only a single heap. On NUMA systems, the
+/// default-provided heaps are likely to be distinct. To ensure that your test
+/// works correctly on NUMA systems, write your test assuming that
+/// t_mem_heap_for_mmap and t_mem_heap_for_device are distinct heaps.
+///
+///     - t_mem_heap_for_mmap: Prefer this heap when allocating memory that
+///       will be mapped with vkMapMemory. This heap has properties
+///       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT and
+///       VK_MEMORY_PROPERTY_HOST_NON_COHERENT_BIT. The Vulkan spec requires
+///       implementations to expose at least one such heap.
+///
+///     - t_mem_heap_for_device: Prefer this heap for best performance during
+///       device-access. This heap may have no property but
+///       VK_MEMORY_PROPERTY_DEVICE_ONLY, which excludes support for
+///       vkMapMemory.
+///
 /// \{
 #define t_name __t_name()
 #define t_user_data __t_user_data()
 #define t_instance (*__t_instance())
 #define t_physical_dev (*__t_physical_dev())
+#define t_physical_dev_mem_props  (__t_physical_dev_mem_props())
+#define t_mem_type_index_for_mmap (__t_mem_type_index_for_mmap())
+#define t_mem_type_index_for_device_access (__t_mem_type_index_for_device_access())
 #define t_device (*__t_device())
 #define t_queue (*__t_queue())
 #define t_cmd_buffer (*__t_cmd_buffer())
@@ -196,6 +218,9 @@ const void *__t_user_data(void);
 const VkInstance *__t_instance(void);
 const VkDevice *__t_device(void);
 const VkPhysicalDevice *__t_physical_dev(void);
+const VkPhysicalDeviceMemoryProperties *__t_physical_dev_mem_props(void);
+const uint32_t __t_mem_type_index_for_mmap(void);
+const uint32_t __t_mem_type_index_for_device_access(void);
 const VkQueue *__t_queue(void);
 const VkCmdBuffer *__t_cmd_buffer(void);
 const VkDynamicVpState *__t_dynamic_vp_state(void);

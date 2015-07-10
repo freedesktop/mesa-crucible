@@ -84,6 +84,7 @@ struct cru_test {
     uint32_t height;
     VkInstance instance;
     VkPhysicalDevice physical_dev;
+    VkPhysicalDeviceMemoryProperties physical_dev_mem_props;
     VkDevice device;
     VkQueue queue;
     VkCmdBuffer cmd_buffer;
@@ -96,6 +97,9 @@ struct cru_test {
     VkImageView image_texture_view;
     VkFramebuffer framebuffer;
     VkPipelineCache pipeline_cache;
+
+    uint32_t mem_type_index_for_mmap;
+    uint32_t mem_type_index_for_device_access;
 };
 
 struct cru_test_thread_arg {
@@ -299,6 +303,24 @@ const VkPhysicalDevice *
 __t_physical_dev(void)
 {
     return &cru_current_test->physical_dev;
+}
+
+const VkPhysicalDeviceMemoryProperties *
+__t_physical_dev_mem_props(void)
+{
+    return &cru_current_test->physical_dev_mem_props;
+}
+
+const uint32_t
+__t_mem_type_index_for_mmap(void)
+{
+    return cru_current_test->mem_type_index_for_mmap;
+}
+
+const uint32_t
+__t_mem_type_index_for_device_access(void)
+{
+    return cru_current_test->mem_type_index_for_device_access;
 }
 
 const VkQueue *
@@ -544,7 +566,7 @@ t_compare_image(void)
         .usage = VK_BUFFER_USAGE_TRANSFER_DESTINATION_BIT);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
-        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        .memoryTypeIndex = t_mem_type_index_for_mmap);
 
     void *map = qoMapMemory(t_device, mem, /*offset*/ 0,
                             buffer_size, /*flags*/ 0);
@@ -741,6 +763,44 @@ __t_assertfv(const char *file, int line, bool cond, const char *cond_string,
     t_end(CRU_TEST_RESULT_FAIL);
 }
 
+/// Find the best VkMemoryType whose properties contain each flag in
+/// required_flags and contain no flag in the union of required_flags and
+/// allowed_flags.
+///
+/// On success, return the type's index into the
+/// VkPhysicalDeviceMemoryProperties::memoryTypes array.
+/// On failure, return UINT32_MAX.
+static uint32_t
+find_best_mem_type_index(
+        const VkPhysicalDeviceMemoryProperties *mem_props,
+        VkMemoryPropertyFlags required_flags,
+        VkMemoryPropertyFlags allowed_flags)
+{
+    uint32_t best_type_index = UINT32_MAX;
+    VkMemoryHeap best_heap;
+
+    allowed_flags |= required_flags;
+
+    for (uint32_t i = 0; i < mem_props->memoryTypeCount; ++i) {
+        VkMemoryType type = mem_props->memoryTypes[i];
+        VkMemoryHeap heap = mem_props->memoryHeaps[type.heapIndex];
+
+        if ((type.propertyFlags & required_flags) != required_flags)
+            continue;
+
+        if ((type.propertyFlags & ~allowed_flags) != 0)
+            continue;
+
+        // Prefer the type with the largest heap.
+        if (best_type_index == UINT32_MAX || heap.size > best_heap.size) {
+            best_type_index = i;
+            best_heap = heap;
+        }
+    }
+
+    return best_type_index;
+}
+
 static void
 cru_test_init_physical_dev(cru_test_t *t)
 {
@@ -754,6 +814,42 @@ cru_test_init_physical_dev(cru_test_t *t)
     count = 1;
     qoEnumeratePhysicalDevices(t_instance, &count, &t->physical_dev);
     t_assertf(count == 1, "enumerated %u physical devices, expected 1", count);
+}
+
+static void
+cru_test_init_physical_dev_mem_props(cru_test_t *t)
+{
+    qoGetPhysicalDeviceMemoryProperties(t->physical_dev,
+                                        &t->physical_dev_mem_props);
+
+    // The Vulkan spec (git aaed022) requires the implementation to expose at
+    // least one host-visible and host-coherent heap.
+    t->mem_type_index_for_mmap = find_best_mem_type_index(
+        &t->physical_dev_mem_props,
+        /*require*/ VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+        /*allow*/ ~VK_MEMORY_PROPERTY_HOST_NON_COHERENT_BIT);
+
+    // The best memory type for device-access is one which gives the best
+    // performance, which is likely one that is device-visible but not
+    // host-visible.
+    t->mem_type_index_for_device_access = find_best_mem_type_index(
+        &t->physical_dev_mem_props,
+        /*require*/ VK_MEMORY_PROPERTY_DEVICE_ONLY,
+        /*allow*/ VK_MEMORY_PROPERTY_DEVICE_ONLY);
+
+    if (t->mem_type_index_for_device_access == UINT32_MAX) {
+        // There exists no device-only memory type. For device-access, then,
+        // simply prefer the overall "best" memory type.
+        t->mem_type_index_for_device_access = find_best_mem_type_index(
+            &t->physical_dev_mem_props,
+            /*require*/ 0, /*allow*/ ~0);
+    }
+
+    t_assertf(t->mem_type_index_for_mmap != UINT32_MAX,
+              "failed to find a host-visible, host-coherent VkMemoryType in "
+              "VkPhysicalDeviceMemoryProperties");
+
+    t_assert(t->mem_type_index_for_device_access != UINT32_MAX);
 }
 
 static void
@@ -815,6 +911,7 @@ cru_test_start_main_thread(void *arg)
     t_cleanup_push_vk_instance(t_instance);
 
     cru_test_init_physical_dev(t);
+    cru_test_init_physical_dev_mem_props(t);
 
     vkCreateDevice(t->physical_dev,
         &(VkDeviceCreateInfo) {
@@ -877,7 +974,8 @@ cru_test_start_main_thread(void *arg)
             },
             .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
 
-        VkDeviceMemory rt_mem = qoAllocImageMemory(t->device, t->rt_image);
+        VkDeviceMemory rt_mem = qoAllocImageMemory(t->device, t->rt_image,
+            .memoryTypeIndex = t_mem_type_index_for_device_access);
 
         qoBindImageMemory(t_device, t_image, rt_mem, /*offset*/ 0);
 

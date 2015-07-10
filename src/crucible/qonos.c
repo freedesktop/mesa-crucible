@@ -33,6 +33,17 @@ qoEnumeratePhysicalDevices(VkInstance instance, uint32_t *count,
     t_assert(result == VK_SUCCESS);
 }
 
+void
+qoGetPhysicalDeviceMemoryProperties(
+        VkPhysicalDevice physical_dev,
+        VkPhysicalDeviceMemoryProperties *mem_props)
+{
+    VkResult result;
+
+    result = vkGetPhysicalDeviceMemoryProperties(physical_dev, mem_props);
+    t_assert(result == VK_SUCCESS);
+}
+
 static VkMemoryRequirements
 ObjectGetMemoryRequirements(VkDevice dev, VkObjectType obj_type,
                             VkObject obj)
@@ -102,6 +113,8 @@ __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info)
     VkDeviceMemory memory;
     VkResult result;
 
+    t_assert(info->memoryTypeIndex != QO_MEMORY_TYPE_INDEX_INVALID);
+
     result = vkAllocMemory(dev, info, &memory);
 
     t_assert(result == VK_SUCCESS);
@@ -116,15 +129,14 @@ __qoAllocMemoryFromRequirements(VkDevice dev,
                                 const VkMemoryRequirements *mem_reqs,
                                 const VkMemoryAllocInfo *override_info)
 {
-    // FIXME: Respect VkMemoryRequirements::memPropsRequired and
-    // memPropsAllowed.
-
     VkMemoryAllocInfo info = *override_info;
 
     if (info.allocationSize == 0)
         info.allocationSize = mem_reqs->size;
 
     t_assert(info.allocationSize >= mem_reqs->size);
+    t_assert(info.memoryTypeIndex != QO_MEMORY_TYPE_INDEX_INVALID);
+    t_assert((1 << info.memoryTypeIndex) & mem_reqs->memoryTypeBits);
 
     return __qoAllocMemory(dev, &info);
 }
@@ -136,7 +148,7 @@ __qoAllocBufferMemory(VkDevice dev, VkBuffer buffer,
     VkMemoryRequirements mem_reqs =
         qoGetBufferMemoryRequirements(dev, buffer);
 
-    return qoAllocMemoryFromRequirements(dev, &mem_reqs, override_info);
+    return __qoAllocMemoryFromRequirements(dev, &mem_reqs, override_info);
 }
 
 VkDeviceMemory
@@ -146,7 +158,7 @@ __qoAllocImageMemory(VkDevice dev, VkImage image,
     VkMemoryRequirements mem_reqs =
         qoGetImageMemoryRequirements(dev, image);
 
-    return qoAllocMemoryFromRequirements(dev, &mem_reqs, override_info);
+    return __qoAllocMemoryFromRequirements(dev, &mem_reqs, override_info);
 }
 
 void *

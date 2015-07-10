@@ -137,7 +137,7 @@ test(void)
                                      .usage = VK_BUFFER_USAGE_GENERAL);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
-        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        .memoryTypeIndex = t_mem_type_index_for_mmap);
 
     void *map = qoMapMemory(t_device, mem, 0, 4096, 0);
     memset(map, 192, 4096);

@@ -92,6 +92,8 @@
 extern "C" {
 #endif
 
+#define QO_MEMORY_TYPE_INDEX_INVALID UINT32_MAX
+
 typedef struct QoExtraGraphicsPipelineCreateInfo_ {
     VkGraphicsPipelineCreateInfo *pNext;
     VkPrimitiveTopology topology;
@@ -111,7 +113,8 @@ typedef struct QoShaderCreateInfo_ {
     .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST
 
 #define QO_MEMORY_ALLOC_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO
+    .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO, \
+    .memoryTypeIndex = QO_MEMORY_TYPE_INDEX_INVALID
 
 #define QO_BUFFER_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO
@@ -285,7 +288,7 @@ qoAllocMemoryFromRequirements(VkDevice dev,
 #define qoAllocMemoryFromRequirements(dev, mem_reqs, ...) \
     __qoAllocMemoryFromRequirements((dev), (mem_reqs), \
         &(VkMemoryAllocInfo) { \
-            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO, \
+            QO_MEMORY_ALLOC_INFO_DEFAULTS, \
             ##__VA_ARGS__, \
         })
 #endif
@@ -298,7 +301,7 @@ qoAllocBufferMemory(VkDevice dev, VkBuffer buffer,
 #define qoAllocBufferMemory(dev, buffer, ...) \
     __qoAllocBufferMemory((dev), (buffer), \
         &(VkMemoryAllocInfo) { \
-            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO, \
+            QO_MEMORY_ALLOC_INFO_DEFAULTS, \
             ##__VA_ARGS__ , \
         })
 #endif
@@ -311,7 +314,7 @@ qoAllocImageMemory(VkDevice dev, VkImage image,
 #define qoAllocImageMemory(dev, image, ...) \
     __qoAllocImageMemory((dev), (image), \
         &(VkMemoryAllocInfo) { \
-            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO, \
+            QO_MEMORY_ALLOC_INFO_DEFAULTS, \
             ##__VA_ARGS__ , \
         })
 #endif
@@ -536,6 +539,7 @@ VkShader qoCreateShader(VkDevice dev, ...);
 #endif
 
 void qoEnumeratePhysicalDevices(VkInstance instance, uint32_t *count, VkPhysicalDevice *physical_devices);
+void qoGetPhysicalDeviceMemoryProperties(VkPhysicalDevice physical_dev, VkPhysicalDeviceMemoryProperties *mem_props);
 VkResult qoQueueSubmit(VkQueue queue, uint32_t cmdBufferCount, const VkCmdBuffer *cmdBuffers, VkFence fence);
 VkDeviceMemory __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info);
 VkDeviceMemory __qoAllocMemoryFromRequirements(VkDevice dev, const VkMemoryRequirements *mem_reqs, const VkMemoryAllocInfo *override_info);
