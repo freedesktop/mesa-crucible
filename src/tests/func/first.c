@@ -157,10 +157,6 @@ test(void)
     VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024,
                                      .usage = VK_BUFFER_USAGE_GENERAL);
 
-    VkBuffer vertex_buffer =
-        qoCreateBuffer(t_device, .size = 1024,
-                       .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-
     // [chadv] I have no idea why this size is needed, but the test fails
     // without it.  The reason must be buried somewhere in a hardcoded value
     // elsewhere in the test.
@@ -200,8 +196,6 @@ test(void)
         .format = VK_FORMAT_R32G32B32A32_SFLOAT,
         .offset = 48, .range = 64);
 
-    qoBindBufferMemory(t_device, vertex_buffer, mem, 1024);
-
     static const float vertex_data[] = {
         // Triangle coordinates
         -0.5, -0.5, 0.0, 1.0,
@@ -212,7 +206,24 @@ test(void)
          1.0,  0.0, 0.0, 0.2,
     };
 
-    memcpy(map + 1024, vertex_data, sizeof(vertex_data));
+    VkBuffer vertex_buffer = qoCreateBuffer(t_device,
+        .size = sizeof(vertex_data),
+        .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+
+    VkMemoryRequirements vertex_mem_reqs =
+        qoGetBufferMemoryRequirements(t_device, vertex_buffer);
+
+    VkDeviceMemory vertex_mem = qoAllocMemory(t_device,
+        .allocationSize = vertex_mem_reqs.size,
+        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
+    memcpy(qoMapMemory(t_device, vertex_mem, /*offset*/ 0,
+                       sizeof(vertex_data), /*flags*/ 0),
+           vertex_data,
+           sizeof(vertex_data));
+
+    qoBindBufferMemory(t_device, vertex_buffer, vertex_mem,
+                       /*offset*/ 0);
 
     const uint32_t texture_width = 16, texture_height = 16;
 
