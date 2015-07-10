@@ -98,7 +98,12 @@ test(void)
     VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024,
                                      .usage = VK_BUFFER_USAGE_GENERAL);
 
-    VkDeviceMemory mem = qoAllocMemory(t_device, .allocationSize = 4096);
+    VkMemoryRequirements buffer_reqs =
+        qoGetBufferMemoryRequirements(t_device, buffer);
+
+    VkDeviceMemory mem = qoAllocMemory(t_device,
+        .allocationSize = buffer_reqs.size);
+
     qoBindBufferMemory(t_device, buffer, mem, 0);
 
     VkBufferView buffer_view;
