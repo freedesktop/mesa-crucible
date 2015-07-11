@@ -283,6 +283,19 @@ qoAllocBufferMemory(VkDevice dev, VkBuffer buffer,
         })
 #endif
 
+#ifdef DOXYGEN
+VkDeviceMemory
+qoAllocImageMemory(VkDevice dev, VkImage image,
+                    const VkMemoryAllocInfo *va_args override_info);
+#else
+#define qoAllocImageMemory(dev, image, ...) \
+    __qoAllocImageMemory((dev), (image), \
+        &(VkMemoryAllocInfo) { \
+            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO, \
+            ##__VA_ARGS__ , \
+        })
+#endif
+
 void *qoMapMemory(VkDevice dev, VkDeviceMemory mem,
                   VkDeviceSize offset, VkDeviceSize size,
                   VkMemoryMapFlags flags);
@@ -495,6 +508,7 @@ void qoEnumeratePhysicalDevices(VkInstance instance, uint32_t *count, VkPhysical
 VkResult qoQueueSubmit(VkQueue queue, uint32_t cmdBufferCount, const VkCmdBuffer *cmdBuffers, VkFence fence);
 VkDeviceMemory __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info);
 VkDeviceMemory __qoAllocBufferMemory(VkDevice dev, VkBuffer buffer, const VkMemoryAllocInfo *override_info);
+VkDeviceMemory __qoAllocImageMemory(VkDevice dev, VkImage image, const VkMemoryAllocInfo *override_info);
 VkBuffer __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info);
 VkBufferView __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info);
 VkPipelineLayout __qoCreatePipelineLayout(VkDevice dev, const VkPipelineLayoutCreateInfo *info);

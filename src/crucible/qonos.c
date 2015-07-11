@@ -111,6 +111,21 @@ __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info)
     return memory;
 }
 
+static VkDeviceMemory
+qoAllocMemoryFromRequirements(VkDevice dev,
+                              const VkMemoryRequirements *mem_reqs,
+                              const VkMemoryAllocInfo *override_info)
+{
+    VkMemoryAllocInfo info = *override_info;
+
+    if (info.allocationSize == 0)
+        info.allocationSize = mem_reqs->size;
+
+    t_assert(info.allocationSize >= mem_reqs->size);
+
+    return __qoAllocMemory(dev, &info);
+}
+
 VkDeviceMemory
 __qoAllocBufferMemory(VkDevice dev, VkBuffer buffer,
                       const VkMemoryAllocInfo *override_info)
@@ -118,14 +133,17 @@ __qoAllocBufferMemory(VkDevice dev, VkBuffer buffer,
     VkMemoryRequirements mem_reqs =
         qoGetBufferMemoryRequirements(dev, buffer);
 
-    VkMemoryAllocInfo info = *override_info;
+    return qoAllocMemoryFromRequirements(dev, &mem_reqs, override_info);
+}
 
-    if (info.allocationSize == 0)
-        info.allocationSize = mem_reqs.size;
+VkDeviceMemory
+__qoAllocImageMemory(VkDevice dev, VkImage image,
+                     const VkMemoryAllocInfo *override_info)
+{
+    VkMemoryRequirements mem_reqs =
+        qoGetImageMemoryRequirements(dev, image);
 
-    t_assert(info.allocationSize >= mem_reqs.size);
-
-    return __qoAllocMemory(dev, &info);
+    return qoAllocMemoryFromRequirements(dev, &mem_reqs, override_info);
 }
 
 void *
