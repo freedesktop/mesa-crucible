@@ -172,7 +172,7 @@ void t_dump_image_fv(cru_image_t *image, const char *format, va_list va);
 #define t_name __t_name()
 #define t_user_data __t_user_data()
 #define t_instance (*__t_instance())
-#define t_physical_device (*__t_physical_device())
+#define t_physical_dev (*__t_physical_dev())
 #define t_device (*__t_device())
 #define t_queue (*__t_queue())
 #define t_cmd_buffer (*__t_cmd_buffer())
@@ -195,7 +195,7 @@ const char *__t_name(void);
 const void *__t_user_data(void);
 const VkInstance *__t_instance(void);
 const VkDevice *__t_device(void);
-const VkPhysicalDevice *__t_physical_device(void);
+const VkPhysicalDevice *__t_physical_dev(void);
 const VkQueue *__t_queue(void);
 const VkCmdBuffer *__t_cmd_buffer(void);
 const VkDynamicVpState *__t_dynamic_vp_state(void);

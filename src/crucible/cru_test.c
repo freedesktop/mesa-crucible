@@ -83,7 +83,7 @@ struct cru_test {
     uint32_t width;
     uint32_t height;
     VkInstance instance;
-    VkPhysicalDevice physical_device;
+    VkPhysicalDevice physical_dev;
     VkDevice device;
     VkQueue queue;
     VkCmdBuffer cmd_buffer;
@@ -296,9 +296,9 @@ __t_device(void)
 }
 
 const VkPhysicalDevice *
-__t_physical_device(void)
+__t_physical_dev(void)
 {
-    return &cru_current_test->physical_device;
+    return &cru_current_test->physical_dev;
 }
 
 const VkQueue *
@@ -742,7 +742,7 @@ __t_assertfv(const char *file, int line, bool cond, const char *cond_string,
 }
 
 static void
-cru_test_init_physical_device(cru_test_t *t)
+cru_test_init_physical_dev(cru_test_t *t)
 {
     // Crucible uses only the first physical device.
     // FINISHME: Add a command-line option to use non-default physical device.
@@ -752,7 +752,7 @@ cru_test_init_physical_device(cru_test_t *t)
     t_assertf(count > 0, "failed to enumerate any physical devices");
 
     count = 1;
-    qoEnumeratePhysicalDevices(t_instance, &count, &t->physical_device);
+    qoEnumeratePhysicalDevices(t_instance, &count, &t->physical_dev);
     t_assertf(count == 1, "enumerated %u physical devices, expected 1", count);
 }
 
@@ -814,9 +814,9 @@ cru_test_start_main_thread(void *arg)
         &t->instance);
     t_cleanup_push_vk_instance(t_instance);
 
-    cru_test_init_physical_device(t);
+    cru_test_init_physical_dev(t);
 
-    vkCreateDevice(t->physical_device,
+    vkCreateDevice(t->physical_dev,
         &(VkDeviceCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             .queueRecordCount = 1,

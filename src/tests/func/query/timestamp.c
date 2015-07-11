@@ -70,7 +70,7 @@ test_timestamp(void)
     VkResult result;
     VkPhysicalDeviceLimits limits;
 
-    result = vkGetPhysicalDeviceLimits(t_physical_device, &limits);
+    result = vkGetPhysicalDeviceLimits(t_physical_dev, &limits);
     t_assert(result == VK_SUCCESS);
 
     freq = limits.timestampFrequency / 1000;
