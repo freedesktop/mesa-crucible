@@ -823,7 +823,7 @@ cru_test_init_physical_dev_mem_props(cru_test_t *t)
                                         &t->physical_dev_mem_props);
 
     // The Vulkan spec (git aaed022) requires the implementation to expose at
-    // least one host-visible and host-coherent heap.
+    // least one host-visible and host-coherent memory type.
     t->mem_type_index_for_mmap = find_best_mem_type_index(
         &t->physical_dev_mem_props,
         /*require*/ VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,

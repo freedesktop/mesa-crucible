@@ -169,21 +169,22 @@ void t_dump_image_fv(cru_image_t *image, const char *format, va_list va);
 
 /// \defgroup Test data
 ///
-/// Crucible provides some default Vulkan memory heaps, described below. On
-/// UMA systems, the default-provided heaps may be identical, because the
-/// Vulkan implementation may expose only a single heap. On NUMA systems, the
-/// default-provided heaps are likely to be distinct. To ensure that your test
+/// Crucible provides some default Vulkan memory types, described below. On
+/// UMA systems, the default-provided types may be identical, because the
+/// Vulkan implementation may expose only a single type. On NUMA systems, the
+/// default-provided types are likely to be distinct. To ensure that your test
 /// works correctly on NUMA systems, write your test assuming that
-/// t_mem_heap_for_mmap and t_mem_heap_for_device are distinct heaps.
+/// t_mem_type_index_for_mmap and t_mem_type_index_for_device_access point to
+/// distinct types.
 ///
-///     - t_mem_heap_for_mmap: Prefer this heap when allocating memory that
-///       will be mapped with vkMapMemory. This heap has properties
+///     - t_mem_type_index_for_mmap: Prefer this memory type when allocating
+///       memory that will be mapped with vkMapMemory. This type has properties
 ///       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT and
 ///       VK_MEMORY_PROPERTY_HOST_NON_COHERENT_BIT. The Vulkan spec requires
-///       implementations to expose at least one such heap.
+///       implementations to expose at least one such memory type.
 ///
-///     - t_mem_heap_for_device: Prefer this heap for best performance during
-///       device-access. This heap may have no property but
+///     - t_mem_type_for_device_access: Prefer this memory type for best
+///       performance during device-access. This type may have no property but
 ///       VK_MEMORY_PROPERTY_DEVICE_ONLY, which excludes support for
 ///       vkMapMemory.
 ///
