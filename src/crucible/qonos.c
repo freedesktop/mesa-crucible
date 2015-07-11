@@ -111,11 +111,14 @@ __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info)
     return memory;
 }
 
-static VkDeviceMemory
-qoAllocMemoryFromRequirements(VkDevice dev,
-                              const VkMemoryRequirements *mem_reqs,
-                              const VkMemoryAllocInfo *override_info)
+VkDeviceMemory
+__qoAllocMemoryFromRequirements(VkDevice dev,
+                                const VkMemoryRequirements *mem_reqs,
+                                const VkMemoryAllocInfo *override_info)
 {
+    // FIXME: Respect VkMemoryRequirements::memPropsRequired and
+    // memPropsAllowed.
+
     VkMemoryAllocInfo info = *override_info;
 
     if (info.allocationSize == 0)

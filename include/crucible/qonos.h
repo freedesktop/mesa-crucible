@@ -272,6 +272,20 @@ VkDeviceMemory qoAllocMemory(VkDevice dev, ...);
 
 #ifdef DOXYGEN
 VkDeviceMemory
+qoAllocMemoryFromRequirements(VkDevice dev,
+                              const VkMemoryRequirements *mem_reqs,
+                              const VkMemoryAllocInfo *va_args override_info);
+#else
+#define qoAllocMemoryFromRequirements(dev, mem_reqs, ...) \
+    __qoAllocMemoryFromRequirements((dev), (mem_reqs), \
+        &(VkMemoryAllocInfo) { \
+            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO, \
+            ##__VA_ARGS__, \
+        })
+#endif
+
+#ifdef DOXYGEN
+VkDeviceMemory
 qoAllocBufferMemory(VkDevice dev, VkBuffer buffer,
                     const VkMemoryAllocInfo *va_args override_info);
 #else
@@ -507,6 +521,7 @@ VkShader qoCreateShader(VkDevice dev, ...);
 void qoEnumeratePhysicalDevices(VkInstance instance, uint32_t *count, VkPhysicalDevice *physical_devices);
 VkResult qoQueueSubmit(VkQueue queue, uint32_t cmdBufferCount, const VkCmdBuffer *cmdBuffers, VkFence fence);
 VkDeviceMemory __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info);
+VkDeviceMemory __qoAllocMemoryFromRequirements(VkDevice dev, const VkMemoryRequirements *mem_reqs, const VkMemoryAllocInfo *override_info);
 VkDeviceMemory __qoAllocBufferMemory(VkDevice dev, VkBuffer buffer, const VkMemoryAllocInfo *override_info);
 VkDeviceMemory __qoAllocImageMemory(VkDevice dev, VkImage image, const VkMemoryAllocInfo *override_info);
 VkBuffer __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info);
