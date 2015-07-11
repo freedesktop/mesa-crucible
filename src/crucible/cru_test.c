@@ -892,8 +892,7 @@ cru_test_start_main_thread(void *arg)
            qoGetImageMemoryRequirements(t->device, t->rt_image);
 
         VkDeviceMemory rt_mem = qoAllocMemory(t->device,
-            .allocationSize = rt_mem_reqs.size,
-            .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+            .allocationSize = rt_mem_reqs.size);
 
         qoBindImageMemory(t_device, t_image, rt_mem, /*offset*/ 0);
 
