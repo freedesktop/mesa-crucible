@@ -96,17 +96,16 @@ setup_dest(struct dest *dest)
             .flags = 0,
         });
 
-    VkBuffer buffer = qoCreateBuffer(t_device, .size = 4 * t_width * t_height,
+    size_t buffer_size = 4 * t_width * t_height;
+
+    VkBuffer buffer = qoCreateBuffer(t_device, .size = buffer_size,
                                      .usage = VK_BUFFER_USAGE_GENERAL);
 
-    VkMemoryRequirements mem_reqs =
-       qoGetBufferMemoryRequirements(t_device, buffer);
-
-    VkDeviceMemory mem = qoAllocMemory(t_device,
-        .allocationSize = mem_reqs.size,
+    VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
         .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
-    void *map = qoMapMemory(t_device, mem, 0, mem_reqs.size, 0);
+    void *map = qoMapMemory(t_device, mem, /*offset*/ 0,
+                            buffer_size, /*flags*/ 0);
 
     qoBindBufferMemory(t_device, buffer, mem, 0);
 

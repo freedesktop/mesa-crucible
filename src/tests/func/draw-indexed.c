@@ -46,20 +46,18 @@ test(void)
 {
     VkPipeline pipeline, restart_pipeline;
     VkBuffer buffer;
-    VkDeviceMemory mem;
     void *map;
 
-    buffer = qoCreateBuffer(t_device, .size = 4096,
+    size_t buffer_size = 4096;
+
+    buffer = qoCreateBuffer(t_device, .size = buffer_size,
                             .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
                                      VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 
-    VkMemoryRequirements requirements =
-        qoGetBufferMemoryRequirements(t_device, buffer);
+    VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
+        .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
-    mem = qoAllocMemory(t_device,
-            .allocationSize = requirements.size,
-            .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-    map = qoMapMemory(t_device, mem, 0, requirements.size, 0);
+    map = qoMapMemory(t_device, mem, 0, buffer_size, 0);
     qoBindBufferMemory(t_device, buffer, mem, 0);
 
     VkFramebuffer framebuffer = qoCreateFramebuffer(t_device,

@@ -160,11 +160,7 @@ test(void)
         .size = sizeof(vertex_data),
         .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
-    VkMemoryRequirements vertex_mem_reqs =
-       qoGetBufferMemoryRequirements(t_device, vertex_buffer);
-
-    VkDeviceMemory vertex_mem = qoAllocMemory(t_device,
-        .allocationSize = vertex_mem_reqs.size,
+    VkDeviceMemory vertex_mem = qoAllocBufferMemory(t_device, vertex_buffer,
         .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
     qoBindBufferMemory(t_device, vertex_buffer, vertex_mem, /*offset*/ 0);

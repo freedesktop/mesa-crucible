@@ -95,11 +95,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
         qoCreateBuffer(t_device, .size = ubo_size,
                        .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 
-    VkMemoryRequirements ubo_reqs =
-       qoGetBufferMemoryRequirements(t_device, ubo);
-
-    VkDeviceMemory ubo_mem = qoAllocMemory(t_device,
-        .allocationSize = ubo_reqs.size,
+    VkDeviceMemory ubo_mem = qoAllocBufferMemory(t_device, ubo,
         .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
     float *const ubo_map = qoMapMemory(t_device, ubo_mem, /*offset*/ 0,
@@ -113,11 +109,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
         qoCreateBuffer(t_device, .size = vbo_size,
                        .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
-    VkMemoryRequirements vbo_reqs =
-       qoGetBufferMemoryRequirements(t_device, vbo);
-
-    VkDeviceMemory vbo_mem = qoAllocMemory(t_device,
-        .allocationSize = vbo_reqs.size,
+    VkDeviceMemory vbo_mem = qoAllocBufferMemory(t_device, vbo,
         .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
     float *const vbo_map = qoMapMemory(t_device, vbo_mem, /*offset*/ 0,
@@ -192,7 +184,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
         .buffer = ubo,
         .viewType = VK_BUFFER_VIEW_TYPE_RAW,
         .format = VK_FORMAT_R32_SFLOAT,
-        .range = ubo_reqs.size);
+        .range = ubo_size);
 
     VkDescriptorSet set;
     qoAllocDescriptorSets(t_device, /*pool*/ 0,

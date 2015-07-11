@@ -26,18 +26,17 @@
 static uint64_t
 get_timestamp(void)
 {
-    VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024,
+    size_t buffer_size = 1024;
+
+    VkBuffer buffer = qoCreateBuffer(t_device, .size = buffer_size,
                                      .usage = VK_BUFFER_USAGE_GENERAL);
 
-    VkMemoryRequirements buffer_requirements =
-       qoGetBufferMemoryRequirements(t_device, buffer);
-
-    VkDeviceMemory mem = qoAllocMemory(t_device,
-        .allocationSize = buffer_requirements.size,
+    VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
         .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
-    void *map = qoMapMemory(t_device, mem, 0, buffer_requirements.size, 0);
-    memset(map, 0x11, buffer_requirements.size);
+    void *map = qoMapMemory(t_device, mem, /*offset*/ 0,
+                            buffer_size, /*flags*/ 0);
+    memset(map, 0x11, buffer_size);
 
     qoBindBufferMemory(t_device, buffer, mem, 0);
 

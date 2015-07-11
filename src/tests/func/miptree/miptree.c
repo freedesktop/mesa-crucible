@@ -238,18 +238,12 @@ miptree_create(void)
 
     VkMemoryRequirements image_reqs =
         qoGetImageMemoryRequirements(t_device, image);
-    VkMemoryRequirements src_buffer_reqs =
-        qoGetBufferMemoryRequirements(t_device, src_buffer);
-    VkMemoryRequirements dest_buffer_reqs =
-        qoGetBufferMemoryRequirements(t_device, dest_buffer);
 
     VkDeviceMemory image_mem = qoAllocMemory(t_device,
         .allocationSize = image_reqs.size);
-    VkDeviceMemory src_buffer_mem = qoAllocMemory(t_device,
-        .allocationSize = src_buffer_reqs.size,
+    VkDeviceMemory src_buffer_mem = qoAllocBufferMemory(t_device, src_buffer,
         .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-    VkDeviceMemory dest_buffer_mem = qoAllocMemory(t_device,
-        .allocationSize = dest_buffer_reqs.size,
+    VkDeviceMemory dest_buffer_mem = qoAllocBufferMemory(t_device, dest_buffer,
         .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
     void *src_buffer_map = qoMapMemory(t_device, src_buffer_mem,
@@ -560,9 +554,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
     size_t vb_size = sizeof(position_data);
     VkBuffer vb = qoCreateBuffer(t_device, .size = vb_size,
                                  .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-    VkMemoryRequirements vb_reqs = qoGetBufferMemoryRequirements(t_device, vb);
-    VkDeviceMemory vb_mem = qoAllocMemory(t_device,
-        .allocationSize = vb_reqs.size,
+    VkDeviceMemory vb_mem = qoAllocBufferMemory(t_device, vb,
         .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
     qoBindBufferMemory(t_device, vb, vb_mem, /*offset*/ 0);
     void *vb_map = qoMapMemory(t_device, vb_mem, /*offset*/ 0,

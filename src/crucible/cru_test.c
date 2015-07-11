@@ -537,19 +537,17 @@ t_compare_image(void)
     assert(t->width > 0);
     assert(t->height > 0);
 
-    VkBuffer buffer = qoCreateBuffer(t->device, .size = 4 * t_width * t_height,
-                                     .usage = VK_BUFFER_USAGE_TRANSFER_DESTINATION_BIT);
+    size_t buffer_size = 4 * t_width * t_height;
 
-    VkMemoryRequirements buffer_reqs =
-       qoGetBufferMemoryRequirements(t->device, buffer);
+    VkBuffer buffer = qoCreateBuffer(t->device,
+        .size = buffer_size,
+        .usage = VK_BUFFER_USAGE_TRANSFER_DESTINATION_BIT);
 
-    size_t mem_size = buffer_reqs.size;
-
-    VkDeviceMemory mem = qoAllocMemory(t_device,
-        .allocationSize = mem_size,
+    VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
         .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
-    void *map = qoMapMemory(t_device, mem, 0, mem_size, 0);
+    void *map = qoMapMemory(t_device, mem, /*offset*/ 0,
+                            buffer_size, /*flags*/ 0);
 
     qoBindBufferMemory(t_device, buffer, mem, /*offset*/ 0);
 
