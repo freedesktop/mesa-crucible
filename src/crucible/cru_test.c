@@ -886,11 +886,7 @@ cru_test_start_main_thread(void *arg)
             },
             .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
 
-        VkMemoryRequirements rt_mem_reqs =
-           qoGetImageMemoryRequirements(t->device, t->rt_image);
-
-        VkDeviceMemory rt_mem = qoAllocMemory(t->device,
-            .allocationSize = rt_mem_reqs.size);
+        VkDeviceMemory rt_mem = qoAllocImageMemory(t->device, t->rt_image);
 
         qoBindImageMemory(t_device, t_image, rt_mem, /*offset*/ 0);
 

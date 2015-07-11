@@ -43,11 +43,7 @@ test(void)
             .depth = 1,
         });
 
-    VkMemoryRequirements ds_requirements =
-       qoGetImageMemoryRequirements(t_device, ds);
-
-    VkDeviceMemory ds_mem = qoAllocMemory(t_device,
-        .allocationSize = ds_requirements.size);
+    VkDeviceMemory ds_mem = qoAllocImageMemory(t_device, ds);
 
     qoBindImageMemory(t_device, ds, ds_mem, /*offset*/ 0);
 

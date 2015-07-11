@@ -236,11 +236,7 @@ miptree_create(void)
         .size = buffer_size,
         .usage = VK_BUFFER_USAGE_TRANSFER_SOURCE_BIT);
 
-    VkMemoryRequirements image_reqs =
-        qoGetImageMemoryRequirements(t_device, image);
-
-    VkDeviceMemory image_mem = qoAllocMemory(t_device,
-        .allocationSize = image_reqs.size);
+    VkDeviceMemory image_mem = qoAllocImageMemory(t_device, image);
     VkDeviceMemory src_buffer_mem = qoAllocBufferMemory(t_device, src_buffer,
         .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
     VkDeviceMemory dest_buffer_mem = qoAllocBufferMemory(t_device, dest_buffer,
@@ -683,10 +679,9 @@ miptree_create_tex_images(const miptree_t *mt, VkImage *tex_images)
             .tiling = VK_IMAGE_TILING_OPTIMAL,
             .usage = VK_IMAGE_USAGE_TRANSFER_DESTINATION_BIT |
                      VK_IMAGE_USAGE_SAMPLED_BIT);
-        VkMemoryRequirements tex_reqs =
-            qoGetImageMemoryRequirements(t_device, tex_images[i]);
-        VkDeviceMemory tex_mem = qoAllocMemory(t_device,
-                                           .allocationSize = tex_reqs.size);
+
+        VkDeviceMemory tex_mem = qoAllocImageMemory(t_device, tex_images[i]);
+
         qoBindImageMemory(t_device, tex_images[i], tex_mem, /*offset*/ 0);
     }
 }
