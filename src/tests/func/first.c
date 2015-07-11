@@ -225,8 +225,8 @@ test(void)
     VkMemoryRequirements texture_reqs =
         qoGetImageMemoryRequirements(t_device, texture);
 
-    VkDeviceMemory texture_mem = qoAllocMemory(t_device,
-        .allocationSize = texture_reqs.size,
+    VkDeviceMemory texture_mem = qoAllocMemoryFromRequirements(t_device,
+        &texture_reqs,
         .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
     qoBindImageMemory(t_device, texture, texture_mem, /*offset*/ 0);

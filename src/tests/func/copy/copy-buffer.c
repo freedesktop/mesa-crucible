@@ -32,16 +32,16 @@ test_large_copy(void)
     VkBuffer buffer2 = qoCreateBuffer(t_device, .size = buffer_size,
                                       .usage = VK_BUFFER_USAGE_GENERAL);
 
-    VkMemoryRequirements buffer_requirements =
+    VkMemoryRequirements total_buffer_reqs =
        qoGetBufferMemoryRequirements(t_device, buffer1);
 
-    const int memory_size = buffer_requirements.size * 2;
+    total_buffer_reqs.size *= 2;
 
-    VkDeviceMemory mem = qoAllocMemory(t_device,
-        .allocationSize = memory_size,
+    VkDeviceMemory mem = qoAllocMemoryFromRequirements(t_device,
+        &total_buffer_reqs,
         .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
-    void *map = qoMapMemory(t_device, mem, 0, buffer_requirements.size * 2, 0);
+    void *map = qoMapMemory(t_device, mem, 0, total_buffer_reqs.size, 0);
 
     // Fill the first buffer_size of the memory with a pattern
     uint32_t *map32 = map;
@@ -49,10 +49,11 @@ test_large_copy(void)
         map32[i] = i;
 
     // Fill the rest with 0
-    memset((char *)map + buffer_size, 0, memory_size - buffer_size);
+    memset((char *)map + buffer_size, 0,
+           total_buffer_reqs.size - buffer_size);
 
     qoBindBufferMemory(t_device, buffer1, mem, 0);
-    qoBindBufferMemory(t_device, buffer2, mem, buffer_requirements.size);
+    qoBindBufferMemory(t_device, buffer2, mem, total_buffer_reqs.size / 2);
 
     VkCmdBuffer cmdBuffer = qoCreateCommandBuffer(t_device);
     qoBeginCommandBuffer(cmdBuffer);
@@ -99,7 +100,7 @@ test_large_copy(void)
     qoQueueSubmit(t_queue, 1, &cmdBuffer, 0);
     vkQueueWaitIdle(t_queue);
 
-    uint32_t *map32_2 = map + buffer_requirements.size;
+    uint32_t *map32_2 = map + total_buffer_reqs.size / 2;
     for (unsigned i = 0; i < buffer_size / sizeof(*map32); i++) {
         t_assertf(map32[i] == map32_2[i],
                   "buffer mismatch at dword %d: found 0x%x, "

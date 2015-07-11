@@ -68,8 +68,7 @@ setup_src(struct src *src)
     VkMemoryRequirements mem_reqs =
        qoGetImageMemoryRequirements(t_device, image);
 
-    VkDeviceMemory mem = qoAllocMemory(t_device,
-        .allocationSize = mem_reqs.size,
+    VkDeviceMemory mem = qoAllocMemoryFromRequirements(t_device, &mem_reqs,
         .memProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
     void *vk_map = qoMapMemory(t_device, mem, 0, mem_reqs.size, 0);
