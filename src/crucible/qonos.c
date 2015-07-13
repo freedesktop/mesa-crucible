@@ -290,11 +290,11 @@ __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info)
     return view;
 }
 
-VkDynamicVpState
+VkDynamicViewportState
 __qoCreateDynamicViewportState(VkDevice dev,
-                               const VkDynamicVpStateCreateInfo *info)
+                               const VkDynamicViewportStateCreateInfo *info)
 {
-    VkDynamicVpState state;
+    VkDynamicViewportState state;
     VkResult result;
 
     result = vkCreateDynamicViewportState(dev, info, &state);
@@ -306,11 +306,11 @@ __qoCreateDynamicViewportState(VkDevice dev,
     return state;
 }
 
-VkDynamicRsState
+VkDynamicRasterState
 __qoCreateDynamicRasterState(VkDevice dev,
-                             const VkDynamicRsStateCreateInfo *info)
+                             const VkDynamicRasterStateCreateInfo *info)
 {
-    VkDynamicRsState state;
+    VkDynamicRasterState state;
     VkResult result;
 
     result = vkCreateDynamicRasterState(dev, info, &state);
@@ -322,11 +322,11 @@ __qoCreateDynamicRasterState(VkDevice dev,
     return state;
 }
 
-VkDynamicCbState
+VkDynamicColorBlendState
 __qoCreateDynamicColorBlendState(VkDevice dev,
-                                  const VkDynamicCbStateCreateInfo *info)
+                                  const VkDynamicColorBlendStateCreateInfo *info)
 {
-    VkDynamicCbState state;
+    VkDynamicColorBlendState state;
     VkResult result;
 
     result = vkCreateDynamicColorBlendState(dev, info, &state);
@@ -338,11 +338,11 @@ __qoCreateDynamicColorBlendState(VkDevice dev,
     return state;
 }
 
-VkDynamicDsState
+VkDynamicDepthStencilState
 __qoCreateDynamicDepthStencilState(VkDevice dev,
-                                   const VkDynamicDsStateCreateInfo *info)
+                                   const VkDynamicDepthStencilStateCreateInfo *info)
 {
-    VkDynamicDsState state;
+    VkDynamicDepthStencilState state;
     VkResult result;
 
     result = vkCreateDynamicDepthStencilState(dev, info, &state);

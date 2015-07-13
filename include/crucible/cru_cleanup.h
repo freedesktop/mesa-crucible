@@ -92,10 +92,10 @@ static inline void cru_cleanup_push_vk_sampler(cru_cleanup_stack_t *c, VkDevice 
 static inline void cru_cleanup_push_vk_descriptor_set(cru_cleanup_stack_t *c, VkDevice dev, VkDescriptorSet x)                  { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_DESCRIPTOR_SET, x); }
 static inline void cru_cleanup_push_vk_descriptor_set_layout(cru_cleanup_stack_t *c, VkDevice dev, VkDescriptorSetLayout x)     { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT, x); }
 static inline void cru_cleanup_push_vk_descriptor_pool(cru_cleanup_stack_t *c, VkDevice dev, VkDescriptorPool x)                { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_DESCRIPTOR_POOL, x); }
-static inline void cru_cleanup_push_vk_dynamic_vp_state(cru_cleanup_stack_t *c, VkDevice dev, VkDynamicVpState x)               { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_DYNAMIC_VP_STATE, x); }
-static inline void cru_cleanup_push_vk_dynamic_rs_state(cru_cleanup_stack_t *c, VkDevice dev, VkDynamicRsState x)               { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_DYNAMIC_RS_STATE, x); }
-static inline void cru_cleanup_push_vk_dynamic_cb_state(cru_cleanup_stack_t *c, VkDevice dev, VkDynamicCbState x)               { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_DYNAMIC_CB_STATE, x); }
-static inline void cru_cleanup_push_vk_dynamic_ds_state(cru_cleanup_stack_t *c, VkDevice dev, VkDynamicDsState x)               { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_DYNAMIC_DS_STATE, x); }
+static inline void cru_cleanup_push_vk_dynamic_vp_state(cru_cleanup_stack_t *c, VkDevice dev, VkDynamicViewportState x)         { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_DYNAMIC_VP_STATE, x); }
+static inline void cru_cleanup_push_vk_dynamic_rs_state(cru_cleanup_stack_t *c, VkDevice dev, VkDynamicRasterState x)           { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_DYNAMIC_RS_STATE, x); }
+static inline void cru_cleanup_push_vk_dynamic_cb_state(cru_cleanup_stack_t *c, VkDevice dev, VkDynamicColorBlendState x)       { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_DYNAMIC_CB_STATE, x); }
+static inline void cru_cleanup_push_vk_dynamic_ds_state(cru_cleanup_stack_t *c, VkDevice dev, VkDynamicDepthStencilState x)     { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_DYNAMIC_DS_STATE, x); }
 static inline void cru_cleanup_push_vk_fence(cru_cleanup_stack_t *c, VkDevice dev, VkFence x)                                   { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_FENCE, x); }
 static inline void cru_cleanup_push_vk_semaphore(cru_cleanup_stack_t *c, VkDevice dev, VkSemaphore x)                           { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_SEMAPHORE, x); }
 static inline void cru_cleanup_push_vk_event(cru_cleanup_stack_t *c, VkDevice dev, VkEvent x)                                   { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_EVENT, x); }

@@ -576,7 +576,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
         const uint32_t width = extents[i].width;
         const uint32_t height = extents[i].height;
 
-        VkDynamicVpState vp_state = qoCreateDynamicViewportState(t_device,
+        VkDynamicViewportState vp_state = qoCreateDynamicViewportState(t_device,
             .viewportAndScissorCount = 1,
             .pViewports = (VkViewport[]) {
                 {

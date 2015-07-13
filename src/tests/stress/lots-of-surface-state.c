@@ -153,7 +153,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
 
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
-    VkDynamicVpState vp_state = qoCreateDynamicViewportState(t_device,
+    VkDynamicViewportState vp_state = qoCreateDynamicViewportState(t_device,
         .viewportAndScissorCount = 1,
         .pViewports = (VkViewport[]) {
             {
@@ -172,7 +172,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
     vkCmdBindDynamicStateObject(t_cmd_buffer,
                                 VK_STATE_BIND_POINT_VIEWPORT, vp_state);
 
-    VkDynamicRsState rs_state = qoCreateDynamicRasterState(t_device);
+    VkDynamicRasterState rs_state = qoCreateDynamicRasterState(t_device);
     vkCmdBindDynamicStateObject(t_cmd_buffer,
                                 VK_STATE_BIND_POINT_RASTER, rs_state);
 

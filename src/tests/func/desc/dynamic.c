@@ -171,7 +171,7 @@ test(void)
 
     memcpy(map + vertex_offset, vertex_data, sizeof(vertex_data));
 
-    VkDynamicVpState vp_state = qoCreateDynamicViewportState(t_device,
+    VkDynamicViewportState vp_state = qoCreateDynamicViewportState(t_device,
         .viewportAndScissorCount = 1,
         .pViewports = (VkViewport[]) {
             {
@@ -188,8 +188,8 @@ test(void)
         }
     );
 
-    VkDynamicRsState rs_state = qoCreateDynamicRasterState(t_device);
-    VkDynamicCbState cb_state = qoCreateDynamicColorBlendState(t_device);
+    VkDynamicRasterState rs_state = qoCreateDynamicRasterState(t_device);
+    VkDynamicColorBlendState cb_state = qoCreateDynamicColorBlendState(t_device);
 
     vkUpdateDescriptorSets(t_device,
         1, /* writeCount */

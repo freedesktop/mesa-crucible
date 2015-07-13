@@ -224,10 +224,10 @@ const uint32_t __t_mem_type_index_for_mmap(void);
 const uint32_t __t_mem_type_index_for_device_access(void);
 const VkQueue *__t_queue(void);
 const VkCmdBuffer *__t_cmd_buffer(void);
-const VkDynamicVpState *__t_dynamic_vp_state(void);
-const VkDynamicRsState *__t_dynamic_rs_state(void);
-const VkDynamicCbState *__t_dynamic_cb_state(void);
-const VkDynamicDsState *__t_dynamic_ds_state(void);
+const VkDynamicViewportState *__t_dynamic_vp_state(void);
+const VkDynamicRasterState *__t_dynamic_rs_state(void);
+const VkDynamicColorBlendState *__t_dynamic_cb_state(void);
+const VkDynamicDepthStencilState *__t_dynamic_ds_state(void);
 const VkImage *__t_image(void);
 const VkColorAttachmentView *__t_image_color_view(void);
 const VkImageView *__t_image_texture_view(void);
@@ -294,10 +294,10 @@ static inline void t_cleanup_push_vk_sampler(VkDevice dev, VkSampler x)         
 static inline void t_cleanup_push_vk_descriptor_set(VkDevice dev, VkDescriptorSet x)                     { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DESCRIPTOR_SET, x); }
 static inline void t_cleanup_push_vk_descriptor_set_layout(VkDevice dev, VkDescriptorSetLayout x)        { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT, x); }
 static inline void t_cleanup_push_vk_descriptor_pool(VkDevice dev, VkDescriptorPool x)                   { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DESCRIPTOR_POOL, x); }
-static inline void t_cleanup_push_vk_dynamic_vp_state(VkDevice dev, VkDynamicVpState x)                  { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DYNAMIC_VP_STATE, x); }
-static inline void t_cleanup_push_vk_dynamic_rs_state(VkDevice dev, VkDynamicRsState x)                  { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DYNAMIC_RS_STATE, x); }
-static inline void t_cleanup_push_vk_dynamic_cb_state(VkDevice dev, VkDynamicCbState x)                  { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DYNAMIC_CB_STATE, x); }
-static inline void t_cleanup_push_vk_dynamic_ds_state(VkDevice dev, VkDynamicDsState x)                  { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DYNAMIC_DS_STATE, x); }
+static inline void t_cleanup_push_vk_dynamic_vp_state(VkDevice dev, VkDynamicViewportState x)            { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DYNAMIC_VP_STATE, x); }
+static inline void t_cleanup_push_vk_dynamic_rs_state(VkDevice dev, VkDynamicRasterState x)              { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DYNAMIC_RS_STATE, x); }
+static inline void t_cleanup_push_vk_dynamic_cb_state(VkDevice dev, VkDynamicColorBlendState x)          { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DYNAMIC_CB_STATE, x); }
+static inline void t_cleanup_push_vk_dynamic_ds_state(VkDevice dev, VkDynamicDepthStencilState x)        { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DYNAMIC_DS_STATE, x); }
 static inline void t_cleanup_push_vk_fence(VkDevice dev, VkFence x)                                      { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_FENCE, x); }
 static inline void t_cleanup_push_vk_semaphore(VkDevice dev, VkSemaphore x)                              { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_SEMAPHORE, x); }
 static inline void t_cleanup_push_vk_event(VkDevice dev, VkEvent x)                                      { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_EVENT, x); }

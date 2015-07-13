@@ -40,14 +40,14 @@
 ///     // Example 1
 ///     // Create state using qoCreateDynamicDepthStencilState. We need only
 ///     // set a named parameter if it deviates from its default value.
-///     VkDynamicDsState state =
+///     VkDynamicDepthStencilState state =
 ///         qoCreateDynamicDepthStencilState(device, .stencilWriteMask = 0x17);
 ///
 ///     // Example 2:
 ///     // Create state using vkCreateDynamicDepthStencilState, but use
 ///     // QO_DYNAMIC_DS_STATE_CREATE_INFO_DEFAULTS to set sensible defaults.
-///     VkDynamicDsState state;
-///     VkDynamicDsStateCreateInfo info = {
+///     VkDynamicDepthStencilState state;
+///     VkDynamicDepthStencilStateCreateInfo info = {
 ///         QO_DYNAMIC_DS_STATE_CREATE_INFO_DEFAULTS,
 ///         .stencilWriteMask = 0x17,
 ///     };
@@ -55,8 +55,8 @@
 ///
 ///     // Example 3:
 ///     // Create state using the raw Vulkan API.
-///     VkDynamicDsState state;
-///     VkDynamicDsStateCreateInfo info = {
+///     VkDynamicDepthStencilState state;
+///     VkDynamicDepthStencilStateCreateInfo info = {
 ///             .sType = VK_STRUCTURE_TYPE_DYNAMIC_DS_STATE_CREATE_INFO,
 ///             .minDepth = 0.0f,           // OpenGL default
 ///             .maxDepth = 1.0f,           // OpenGL default
@@ -390,44 +390,44 @@ VkDescriptorSetLayout qoCreateDescriptorSetLayout(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
-VkDynamicVpStateCreateInfo qoCreateDynamicVpState(VkDevice dev, ...);
+VkDynamicViewportStateCreateInfo qoCreateDynamicVpState(VkDevice dev, ...);
 #else
 #define qoCreateDynamicViewportState(dev, ...) \
     __qoCreateDynamicViewportState(dev, \
-        &(VkDynamicVpStateCreateInfo) { \
+        &(VkDynamicViewportStateCreateInfo) { \
             QO_DYNAMIC_VP_STATE_CREATE_INFO_DEFAULTS, \
             ##__VA_ARGS__, \
         })
 #endif
 
 #ifdef DOXYGEN
-VkDynamicRsStateCreateInfo qoCreateDynamicRasterState(VkDevice dev, ...);
+VkDynamicRasterStateCreateInfo qoCreateDynamicRasterState(VkDevice dev, ...);
 #else
 #define qoCreateDynamicRasterState(dev, ...) \
     __qoCreateDynamicRasterState(dev, \
-        &(VkDynamicRsStateCreateInfo) { \
+        &(VkDynamicRasterStateCreateInfo) { \
             QO_DYNAMIC_RS_STATE_CREATE_INFO_DEFAULTS, \
             ##__VA_ARGS__, \
         })
 #endif
 
 #ifdef DOXYGEN
-VkDynamicCbStateCreateInfo qoCreateDynamicColorBlendState(VkDevice dev, ...);
+VkDynamicColorBlendStateCreateInfo qoCreateDynamicColorBlendState(VkDevice dev, ...);
 #else
 #define qoCreateDynamicColorBlendState(dev, ...) \
     __qoCreateDynamicColorBlendState(dev, \
-        &(VkDynamicCbStateCreateInfo) { \
+        &(VkDynamicColorBlendStateCreateInfo) { \
             QO_DYNAMIC_CB_STATE_CREATE_INFO_DEFAULTS, \
             ##__VA_ARGS__, \
         })
 #endif
 
 #ifdef DOXYGEN
-VkDynamicDsStateCreateInfo qoCreateDynamicDepthStencilState(VkDevice dev, ...);
+VkDynamicDepthStencilStateCreateInfo qoCreateDynamicDepthStencilState(VkDevice dev, ...);
 #else
 #define qoCreateDynamicDepthStencilState(dev, ...) \
     __qoCreateDynamicDepthStencilState(dev, \
-        &(VkDynamicDsStateCreateInfo) { \
+        &(VkDynamicDepthStencilStateCreateInfo) { \
             QO_DYNAMIC_DS_STATE_CREATE_INFO_DEFAULTS, \
             ##__VA_ARGS__, \
         })
@@ -555,10 +555,10 @@ VkResult qoAllocDescriptorSets(VkDevice dev, VkDescriptorPool descriptorPool,
                                VkDescriptorSetUsage usage, uint32_t count,
                                const VkDescriptorSetLayout *layouts,
                                VkDescriptorSet *sets);
-VkDynamicVpState __qoCreateDynamicViewportState(VkDevice dev, const VkDynamicVpStateCreateInfo *info);
-VkDynamicRsState __qoCreateDynamicRasterState(VkDevice dev, const VkDynamicRsStateCreateInfo *info);
-VkDynamicCbState __qoCreateDynamicColorBlendState(VkDevice dev, const VkDynamicCbStateCreateInfo *info);
-VkDynamicDsState __qoCreateDynamicDepthStencilState(VkDevice dev, const VkDynamicDsStateCreateInfo *info);
+VkDynamicViewportState __qoCreateDynamicViewportState(VkDevice dev, const VkDynamicViewportStateCreateInfo *info);
+VkDynamicRasterState __qoCreateDynamicRasterState(VkDevice dev, const VkDynamicRasterStateCreateInfo *info);
+VkDynamicColorBlendState __qoCreateDynamicColorBlendState(VkDevice dev, const VkDynamicColorBlendStateCreateInfo *info);
+VkDynamicDepthStencilState __qoCreateDynamicDepthStencilState(VkDevice dev, const VkDynamicDepthStencilStateCreateInfo *info);
 VkCmdBuffer __qoCreateCommandBuffer(VkDevice dev, const VkCmdBufferCreateInfo *info);
 VkResult __qoBeginCommandBuffer(VkCmdBuffer cmd, const VkCmdBufferBeginInfo *info);
 VkResult __qoEndCommandBuffer(VkCmdBuffer cmd);

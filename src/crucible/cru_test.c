@@ -88,10 +88,10 @@ struct cru_test {
     VkDevice device;
     VkQueue queue;
     VkCmdBuffer cmd_buffer;
-    VkDynamicVpState dynamic_vp_state;
-    VkDynamicRsState dynamic_rs_state;
-    VkDynamicCbState dynamic_cb_state;
-    VkDynamicDsState dynamic_ds_state;
+    VkDynamicViewportState dynamic_vp_state;
+    VkDynamicRasterState dynamic_rs_state;
+    VkDynamicColorBlendState dynamic_cb_state;
+    VkDynamicDepthStencilState dynamic_ds_state;
     VkImage rt_image;
     VkColorAttachmentView image_color_view;
     VkImageView image_texture_view;
@@ -335,25 +335,25 @@ __t_cmd_buffer(void)
     return &cru_current_test->cmd_buffer;
 }
 
-const VkDynamicVpState *
+const VkDynamicViewportState *
 __t_dynamic_vp_state(void)
 {
     return &cru_current_test->dynamic_vp_state;
 }
 
-const VkDynamicRsState *
+const VkDynamicRasterState *
 __t_dynamic_rs_state(void)
 {
     return &cru_current_test->dynamic_rs_state;
 }
 
-const VkDynamicCbState *
+const VkDynamicColorBlendState *
 __t_dynamic_cb_state(void)
 {
     return &cru_current_test->dynamic_cb_state;
 }
 
-const VkDynamicDsState *
+const VkDynamicDepthStencilState *
 __t_dynamic_ds_state(void)
 {
     return &cru_current_test->dynamic_ds_state;
