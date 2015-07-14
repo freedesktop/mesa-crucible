@@ -44,29 +44,28 @@ qoGetPhysicalDeviceMemoryProperties(
     t_assert(result == VK_SUCCESS);
 }
 
-static VkMemoryRequirements
-ObjectGetMemoryRequirements(VkDevice dev, VkObjectType obj_type,
-                            VkObject obj)
+VkMemoryRequirements
+qoGetBufferMemoryRequirements(VkDevice dev, VkBuffer buffer)
 {
     VkResult result;
     VkMemoryRequirements mem_reqs;
 
-    result = vkGetObjectMemoryRequirements(dev, obj_type, obj, &mem_reqs);
+    result = vkGetBufferMemoryRequirements(dev, buffer, &mem_reqs);
     t_assert(result == VK_SUCCESS);
 
     return mem_reqs;
 }
 
 VkMemoryRequirements
-qoGetBufferMemoryRequirements(VkDevice dev, VkBuffer buffer)
-{
-    return ObjectGetMemoryRequirements(dev, VK_OBJECT_TYPE_BUFFER, buffer);
-}
-
-VkMemoryRequirements
 qoGetImageMemoryRequirements(VkDevice dev, VkImage image)
 {
-    return ObjectGetMemoryRequirements(dev, VK_OBJECT_TYPE_IMAGE, image);
+    VkResult result;
+    VkMemoryRequirements mem_reqs;
+
+    result = vkGetImageMemoryRequirements(dev, image, &mem_reqs);
+    t_assert(result == VK_SUCCESS);
+
+    return mem_reqs;
 }
 
 VkResult
@@ -75,8 +74,7 @@ qoBindBufferMemory(VkDevice device, VkBuffer buffer,
 {
     VkResult result;
 
-    result = vkBindObjectMemory(device, VK_OBJECT_TYPE_BUFFER,
-                                buffer, mem, offset);
+    result = vkBindBufferMemory(device, buffer, mem, offset);
     t_assert(result == VK_SUCCESS);
 
     return result;
@@ -88,8 +86,7 @@ qoBindImageMemory(VkDevice device, VkImage image,
 {
     VkResult result;
 
-    result = vkBindObjectMemory(device, VK_OBJECT_TYPE_IMAGE,
-                                image, mem, offset);
+    result = vkBindImageMemory(device, image, mem, offset);
     t_assert(result == VK_SUCCESS);
 
     return result;
