@@ -171,26 +171,6 @@ test(void)
 
     memcpy(map + vertex_offset, vertex_data, sizeof(vertex_data));
 
-    VkDynamicViewportState vp_state = qoCreateDynamicViewportState(t_device,
-        .viewportAndScissorCount = 1,
-        .pViewports = (VkViewport[]) {
-            {
-                .originX = 0,
-                .originY = 0,
-                .width = t_width,
-                .height = t_height,
-                .minDepth = 0,
-                .maxDepth = 1
-            },
-        },
-        .pScissors = (VkRect2D[]) {
-            {{  0,  0 }, {t_width, t_height}},
-        }
-    );
-
-    VkDynamicRasterState rs_state = qoCreateDynamicRasterState(t_device);
-    VkDynamicColorBlendState cb_state = qoCreateDynamicColorBlendState(t_device);
-
     vkUpdateDescriptorSets(t_device,
         1, /* writeCount */
         (VkWriteDescriptorSet[]) {
@@ -245,12 +225,6 @@ test(void)
                            (VkBuffer[]) { buffer },
                            (VkDeviceSize[]) { vertex_offset });
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-    vkCmdBindDynamicStateObject(t_cmd_buffer,
-                                VK_STATE_BIND_POINT_VIEWPORT, vp_state);
-    vkCmdBindDynamicStateObject(t_cmd_buffer,
-                                VK_STATE_BIND_POINT_RASTER, rs_state);
-    vkCmdBindDynamicStateObject(t_cmd_buffer,
-                                VK_STATE_BIND_POINT_COLOR_BLEND, cb_state);
 
     uint32_t dynamic_offsets[1] = { 0 };
     vkCmdBindDescriptorSets(t_cmd_buffer,
