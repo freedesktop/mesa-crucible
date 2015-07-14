@@ -568,9 +568,9 @@ render_textures(VkFormat format, VkImageView *tex_views,
 
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device);
     qoBeginCommandBuffer(cmd);
-    vkCmdBindDynamicStateObject(cmd, VK_STATE_BIND_POINT_RASTER, t_dynamic_rs_state);
-    vkCmdBindDynamicStateObject(cmd, VK_STATE_BIND_POINT_COLOR_BLEND, t_dynamic_cb_state);
-    vkCmdBindDynamicStateObject(cmd, VK_STATE_BIND_POINT_DEPTH_STENCIL, t_dynamic_ds_state);
+    vkCmdBindDynamicRasterState(cmd, t_dynamic_rs_state);
+    vkCmdBindDynamicColorBlendState(cmd, t_dynamic_cb_state);
+    vkCmdBindDynamicDepthStencilState(cmd, t_dynamic_ds_state);
 
     for (uint32_t i = 0; i < count; ++i) {
         const uint32_t width = extents[i].width;
@@ -592,8 +592,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
                 { {0, 0 }, {width, height} },
             });
 
-        vkCmdBindDynamicStateObject(cmd, VK_STATE_BIND_POINT_VIEWPORT,
-                                    vp_state);
+        vkCmdBindDynamicViewportState(cmd, vp_state);
 
         VkFramebuffer fb = qoCreateFramebuffer(t_device,
             .attachmentCount = 1,

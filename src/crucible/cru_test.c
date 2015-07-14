@@ -952,14 +952,10 @@ cru_test_start_main_thread(void *arg)
     t->cmd_buffer = qoCreateCommandBuffer(t_device);
 
     qoBeginCommandBuffer(t_cmd_buffer);
-    vkCmdBindDynamicStateObject(t->cmd_buffer, VK_STATE_BIND_POINT_VIEWPORT,
-                                t->dynamic_vp_state);
-    vkCmdBindDynamicStateObject(t->cmd_buffer, VK_STATE_BIND_POINT_RASTER,
-                                t->dynamic_rs_state);
-    vkCmdBindDynamicStateObject(t->cmd_buffer, VK_STATE_BIND_POINT_COLOR_BLEND,
-                                t->dynamic_cb_state);
-    vkCmdBindDynamicStateObject(t->cmd_buffer, VK_STATE_BIND_POINT_DEPTH_STENCIL,
-                                t->dynamic_ds_state);
+    vkCmdBindDynamicViewportState(t->cmd_buffer, t->dynamic_vp_state);
+    vkCmdBindDynamicRasterState(t->cmd_buffer, t->dynamic_rs_state);
+    vkCmdBindDynamicColorBlendState(t->cmd_buffer, t->dynamic_cb_state);
+    vkCmdBindDynamicDepthStencilState(t->cmd_buffer, t->dynamic_ds_state);
 
     if (!t->def->no_image) {
         assert(t_width > 0);
