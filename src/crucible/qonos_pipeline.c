@@ -32,10 +32,10 @@ qoCreateGraphicsPipeline(VkDevice device,
                          const QoExtraGraphicsPipelineCreateInfo *extra)
 {
     VkGraphicsPipelineCreateInfo pipeline_info;
-    VkPipelineIaStateCreateInfo ia_info;
-    VkPipelineRsStateCreateInfo rs_info;
-    VkPipelineMsStateCreateInfo ms_info;
-    VkPipelineCbStateCreateInfo cb_info;
+    VkPipelineInputAssemblyStateCreateInfo ia_info;
+    VkPipelineRasterStateCreateInfo rs_info;
+    VkPipelineMultisampleStateCreateInfo ms_info;
+    VkPipelineColorBlendStateCreateInfo cb_info;
     VkPipelineShaderStageCreateInfo stage_info[VK_SHADER_STAGE_NUM];
     VkPipeline pipeline;
     VkResult result;
@@ -50,33 +50,33 @@ qoCreateGraphicsPipeline(VkDevice device,
         };
     };
 
-    if (pipeline_info.pIaState == NULL) {
-        ia_info = (VkPipelineIaStateCreateInfo) {
-            QO_PIPELINE_IA_STATE_CREATE_INFO_DEFAULTS,
+    if (pipeline_info.pInputAssemblyState == NULL) {
+        ia_info = (VkPipelineInputAssemblyStateCreateInfo) {
+            QO_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO_DEFAULTS,
             .topology = extra->topology,
         };
-        pipeline_info.pIaState = &ia_info;
+        pipeline_info.pInputAssemblyState = &ia_info;
     }
 
-    if (pipeline_info.pRsState == NULL) {
-        rs_info = (VkPipelineRsStateCreateInfo) {
-            QO_PIPELINE_RS_STATE_CREATE_INFO_DEFAULTS,
+    if (pipeline_info.pRasterState == NULL) {
+        rs_info = (VkPipelineRasterStateCreateInfo) {
+            QO_PIPELINE_RASTER_STATE_CREATE_INFO_DEFAULTS,
         };
-        pipeline_info.pRsState = &rs_info;
+        pipeline_info.pRasterState = &rs_info;
     }
 
-    if (pipeline_info.pMsState == NULL) {
-        ms_info = (VkPipelineMsStateCreateInfo) {
-            QO_PIPELINE_MS_STATE_CREATE_INFO_DEFAULTS,
+    if (pipeline_info.pMultisampleState == NULL) {
+        ms_info = (VkPipelineMultisampleStateCreateInfo) {
+            QO_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO_DEFAULTS,
         };
-        pipeline_info.pMsState = &ms_info;
+        pipeline_info.pMultisampleState = &ms_info;
     }
 
-    if (pipeline_info.pCbState == NULL) {
-        cb_info = (VkPipelineCbStateCreateInfo) {
-            QO_PIPELINE_CB_STATE_CREATE_INFO_DEFAULTS,
+    if (pipeline_info.pColorBlendState == NULL) {
+        cb_info = (VkPipelineColorBlendStateCreateInfo) {
+            QO_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO_DEFAULTS,
         };
-        pipeline_info.pCbState = &cb_info;
+        pipeline_info.pColorBlendState = &cb_info;
     }
 
     // Look for vertex or fragment shaders in the chain

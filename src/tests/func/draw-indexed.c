@@ -109,8 +109,8 @@ test(void)
             .pNext =
         &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-            .pIaState = &(VkPipelineIaStateCreateInfo) {
-                .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO,
+            .pInputAssemblyState = &(VkPipelineInputAssemblyStateCreateInfo) {
+                QO_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO_DEFAULTS,
                 .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
                 .primitiveRestartEnable = false,
             },
@@ -123,8 +123,8 @@ test(void)
             .pNext =
         &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-            .pIaState = &(VkPipelineIaStateCreateInfo) {
-                .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO,
+            .pInputAssemblyState = &(VkPipelineInputAssemblyStateCreateInfo) {
+                QO_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO_DEFAULTS,
                 .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
                 .primitiveRestartEnable = true,
             },

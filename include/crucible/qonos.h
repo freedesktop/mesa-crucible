@@ -139,60 +139,60 @@ typedef struct QoShaderCreateInfo_ {
 #define QO_DESCRIPTOR_SET_LAYOUT_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO
 
-#define QO_PIPELINE_IA_STATE_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_PIPELINE_IA_STATE_CREATE_INFO, \
+#define QO_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO, \
     .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, \
     .primitiveRestartEnable = false
 
-#define QO_PIPELINE_RS_STATE_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_PIPELINE_RS_STATE_CREATE_INFO, \
+#define QO_PIPELINE_RASTER_STATE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTER_STATE_CREATE_INFO, \
     .depthClipEnable = false, \
     .rasterizerDiscardEnable = false, \
     .fillMode = VK_FILL_MODE_SOLID, \
     .cullMode = VK_CULL_MODE_NONE, \
     .frontFace = VK_FRONT_FACE_CCW
 
-#define QO_PIPELINE_DS_STATE_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_PIPELINE_DS_STATE_CREATE_INFO, \
+#define QO_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO, \
     .depthTestEnable = false, \
     .depthWriteEnable = false, \
     .depthBoundsEnable = false, \
     .stencilTestEnable = false
 
-#define QO_PIPELINE_MS_STATE_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_PIPELINE_MS_STATE_CREATE_INFO, \
+#define QO_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO, \
     .rasterSamples = 1, \
     .sampleMask = 0xffffffff
 
-#define QO_PIPELINE_CB_ATTACHMENT_STATE_DEFAULTS \
+#define QO_PIPELINE_COLOR_BLEND_ATTACHMENT_STATE_DEFAULTS \
     .blendEnable = false, \
     .channelWriteMask = (VK_CHANNEL_R_BIT | VK_CHANNEL_G_BIT | \
                          VK_CHANNEL_B_BIT | VK_CHANNEL_A_BIT)
 
-#define QO_PIPELINE_CB_STATE_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_PIPELINE_CB_STATE_CREATE_INFO, \
+#define QO_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO, \
     .attachmentCount = 1, \
-    .pAttachments = (VkPipelineCbAttachmentState []) { \
-       { QO_PIPELINE_CB_ATTACHMENT_STATE_DEFAULTS }, \
+    .pAttachments = (VkPipelineColorBlendAttachmentState []) { \
+       { QO_PIPELINE_COLOR_BLEND_ATTACHMENT_STATE_DEFAULTS }, \
     }
 
-#define QO_DYNAMIC_VP_STATE_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_DYNAMIC_VP_STATE_CREATE_INFO, \
+#define QO_DYNAMIC_VIEWPORT_STATE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_DYNAMIC_VIEWPORT_STATE_CREATE_INFO, \
     .viewportAndScissorCount = 0
 
-#define QO_DYNAMIC_RS_STATE_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_DYNAMIC_RS_STATE_CREATE_INFO, \
+#define QO_DYNAMIC_RASTER_STATE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_DYNAMIC_RASTER_STATE_CREATE_INFO, \
     .depthBias = 0.0f, \
     .depthBiasClamp = 0.0f, \
     .slopeScaledDepthBias = 0.0f, \
     .lineWidth = 1.0f
 
-#define QO_DYNAMIC_CB_STATE_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_DYNAMIC_CB_STATE_CREATE_INFO, \
+#define QO_DYNAMIC_COLOR_BLEND_STATE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_DYNAMIC_COLOR_BLEND_STATE_CREATE_INFO, \
     .blendConst = {0.0f, 0.0f, 0.0f, 0.0f} /* default in OpenGL ES 3.1 */
 
-#define QO_DYNAMIC_DS_STATE_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_DYNAMIC_DS_STATE_CREATE_INFO, \
+#define QO_DYNAMIC_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_DYNAMIC_DEPTH_STENCIL_STATE_CREATE_INFO, \
     .minDepthBounds = 0.0f, /* default in OpenGL ES 3.1 */ \
     .maxDepthBounds = 1.0f, /* default in OpenGL ES 3.1 */ \
     .stencilReadMask = ~0,  /* default in OpenGL ES 3.1 */ \
@@ -412,7 +412,7 @@ VkDynamicViewportStateCreateInfo qoCreateDynamicVpState(VkDevice dev, ...);
 #define qoCreateDynamicViewportState(dev, ...) \
     __qoCreateDynamicViewportState(dev, \
         &(VkDynamicViewportStateCreateInfo) { \
-            QO_DYNAMIC_VP_STATE_CREATE_INFO_DEFAULTS, \
+            QO_DYNAMIC_VIEWPORT_STATE_CREATE_INFO_DEFAULTS, \
             ##__VA_ARGS__, \
         })
 #endif
@@ -423,7 +423,7 @@ VkDynamicRasterStateCreateInfo qoCreateDynamicRasterState(VkDevice dev, ...);
 #define qoCreateDynamicRasterState(dev, ...) \
     __qoCreateDynamicRasterState(dev, \
         &(VkDynamicRasterStateCreateInfo) { \
-            QO_DYNAMIC_RS_STATE_CREATE_INFO_DEFAULTS, \
+            QO_DYNAMIC_RASTER_STATE_CREATE_INFO_DEFAULTS, \
             ##__VA_ARGS__, \
         })
 #endif
@@ -434,7 +434,7 @@ VkDynamicColorBlendStateCreateInfo qoCreateDynamicColorBlendState(VkDevice dev, 
 #define qoCreateDynamicColorBlendState(dev, ...) \
     __qoCreateDynamicColorBlendState(dev, \
         &(VkDynamicColorBlendStateCreateInfo) { \
-            QO_DYNAMIC_CB_STATE_CREATE_INFO_DEFAULTS, \
+            QO_DYNAMIC_COLOR_BLEND_STATE_CREATE_INFO_DEFAULTS, \
             ##__VA_ARGS__, \
         })
 #endif
@@ -445,7 +445,7 @@ VkDynamicDepthStencilStateCreateInfo qoCreateDynamicDepthStencilState(VkDevice d
 #define qoCreateDynamicDepthStencilState(dev, ...) \
     __qoCreateDynamicDepthStencilState(dev, \
         &(VkDynamicDepthStencilStateCreateInfo) { \
-            QO_DYNAMIC_DS_STATE_CREATE_INFO_DEFAULTS, \
+            QO_DYNAMIC_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS, \
             ##__VA_ARGS__, \
         })
 #endif

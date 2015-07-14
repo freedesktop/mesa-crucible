@@ -139,13 +139,13 @@ test(void)
         &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .pVertexInputState = &vi_create_info,
-            .pRsState = &(VkPipelineRsStateCreateInfo) {
-                QO_PIPELINE_RS_STATE_CREATE_INFO_DEFAULTS,
+            .pRasterState = &(VkPipelineRasterStateCreateInfo) {
+                QO_PIPELINE_RASTER_STATE_CREATE_INFO_DEFAULTS,
                 .depthClipEnable = true,
                 .rasterizerDiscardEnable = false,
             },
-            .pDsState = &(VkPipelineDsStateCreateInfo) {
-                QO_PIPELINE_DS_STATE_CREATE_INFO_DEFAULTS,
+            .pDepthStencilState = &(VkPipelineDepthStencilStateCreateInfo) {
+                QO_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS,
                 .depthTestEnable = true,
                 .depthWriteEnable = true,
                 .depthCompareOp = VK_COMPARE_OP_GREATER
