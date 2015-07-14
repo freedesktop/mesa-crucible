@@ -48,36 +48,56 @@ test(void)
 
     qoBindImageMemory(t_device, ds, ds_mem, /*offset*/ 0);
 
-    VkDepthStencilView ds_view = qoCreateDepthStencilView(t_device, .image = ds);
+    VkAttachmentView ds_view = qoCreateAttachmentView(t_device,
+        .image = ds,
+        .format = VK_FORMAT_D24_UNORM);
 
     VkFramebuffer framebuffer = qoCreateFramebuffer(t_device,
-        .pColorAttachments = (VkColorAttachmentBindInfo[]) {
+        .attachmentCount = 2,
+        .pAttachments = (VkAttachmentBindInfo[]) {
             {
-                .view = t_image_color_view,
+                .view = t_image_attachment_view,
                 .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
             },
-        },
-        .pDepthStencilAttachment = &(VkDepthStencilBindInfo) {
-            .view = ds_view,
-            .layout = 0
+            {
+                .view = ds_view,
+                .layout = VK_IMAGE_LAYOUT_GENERAL,
+            },
         },
         .width = t_width,
         .height = t_height);
 
     VkRenderPass pass = qoCreateRenderPass(t_device,
-        .renderArea = { { 0, 0 }, { t_width, t_height } },
-        .pColorFormats = (VkFormat[]) { VK_FORMAT_R8G8B8A8_UNORM },
-        .pColorLayouts = (VkImageLayout[]) { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-        .pColorLoadOps = (VkAttachmentLoadOp[]) { VK_ATTACHMENT_LOAD_OP_CLEAR },
-        .pColorStoreOps = (VkAttachmentStoreOp[]) { VK_ATTACHMENT_STORE_OP_STORE },
-        .pColorLoadClearValues = (VkClearColorValue[]) {
-            { .f32 = { 0.2, 0.2, 0.2, 1.0 } },
+        .attachmentCount = 2,
+        .pAttachments = (VkAttachmentDescription[]) {
+            {
+                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
+                .format = VK_FORMAT_R8G8B8A8_UNORM,
+                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+            },
+            {
+                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
+                .format = VK_FORMAT_D24_UNORM,
+                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+            },
         },
-        .depthStencilFormat = VK_FORMAT_D24_UNORM,
-        .depthStencilLayout = 0,
-        .depthLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-        .depthLoadClearValue = 0.5,
-        .depthStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE);
+        .subpassCount = 1,
+        .pSubpasses = (VkSubpassDescription[]) {
+            {
+                QO_SUBPASS_DESCRIPTION_DEFAULTS,
+                .colorCount = 1,
+                .colorAttachments = (VkAttachmentReference[]) {
+                    {
+                        .attachment = 0,
+                        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                    },
+                },
+                .depthStencilAttachment = {
+                    .attachment = 1,
+                    .layout = VK_IMAGE_LAYOUT_GENERAL,
+                }
+            }
+        });
 
     VkPipelineVertexInputStateCreateInfo vi_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
@@ -125,8 +145,7 @@ test(void)
                 .rasterizerDiscardEnable = false,
             },
             .pDsState = &(VkPipelineDsStateCreateInfo) {
-                .sType = VK_STRUCTURE_TYPE_PIPELINE_DS_STATE_CREATE_INFO,
-                .format = VK_FORMAT_D24_UNORM,
+                QO_PIPELINE_DS_STATE_CREATE_INFO_DEFAULTS,
                 .depthTestEnable = true,
                 .depthWriteEnable = true,
                 .depthCompareOp = VK_COMPARE_OP_GREATER
@@ -167,10 +186,16 @@ test(void)
            vertex_data, sizeof(vertex_data));
 
     vkCmdBeginRenderPass(t_cmd_buffer,
-                         &(VkRenderPassBegin) {
-                             .renderPass = pass,
-                             .framebuffer = framebuffer
-                         });
+        &(VkRenderPassBeginInfo) {
+            .renderPass = pass,
+            .framebuffer = framebuffer,
+            .renderArea = { { 0, 0 }, { t_width, t_height } },
+            .attachmentCount = 2,
+            .pAttachmentClearValues = (VkClearValue[]) {
+                { .color = { .f32 = { 0.2, 0.2, 0.2, 1.0 } } },
+                { .ds = { .depth = 0.5 } },
+            }
+        }, VK_RENDER_PASS_CONTENTS_INLINE);
 
     vkCmdBindVertexBuffers(t_cmd_buffer, 0, 2,
                            (VkBuffer[]) { vertex_buffer, vertex_buffer },

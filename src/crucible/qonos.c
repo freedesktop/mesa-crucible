@@ -453,32 +453,17 @@ __qoCreateImageView(VkDevice dev, const VkImageViewCreateInfo *info)
     return view;
 }
 
-VkColorAttachmentView
-__qoCreateColorAttachmentView(VkDevice dev, const VkColorAttachmentViewCreateInfo *info)
+VkAttachmentView
+__qoCreateAttachmentView(VkDevice dev, const VkAttachmentViewCreateInfo *info)
 {
-    VkColorAttachmentView view;
+    VkAttachmentView view;
     VkResult result;
 
-    result = vkCreateColorAttachmentView(dev, info, &view);
+    result = vkCreateAttachmentView(dev, info, &view);
 
     t_assert(result == VK_SUCCESS);
     t_assert(view);
-    t_cleanup_push_vk_color_attachment_view(dev, view);
-
-    return view;
-}
-
-VkDepthStencilView
-__qoCreateDepthStencilView(VkDevice dev, const VkDepthStencilViewCreateInfo *info)
-{
-    VkDepthStencilView view;
-    VkResult result;
-
-    result = vkCreateDepthStencilView(dev, info, &view);
-
-    t_assert(result == VK_SUCCESS);
-    t_assert(view);
-    t_cleanup_push_vk_depth_stencil_view(dev, view);
+    t_cleanup_push_vk_attachment_view(dev, view);
 
     return view;
 }

@@ -60,16 +60,6 @@ test(void)
     map = qoMapMemory(t_device, mem, 0, buffer_size, 0);
     qoBindBufferMemory(t_device, buffer, mem, 0);
 
-    VkFramebuffer framebuffer = qoCreateFramebuffer(t_device,
-        .width = t_width,
-        .height = t_height,
-        .pColorAttachments = (VkColorAttachmentBindInfo[]) {
-            {
-                .view = t_image_color_view,
-                .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
-            },
-        });
-
 #define HEX_COLOR(v, f)                         \
     {                                           \
         ((v) >> 16) / 255.0,                    \
@@ -79,13 +69,26 @@ test(void)
     }
 
     VkRenderPass pass = qoCreateRenderPass(t_device,
-        .renderArea = { { 0, 0 }, { t_width, t_height } },
-        .pColorFormats = (VkFormat[]) { VK_FORMAT_R8G8B8A8_UNORM },
-        .pColorLayouts = (VkImageLayout[]) { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-        .pColorLoadOps = (VkAttachmentLoadOp[]) { VK_ATTACHMENT_LOAD_OP_CLEAR },
-        .pColorStoreOps = (VkAttachmentStoreOp[]) { VK_ATTACHMENT_STORE_OP_STORE },
-        .pColorLoadClearValues = (VkClearColorValue[]) {
-            { .f32 = HEX_COLOR(0x522a27, 1.0) },
+        .attachmentCount = 1,
+        .pAttachments = (VkAttachmentDescription[]) {
+            {
+                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
+                .format = VK_FORMAT_R8G8B8A8_UNORM,
+                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+            },
+        },
+        .subpassCount = 1,
+        .pSubpasses = (VkSubpassDescription[]) {
+            {
+                QO_SUBPASS_DESCRIPTION_DEFAULTS,
+                .colorCount = 1,
+                .colorAttachments = (VkAttachmentReference[]) {
+                    {
+                        .attachment = 0,
+                        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                    },
+                },
+            }
         });
 
     VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
@@ -152,10 +155,15 @@ test(void)
     memcpy(map, &vertex_data, sizeof(vertex_data));
 
     vkCmdBeginRenderPass(t_cmd_buffer,
-                         &(VkRenderPassBegin) {
-                             .renderPass = pass,
-                             .framebuffer = framebuffer
-                         });
+        &(VkRenderPassBeginInfo) {
+            .renderPass = pass,
+            .framebuffer = t_framebuffer,
+            .renderArea = { { 0, 0 }, { t_width, t_height } },
+            .attachmentCount = 1,
+            .pAttachmentClearValues = (VkClearValue[]) {
+                { .color = { .f32 = HEX_COLOR(0x522a27, 1.0) } },
+            }
+        }, VK_RENDER_PASS_CONTENTS_INLINE);
 
     vkCmdBindVertexBuffers(t_cmd_buffer, 0, 2,
                            (VkBuffer[]) { buffer, buffer },

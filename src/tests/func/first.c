@@ -309,20 +309,39 @@ test(void)
         }, 0, NULL);
 
     VkRenderPass pass = qoCreateRenderPass(t_device,
-        .renderArea = {{0, 0}, {t_width, t_height}},
-        .pColorFormats = (VkFormat[]) { VK_FORMAT_R8G8B8A8_UNORM },
-        .pColorLayouts = (VkImageLayout[]) { VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-        .pColorLoadOps = (VkAttachmentLoadOp[]) { VK_ATTACHMENT_LOAD_OP_CLEAR },
-        .pColorStoreOps = (VkAttachmentStoreOp[]) { VK_ATTACHMENT_STORE_OP_STORE },
-        .pColorLoadClearValues = (VkClearColorValue[]) {
-            { .f32 = { 1.0, 0.0, 0.0, 1.0 } },
+        .attachmentCount = 1,
+        .pAttachments = (VkAttachmentDescription[]) {
+            {
+                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
+                .format = VK_FORMAT_R8G8B8A8_UNORM,
+                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+            },
+        },
+        .subpassCount = 1,
+        .pSubpasses = (VkSubpassDescription[]) {
+            {
+                QO_SUBPASS_DESCRIPTION_DEFAULTS,
+                .colorCount = 1,
+                .colorAttachments = (VkAttachmentReference[]) {
+                    {
+                        .attachment = 0,
+                        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                    },
+                },
+            }
         });
 
     vkCmdBeginRenderPass(t_cmd_buffer,
-        &(VkRenderPassBegin) {
+        &(VkRenderPassBeginInfo) {
             .renderPass = pass,
             .framebuffer = t_framebuffer,
-        });
+            .renderArea = { { 0, 0 }, { t_width, t_height } },
+            .attachmentCount = 1,
+            .pAttachmentClearValues = (VkClearValue[]) {
+                { .color = { .f32 = { 1.0, 0.0, 0.0, 1.0 } } },
+            }
+        }, VK_RENDER_PASS_CONTENTS_INLINE);
+
     vkCmdBindVertexBuffers(t_cmd_buffer, 0, 2,
                            (VkBuffer[]) { vertex_buffer, vertex_buffer },
                            (VkDeviceSize[]) { 0, 3 * 4 * sizeof(float) });

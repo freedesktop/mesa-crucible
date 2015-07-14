@@ -83,8 +83,7 @@ static inline void cru_cleanup_push_vk_buffer(cru_cleanup_stack_t *c, VkDevice d
 static inline void cru_cleanup_push_vk_buffer_view(cru_cleanup_stack_t *c, VkDevice dev, VkBufferView x)                        { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_BUFFER_VIEW, x); }
 static inline void cru_cleanup_push_vk_image(cru_cleanup_stack_t *c, VkDevice dev, VkImage x)                                   { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_IMAGE, x); }
 static inline void cru_cleanup_push_vk_image_view(cru_cleanup_stack_t *c, VkDevice dev, VkImageView x)                          { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_IMAGE_VIEW, x); }
-static inline void cru_cleanup_push_vk_color_attachment_view(cru_cleanup_stack_t *c, VkDevice dev, VkColorAttachmentView x)     { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_COLOR_ATTACHMENT_VIEW, x); }
-static inline void cru_cleanup_push_vk_depth_stencil_view(cru_cleanup_stack_t *c, VkDevice dev, VkDepthStencilView x)           { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_DEPTH_STENCIL_VIEW, x); }
+static inline void cru_cleanup_push_vk_color_attachment_view(cru_cleanup_stack_t *c, VkDevice dev, VkAttachmentView x)     { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_ATTACHMENT_VIEW, x); }
 static inline void cru_cleanup_push_vk_shader(cru_cleanup_stack_t *c, VkDevice dev, VkShader x)                                 { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_SHADER, x); }
 static inline void cru_cleanup_push_vk_pipeline(cru_cleanup_stack_t *c, VkDevice dev, VkPipeline x)                             { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_PIPELINE, x); }
 static inline void cru_cleanup_push_vk_pipeline_layout(cru_cleanup_stack_t *c, VkDevice dev, VkPipelineLayout x)                { cru_cleanup_push_vk_object(c, dev, VK_OBJECT_TYPE_PIPELINE_LAYOUT, x); }

@@ -204,7 +204,7 @@ void t_dump_image_fv(cru_image_t *image, const char *format, va_list va);
 #define t_dynamic_cb_state (*__t_dynamic_cb_state())
 #define t_dynamic_ds_state (*__t_dynamic_ds_state())
 #define t_image (*__t_image())
-#define t_image_color_view (*__t_image_color_view())
+#define t_image_attachment_view (*__t_image_attachment_view())
 #define t_image_texture_view (*__t_image_texture_view())
 #define t_framebuffer (*__t_framebuffer())
 #define t_pipeline_cache (*__t_pipeline_cache())
@@ -229,7 +229,7 @@ const VkDynamicRasterState *__t_dynamic_rs_state(void);
 const VkDynamicColorBlendState *__t_dynamic_cb_state(void);
 const VkDynamicDepthStencilState *__t_dynamic_ds_state(void);
 const VkImage *__t_image(void);
-const VkColorAttachmentView *__t_image_color_view(void);
+const VkAttachmentView *__t_image_attachment_view(void);
 const VkImageView *__t_image_texture_view(void);
 const VkFramebuffer *__t_framebuffer(void);
 const VkPipelineCache *__t_pipeline_cache(void);
@@ -283,8 +283,7 @@ static inline void t_cleanup_push_vk_buffer(VkDevice dev, VkBuffer x)           
 static inline void t_cleanup_push_vk_buffer_view(VkDevice dev, VkBufferView x)                           { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_BUFFER_VIEW, x); }
 static inline void t_cleanup_push_vk_image(VkDevice dev, VkImage x)                                      { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_IMAGE, x); }
 static inline void t_cleanup_push_vk_image_view(VkDevice dev, VkImageView x)                             { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_IMAGE_VIEW, x); }
-static inline void t_cleanup_push_vk_color_attachment_view(VkDevice dev, VkColorAttachmentView x)        { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_COLOR_ATTACHMENT_VIEW, x); }
-static inline void t_cleanup_push_vk_depth_stencil_view(VkDevice dev, VkDepthStencilView x)              { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_DEPTH_STENCIL_VIEW, x); }
+static inline void t_cleanup_push_vk_attachment_view(VkDevice dev, VkAttachmentView x)        { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_ATTACHMENT_VIEW, x); }
 static inline void t_cleanup_push_vk_shader(VkDevice dev, VkShader x)                                    { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_SHADER, x); }
 static inline void t_cleanup_push_vk_shader_module(VkDevice dev, VkShader x)                             { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_SHADER_MODULE, x); }
 static inline void t_cleanup_push_vk_pipeline_cache(VkDevice dev, VkRenderPass x)                        { t_cleanup_push_vk_object(dev, VK_OBJECT_TYPE_PIPELINE_CACHE, x); }

@@ -100,7 +100,7 @@ struct mipslice {
     uint32_t height;
 
     VkImageView texture_view;
-    VkColorAttachmentView color_view;
+    VkAttachmentView color_view;
 
     cru_image_t *src_cru_image;
     cru_image_t *dest_cru_image;
@@ -281,7 +281,7 @@ miptree_create(void)
         t_assert(level_height == cru_image_get_height(file_image));
 
         for (uint32_t a = 0; a < array_length; ++a) {
-            VkColorAttachmentView color_view = qoCreateColorAttachmentView(
+            VkAttachmentView color_view = qoCreateAttachmentView(
                 t_device,
                 .image = image,
                 .format = format,
@@ -469,7 +469,7 @@ miptree_copy_textures_to_dest_buffer(const miptree_t *mt, VkImage *tex_images)
 
 static void
 render_textures(VkFormat format, VkImageView *tex_views,
-                VkColorAttachmentView *color_views, VkExtent2D *extents,
+                VkAttachmentView *color_views, VkExtent2D *extents,
                 uint32_t count)
 {
     static const uint32_t num_vertices = 4;
@@ -596,29 +596,38 @@ render_textures(VkFormat format, VkImageView *tex_views,
                                     vp_state);
 
         VkFramebuffer fb = qoCreateFramebuffer(t_device,
-            .colorAttachmentCount = 1,
-            .pColorAttachments = (VkColorAttachmentBindInfo[]) {
+            .attachmentCount = 1,
+            .pAttachments = (VkAttachmentBindInfo[]) {
                 {
                     .view = color_views[i],
                     .layout = VK_IMAGE_LAYOUT_GENERAL,
                 },
             },
-            .sampleCount = 1,
             .width = width,
             .height = height,
             .layers = 1);
 
         VkRenderPass pass = qoCreateRenderPass(t_device,
-            .renderArea = { {0, 0}, {width, height} },
-            .extent = {0},
-            .colorAttachmentCount = 1,
-            .sampleCount = 1,
-            .layers = 1,
-            .pColorFormats = (VkFormat[]) { format },
-            .pColorLayouts = (VkImageLayout[]) { VK_IMAGE_LAYOUT_GENERAL },
-            .pColorLoadOps = (VkAttachmentLoadOp[]) { VK_ATTACHMENT_LOAD_OP_LOAD },
-            .pColorLoadClearValues = (VkClearColorValue[]) {},
-            .pColorStoreOps = (VkAttachmentStoreOp[]) { VK_ATTACHMENT_STORE_OP_STORE });
+            .attachmentCount = 1,
+            .pAttachments = (VkAttachmentDescription[]) {
+                {
+                    QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
+                    .format = VK_FORMAT_R8G8B8A8_UNORM
+                },
+            },
+            .subpassCount = 1,
+            .pSubpasses = (VkSubpassDescription[]) {
+                {
+                    QO_SUBPASS_DESCRIPTION_DEFAULTS,
+                    .colorCount = 1,
+                    .colorAttachments = (VkAttachmentReference[]) {
+                        {
+                            .attachment = 0,
+                            .layout = VK_IMAGE_LAYOUT_GENERAL,
+                        },
+                    },
+                }
+            });
 
         vkUpdateDescriptorSets(t_device,
             1, /* writeCount */
@@ -640,10 +649,14 @@ render_textures(VkFormat format, VkImageView *tex_views,
             }, 0, NULL);
 
         vkCmdBeginRenderPass(cmd,
-            &(VkRenderPassBegin) {
+            &(VkRenderPassBeginInfo) {
                 .renderPass = pass,
                 .framebuffer = fb,
-            });
+                .renderArea = { {0, 0}, {width, height} },
+                .attachmentCount = 1,
+                .pAttachmentClearValues = NULL
+            }, VK_RENDER_PASS_CONTENTS_INLINE);
+
         vkCmdBindVertexBuffers(cmd, /*startBinding*/ 0, /*bindingCount*/ 1,
                                (VkBuffer[]) {vb},
                                (VkDeviceSize[]) {vb_position_offset});
@@ -693,7 +706,7 @@ miptree_upload_with_render(const miptree_t *mt)
 {
     VkImage tex_images[mt->num_slices];
     VkImageView tex_views[mt->num_slices];
-    VkColorAttachmentView color_views[mt->num_slices];
+    VkAttachmentView color_views[mt->num_slices];
     VkExtent2D extents[mt->num_slices];
 
     miptree_create_tex_images(mt, tex_images);
@@ -735,7 +748,7 @@ miptree_download_with_render(const miptree_t *mt)
 {
     VkImage tex_images[mt->num_slices];
     VkImageView tex_views[mt->num_slices];
-    VkColorAttachmentView color_views[mt->num_slices];
+    VkAttachmentView color_views[mt->num_slices];
     VkExtent2D extents[mt->num_slices];
 
     miptree_create_tex_images(mt, tex_images);
@@ -748,7 +761,7 @@ miptree_download_with_render(const miptree_t *mt)
 
         tex_views[i] = slice->texture_view;
 
-        color_views[i] = qoCreateColorAttachmentView(t_device,
+        color_views[i] = qoCreateAttachmentView(t_device,
             .image = tex_images[i],
             .format = mt->format,
             .mipLevel = 0,

@@ -152,6 +152,13 @@ typedef struct QoShaderCreateInfo_ {
     .cullMode = VK_CULL_MODE_NONE, \
     .frontFace = VK_FRONT_FACE_CCW
 
+#define QO_PIPELINE_DS_STATE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_PIPELINE_DS_STATE_CREATE_INFO, \
+    .depthTestEnable = false, \
+    .depthWriteEnable = false, \
+    .depthBoundsEnable = false, \
+    .stencilTestEnable = false
+
 #define QO_PIPELINE_MS_STATE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_MS_STATE_CREATE_INFO, \
     .rasterSamples = 1, \
@@ -159,7 +166,6 @@ typedef struct QoShaderCreateInfo_ {
 
 #define QO_PIPELINE_CB_ATTACHMENT_STATE_DEFAULTS \
     .blendEnable = false, \
-    .format = VK_FORMAT_R8G8B8A8_UNORM, \
     .channelWriteMask = (VK_CHANNEL_R_BIT | VK_CHANNEL_G_BIT | \
                          VK_CHANNEL_B_BIT | VK_CHANNEL_A_BIT)
 
@@ -201,22 +207,35 @@ typedef struct QoShaderCreateInfo_ {
 #define QO_CMD_BUFFER_BEGIN_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_BEGIN_INFO
 
+#define QO_ATTACHMENT_DESCRIPTION_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION, \
+    .samples = 1, \
+    .loadOp = VK_ATTACHMENT_LOAD_OP_LOAD, \
+    .storeOp = VK_ATTACHMENT_STORE_OP_STORE, \
+    .initialLayout = VK_IMAGE_LAYOUT_GENERAL, \
+    .finalLayout = VK_IMAGE_LAYOUT_GENERAL
+
+#define QO_SUBPASS_DESCRIPTION_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION, \
+    .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS, \
+    .inputCount = 0, \
+    .inputAttachments = NULL, \
+    .resolveAttachments = NULL, \
+    .depthStencilAttachment = { \
+        .attachment = VK_ATTACHMENT_UNUSED, \
+        .layout = VK_IMAGE_LAYOUT_GENERAL, \
+    }, \
+    .preserveCount = 0, \
+    .preserveAttachments = NULL
+
 #define QO_FRAMEBUFFER_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO, \
-    .colorAttachmentCount = 1, \
-    .pColorAttachments = NULL, \
-    .pDepthStencilAttachment = NULL, \
-    .sampleCount = 1, \
     .layers = 1
 
 #define QO_RENDER_PASS_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO, \
-    .colorAttachmentCount = 1, \
-    .sampleCount = 1, \
-    .layers = 1, \
-    .extent = {0}, \
-    .depthStencilFormat = VK_FORMAT_UNDEFINED, \
-    .depthStencilLayout = 0
+    .dependencyCount = 0, \
+    .pDependencies = NULL
 
 #define QO_IMAGE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO, \
@@ -243,13 +262,11 @@ typedef struct QoShaderCreateInfo_ {
         .arraySize = 1, \
     }
 
-#define QO_COLOR_ATTACHMENT_VIEW_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_COLOR_ATTACHMENT_VIEW_CREATE_INFO, \
+#define QO_ATTACHMENT_VIEW_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_ATTACHMENT_VIEW_CREATE_INFO, \
     .mipLevel = 0, \
     .baseArraySlice = 0, \
-    .arraySize = 1, \
-    .msaaResolveImage = 0, \
-    .msaaResolveSubResource = {0}
+    .arraySize = 1
 
 #define QO_DEPTH_STENCIL_VIEW_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_DEPTH_STENCIL_VIEW_CREATE_INFO, \
@@ -506,23 +523,12 @@ VkImageView qoCreateImageView(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
-VkColorAttachmentView qoCreateColorAttachmentView(VkDevice dev, ...);
+VkAttachmentView qoCreateAttachmentView(VkDevice dev, ...);
 #else
-#define qoCreateColorAttachmentView(dev, ...) \
-    __qoCreateColorAttachmentView(dev, \
-        &(VkColorAttachmentViewCreateInfo) { \
-            QO_COLOR_ATTACHMENT_VIEW_CREATE_INFO_DEFAULTS, \
-            ##__VA_ARGS__, \
-        })
-#endif
-
-#ifdef DOXYGEN
-VkDepthStencilView qoCreateDepthStencilView(VkDevice dev, ...);
-#else
-#define qoCreateDepthStencilView(dev, ...) \
-    __qoCreateDepthStencilView(dev, \
-        &(VkDepthStencilViewCreateInfo) { \
-            QO_DEPTH_STENCIL_VIEW_CREATE_INFO_DEFAULTS, \
+#define qoCreateAttachmentView(dev, ...) \
+    __qoCreateAttachmentView(dev, \
+        &(VkAttachmentViewCreateInfo) { \
+            QO_ATTACHMENT_VIEW_CREATE_INFO_DEFAULTS, \
             ##__VA_ARGS__, \
         })
 #endif
@@ -570,8 +576,7 @@ VkPipeline qoCreateGraphicsPipeline(VkDevice dev,
                                     const QoExtraGraphicsPipelineCreateInfo *info);
 VkImage __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info);
 VkImageView __qoCreateImageView(VkDevice dev, const VkImageViewCreateInfo *info);
-VkColorAttachmentView __qoCreateColorAttachmentView(VkDevice dev, const VkColorAttachmentViewCreateInfo *info);
-VkDepthStencilView __qoCreateDepthStencilView(VkDevice dev, const VkDepthStencilViewCreateInfo *info);
+VkAttachmentView __qoCreateAttachmentView(VkDevice dev, const VkAttachmentViewCreateInfo *info);
 VkShader __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info);
 
 #ifdef __cplusplus

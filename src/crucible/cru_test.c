@@ -93,7 +93,7 @@ struct cru_test {
     VkDynamicColorBlendState dynamic_cb_state;
     VkDynamicDepthStencilState dynamic_ds_state;
     VkImage rt_image;
-    VkColorAttachmentView image_color_view;
+    VkAttachmentView image_attachment_view;
     VkImageView image_texture_view;
     VkFramebuffer framebuffer;
     VkPipelineCache pipeline_cache;
@@ -366,11 +366,11 @@ __t_image(void)
     return &cru_current_test->rt_image;
 }
 
-const VkColorAttachmentView *
-__t_image_color_view(void)
+const VkAttachmentView *
+__t_image_attachment_view(void)
 {
     t_assert(!cru_current_test->def->no_image);
-    return &cru_current_test->image_color_view;
+    return &cru_current_test->image_attachment_view;
 }
 
 const VkImageView *
@@ -979,7 +979,7 @@ cru_test_start_main_thread(void *arg)
 
         qoBindImageMemory(t_device, t_image, rt_mem, /*offset*/ 0);
 
-        t->image_color_view = qoCreateColorAttachmentView(t_device,
+        t->image_attachment_view = qoCreateAttachmentView(t_device,
             .image = t->rt_image,
             .format = VK_FORMAT_R8G8B8A8_UNORM);
 
@@ -989,9 +989,10 @@ cru_test_start_main_thread(void *arg)
             .format = VK_FORMAT_R8G8B8A8_UNORM);
 
         t->framebuffer = qoCreateFramebuffer(t_device,
-            .pColorAttachments = (VkColorAttachmentBindInfo[]) {
+            .attachmentCount = 1,
+            .pAttachments = (VkAttachmentBindInfo[]) {
                 {
-                    .view = t->image_color_view,
+                    .view = t->image_attachment_view,
                     .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
                 },
             },
