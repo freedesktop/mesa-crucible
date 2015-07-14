@@ -25,10 +25,6 @@
 #include "cru_test.h"
 
 enum {
-    // Must be 1 because we rely on '-' in the getopt optstring to detect
-    // testnames.
-    OPT_TEST = 1,
-
     OPT_HELP = 2,
 };
 
@@ -40,18 +36,17 @@ static int opt_all_tests = 1;
 
 // From man:getopt(3) :
 //
-//    If the first character  of  optstring  is '-', then each nonoption
-//    argv-element is handled as if it were the argument of an option with
-//    character code 1.  (This is used by programs  that were  written  to
-//    expect options  and other argv-elements in any order and that care about
-//    the ordering of the two.) The special argument "--" forces an  end  of
-//    option- scanning regardless of the scanning mode.
+//    By default, getopt() permutes the contents of argv as it scans, so that
+//    eventually all the nonoptions are at the end. [...] If the first
+//    character of optstring is '+' or the environ‐ ment variable
+//    POSIXLY_CORRECT is set, then option processing stops as soon as
+//    a nonoption argument is encountered.
 //
 //    If the first character (following any optional '+' or '-' described
 //    above) of optstring is a colon (':'),  then getopt() returns ':' instead
 //    of '?' to indicate a missing option argument.
 //
-static const char *shortopts = "-:";
+static const char *shortopts = "+:h";
 
 static const struct option longopts[] = {
     {"help",          no_argument,       &opt_flag,       OPT_HELP},
@@ -77,7 +72,7 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
     opterr = 0;
 
     // Reset getopt.
-    optind = 0;
+    optind = 1;
 
     while (true) {
         int optchar;
@@ -97,15 +92,6 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
                     break;
             }
             break;
-        case OPT_TEST:
-            ; // Shut up compiler. Declaration cannot follow label.
-            const char *pattern = optarg;
-            if (!cru_array_memcpy(&test_patterns, &pattern, sizeof(pattern))) {
-                cru_loge("out of memory");
-                abort();
-            }
-            opt_all_tests = false;
-            break;
         case ':':
             cru_usage_error(cmd, "%s requires an argument", argv[optind-1]);
             break;
@@ -117,8 +103,24 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
     }
 
 done_getopt:
-    if (optind < argc)
-        cru_usage_error(cmd, "trailing arguments");
+    while (optind < argc) {
+        const char *arg = argv[optind++];
+
+        printf("XXX optind %d\n", optind);
+        printf("XXX arg %s\n", arg);
+
+        if (arg[0] == '-') {
+            cru_usage_error(cmd, "option %s follows a non-option",
+                            argv[optind-1]);
+        }
+
+        if (!cru_array_memcpy(&test_patterns, &arg, sizeof(arg))) {
+            cru_loge("out of memory");
+            abort();
+        }
+
+        opt_all_tests = false;
+    }
 }
 
 static void
