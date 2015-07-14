@@ -33,6 +33,12 @@ static const char *opt_test_name;
 static uint32_t opt_image_width;
 static uint32_t opt_image_height;
 
+// From man:getopt(3) :
+//
+//    If the first character (following any optional '+' or '-' described
+//    above) of optstring is a colon (':'),  then getopt() returns ':' instead
+//    of '?' to indicate a missing option argument.
+//
 static const char *shortopts = ":";
 
 static const struct option longopts[] = {

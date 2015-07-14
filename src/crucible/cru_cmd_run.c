@@ -46,6 +46,11 @@ static int opt_all_tests = 1;
 //    expect options  and other argv-elements in any order and that care about
 //    the ordering of the two.) The special argument "--" forces an  end  of
 //    option- scanning regardless of the scanning mode.
+//
+//    If the first character (following any optional '+' or '-' described
+//    above) of optstring is a colon (':'),  then getopt() returns ':' instead
+//    of '?' to indicate a missing option argument.
+//
 static const char *shortopts = "-:";
 
 static const struct option longopts[] = {

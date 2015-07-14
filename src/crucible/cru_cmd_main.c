@@ -31,6 +31,17 @@ enum {
 static int opt_flag;
 static const char *opt_command;
 
+// From man:getopt(3) :
+//    By default, getopt() permutes the contents of argv as it scans, so that
+//    eventually all the nonoptions are at the end. Two other modes are also
+//    implemented. If the first character of optstring is '+' or the environ‐
+//    ment  variable  POSIXLY_CORRECT is set, then option processing stops as
+//    soon as a nonoption argument is encountered.
+//
+//    If the first character (following any optional '+' or '-' described
+//    above) of optstring is a colon (':'),  then getopt() returns ':' instead
+//    of '?' to indicate a missing option argument.
+//
 static const char *shortopts = "+:h";
 
 static const struct option longopts[] = {
