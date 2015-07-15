@@ -21,16 +21,10 @@
 
 #include "cru_cmd.h"
 
-enum {
-    OPT_HELP = 1,
-};
-
-static int opt_flag;
-
-static const char *shortopts = "";
+static const char *shortopts = "h";
 
 static const struct option longopts[] = {
-    {"help", no_argument, &opt_flag, OPT_HELP},
+    {"help", no_argument, NULL, 'h'},
     {0},
 };
 
@@ -49,14 +43,10 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
         switch (optchar) {
         case -1:
             goto done_getopt;
-        case 0:
-            switch (opt_flag) {
-                case OPT_HELP:
-                    cru_command_page_help(cmd);
-                    exit(0);
-                default:
-                    cru_unreachable;
-            }
+        case 'h':
+            cru_command_page_help(cmd);
+            exit(0);
+            break;
         case ':':
             cru_usage_error(cmd, "%s requires an argument", argv[optind-1]);
             break;
