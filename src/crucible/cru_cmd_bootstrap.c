@@ -23,7 +23,7 @@
 #include "cru_cmd.h"
 
 enum {
-    OPT_HELP = 1,
+    OPT_HELP = 'h',
     OPT_WIDTH,
     OPT_HEIGHT,
 };
@@ -39,10 +39,10 @@ static uint32_t opt_image_height;
 //    above) of optstring is a colon (':'),  then getopt() returns ':' instead
 //    of '?' to indicate a missing option argument.
 //
-static const char *shortopts = ":";
+static const char *shortopts = ":h";
 
 static const struct option longopts[] = {
-    {"help",       no_argument,       &opt_flag, OPT_HELP},
+    {"help",       no_argument,       NULL,      OPT_HELP},
     {"width",      required_argument, &opt_flag, OPT_WIDTH},
     {"height",     required_argument, &opt_flag, OPT_HEIGHT},
     {0},
@@ -63,6 +63,10 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
         switch (optchar) {
         case -1:
             goto done_getopt;
+        case OPT_HELP:
+            cru_command_page_help(cmd);
+            exit(0);
+            break;
         case 0:
             switch (opt_flag) {
             case OPT_WIDTH:
@@ -74,10 +78,6 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
                 if (sscanf(optarg, "%u", &opt_image_height) < 1) {
                     cru_usage_error(cmd, "--height requires an uint argument");
                 }
-                break;
-            case OPT_HELP:
-                cru_command_page_help(cmd);
-                exit(0);
                 break;
             default:
                 cru_unreachable;
