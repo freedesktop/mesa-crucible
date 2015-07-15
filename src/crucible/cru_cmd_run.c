@@ -24,11 +24,6 @@
 #include "cru_cmd.h"
 #include "cru_test.h"
 
-enum {
-    OPT_HELP = 2,
-};
-
-static int opt_flag;
 static int opt_no_cleanup = 0;
 static int opt_dump = 0;
 static int opt_use_spir_v = 0;
@@ -49,7 +44,7 @@ static int opt_all_tests = 1;
 static const char *shortopts = "+:h";
 
 static const struct option longopts[] = {
-    {"help",          no_argument,       &opt_flag,       OPT_HELP},
+    {"help",          no_argument,       NULL,           'h'},
     {"no-cleanup",    no_argument,       &opt_no_cleanup, true},
     {"dump",          no_argument,       &opt_dump,       true},
     {"no-dump",       no_argument,       &opt_dump,       false},
@@ -77,20 +72,14 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
     while (true) {
         int optchar;
 
-        opt_flag = 0;
         optchar = getopt_long(argc, argv, shortopts, longopts, NULL);
 
         switch (optchar) {
         case -1:
             goto done_getopt;
-        case 0:
-            switch (opt_flag) {
-                case OPT_HELP:
-                    cru_command_page_help(cmd);
-                    exit(0);
-                default:
-                    break;
-            }
+        case 'h':
+            cru_command_page_help(cmd);
+            exit(0);
             break;
         case ':':
             cru_usage_error(cmd, "%s requires an argument", argv[optind-1]);
