@@ -918,7 +918,7 @@ cru_test_start_main_thread(void *arg)
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             .queueRecordCount = 1,
             .pRequestedQueues = &(VkDeviceQueueCreateInfo) {
-                .queueNodeIndex = 0,
+                .queueFamilyIndex = 0,
                 .queueCount = 1,
             },
         },
