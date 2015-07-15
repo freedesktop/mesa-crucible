@@ -87,6 +87,7 @@ struct cru_test {
     VkPhysicalDeviceMemoryProperties physical_dev_mem_props;
     VkDevice device;
     VkQueue queue;
+    VkCmdPool cmd_pool;
     VkCmdBuffer cmd_buffer;
     VkDynamicViewportState dynamic_vp_state;
     VkDynamicRasterState dynamic_rs_state;
@@ -327,6 +328,12 @@ const VkQueue *
 __t_queue(void)
 {
     return &cru_current_test->queue;
+}
+
+const VkCmdBuffer *
+__t_cmd_pool(void)
+{
+    return &cru_current_test->cmd_pool;
 }
 
 const VkCmdBuffer *
@@ -588,7 +595,7 @@ t_compare_image(void)
         },
     };
 
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t->device);
+    VkCmdBuffer cmd = qoCreateCommandBuffer(t->device, t->cmd_pool);
     qoBeginCommandBuffer(cmd);
     vkCmdCopyImageToBuffer(cmd, t_image,
                            VK_IMAGE_LAYOUT_GENERAL, buffer, 1, &copy);
@@ -949,7 +956,17 @@ cru_test_start_main_thread(void *arg)
     t->dynamic_rs_state = qoCreateDynamicRasterState(t_device);
     t->dynamic_cb_state = qoCreateDynamicColorBlendState(t_device);
     t->dynamic_ds_state = qoCreateDynamicDepthStencilState(t_device);
-    t->cmd_buffer = qoCreateCommandBuffer(t_device);
+
+    VkResult res = vkCreateCommandPool(t_device,
+        &(VkCmdPoolCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_CMD_POOL_CREATE_INFO,
+            .queueFamilyIndex = 0,
+            .flags = 0,
+        }, &t->cmd_pool);
+    t_assert(res == VK_SUCCESS);
+    t_cleanup_push_vk_object(t->device, VK_OBJECT_TYPE_CMD_POOL, t->cmd_pool);
+
+    t->cmd_buffer = qoCreateCommandBuffer(t_device, t_cmd_pool);
 
     qoBeginCommandBuffer(t_cmd_buffer);
     vkCmdBindDynamicViewportState(t->cmd_buffer, t->dynamic_vp_state);

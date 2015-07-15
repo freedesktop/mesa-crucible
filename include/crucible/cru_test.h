@@ -198,6 +198,7 @@ void t_dump_image_fv(cru_image_t *image, const char *format, va_list va);
 #define t_mem_type_index_for_device_access (__t_mem_type_index_for_device_access())
 #define t_device (*__t_device())
 #define t_queue (*__t_queue())
+#define t_cmd_pool (*__t_cmd_pool())
 #define t_cmd_buffer (*__t_cmd_buffer())
 #define t_dynamic_vp_state (*__t_dynamic_vp_state())
 #define t_dynamic_rs_state (*__t_dynamic_rs_state())
@@ -223,6 +224,7 @@ const VkPhysicalDeviceMemoryProperties *__t_physical_dev_mem_props(void);
 const uint32_t __t_mem_type_index_for_mmap(void);
 const uint32_t __t_mem_type_index_for_device_access(void);
 const VkQueue *__t_queue(void);
+const VkCmdPool *__t_cmd_pool(void);
 const VkCmdBuffer *__t_cmd_buffer(void);
 const VkDynamicViewportState *__t_dynamic_vp_state(void);
 const VkDynamicRasterState *__t_dynamic_rs_state(void);

@@ -87,7 +87,7 @@ setup_src(struct src *src)
 static void
 setup_dest(struct dest *dest)
 {
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device);
+    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
 
     vkBeginCommandBuffer(cmd,
         &(VkCmdBufferBeginInfo) {

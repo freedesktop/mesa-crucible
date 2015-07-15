@@ -342,7 +342,7 @@ miptree_create(void)
 static void
 miptree_upload_with_copy(const miptree_t *mt)
 {
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device);
+    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
@@ -374,7 +374,7 @@ miptree_upload_with_copy(const miptree_t *mt)
 static void
 miptree_download_with_copy(const miptree_t *mt)
 {
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device);
+    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
@@ -406,7 +406,7 @@ miptree_download_with_copy(const miptree_t *mt)
 static void
 miptree_copy_src_buffer_to_textures(const miptree_t *mt, VkImage *tex_images)
 {
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device);
+    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
@@ -438,7 +438,7 @@ miptree_copy_src_buffer_to_textures(const miptree_t *mt, VkImage *tex_images)
 static void
 miptree_copy_textures_to_dest_buffer(const miptree_t *mt, VkImage *tex_images)
 {
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device);
+    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
@@ -566,7 +566,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
                           ARRAY_LENGTH(set_layouts),
                           set_layouts, sets);
 
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device);
+    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
     vkCmdBindDynamicRasterState(cmd, t_dynamic_rs_state);
     vkCmdBindDynamicColorBlendState(cmd, t_dynamic_cb_state);

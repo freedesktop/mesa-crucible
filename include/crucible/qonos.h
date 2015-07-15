@@ -451,12 +451,13 @@ VkDynamicDepthStencilStateCreateInfo qoCreateDynamicDepthStencilState(VkDevice d
 #endif
 
 #ifdef DOXYGEN
-VkCmdBuffer qoCreateCommandBuffer(VkDevice dev, ...);
+VkCmdBuffer qoCreateCommandBuffer(VkDevice dev, VkCmdPool pool, ...);
 #else
-#define qoCreateCommandBuffer(dev, ...) \
-    __qoCreateCommandBuffer(dev, \
+#define qoCreateCommandBuffer(dev, pool, ...) \
+    __qoCreateCommandBuffer(dev, pool, \
         &(VkCmdBufferCreateInfo) { \
             QO_CMD_BUFFER_CREATE_INFO_DEFAULTS, \
+            .cmdPool = pool, \
             ##__VA_ARGS__, \
         })
 #endif
@@ -565,7 +566,7 @@ VkDynamicViewportState __qoCreateDynamicViewportState(VkDevice dev, const VkDyna
 VkDynamicRasterState __qoCreateDynamicRasterState(VkDevice dev, const VkDynamicRasterStateCreateInfo *info);
 VkDynamicColorBlendState __qoCreateDynamicColorBlendState(VkDevice dev, const VkDynamicColorBlendStateCreateInfo *info);
 VkDynamicDepthStencilState __qoCreateDynamicDepthStencilState(VkDevice dev, const VkDynamicDepthStencilStateCreateInfo *info);
-VkCmdBuffer __qoCreateCommandBuffer(VkDevice dev, const VkCmdBufferCreateInfo *info);
+VkCmdBuffer __qoCreateCommandBuffer(VkDevice dev, VkCmdPool pool, const VkCmdBufferCreateInfo *info);
 VkResult __qoBeginCommandBuffer(VkCmdBuffer cmd, const VkCmdBufferBeginInfo *info);
 VkResult __qoEndCommandBuffer(VkCmdBuffer cmd);
 VkFramebuffer __qoCreateFramebuffer(VkDevice dev, const VkFramebufferCreateInfo *info);

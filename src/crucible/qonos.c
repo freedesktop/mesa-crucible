@@ -21,6 +21,8 @@
 
 #include <crucible/qonos.h>
 
+#include <string.h>
+
 #include "cru_test.h"
 
 void
@@ -352,10 +354,13 @@ __qoCreateDynamicDepthStencilState(VkDevice dev,
 }
 
 VkCmdBuffer
-__qoCreateCommandBuffer(VkDevice dev, const VkCmdBufferCreateInfo *info)
+__qoCreateCommandBuffer(VkDevice dev, VkCmdPool pool,
+                        const VkCmdBufferCreateInfo *info)
 {
     VkCmdBuffer cmd;
     VkResult result;
+
+    assert(memcmp(&info->cmdPool, &pool, sizeof(pool)) == 0);
 
     result = vkCreateCommandBuffer(dev, info, &cmd);
 
