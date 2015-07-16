@@ -77,6 +77,8 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
         switch (optchar) {
         case -1:
             goto done_getopt;
+	case 0:
+	    break;
         case 'h':
             cru_command_page_help(cmd);
             exit(0);
