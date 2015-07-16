@@ -141,8 +141,10 @@ qoCreateGraphicsPipeline(VkDevice device,
     }
 
     if (!has_vs) {
-        VkShader default_vs = extra->vertexShader ? extra->vertexShader :
-            qoCreateShaderGLSL(t_device, VERTEX,
+        VkShader vs = extra->vertexShader;
+
+        if (!vs.handle) {
+            vs = qoCreateShaderGLSL(t_device, VERTEX,
                 layout(location = 0) in vec4 a_position;
                 layout(location = 1) in vec4 a_color;
                 out vec4 v_color;
@@ -152,19 +154,22 @@ qoCreateGraphicsPipeline(VkDevice device,
                     v_color = a_color;
                 }
             );
+        }
 
         stage_info[pipeline_info.stageCount++] =
             (VkPipelineShaderStageCreateInfo) {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
                 .stage = VK_SHADER_STAGE_VERTEX,
-                .shader = default_vs,
+                .shader = vs,
                 .pSpecializationInfo = NULL,
             };
     }
 
     if (!has_fs) {
-        VkShader default_fs = extra->fragmentShader ? extra->fragmentShader :
-            qoCreateShaderGLSL(t_device, FRAGMENT,
+        VkShader fs = extra->fragmentShader;
+
+        if (!fs.handle) {
+            fs = qoCreateShaderGLSL(t_device, FRAGMENT,
                 out vec4 f_color;
                 in vec4 v_color;
                 void main()
@@ -172,12 +177,13 @@ qoCreateGraphicsPipeline(VkDevice device,
                     f_color = v_color;
                 }
             );
+        }
 
         stage_info[pipeline_info.stageCount++] =
             (VkPipelineShaderStageCreateInfo) {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
                 .stage = VK_SHADER_STAGE_FRAGMENT,
-                .shader = default_fs,
+                .shader = fs,
                 .pSpecializationInfo = NULL,
             };
     }
@@ -186,7 +192,7 @@ qoCreateGraphicsPipeline(VkDevice device,
                                        1, &pipeline_info, &pipeline);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(pipeline);
+    t_assert(pipeline.handle);
     t_cleanup_push_vk_pipeline(t_device, pipeline);
 
     return pipeline;

@@ -92,6 +92,37 @@
 extern "C" {
 #endif
 
+#define QO_NULL_CMD_BUFFER                          ((VkCmdBuffer) {0})
+#define QO_NULL_DEVICE                              ((VkDevice) {0})
+#define QO_NULL_INSTANCE                            ((VkInstance) {0})
+#define QO_NULL_QUEUE                               ((VkQueue) {0})
+
+#define QO NULL_ATTACHMENT_VIEW                     ((VkAttachmentView {0}))
+#define QO_NULL_BUFFER                              ((VkBuffer) {0})
+#define QO_NULL_BUFFER_VIEW                         ((VkBufferView) {0})
+#define QO_NULL_CMD_POOL                            ((VkCmdPool) {0})
+#define QO_NULL_DESCRIPTOR_POOL                     ((VkDescriptorPool) {0})
+#define QO_NULL_DESCRIPTOR_SET_LAYOUT               ((VkDescriptorSetLayout) {0})
+#define QO_NULL_DEVICE_MEMORY                       ((VkDeviceMemory) {0})
+#define QO_NULL_DYNAMIC_COLOR_BLEND_STATE           ((VkDynamicColorBlendState) {0})
+#define QO_NULL_DYNAMIC_DEPTH_STENCIL_STATE         ((VkDynamicDepthStencilState) {0})
+#define QO_NULL_DYNAMIC_RASTER_STATE                ((VkDynamicRasterState) {0})
+#define QO_NULL_DYNAMIC_VIEWPORT_STATE              ((VkDynamicViewportState) {0})
+#define QO_NULL_EVENT                               ((VkEvent) {0})
+#define QO_NULL_FENCE                               ((VkFence) {0})
+#define QO_NULL_FRAMEBUFFER                         ((VkFramebuffer) {0})
+#define QO_NULL_IMAGE                               ((VkImage) {0})
+#define QO_NULL_IMAGE_VIEW                          ((VkImageView) {0})
+#define QO_NULL_PIPELINE                            ((VkPipeline) {0})
+#define QO_NULL_PIPELINE_CACHE                      ((VkPipelineCache) {0})
+#define QO_NULL_PIPELINE_LAYOUT                     ((VkPipelineLayout) {0})
+#define QO_NULL_QUERY_POOL                          ((VkQueryPool) {0})
+#define QO_NULL_RENDER_PASS                         ((VkRenderPass) {0})
+#define QO_NULL_SAMPLER                             ((VkSampler) {0})
+#define QO_NULL_SEMAPHORE                           ((VkSemaphore) {0})
+#define QO_NULL_SHADER                              ((VkShader) {0})
+#define QO_NULL_SHADER_MODULE                       ((VkShaderModule) {0})
+
 #define QO_MEMORY_TYPE_INDEX_INVALID UINT32_MAX
 
 typedef struct QoExtraGraphicsPipelineCreateInfo_ {

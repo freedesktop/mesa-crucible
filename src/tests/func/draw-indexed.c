@@ -195,7 +195,7 @@ test(void)
 
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
-    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, 0);
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
 }
 
 cru_define_test {

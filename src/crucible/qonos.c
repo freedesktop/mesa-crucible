@@ -50,7 +50,7 @@ VkMemoryRequirements
 qoGetBufferMemoryRequirements(VkDevice dev, VkBuffer buffer)
 {
     VkResult result;
-    VkMemoryRequirements mem_reqs;
+    VkMemoryRequirements mem_reqs = {0};
 
     result = vkGetBufferMemoryRequirements(dev, buffer, &mem_reqs);
     t_assert(result == VK_SUCCESS);
@@ -62,7 +62,7 @@ VkMemoryRequirements
 qoGetImageMemoryRequirements(VkDevice dev, VkImage image)
 {
     VkResult result;
-    VkMemoryRequirements mem_reqs;
+    VkMemoryRequirements mem_reqs = {0};
 
     result = vkGetImageMemoryRequirements(dev, image, &mem_reqs);
     t_assert(result == VK_SUCCESS);
@@ -109,7 +109,7 @@ qoQueueSubmit(VkQueue queue, uint32_t cmdBufferCount,
 VkDeviceMemory
 __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info)
 {
-    VkDeviceMemory memory;
+    VkDeviceMemory memory = {0};
     VkResult result;
 
     t_assert(info->memoryTypeIndex != QO_MEMORY_TYPE_INDEX_INVALID);
@@ -117,7 +117,7 @@ __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info)
     result = vkAllocMemory(dev, info, &memory);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(memory);
+    t_assert(memory.handle);
     t_cleanup_push_vk_device_memory(dev, memory);
 
     return memory;
@@ -180,13 +180,13 @@ qoMapMemory(VkDevice dev, VkDeviceMemory mem,
 VkPipelineCache
 __qoCreatePipelineCache(VkDevice dev, const VkPipelineCacheCreateInfo *info)
 {
-    VkPipelineCache pipeline_cache;
+    VkPipelineCache pipeline_cache = {0};
     VkResult result;
 
     result = vkCreatePipelineCache(dev, info, &pipeline_cache);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(pipeline_cache);
+    t_assert(pipeline_cache.handle);
     t_cleanup_push_vk_pipeline_cache(dev, pipeline_cache);
 
     return pipeline_cache;
@@ -195,13 +195,13 @@ __qoCreatePipelineCache(VkDevice dev, const VkPipelineCacheCreateInfo *info)
 VkPipelineLayout
 __qoCreatePipelineLayout(VkDevice dev, const VkPipelineLayoutCreateInfo *info)
 {
-    VkPipelineLayout pipeline_layout;
+    VkPipelineLayout pipeline_layout = {0};
     VkResult result;
 
     result = vkCreatePipelineLayout(dev, info, &pipeline_layout);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(pipeline_layout);
+    t_assert(pipeline_layout.handle);
     t_cleanup_push_vk_pipeline_layout(dev, pipeline_layout);
 
     return pipeline_layout;
@@ -210,13 +210,13 @@ __qoCreatePipelineLayout(VkDevice dev, const VkPipelineLayoutCreateInfo *info)
 VkSampler
 __qoCreateSampler(VkDevice dev, const VkSamplerCreateInfo *info)
 {
+    VkSampler sampler = {0};
     VkResult result;
-    VkSampler sampler;
 
     result = vkCreateSampler(dev, info, &sampler);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(sampler);
+    t_assert(sampler.handle);
     t_cleanup_push_vk_sampler(dev, sampler);
 
     return sampler;
@@ -226,13 +226,13 @@ VkDescriptorSetLayout
 __qoCreateDescriptorSetLayout(VkDevice dev,
                               const VkDescriptorSetLayoutCreateInfo *info)
 {
-    VkDescriptorSetLayout layout;
+    VkDescriptorSetLayout layout = {0};
     VkResult result;
 
     result = vkCreateDescriptorSetLayout(dev, info, &layout);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(layout);
+    t_assert(layout.handle);
     t_cleanup_push_vk_descriptor_set_layout(dev, layout);
 
     return layout;
@@ -247,13 +247,14 @@ qoAllocDescriptorSets(VkDevice dev, VkDescriptorPool descriptorPool,
     VkResult result;
     uint32_t out_count = 0;
 
+    memset(sets, 0, count * sizeof(sets[0]));
     result = vkAllocDescriptorSets(dev, descriptorPool, usage, count, layouts,
                                    sets, &out_count);
     t_assert(result == VK_SUCCESS);
     t_assert(out_count == count);
 
     for (uint32_t i = 0; i < count; ++i) {
-        t_cleanup_push_vk_descriptor_set(dev, sets[i]);
+        t_assert(sets[i].handle);
     }
 
     return result;
@@ -262,13 +263,13 @@ qoAllocDescriptorSets(VkDevice dev, VkDescriptorPool descriptorPool,
 VkBuffer
 __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info)
 {
-    VkBuffer buffer;
+    VkBuffer buffer = {0};
     VkResult result;
 
     result = vkCreateBuffer(dev, info, &buffer);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(buffer);
+    t_assert(buffer.handle);
     t_cleanup_push_vk_buffer(dev, buffer);
 
     return buffer;
@@ -277,13 +278,13 @@ __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info)
 VkBufferView
 __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info)
 {
-    VkBufferView view;
+    VkBufferView view = {0};
     VkResult result;
 
     result = vkCreateBufferView(dev, info, &view);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(view);
+    t_assert(view.handle);
     t_cleanup_push_vk_buffer_view(dev, view);
 
     return view;
@@ -293,14 +294,14 @@ VkDynamicViewportState
 __qoCreateDynamicViewportState(VkDevice dev,
                                const VkDynamicViewportStateCreateInfo *info)
 {
-    VkDynamicViewportState state;
+    VkDynamicViewportState state = {0};
     VkResult result;
 
     result = vkCreateDynamicViewportState(dev, info, &state);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(state);
-    t_cleanup_push_vk_dynamic_vp_state(dev, state);
+    t_assert(state.handle);
+    t_cleanup_push_vk_dynamic_viewport_state(dev, state);
 
     return state;
 }
@@ -309,14 +310,14 @@ VkDynamicRasterState
 __qoCreateDynamicRasterState(VkDevice dev,
                              const VkDynamicRasterStateCreateInfo *info)
 {
-    VkDynamicRasterState state;
+    VkDynamicRasterState state = {0};
     VkResult result;
 
     result = vkCreateDynamicRasterState(dev, info, &state);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(state);
-    t_cleanup_push_vk_dynamic_rs_state(dev, state);
+    t_assert(state.handle);
+    t_cleanup_push_vk_dynamic_raster_state(dev, state);
 
     return state;
 }
@@ -325,14 +326,14 @@ VkDynamicColorBlendState
 __qoCreateDynamicColorBlendState(VkDevice dev,
                                   const VkDynamicColorBlendStateCreateInfo *info)
 {
-    VkDynamicColorBlendState state;
+    VkDynamicColorBlendState state = {0};
     VkResult result;
 
     result = vkCreateDynamicColorBlendState(dev, info, &state);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(state);
-    t_cleanup_push_vk_dynamic_cb_state(dev, state);
+    t_assert(state.handle);
+    t_cleanup_push_vk_dynamic_color_blend_state(dev, state);
 
     return state;
 }
@@ -341,14 +342,14 @@ VkDynamicDepthStencilState
 __qoCreateDynamicDepthStencilState(VkDevice dev,
                                    const VkDynamicDepthStencilStateCreateInfo *info)
 {
-    VkDynamicDepthStencilState state;
+    VkDynamicDepthStencilState state = {0};
     VkResult result;
 
     result = vkCreateDynamicDepthStencilState(dev, info, &state);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(state);
-    t_cleanup_push_vk_dynamic_ds_state(dev, state);
+    t_assert(state.handle);
+    t_cleanup_push_vk_dynamic_depth_stencil_state(dev, state);
 
     return state;
 }
@@ -357,7 +358,7 @@ VkCmdBuffer
 __qoCreateCommandBuffer(VkDevice dev, VkCmdPool pool,
                         const VkCmdBufferCreateInfo *info)
 {
-    VkCmdBuffer cmd;
+    VkCmdBuffer cmd = QO_NULL_CMD_BUFFER;
     VkResult result;
 
     assert(memcmp(&info->cmdPool, &pool, sizeof(pool)) == 0);
@@ -366,7 +367,7 @@ __qoCreateCommandBuffer(VkDevice dev, VkCmdPool pool,
 
     t_assert(result == VK_SUCCESS);
     t_assert(cmd);
-    t_cleanup_push_vk_command_buffer(dev, cmd);
+    t_cleanup_push_vk_cmd_buffer(dev, cmd);
 
     return cmd;
 }
@@ -396,13 +397,13 @@ __qoEndCommandBuffer(VkCmdBuffer cmd)
 VkFramebuffer
 __qoCreateFramebuffer(VkDevice dev, const VkFramebufferCreateInfo *info)
 {
+    VkFramebuffer fb = {0};
     VkResult result;
-    VkFramebuffer fb;
 
     result = vkCreateFramebuffer(dev, info, &fb);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(fb);
+    t_assert(fb.handle);
     t_cleanup_push_vk_framebuffer(dev, fb);
 
     return fb;
@@ -411,13 +412,13 @@ __qoCreateFramebuffer(VkDevice dev, const VkFramebufferCreateInfo *info)
 VkRenderPass
 __qoCreateRenderPass(VkDevice dev, const VkRenderPassCreateInfo *info)
 {
+    VkRenderPass pass = {0};
     VkResult result;
-    VkRenderPass pass;
 
     result = vkCreateRenderPass(dev, info, &pass);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(pass);
+    t_assert(pass.handle);
     t_cleanup_push_vk_render_pass(dev, pass);
 
     return pass;
@@ -428,13 +429,13 @@ VkResult __qoEndCommandBuffer(VkCmdBuffer cmd);
 VkImage
 __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info)
 {
-    VkImage image;
+    VkImage image = {0};
     VkResult result;
 
     result = vkCreateImage(dev, info, &image);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(image);
+    t_assert(image.handle);
     t_cleanup_push_vk_image(dev, image);
 
     return image;
@@ -443,13 +444,13 @@ __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info)
 VkImageView
 __qoCreateImageView(VkDevice dev, const VkImageViewCreateInfo *info)
 {
-    VkImageView view;
+    VkImageView view = {0};
     VkResult result;
 
     result = vkCreateImageView(dev, info, &view);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(view);
+    t_assert(view.handle);
     t_cleanup_push_vk_image_view(dev, view);
 
     return view;
@@ -458,13 +459,13 @@ __qoCreateImageView(VkDevice dev, const VkImageViewCreateInfo *info)
 VkAttachmentView
 __qoCreateAttachmentView(VkDevice dev, const VkAttachmentViewCreateInfo *info)
 {
-    VkAttachmentView view;
+    VkAttachmentView view = {0};
     VkResult result;
 
     result = vkCreateAttachmentView(dev, info, &view);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(view);
+    t_assert(view.handle);
     t_cleanup_push_vk_attachment_view(dev, view);
 
     return view;
@@ -473,8 +474,8 @@ __qoCreateAttachmentView(VkDevice dev, const VkAttachmentViewCreateInfo *info)
 VkShader
 __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
 {
-    VkShaderModule module;
-    VkShader shader;
+    VkShaderModule module = {0};
+    VkShader shader = {0};
     VkResult result;
 
     VkShaderModuleCreateInfo module_info = {
@@ -498,7 +499,7 @@ __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
     result = vkCreateShaderModule(dev, &module_info, &module);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(module);
+    t_assert(module.handle);
     t_cleanup_push_vk_shader_module(dev, module);
 
     result = vkCreateShader(dev,
@@ -510,7 +511,7 @@ __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
         }, &shader);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(shader);
+    t_assert(shader.handle);
     t_cleanup_push_vk_shader(dev, shader);
 
     return shader;

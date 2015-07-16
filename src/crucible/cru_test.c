@@ -330,7 +330,7 @@ __t_queue(void)
     return &cru_current_test->queue;
 }
 
-const VkCmdBuffer *
+const VkCmdPool *
 __t_cmd_pool(void)
 {
     return &cru_current_test->cmd_pool;
@@ -600,7 +600,7 @@ t_compare_image(void)
     vkCmdCopyImageToBuffer(cmd, t_image,
                            VK_IMAGE_LAYOUT_GENERAL, buffer, 1, &copy);
     qoEndCommandBuffer(cmd);
-    qoQueueSubmit(t_queue, 1, &cmd, 0);
+    qoQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
     vkQueueWaitIdle(t_queue);
 
     cru_image_t *actual_image =
@@ -933,7 +933,6 @@ cru_test_start_main_thread(void *arg)
     t_cleanup_push_vk_device(t_device);
 
     vkGetDeviceQueue(t_device, 0, 0, &t->queue);
-    t_cleanup_push_vk_queue(t->device, t->queue);
 
     t->pipeline_cache = qoCreatePipelineCache(t->device);
 
@@ -964,7 +963,7 @@ cru_test_start_main_thread(void *arg)
             .flags = 0,
         }, &t->cmd_pool);
     t_assert(res == VK_SUCCESS);
-    t_cleanup_push_vk_object(t->device, VK_OBJECT_TYPE_CMD_POOL, t->cmd_pool);
+    t_cleanup_push_vk_cmd_pool(t->device, t->cmd_pool);
 
     t->cmd_buffer = qoCreateCommandBuffer(t_device, t_cmd_pool);
 

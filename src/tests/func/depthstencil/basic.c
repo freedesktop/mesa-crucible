@@ -151,7 +151,7 @@ test(void)
                 .depthCompareOp = VK_COMPARE_OP_GREATER
             },
             .flags = 0,
-            .layout = VK_NULL_HANDLE
+            .layout = QO_NULL_PIPELINE_LAYOUT,
         }});
 
     static const float vertex_data[] = {
@@ -208,7 +208,7 @@ test(void)
 
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
-    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, 0);
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
 }
 
 cru_define_test {

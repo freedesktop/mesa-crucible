@@ -182,7 +182,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
         .range = ubo_size);
 
     VkDescriptorSet set;
-    qoAllocDescriptorSets(t_device, /*pool*/ 0,
+    qoAllocDescriptorSets(t_device, QO_NULL_DESCRIPTOR_POOL,
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           1, &set_layout, &set);
 
@@ -243,7 +243,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
 
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
-    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, 0);
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
 }
 
 static void

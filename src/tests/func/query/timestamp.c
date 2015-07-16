@@ -46,7 +46,7 @@ get_timestamp(void)
     vkCmdWriteTimestamp(cmdBuffer, VK_TIMESTAMP_TYPE_BOTTOM, buffer, 8);
     qoEndCommandBuffer(cmdBuffer);
 
-    qoQueueSubmit(t_queue, 1, &cmdBuffer, 0);
+    qoQueueSubmit(t_queue, 1, &cmdBuffer, QO_NULL_FENCE);
 
     vkQueueWaitIdle(t_queue);
 

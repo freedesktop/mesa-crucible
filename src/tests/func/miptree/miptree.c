@@ -368,7 +368,7 @@ miptree_upload_with_copy(const miptree_t *mt)
     }
 
     qoEndCommandBuffer(cmd);
-    vkQueueSubmit(t_queue, 1, &cmd, 0);
+    vkQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
 }
 
 static void
@@ -400,7 +400,7 @@ miptree_download_with_copy(const miptree_t *mt)
     }
 
     qoEndCommandBuffer(cmd);
-    vkQueueSubmit(t_queue, 1, &cmd, 0);
+    vkQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
 }
 
 static void
@@ -432,7 +432,7 @@ miptree_copy_src_buffer_to_textures(const miptree_t *mt, VkImage *tex_images)
     }
 
     qoEndCommandBuffer(cmd);
-    qoQueueSubmit(t_queue, 1, &cmd, 0);
+    qoQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
 }
 
 static void
@@ -464,7 +464,7 @@ miptree_copy_textures_to_dest_buffer(const miptree_t *mt, VkImage *tex_images)
     }
 
     qoEndCommandBuffer(cmd);
-    qoQueueSubmit(t_queue, 1, &cmd, 0);
+    qoQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
 }
 
 static void
@@ -561,7 +561,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
     memcpy(vb_map + vb_position_offset, position_data, sizeof(position_data));
 
     VkDescriptorSet sets[1];
-    qoAllocDescriptorSets(t_device, /*pool*/ 0,
+    qoAllocDescriptorSets(t_device, QO_NULL_DESCRIPTOR_POOL,
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           ARRAY_LENGTH(set_layouts),
                           set_layouts, sets);
@@ -671,7 +671,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
     }
 
     qoEndCommandBuffer(cmd);
-    qoQueueSubmit(t_queue, 1, &cmd, 0);
+    qoQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
 }
 
 static void

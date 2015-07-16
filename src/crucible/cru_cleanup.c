@@ -61,27 +61,155 @@ struct cmd_cru_cleanup_stack {
     cru_cleanup_stack_t *cleanup;
 };
 
-struct cmd_cru_image {
-    cru_image_t *image;
-};
-
-struct cmd_vk_device {
-    VkDevice device;
-};
-
-struct cmd_vk_device_memory {
-    VkDevice device;
-    VkDeviceMemory device_memory;
-};
-
+// Non-dispatchable Vulkan objects
 struct cmd_vk_instance {
    VkInstance instance;
 };
 
-struct cmd_vk_object {
-    VkDevice device;
-    VkObjectType obj_type;
-    VkObject obj;
+struct cmd_vk_device {
+    VkDevice dev;
+};
+
+// Dispatchable Vulkan objects
+struct cmd_cru_image {
+    cru_image_t *image;
+};
+
+struct cmd_vk_attachment_view {
+    VkDevice dev;
+    VkAttachmentView x;
+};
+
+struct cmd_vk_buffer {
+    VkDevice dev;
+    VkBuffer x;
+};
+
+struct cmd_vk_buffer_view {
+    VkDevice dev;
+    VkBufferView x;
+};
+
+struct cmd_vk_cmd_buffer {
+    VkDevice dev;
+    VkCmdBuffer x;
+};
+
+struct cmd_vk_cmd_pool {
+    VkDevice dev;
+    VkCmdPool x;
+};
+
+struct cmd_vk_descriptor_pool {
+    VkDevice dev;
+    VkDescriptorPool x;
+};
+
+struct cmd_vk_descriptor_set_layout {
+    VkDevice dev;
+    VkDescriptorSetLayout x;
+};
+
+struct cmd_vk_device_memory {
+    VkDevice dev;
+    VkDeviceMemory x;
+};
+
+struct cmd_vk_dynamic_color_blend_state {
+    VkDevice dev;
+    VkDynamicColorBlendState x;
+};
+
+struct cmd_vk_dynamic_depth_stencil_state {
+    VkDevice dev;
+    VkDynamicDepthStencilState x;
+};
+
+struct cmd_vk_dynamic_raster_state {
+    VkDevice dev;
+    VkDynamicRasterState x;
+};
+
+struct cmd_vk_dynamic_viewport_state {
+    VkDevice dev;
+    VkDynamicViewportState x;
+};
+
+struct cmd_vk_event {
+    VkDevice dev;
+    VkEvent x;
+};
+
+struct cmd_vk_fence {
+    VkDevice dev;
+    VkFence x;
+};
+
+struct cmd_vk_framebuffer {
+    VkDevice dev;
+    VkFramebuffer x;
+};
+
+struct cmd_vk_image {
+    VkDevice dev;
+    VkImage x;
+};
+
+struct cmd_vk_image_view {
+    VkDevice dev;
+    VkImageView x;
+};
+
+
+
+struct cmd_vk_memory_map {
+    VkDevice dev;
+    VkDeviceMemory x;
+};
+
+struct cmd_vk_pipeline {
+    VkDevice dev;
+    VkPipeline x;
+};
+
+struct cmd_vk_pipeline_cache {
+    VkDevice dev;
+    VkPipelineCache x;
+};
+
+struct cmd_vk_pipeline_layout {
+    VkDevice dev;
+    VkPipelineLayout x;
+};
+
+struct cmd_vk_query_pool {
+    VkDevice dev;
+    VkQueryPool x;
+};
+
+struct cmd_vk_render_pass {
+    VkDevice dev;
+    VkRenderPass x;
+};
+
+struct cmd_vk_sampler {
+    VkDevice dev;
+    VkSampler x;
+};
+
+struct cmd_vk_semaphore {
+    VkDevice dev;
+    VkSemaphore x;
+};
+
+struct cmd_vk_shader {
+    VkDevice dev;
+    VkShader x;
+};
+
+struct cmd_vk_shader_module {
+    VkDevice dev;
+    VkShaderModule x;
 };
 
 cru_cleanup_stack_t*
@@ -146,12 +274,15 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
         cmd->var = va_arg(va, __typeof__(cmd->var))
 
     switch (cmd_type) {
+        // Misc objects
         case CRU_CLEANUP_CMD_CALLBACK: {
             CMD_CREATE(struct cmd_callback);
             CMD_SET(func);
             CMD_SET(data);
             break;
         }
+
+        // Crucible objects
         case CRU_CLEANUP_CMD_CRU_CLEANUP_STACK: {
             CMD_CREATE(struct cmd_cru_cleanup_stack);
             CMD_SET(cleanup);
@@ -162,6 +293,8 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
             CMD_SET(image);
             break;
         }
+
+        // Dispatchable Vulkan objects
         case CRU_CLEANUP_CMD_VK_INSTANCE: {
             CMD_CREATE(struct cmd_vk_instance);
             CMD_SET(instance);
@@ -169,26 +302,171 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
         }
         case CRU_CLEANUP_CMD_VK_DEVICE: {
             CMD_CREATE(struct cmd_vk_device);
-            CMD_SET(device);
+            CMD_SET(dev);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_MEMORY_MAP: {
+            CMD_CREATE(struct cmd_vk_memory_map);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+
+        // Non-dispatchable Vulkan objects
+        case CRU_CLEANUP_CMD_VK_ATTACHMENT_VIEW: {
+            CMD_CREATE(struct cmd_vk_attachment_view);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_BUFFER: {
+            CMD_CREATE(struct cmd_vk_buffer);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_BUFFER_VIEW: {
+            CMD_CREATE(struct cmd_vk_buffer_view);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_CMD_BUFFER: {
+            CMD_CREATE(struct cmd_vk_cmd_buffer);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_CMD_POOL: {
+            CMD_CREATE(struct cmd_vk_cmd_pool);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_DESCRIPTOR_POOL: {
+            CMD_CREATE(struct cmd_vk_descriptor_pool);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET_LAYOUT: {
+            CMD_CREATE(struct cmd_vk_descriptor_set_layout);
+            CMD_SET(dev);
+            CMD_SET(x);
             break;
         }
         case CRU_CLEANUP_CMD_VK_DEVICE_MEMORY: {
             CMD_CREATE(struct cmd_vk_device_memory);
-            CMD_SET(device);
-            CMD_SET(device_memory);
+            CMD_SET(dev);
+            CMD_SET(x);
             break;
         }
-        case CRU_CLEANUP_CMD_VK_MEMORY_MAP: {
-            CMD_CREATE(struct cmd_vk_device_memory);
-            CMD_SET(device);
-            CMD_SET(device_memory);
+        case CRU_CLEANUP_CMD_VK_DYNAMIC_COLOR_BLEND_STATE: {
+            CMD_CREATE(struct cmd_vk_dynamic_color_blend_state);
+            CMD_SET(dev);
+            CMD_SET(x);
             break;
         }
-        case CRU_CLEANUP_CMD_VK_OBJECT: {
-            CMD_CREATE(struct cmd_vk_object);
-            CMD_SET(device);
-            CMD_SET(obj_type);
-            CMD_SET(obj);
+        case CRU_CLEANUP_CMD_VK_DYNAMIC_DEPTH_STENCIL_STATE: {
+            CMD_CREATE(struct cmd_vk_dynamic_depth_stencil_state);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_DYNAMIC_RASTER_STATE: {
+            CMD_CREATE(struct cmd_vk_dynamic_raster_state);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_DYNAMIC_VIEWPORT_STATE: {
+            CMD_CREATE(struct cmd_vk_dynamic_viewport_state);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_EVENT: {
+            CMD_CREATE(struct cmd_vk_event);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_FENCE: {
+            CMD_CREATE(struct cmd_vk_fence);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_FRAMEBUFFER: {
+            CMD_CREATE(struct cmd_vk_framebuffer);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_IMAGE: {
+            CMD_CREATE(struct cmd_vk_image);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_IMAGE_VIEW: {
+            CMD_CREATE(struct cmd_vk_image_view);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_PIPELINE: {
+            CMD_CREATE(struct cmd_vk_pipeline);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_PIPELINE_CACHE: {
+            CMD_CREATE(struct cmd_vk_pipeline_cache);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_PIPELINE_LAYOUT: {
+            CMD_CREATE(struct cmd_vk_pipeline_layout);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_QUERY_POOL: {
+            CMD_CREATE(struct cmd_vk_query_pool);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_RENDER_PASS: {
+            CMD_CREATE(struct cmd_vk_render_pass);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_SAMPLER: {
+            CMD_CREATE(struct cmd_vk_sampler);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_SEMAPHORE: {
+            CMD_CREATE(struct cmd_vk_semaphore);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_SHADER: {
+            CMD_CREATE(struct cmd_vk_shader);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_SHADER_MODULE: {
+            CMD_CREATE(struct cmd_vk_shader_module);
+            CMD_SET(dev);
+            CMD_SET(x);
             break;
         }
     }
@@ -221,11 +499,14 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
         assert(cmd)
 
     switch (header->cmd_type) {
+        // Misc objects
         case CRU_CLEANUP_CMD_CALLBACK: {
             CMD_GET(struct cmd_callback);
             cmd->func(cmd->data);
             break;
         }
+
+        // Crucible objects
         case CRU_CLEANUP_CMD_CRU_CLEANUP_STACK: {
             CMD_GET(struct cmd_cru_cleanup_stack);
             cru_cleanup_release(cmd->cleanup);
@@ -236,29 +517,153 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
             cru_image_release(cmd->image);
             break;
         }
+
+        // Dispatchable Vulkan objects
+        case CRU_CLEANUP_CMD_VK_DEVICE: {
+            CMD_GET(struct cmd_vk_device);
+            vkDestroyDevice(cmd->dev);
+            break;
+        }
         case CRU_CLEANUP_CMD_VK_INSTANCE: {
             CMD_GET(struct cmd_vk_instance);
             vkDestroyInstance(cmd->instance);
             break;
         }
-        case CRU_CLEANUP_CMD_VK_DEVICE: {
-            CMD_GET(struct cmd_vk_device);
-            vkDestroyDevice(cmd->device);
+        case CRU_CLEANUP_CMD_VK_MEMORY_MAP: {
+            CMD_GET(struct cmd_vk_memory_map);
+            vkUnmapMemory(cmd->dev, cmd->x);
+            break;
+        }
+
+        // Non-dispatchable Vulkan objects
+        case CRU_CLEANUP_CMD_VK_ATTACHMENT_VIEW: {
+            CMD_GET(struct cmd_vk_attachment_view);
+            vkDestroyAttachmentView(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_BUFFER: {
+            CMD_GET(struct cmd_vk_buffer);
+            vkDestroyBuffer(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_BUFFER_VIEW: {
+            CMD_GET(struct cmd_vk_buffer_view);
+            vkDestroyBufferView(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_CMD_BUFFER: {
+            CMD_GET(struct cmd_vk_cmd_buffer);
+            vkDestroyCommandBuffer(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_CMD_POOL: {
+            CMD_GET(struct cmd_vk_cmd_pool);
+            vkDestroyCommandPool(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_DESCRIPTOR_POOL: {
+            CMD_GET(struct cmd_vk_descriptor_pool);
+            vkDestroyDescriptorPool(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET_LAYOUT: {
+            CMD_GET(struct cmd_vk_descriptor_set_layout);
+            vkDestroyDescriptorSetLayout(cmd->dev, cmd->x);
             break;
         }
         case CRU_CLEANUP_CMD_VK_DEVICE_MEMORY: {
             CMD_GET(struct cmd_vk_device_memory);
-            vkFreeMemory(cmd->device, cmd->device_memory);
+            vkFreeMemory(cmd->dev, cmd->x);
             break;
         }
-        case CRU_CLEANUP_CMD_VK_MEMORY_MAP: {
-            CMD_GET(struct cmd_vk_device_memory);
-            vkUnmapMemory(cmd->device, cmd->device_memory);
+        case CRU_CLEANUP_CMD_VK_DYNAMIC_COLOR_BLEND_STATE: {
+            CMD_GET(struct cmd_vk_dynamic_color_blend_state);
+            vkDestroyDynamicColorBlendState(cmd->dev, cmd->x);
             break;
         }
-        case CRU_CLEANUP_CMD_VK_OBJECT: {
-            CMD_GET(struct cmd_vk_object);
-            vkDestroyObject(cmd->device, cmd->obj_type, cmd->obj);
+        case CRU_CLEANUP_CMD_VK_DYNAMIC_DEPTH_STENCIL_STATE: {
+            CMD_GET(struct cmd_vk_dynamic_depth_stencil_state);
+            vkDestroyDynamicDepthStencilState(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_DYNAMIC_RASTER_STATE: {
+            CMD_GET(struct cmd_vk_dynamic_raster_state);
+            vkDestroyDynamicRasterState(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_DYNAMIC_VIEWPORT_STATE: {
+            CMD_GET(struct cmd_vk_dynamic_viewport_state);
+            vkDestroyDynamicViewportState(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_EVENT: {
+            CMD_GET(struct cmd_vk_event);
+            vkDestroyEvent(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_FENCE: {
+            CMD_GET(struct cmd_vk_fence);
+            vkDestroyFence(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_FRAMEBUFFER: {
+            CMD_GET(struct cmd_vk_framebuffer);
+            vkDestroyFramebuffer(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_IMAGE: {
+            CMD_GET(struct cmd_vk_image);
+            vkDestroyImage(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_IMAGE_VIEW: {
+            CMD_GET(struct cmd_vk_image_view);
+            vkDestroyImageView(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_PIPELINE: {
+            CMD_GET(struct cmd_vk_pipeline);
+            vkDestroyPipeline(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_PIPELINE_CACHE: {
+            CMD_GET(struct cmd_vk_pipeline_cache);
+            vkDestroyPipelineCache(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_PIPELINE_LAYOUT: {
+            CMD_GET(struct cmd_vk_pipeline_layout);
+            vkDestroyPipelineLayout(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_QUERY_POOL: {
+            CMD_GET(struct cmd_vk_query_pool);
+            vkDestroyQueryPool(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_RENDER_PASS: {
+            CMD_GET(struct cmd_vk_render_pass);
+            vkDestroyRenderPass(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_SAMPLER: {
+            CMD_GET(struct cmd_vk_sampler);
+            vkDestroySampler(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_SEMAPHORE: {
+            CMD_GET(struct cmd_vk_semaphore);
+            vkDestroySemaphore(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_SHADER: {
+            CMD_GET(struct cmd_vk_shader);
+            vkDestroyShader(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_SHADER_MODULE: {
+            CMD_GET(struct cmd_vk_shader_module);
+            vkDestroyShaderModule(cmd->dev, cmd->x);
             break;
         }
     }
