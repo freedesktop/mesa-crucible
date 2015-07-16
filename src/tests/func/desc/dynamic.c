@@ -29,7 +29,7 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
 {
     VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
-        layout(set = 0, binding = 0) uniform block1 {
+        layout(std140, set = 0, binding = 0) uniform block1 {
             vec4 color;
             vec4 offset;
         } u1;
