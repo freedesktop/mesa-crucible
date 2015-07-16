@@ -97,9 +97,6 @@ done_getopt:
     while (optind < argc) {
         const char *arg = argv[optind++];
 
-        printf("XXX optind %d\n", optind);
-        printf("XXX arg %s\n", arg);
-
         if (arg[0] == '-') {
             cru_usage_error(cmd, "option %s follows a non-option",
                             argv[optind-1]);
