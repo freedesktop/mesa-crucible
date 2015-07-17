@@ -96,6 +96,9 @@ struct cru_test {
     VkImage rt_image;
     VkAttachmentView color_attachment_view;
     VkImageView color_texture_view;
+    VkImage ds_image;
+    VkAttachmentView ds_attachment_view;
+    VkImageView depth_image_view;
     VkFramebuffer framebuffer;
     VkPipelineCache pipeline_cache;
 
@@ -385,6 +388,36 @@ __t_color_texture_view(void)
 {
     t_assert(!cru_current_test->def->no_image);
     return &cru_current_test->color_texture_view;
+}
+
+const VkImage *
+__t_ds_image(void)
+{
+    const cru_test_t *t = cru_current_test;
+
+    t_assert(!t->def->no_image);
+    t_assert(t->ds_image.handle);
+    return &t->ds_image;
+}
+
+const VkAttachmentView *
+__t_ds_attachment_view(void)
+{
+    const cru_test_t *t = cru_current_test;
+
+    t_assert(!t->def->no_image);
+    t_assert(t->ds_attachment_view.handle);
+    return &t->ds_attachment_view;
+}
+
+const VkImageView *
+__t_depth_image_view(void)
+{
+    const cru_test_t *t = cru_current_test;
+
+    t_assert(!t->def->no_image);
+    t_assert(t->depth_image_view.handle);
+    return &t->depth_image_view;
 }
 
 const VkFramebuffer *
@@ -947,6 +980,9 @@ create_attachment(VkDevice dev,
 static void
 cru_test_create_framebuffer(cru_test_t *t)
 {
+    VkAttachmentBindInfo bind_info[2];
+    uint32_t att_count = 0;
+
     if (t->def->no_image)
         return;
 
@@ -958,16 +994,31 @@ cru_test_create_framebuffer(cru_test_t *t)
                       &t->color_attachment_view,
                       &t->color_texture_view);
 
+    bind_info[att_count++] = (VkAttachmentBindInfo) {
+        .view = t->color_attachment_view,
+        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+    };
+
+    if (t->def->depthstencil_format != VK_FORMAT_UNDEFINED) {
+        create_attachment(t->device, t->def->depthstencil_format,
+                          VK_IMAGE_USAGE_DEPTH_STENCIL_BIT,
+                          VK_IMAGE_ASPECT_DEPTH,
+                          t->width, t->height,
+                          &t->ds_image,
+                          &t->ds_attachment_view,
+                          &t->depth_image_view);
+
+        bind_info[att_count++] = (VkAttachmentBindInfo) {
+            .view = t->ds_attachment_view,
+            .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+        };
+    }
+
     t->framebuffer = qoCreateFramebuffer(t_device,
-        .attachmentCount = 1,
-        .pAttachments = (VkAttachmentBindInfo[]) {
-            {
-                .view = t->color_attachment_view,
-                .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-            },
-        },
         .width = t->width,
-        .height = t->height);
+        .height = t->height,
+        .attachmentCount = att_count,
+        .pAttachments = bind_info);
 }
 
 static void *

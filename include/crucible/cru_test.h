@@ -83,6 +83,13 @@ struct cru_test_def {
     uint32_t samples;
     bool no_image;
 
+    /// \brief Create a default depthstencil attachment.
+    ///
+    /// If and only if depthstencil_format is set, then the test's default
+    /// framebuffer (t_framebuffer) will have a depthstencil attachment; and
+    /// t_ds_image, t_ds_attachment_view, and t_depth_view will be non-null.
+    VkFormat depthstencil_format;
+
     /// \brief Skip this test.
     ///
     /// This is useful for work-in-progress tests.
@@ -207,6 +214,9 @@ void t_dump_image_fv(cru_image_t *image, const char *format, va_list va);
 #define t_image (*__t_image())
 #define t_color_attachment_view (*__t_color_attachment_view())
 #define t_color_texture_view (*__t_color_texture_view())
+#define t_ds_image (*__t_ds_image())
+#define t_ds_attachment_view (*__t_ds_attachment_view())
+#define t_depth_image_view (*__t_depth_image_view())
 #define t_framebuffer (*__t_framebuffer())
 #define t_pipeline_cache (*__t_pipeline_cache())
 #define t_width (*__t_width())
@@ -233,6 +243,9 @@ const VkDynamicDepthStencilState *__t_dynamic_ds_state(void);
 const VkImage *__t_image(void);
 const VkAttachmentView *__t_color_attachment_view(void);
 const VkImageView *__t_color_texture_view(void);
+const VkImage *__t_ds_image(void);
+const VkAttachmentView *__t_ds_attachment_view(void);
+const VkImageView *__t_depth_image_view(void);
 const VkFramebuffer *__t_framebuffer(void);
 const VkPipelineCache *__t_pipeline_cache(void);
 const uint32_t *__t_height(void);
