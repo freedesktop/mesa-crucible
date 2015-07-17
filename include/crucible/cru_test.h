@@ -146,7 +146,7 @@ void __t_assertfv(const char *file, int line, bool cond, const char *cond_string
 /// Compare the test's rendered image against its reference image, ending the
 /// test.
 ///
-/// \see t_image
+/// \see t_color_image
 /// \see t_ref_image
 void t_compare_image(void) cru_noreturn;
 
@@ -211,9 +211,9 @@ void t_dump_image_fv(cru_image_t *image, const char *format, va_list va);
 #define t_dynamic_rs_state (*__t_dynamic_rs_state())
 #define t_dynamic_cb_state (*__t_dynamic_cb_state())
 #define t_dynamic_ds_state (*__t_dynamic_ds_state())
-#define t_image (*__t_image())
+#define t_color_image (*__t_color_image())
 #define t_color_attachment_view (*__t_color_attachment_view())
-#define t_color_texture_view (*__t_color_texture_view())
+#define t_color_image_view (*__t_color_image_view())
 #define t_ds_image (*__t_ds_image())
 #define t_ds_attachment_view (*__t_ds_attachment_view())
 #define t_depth_image_view (*__t_depth_image_view())
@@ -240,9 +240,9 @@ const VkDynamicViewportState *__t_dynamic_vp_state(void);
 const VkDynamicRasterState *__t_dynamic_rs_state(void);
 const VkDynamicColorBlendState *__t_dynamic_cb_state(void);
 const VkDynamicDepthStencilState *__t_dynamic_ds_state(void);
-const VkImage *__t_image(void);
+const VkImage *__t_color_image(void);
 const VkAttachmentView *__t_color_attachment_view(void);
-const VkImageView *__t_color_texture_view(void);
+const VkImageView *__t_color_image_view(void);
 const VkImage *__t_ds_image(void);
 const VkAttachmentView *__t_ds_attachment_view(void);
 const VkImageView *__t_depth_image_view(void);

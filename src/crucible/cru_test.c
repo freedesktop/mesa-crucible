@@ -370,7 +370,7 @@ __t_dynamic_ds_state(void)
 }
 
 const VkImage *
-__t_image(void)
+__t_color_image(void)
 {
     t_assert(!cru_current_test->def->no_image);
     return &cru_current_test->rt_image;
@@ -384,7 +384,7 @@ __t_color_attachment_view(void)
 }
 
 const VkImageView *
-__t_color_texture_view(void)
+__t_color_image_view(void)
 {
     t_assert(!cru_current_test->def->no_image);
     return &cru_current_test->color_texture_view;
@@ -630,7 +630,7 @@ t_compare_image(void)
 
     VkCmdBuffer cmd = qoCreateCommandBuffer(t->device, t->cmd_pool);
     qoBeginCommandBuffer(cmd);
-    vkCmdCopyImageToBuffer(cmd, t_image,
+    vkCmdCopyImageToBuffer(cmd, t_color_image,
                            VK_IMAGE_LAYOUT_GENERAL, buffer, 1, &copy);
     qoEndCommandBuffer(cmd);
     qoQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
