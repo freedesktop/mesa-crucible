@@ -50,7 +50,7 @@ test(void)
         .attachmentCount = 2,
         .pAttachments = (VkAttachmentBindInfo[]) {
             {
-                .view = t_image_attachment_view,
+                .view = t_color_attachment_view,
                 .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
             },
             {
