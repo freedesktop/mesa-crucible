@@ -23,12 +23,6 @@
 
 #include "basic-spirv.h"
 
-static inline uint32_t
-align_u32(uint32_t value, uint32_t alignment)
-{
-    return (value + alignment - 1) & ~(alignment - 1);
-}
-
 static void
 test(void)
 {
