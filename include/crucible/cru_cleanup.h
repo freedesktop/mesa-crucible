@@ -58,7 +58,6 @@ enum cru_cleanup_cmd {
     CRU_CLEANUP_CMD_VK_IMAGE,
     CRU_CLEANUP_CMD_VK_IMAGE_VIEW,
     CRU_CLEANUP_CMD_VK_INSTANCE,
-    CRU_CLEANUP_CMD_VK_MEMORY_MAP,
     CRU_CLEANUP_CMD_VK_PIPELINE,
     CRU_CLEANUP_CMD_VK_PIPELINE_CACHE,
     CRU_CLEANUP_CMD_VK_PIPELINE_LAYOUT,
@@ -113,7 +112,6 @@ static inline void cru_cleanup_push_vk_fence(cru_cleanup_stack_t *c, VkDevice de
 static inline void cru_cleanup_push_vk_framebuffer(cru_cleanup_stack_t *c, VkDevice dev, VkFramebuffer x)                                   { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_FRAMEBUFFER,                   dev, x); }
 static inline void cru_cleanup_push_vk_image(cru_cleanup_stack_t *c, VkDevice dev, VkImage x)                                               { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_IMAGE,                         dev, x); }
 static inline void cru_cleanup_push_vk_image_view(cru_cleanup_stack_t *c, VkDevice dev, VkImageView x)                                      { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_IMAGE_VIEW,                    dev, x); }
-static inline void cru_cleanup_push_vk_memory_map(cru_cleanup_stack_t *c, VkDevice dev, VkDeviceMemory x)                                   { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_MEMORY_MAP,                    dev, x); }
 static inline void cru_cleanup_push_vk_pipeline(cru_cleanup_stack_t *c, VkDevice dev, VkPipeline x)                                         { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_PIPELINE,                      dev, x); }
 static inline void cru_cleanup_push_vk_pipeline_layout(cru_cleanup_stack_t *c, VkDevice dev, VkPipelineLayout x)                            { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_PIPELINE_LAYOUT,               dev, x); }
 static inline void cru_cleanup_push_vk_query_pool(cru_cleanup_stack_t *c, VkDevice dev, VkQueryPool x)                                      { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_QUERY_POOL,                    dev, x); }

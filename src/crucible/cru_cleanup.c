@@ -160,13 +160,6 @@ struct cmd_vk_image_view {
     VkImageView x;
 };
 
-
-
-struct cmd_vk_memory_map {
-    VkDevice dev;
-    VkDeviceMemory x;
-};
-
 struct cmd_vk_pipeline {
     VkDevice dev;
     VkPipeline x;
@@ -303,12 +296,6 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
         case CRU_CLEANUP_CMD_VK_DEVICE: {
             CMD_CREATE(struct cmd_vk_device);
             CMD_SET(dev);
-            break;
-        }
-        case CRU_CLEANUP_CMD_VK_MEMORY_MAP: {
-            CMD_CREATE(struct cmd_vk_memory_map);
-            CMD_SET(dev);
-            CMD_SET(x);
             break;
         }
 
@@ -527,11 +514,6 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
         case CRU_CLEANUP_CMD_VK_INSTANCE: {
             CMD_GET(struct cmd_vk_instance);
             vkDestroyInstance(cmd->instance);
-            break;
-        }
-        case CRU_CLEANUP_CMD_VK_MEMORY_MAP: {
-            CMD_GET(struct cmd_vk_memory_map);
-            vkUnmapMemory(cmd->dev, cmd->x);
             break;
         }
 
