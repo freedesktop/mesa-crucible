@@ -893,6 +893,83 @@ fail_create_cleanup_stack:
     t_fail_silent();
 }
 
+static void
+create_attachment(VkDevice dev,
+                  VkFormat format,
+                  VkImageUsageFlags image_usage_flags,
+                  VkImageAspect image_aspect,
+                  uint32_t width, uint32_t height,
+                  VkImage *out_image,
+                  VkAttachmentView *out_attachment_view,
+                  VkImageView *out_image_view)
+{
+    if (format == VK_FORMAT_UNDEFINED) {
+        *out_image = QO_NULL_IMAGE;
+        *out_attachment_view = QO_NULL_ATTACHMENT_VIEW;
+        *out_image_view = QO_NULL_IMAGE_VIEW;
+        return;
+    }
+
+    t_assert(width > 0);
+    t_assert(height > 0);
+
+    *out_image = qoCreateImage(dev,
+        .format = format,
+        .extent = {
+            .width = width,
+            .height = height,
+            .depth = 1,
+        },
+        .usage = image_usage_flags);
+
+    VkDeviceMemory mem = qoAllocImageMemory(dev, *out_image,
+        .memoryTypeIndex = t_mem_type_index_for_device_access);
+
+    qoBindImageMemory(dev, *out_image, mem, /*offset*/ 0);
+
+    *out_attachment_view = qoCreateAttachmentView(dev,
+        .image = *out_image,
+        .format = format);
+
+    *out_image_view = qoCreateImageView(dev,
+        .image = *out_image,
+        .viewType = VK_IMAGE_VIEW_TYPE_2D,
+        .format = format,
+        .subresourceRange = {
+            .aspect = image_aspect,
+            .baseMipLevel = 0,
+            .mipLevels = 1,
+            .baseArraySlice = 0,
+            .arraySize = 1,
+        });
+}
+
+static void
+cru_test_create_framebuffer(cru_test_t *t)
+{
+    if (t->def->no_image)
+        return;
+
+    create_attachment(t->device, VK_FORMAT_R8G8B8A8_UNORM,
+                      VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+                      VK_IMAGE_ASPECT_COLOR,
+                      t->width, t->height,
+                      &t->rt_image,
+                      &t->color_attachment_view,
+                      &t->color_texture_view);
+
+    t->framebuffer = qoCreateFramebuffer(t_device,
+        .attachmentCount = 1,
+        .pAttachments = (VkAttachmentBindInfo[]) {
+            {
+                .view = t->color_attachment_view,
+                .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+            },
+        },
+        .width = t->width,
+        .height = t->height);
+}
+
 static void *
 cru_test_start_main_thread(void *arg)
 {
@@ -973,44 +1050,7 @@ cru_test_start_main_thread(void *arg)
     vkCmdBindDynamicColorBlendState(t->cmd_buffer, t->dynamic_cb_state);
     vkCmdBindDynamicDepthStencilState(t->cmd_buffer, t->dynamic_ds_state);
 
-    if (!t->def->no_image) {
-        assert(t_width > 0);
-        assert(t_height > 0);
-
-        t->rt_image = qoCreateImage(t_device,
-            .format = VK_FORMAT_R8G8B8A8_UNORM,
-            .extent = {
-                .width = t_width,
-                .height = t_height,
-                .depth = 1,
-            },
-            .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
-
-        VkDeviceMemory rt_mem = qoAllocImageMemory(t->device, t->rt_image,
-            .memoryTypeIndex = t_mem_type_index_for_device_access);
-
-        qoBindImageMemory(t_device, t_image, rt_mem, /*offset*/ 0);
-
-        t->color_attachment_view = qoCreateAttachmentView(t_device,
-            .image = t->rt_image,
-            .format = VK_FORMAT_R8G8B8A8_UNORM);
-
-        t->color_texture_view = qoCreateImageView(t_device,
-            .image = t_image,
-            .viewType = VK_IMAGE_VIEW_TYPE_2D,
-            .format = VK_FORMAT_R8G8B8A8_UNORM);
-
-        t->framebuffer = qoCreateFramebuffer(t_device,
-            .attachmentCount = 1,
-            .pAttachments = (VkAttachmentBindInfo[]) {
-                {
-                    .view = t->color_attachment_view,
-                    .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                },
-            },
-            .width = t->width,
-            .height = t->height);
-    }
+    cru_test_create_framebuffer(t);
 
     t->phase = CRU_TEST_PHASE_MAIN;
     t->def->start();
