@@ -109,7 +109,7 @@ test(void)
                 QO_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS,
                 .depthTestEnable = true,
                 .depthWriteEnable = true,
-                .depthCompareOp = VK_COMPARE_OP_GREATER
+                .depthCompareOp = VK_COMPARE_OP_GREATER_EQUAL,
             },
             .flags = 0,
             .layout = QO_NULL_PIPELINE_LAYOUT,
