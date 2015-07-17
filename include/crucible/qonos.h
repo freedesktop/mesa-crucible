@@ -97,7 +97,7 @@ extern "C" {
 #define QO_NULL_INSTANCE                            ((VkInstance) {0})
 #define QO_NULL_QUEUE                               ((VkQueue) {0})
 
-#define QO NULL_ATTACHMENT_VIEW                     ((VkAttachmentView {0}))
+#define QO_NULL_ATTACHMENT_VIEW                     ((VkAttachmentView) {0})
 #define QO_NULL_BUFFER                              ((VkBuffer) {0})
 #define QO_NULL_BUFFER_VIEW                         ((VkBufferView) {0})
 #define QO_NULL_CMD_POOL                            ((VkCmdPool) {0})
