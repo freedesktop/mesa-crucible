@@ -28,39 +28,6 @@ test(void)
 {
     VkPipeline pipeline;
 
-    VkImage ds = qoCreateImage(t_device,
-        .format = VK_FORMAT_D24_UNORM,
-        .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_BIT,
-        .extent = {
-            .width = t_width,
-            .height = t_height,
-            .depth = 1,
-        });
-
-    VkDeviceMemory ds_mem = qoAllocImageMemory(t_device, ds,
-        .memoryTypeIndex = t_mem_type_index_for_device_access);
-
-    qoBindImageMemory(t_device, ds, ds_mem, /*offset*/ 0);
-
-    VkAttachmentView ds_view = qoCreateAttachmentView(t_device,
-        .image = ds,
-        .format = VK_FORMAT_D24_UNORM);
-
-    VkFramebuffer framebuffer = qoCreateFramebuffer(t_device,
-        .attachmentCount = 2,
-        .pAttachments = (VkAttachmentBindInfo[]) {
-            {
-                .view = t_color_attachment_view,
-                .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
-            },
-            {
-                .view = ds_view,
-                .layout = VK_IMAGE_LAYOUT_GENERAL,
-            },
-        },
-        .width = t_width,
-        .height = t_height);
-
     VkRenderPass pass = qoCreateRenderPass(t_device,
         .attachmentCount = 2,
         .pAttachments = (VkAttachmentDescription[]) {
@@ -182,7 +149,7 @@ test(void)
     vkCmdBeginRenderPass(t_cmd_buffer,
         &(VkRenderPassBeginInfo) {
             .renderPass = pass,
-            .framebuffer = framebuffer,
+            .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
             .attachmentCount = 2,
             .pAttachmentClearValues = (VkClearValue[]) {
@@ -207,5 +174,6 @@ test(void)
 
 cru_define_test {
     .name = "func.depthstencil.basic",
-    .start = test
+    .start = test,
+    .depthstencil_format = VK_FORMAT_D24_UNORM,
 };
