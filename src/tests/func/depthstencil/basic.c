@@ -23,9 +23,16 @@
 
 #include "basic-spirv.h"
 
+typedef struct test_params {
+    float depth_clear_value;
+    VkCompareOp depth_compare_op;
+} test_params_t;
+
 static void
 test(void)
 {
+    const test_params_t *params = t_user_data;
+
     VkPipeline pipeline;
 
     VkRenderPass pass = qoCreateRenderPass(t_device,
@@ -109,7 +116,7 @@ test(void)
                 QO_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS,
                 .depthTestEnable = true,
                 .depthWriteEnable = true,
-                .depthCompareOp = VK_COMPARE_OP_GREATER_EQUAL,
+                .depthCompareOp = params->depth_compare_op,
             },
             .flags = 0,
             .layout = QO_NULL_PIPELINE_LAYOUT,
@@ -154,7 +161,7 @@ test(void)
             .attachmentCount = 2,
             .pAttachmentClearValues = (VkClearValue[]) {
                 { .color = { .f32 = { 0.2, 0.2, 0.2, 1.0 } } },
-                { .ds = { .depth = 0.5 } },
+                { .ds = { .depth = params->depth_clear_value } },
             }
         }, VK_RENDER_PASS_CONTENTS_INLINE);
 
@@ -173,7 +180,41 @@ test(void)
 }
 
 cru_define_test {
-    .name = "func.depthstencil.basic",
+    .name = "func.depthstencil.basic-depth.clear-0.0.op-less",
     .start = test,
     .depthstencil_format = VK_FORMAT_D24_UNORM,
+    .user_data = &(test_params_t) {
+        .depth_compare_op = VK_COMPARE_OP_LESS,
+        .depth_clear_value = 0.0,
+    },
+};
+
+cru_define_test {
+    .name = "func.depthstencil.basic-depth.clear-0.0.op-greater",
+    .start = test,
+    .depthstencil_format = VK_FORMAT_D24_UNORM,
+    .user_data = &(test_params_t) {
+        .depth_compare_op = VK_COMPARE_OP_GREATER,
+        .depth_clear_value = 0.0,
+    },
+};
+
+cru_define_test {
+    .name = "func.depthstencil.basic-depth.clear-0.5.op-greater-equal",
+    .start = test,
+    .depthstencil_format = VK_FORMAT_D24_UNORM,
+    .user_data = &(test_params_t) {
+        .depth_clear_value = 0.5,
+        .depth_compare_op = VK_COMPARE_OP_GREATER_EQUAL,
+    },
+};
+
+cru_define_test {
+    .name = "func.depthstencil.basic-depth.clear-1.0.op-greater",
+    .start = test,
+    .depthstencil_format = VK_FORMAT_D24_UNORM,
+    .user_data = &(test_params_t) {
+        .depth_clear_value = 1.0,
+        .depth_compare_op = VK_COMPARE_OP_GREATER,
+    },
 };
