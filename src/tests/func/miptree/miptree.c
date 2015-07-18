@@ -57,11 +57,13 @@ typedef struct mipslice mipslice_t;
 
 enum miptree_upload_method {
     MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+    MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
     MIPTREE_UPLOAD_METHOD_RENDER,
 };
 
 enum miptree_download_method {
     MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
+    MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
     MIPTREE_DOWNLOAD_METHOD_RENDER,
 };
 
@@ -102,9 +104,13 @@ struct mipslice {
     VkImageView texture_view;
     VkAttachmentView color_view;
 
+    uint32_t buffer_offset;
+
+    VkImage src_vk_image;
+    VkImage dest_vk_image;
+
     cru_image_t *src_cru_image;
     cru_image_t *dest_cru_image;
-    uint32_t buffer_offset;
 };
 
 static const char *image512x512_filenames[] = {
@@ -303,6 +309,35 @@ miptree_create(void)
             void *src_pixels = src_buffer_map + buffer_offset;
             void *dest_pixels = dest_buffer_map + buffer_offset;
 
+            VkImage src_vk_image = qoCreateImage(t_device,
+                .format = format,
+                .mipLevels = 1,
+                .arraySize = 1,
+                .extent = {
+                    .width = level_width,
+                    .height = level_height,
+                    .depth = 1,
+                },
+                .tiling = VK_IMAGE_TILING_LINEAR,
+                .usage = VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT);
+
+            VkImage dest_vk_image = qoCreateImage(t_device,
+                .format = format,
+                .mipLevels = 1,
+                .arraySize = 1,
+                .extent = {
+                    .width = level_width,
+                    .height = level_height,
+                    .depth = 1,
+                },
+                .tiling = VK_IMAGE_TILING_LINEAR,
+                .usage = VK_IMAGE_USAGE_TRANSFER_DESTINATION_BIT);
+
+            qoBindImageMemory(t_device, src_vk_image, src_buffer_mem,
+                              buffer_offset);
+            qoBindImageMemory(t_device, dest_vk_image, dest_buffer_mem,
+                              buffer_offset);
+
             cru_image_t *src_image;
             cru_image_t *dest_image;
 
@@ -319,13 +354,19 @@ miptree_create(void)
             mt->slices[a * levels + l] = (mipslice_t) {
                 .texture_view = texture_view,
                 .color_view = color_view,
-                .src_cru_image = src_image,
-                .dest_cru_image = dest_image,
+
                 .level = l,
                 .array_slice = a,
                 .width = level_width,
                 .height = level_height,
+
                 .buffer_offset = buffer_offset,
+
+                .src_vk_image = src_vk_image,
+                .dest_vk_image = dest_vk_image,
+
+                .src_cru_image = src_image,
+                .dest_cru_image = dest_image,
             };
 
             adjust_mipslice_color(src_pixels, format,
@@ -397,6 +438,87 @@ miptree_download_copy_to_buffer(const miptree_t *mt)
 
         vkCmdCopyImageToBuffer(cmd, mt->image, VK_IMAGE_LAYOUT_GENERAL,
                                mt->dest_buffer, 1, &copy);
+    }
+
+    qoEndCommandBuffer(cmd);
+    vkQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
+}
+
+
+static void
+miptree_upload_copy_from_linear_image(const miptree_t *mt)
+{
+    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    qoBeginCommandBuffer(cmd);
+
+    for (uint32_t i = 0; i < mt->num_slices; ++i) {
+        const mipslice_t *slice = &mt->slices[i];
+
+        VkImageCopy copy = {
+            .srcSubresource = {
+                .aspect = VK_IMAGE_ASPECT_COLOR,
+                .mipLevel = 0,
+                .arraySlice = 0,
+            },
+            .srcOffset = { .x = 0, .y = 0, .z = 0 },
+
+            .destSubresource = {
+                .aspect = VK_IMAGE_ASPECT_COLOR,
+                .mipLevel = slice->level,
+                .arraySlice = slice->array_slice,
+            },
+            .destOffset = { .x = 0, .y = 0, .z = 0 },
+
+            .extent = {
+                .width = slice->width,
+                .height = slice->height,
+                .depth = 1,
+            },
+        };
+
+        vkCmdCopyImage(cmd, slice->src_vk_image, VK_IMAGE_LAYOUT_GENERAL,
+                       mt->image, VK_IMAGE_LAYOUT_GENERAL,
+                       1, &copy);
+    }
+
+    qoEndCommandBuffer(cmd);
+    vkQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
+}
+
+static void
+miptree_download_copy_to_linear_image(const miptree_t *mt)
+{
+    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    qoBeginCommandBuffer(cmd);
+
+    for (uint32_t i = 0; i < mt->num_slices; ++i) {
+        const mipslice_t *slice = &mt->slices[i];
+
+        VkImageCopy copy = {
+            .srcSubresource = {
+                .aspect = VK_IMAGE_ASPECT_COLOR,
+                .mipLevel = slice->level,
+                .arraySlice = slice->array_slice,
+            },
+            .srcOffset = { .x = 0, .y = 0, .z = 0 },
+
+            .destSubresource = {
+                .aspect = VK_IMAGE_ASPECT_COLOR,
+                .mipLevel = 0,
+                .arraySlice = 0,
+            },
+            .destOffset = { .x = 0, .y = 0, .z = 0 },
+
+            .extent = {
+                .width = slice->width,
+                .height = slice->height,
+                .depth = 1,
+            },
+        };
+
+        vkCmdCopyImage(cmd, mt->image, VK_IMAGE_LAYOUT_GENERAL,
+                       slice->dest_vk_image, VK_IMAGE_LAYOUT_GENERAL,
+                       1, &copy);
     }
 
     qoEndCommandBuffer(cmd);
@@ -782,6 +904,9 @@ miptree_upload(const miptree_t *mt)
     case MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER:
         miptree_upload_copy_from_buffer(mt);
         break;
+    case MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE:
+        miptree_upload_copy_from_linear_image(mt);
+        break;
     case MIPTREE_UPLOAD_METHOD_RENDER:
         miptree_upload_render(mt);
         break;
@@ -796,6 +921,9 @@ miptree_download(const miptree_t *mt)
     switch (params->download_method) {
     case MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER:
         miptree_download_copy_to_buffer(mt);
+        break;
+    case MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE:
+        miptree_download_copy_to_linear_image(mt);
         break;
     case MIPTREE_DOWNLOAD_METHOD_RENDER:
         miptree_download_render(mt);

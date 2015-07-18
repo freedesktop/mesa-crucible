@@ -32,8 +32,14 @@ params_iter = (
     for view in ('2d',)
     for levels in (1, 2)
     for array_length in (1, 2)
-    for upload_method in ('copy-from-buffer', 'render')
-    for download_method in ('copy-to-buffer', 'render')
+    for upload_method in (
+        'copy-from-buffer',
+        'copy-from-linear-image',
+        'render')
+    for download_method in (
+        'copy-to-buffer',
+        'copy-to-linear-image',
+        'render')
 )
 
 template = dedent("""
