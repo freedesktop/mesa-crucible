@@ -51,6 +51,7 @@
 
 #include "miptree-spirv.h"
 
+typedef struct cru_format_info cru_format_info_t;
 typedef struct test_params test_params_t;
 typedef struct miptree miptree_t;
 typedef struct mipslice mipslice_t;
@@ -78,14 +79,23 @@ struct test_params {
     enum miptree_download_method download_method;
 };
 
+// FINISHME: Move me to core Crucible.
+struct cru_format_info {
+    VkFormat format;
+    uint8_t num_channels;
+    uint8_t cpp;
+    bool has_color:1;
+    bool has_depth:1;
+    bool has_stencil:1;
+};
+
 struct miptree {
+    const cru_format_info_t *format_info;
+
     VkImage image;
 
     VkBuffer src_buffer;
     VkBuffer dest_buffer;
-
-    VkFormat format;
-    uint32_t cpp;
 
     uint32_t width;
     uint32_t height;
@@ -127,15 +137,46 @@ static const char *image512x512_filenames[] = {
     "mandrill-1x1.png",
 };
 
+// FINISHME: Move me to core Crucible.
+static const struct cru_format_info
+cru_format_info_table[] = {
+    {
+        .format = VK_FORMAT_R8G8B8A8_UNORM,
+        .num_channels = 4,
+        .cpp = 4,
+        .has_color = 1,
+    },
+    {
+        .format = VK_FORMAT_UNDEFINED,
+    },
+};
+
+// FINISHME: Move me to core Crucible.
+static const struct cru_format_info *
+cru_format_get_info(VkFormat format)
+{
+    const struct cru_format_info *info;
+
+    for (info = cru_format_info_table;
+         info->format != VK_FORMAT_UNDEFINED; ++info) {
+        if (info->format == format) {
+            return info;
+        }
+    }
+
+    t_failf("failed to find cru_format_info for VkFormat %d", format);
+}
+
 // Fill the pixels with a canary color.
 static void
-fill_rect_with_canary(void *pixels, VkFormat format,
+fill_rect_with_canary(void *pixels,
+                      const cru_format_info_t *format_info,
                       uint32_t width, uint32_t height)
 {
     static const float peach[] = {1.0, 0.4, 0.2, 1.0};
 
     // Maybe we'll want to test other formats in the future.
-    t_assert(format == VK_FORMAT_R8G8B8A8_UNORM);
+    t_assertf(format_info->format == VK_FORMAT_R8G8B8A8_UNORM, "FINISHME");
 
     for (uint32_t i = 0; i < width * height; ++i) {
         uint8_t *rgba = pixels + (4 * i);
@@ -150,7 +191,8 @@ fill_rect_with_canary(void *pixels, VkFormat format,
 /// Ensure that each mipslice's image is unique, and that each pair of images
 /// is easily distinguishable visually.
 static void
-adjust_mipslice_color(void *pixels, VkFormat format,
+adjust_mipslice_color(void *pixels,
+                      const cru_format_info_t *format_info,
                       uint32_t width, uint32_t height,
                       uint32_t level, uint32_t num_levels,
                       uint32_t layer, uint32_t num_layers)
@@ -158,8 +200,7 @@ adjust_mipslice_color(void *pixels, VkFormat format,
     float red_scale = 1.0f - (float) level / num_levels;
     float blue_scale = 1.0f - (float) layer / num_layers;
 
-    t_assertf(format == VK_FORMAT_R8G8B8A8_UNORM,
-              "FINISHME: format 0x%x", format);
+    t_assertf(format_info->format == VK_FORMAT_R8G8B8A8_UNORM, "FINISHME");
 
     for (uint32_t i = 0; i < width * height; ++i) {
         uint8_t *rgba = pixels + 4 * i;
@@ -212,7 +253,8 @@ miptree_create(void)
     t_assert(params->view_type == VK_IMAGE_VIEW_TYPE_2D);
 
     const VkFormat format = params->format;
-    const uint32_t cpp = 4;
+    const cru_format_info_t *format_info = cru_format_get_info(format);
+    const uint32_t cpp = format_info->cpp;
     const uint32_t levels = params->levels;
     const uint32_t width = params->width;
     const uint32_t height = params->height;
@@ -264,8 +306,7 @@ miptree_create(void)
     mt->image = image;
     mt->src_buffer = src_buffer;
     mt->dest_buffer = dest_buffer;
-    mt->format = format;
-    mt->cpp = cpp;
+    mt->format_info = format_info;
     mt->width = width;
     mt->height = height;
     mt->levels = levels;
@@ -349,7 +390,8 @@ miptree_create(void)
             dest_image = cru_image_from_pixels(dest_pixels, format,
                                                level_width, level_height);
             t_cleanup_push(dest_image);
-            fill_rect_with_canary(dest_pixels, format, level_width, level_height);
+            fill_rect_with_canary(dest_pixels, format_info,
+                                  level_width, level_height);
 
             mt->slices[a * levels + l] = (mipslice_t) {
                 .texture_view = texture_view,
@@ -369,7 +411,7 @@ miptree_create(void)
                 .dest_cru_image = dest_image,
             };
 
-            adjust_mipslice_color(src_pixels, format,
+            adjust_mipslice_color(src_pixels, format_info,
                                   level_width, level_height,
                                   l, levels, a, array_length);
 
@@ -526,8 +568,10 @@ miptree_download_copy_to_linear_image(const miptree_t *mt)
 }
 
 static void
-render_textures(VkFormat format, VkImageView *tex_views,
-                VkAttachmentView *color_views, VkExtent2D *extents,
+render_textures(const cru_format_info_t *format_info,
+                VkImageView *tex_views,
+                VkAttachmentView *color_views,
+                VkExtent2D *extents,
                 uint32_t count)
 {
     static const uint32_t num_vertices = 4;
@@ -538,6 +582,8 @@ render_textures(VkFormat format, VkImageView *tex_views,
          1,  1,
         -1,  1,
     };
+
+    const VkFormat format = format_info->format;
 
     VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
         layout(location = 0) in vec2 a_position;
@@ -750,7 +796,7 @@ miptree_upload_render(const miptree_t *mt)
         tex_views[i] = qoCreateImageView(t_device,
             .image = slice->src_vk_image,
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
-            .format = mt->format,
+            .format = mt->format_info->format,
             .channels = {
                 VK_CHANNEL_SWIZZLE_R,
                 VK_CHANNEL_SWIZZLE_G,
@@ -766,7 +812,7 @@ miptree_upload_render(const miptree_t *mt)
             });
     }
 
-    render_textures(mt->format, tex_views, color_views, extents,
+    render_textures(mt->format_info, tex_views, color_views, extents,
                     mt->num_slices);
 }
 
@@ -787,13 +833,13 @@ miptree_download_render(const miptree_t *mt)
 
         color_views[i] = qoCreateAttachmentView(t_device,
             .image = slice->dest_vk_image,
-            .format = mt->format,
+            .format = mt->format_info->format,
             .mipLevel = 0,
             .baseArraySlice = 0,
             .arraySize = 1);
     }
 
-    render_textures(mt->format, tex_views, color_views, extents,
+    render_textures(mt->format_info, tex_views, color_views, extents,
                     mt->num_slices);
 }
 
