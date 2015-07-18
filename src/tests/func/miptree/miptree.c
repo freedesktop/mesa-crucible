@@ -526,70 +526,6 @@ miptree_download_copy_to_linear_image(const miptree_t *mt)
 }
 
 static void
-miptree_copy_src_buffer_to_textures(const miptree_t *mt, VkImage *tex_images)
-{
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
-    qoBeginCommandBuffer(cmd);
-
-    for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        const mipslice_t *slice = &mt->slices[i];
-
-        VkBufferImageCopy copy = {
-            .bufferOffset = slice->buffer_offset,
-            .imageSubresource = {
-                .aspect = VK_IMAGE_ASPECT_COLOR,
-                .mipLevel = 0,
-                .arraySlice = 0,
-            },
-            .imageOffset = {.x = 0, .y = 0, .z = 0},
-            .imageExtent = {
-                .width = slice->width,
-                .height = slice->height,
-                .depth = 1,
-            },
-        };
-
-        vkCmdCopyBufferToImage(cmd, mt->src_buffer, tex_images[i],
-                               VK_IMAGE_LAYOUT_GENERAL, 1, &copy);
-    }
-
-    qoEndCommandBuffer(cmd);
-    qoQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
-}
-
-static void
-miptree_copy_textures_to_dest_buffer(const miptree_t *mt, VkImage *tex_images)
-{
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
-    qoBeginCommandBuffer(cmd);
-
-    for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        const mipslice_t *slice = &mt->slices[i];
-
-        VkBufferImageCopy copy = {
-            .bufferOffset = slice->buffer_offset,
-            .imageSubresource = {
-                .aspect = VK_IMAGE_ASPECT_COLOR,
-                .mipLevel = 0,
-                .arraySlice = 0,
-            },
-            .imageOffset = {.x = 0, .y = 0, .z = 0},
-            .imageExtent = {
-                .width = slice->width,
-                .height = slice->height,
-                .depth = 1,
-            },
-        };
-
-        vkCmdCopyImageToBuffer(cmd, tex_images[i], VK_IMAGE_LAYOUT_GENERAL,
-                               mt->dest_buffer, 1, &copy);
-    }
-
-    qoEndCommandBuffer(cmd);
-    qoQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
-}
-
-static void
 render_textures(VkFormat format, VkImageView *tex_views,
                 VkAttachmentView *color_views, VkExtent2D *extents,
                 uint32_t count)
@@ -797,41 +733,11 @@ render_textures(VkFormat format, VkImageView *tex_views,
 }
 
 static void
-miptree_create_tex_images(const miptree_t *mt, VkImage *tex_images)
-{
-    for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        const mipslice_t *slice = &mt->slices[i];
-
-        tex_images[i] = qoCreateImage(t_device,
-            .format = mt->format,
-            .mipLevels = 1,
-            .arraySize = 1,
-            .extent = {
-                .width = slice->width,
-                .height = slice->height,
-                .depth = 1,
-            },
-            .tiling = VK_IMAGE_TILING_OPTIMAL,
-            .usage = VK_IMAGE_USAGE_TRANSFER_DESTINATION_BIT |
-                     VK_IMAGE_USAGE_SAMPLED_BIT);
-
-        VkDeviceMemory tex_mem = qoAllocImageMemory(t_device, tex_images[i],
-            .memoryTypeIndex = t_mem_type_index_for_device_access);
-
-        qoBindImageMemory(t_device, tex_images[i], tex_mem, /*offset*/ 0);
-    }
-}
-
-static void
 miptree_upload_render(const miptree_t *mt)
 {
-    VkImage tex_images[mt->num_slices];
     VkImageView tex_views[mt->num_slices];
     VkAttachmentView color_views[mt->num_slices];
     VkExtent2D extents[mt->num_slices];
-
-    miptree_create_tex_images(mt, tex_images);
-    miptree_copy_src_buffer_to_textures(mt, tex_images);
 
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
         const mipslice_t *slice = &mt->slices[i];
@@ -842,7 +748,7 @@ miptree_upload_render(const miptree_t *mt)
         color_views[i] = slice->color_view;
 
         tex_views[i] = qoCreateImageView(t_device,
-            .image = tex_images[i],
+            .image = slice->src_vk_image,
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
             .format = mt->format,
             .channels = {
@@ -867,12 +773,9 @@ miptree_upload_render(const miptree_t *mt)
 static void
 miptree_download_render(const miptree_t *mt)
 {
-    VkImage tex_images[mt->num_slices];
     VkImageView tex_views[mt->num_slices];
     VkAttachmentView color_views[mt->num_slices];
     VkExtent2D extents[mt->num_slices];
-
-    miptree_create_tex_images(mt, tex_images);
 
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
         const mipslice_t *slice = &mt->slices[i];
@@ -883,7 +786,7 @@ miptree_download_render(const miptree_t *mt)
         tex_views[i] = slice->texture_view;
 
         color_views[i] = qoCreateAttachmentView(t_device,
-            .image = tex_images[i],
+            .image = slice->dest_vk_image,
             .format = mt->format,
             .mipLevel = 0,
             .baseArraySlice = 0,
@@ -892,7 +795,6 @@ miptree_download_render(const miptree_t *mt)
 
     render_textures(mt->format, tex_views, color_views, extents,
                     mt->num_slices);
-    miptree_copy_textures_to_dest_buffer(mt, tex_images);
 }
 
 static void
