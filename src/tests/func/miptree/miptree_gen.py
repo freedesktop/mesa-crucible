@@ -24,11 +24,12 @@
 from textwrap import dedent
 from collections import namedtuple
 
-Params = namedtuple('Params', ('view', 'levels', 'array_length',
+Params = namedtuple('Params', ('format', 'view', 'levels', 'array_length',
                     'upload', 'download'))
 
 params_iter = (
-    Params(view, levels, array_length, upload_method, download_method)
+    Params(format, view, levels, array_length, upload_method, download_method)
+    for format in (('r8g8b8a8-unorm', 'VK_FORMAT_R8G8B8A8_UNORM'),)
     for view in ('2d',)
     for levels in (1, 2)
     for array_length in (1, 2)
@@ -45,11 +46,13 @@ params_iter = (
 template = dedent("""
     cru_define_test {{
         .name = "func.miptree"
+                ".{format[0]}"
                 ".view-{view}.levels{levels:02}.array{array_length:02}"
                 ".upload-{upload}.download-{download}",
         .start = test,
         .no_image = true,
         .user_data = &(test_params_t) {{
+            .format = {format[1]},
             .view_type = VK_IMAGE_VIEW_TYPE_{view_caps},
             .levels = {levels},
             .width = 512,
@@ -95,6 +98,7 @@ def main():
 
         for p in params_iter:
             test_def = template.format(
+                format = p.format,
                 view = p.view,
                 levels = p.levels,
                 array_length = p.array_length,

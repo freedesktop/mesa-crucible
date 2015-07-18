@@ -68,6 +68,7 @@ enum miptree_download_method {
 };
 
 struct test_params {
+    VkFormat format;
     VkImageViewType view_type;
     uint32_t levels;
     uint32_t width;
@@ -210,9 +211,8 @@ miptree_create(void)
     /* FINISHME: 1D, 1D array, cube map, and 3D textures */
     t_assert(params->view_type == VK_IMAGE_VIEW_TYPE_2D);
 
-    const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
+    const VkFormat format = params->format;
     const uint32_t cpp = 4;
-
     const uint32_t levels = params->levels;
     const uint32_t width = params->width;
     const uint32_t height = params->height;
@@ -669,7 +669,7 @@ render_textures(VkFormat format, VkImageView *tex_views,
             .pAttachments = (VkAttachmentDescription[]) {
                 {
                     QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
-                    .format = VK_FORMAT_R8G8B8A8_UNORM
+                    .format = format,
                 },
             },
             .subpassCount = 1,
