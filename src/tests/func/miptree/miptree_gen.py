@@ -32,8 +32,8 @@ params_iter = (
     for view in ('2d',)
     for levels in (1, 2)
     for array_length in (1, 2)
-    for upload_method in ('copy', 'render')
-    for download_method in ('copy', 'render')
+    for upload_method in ('copy-from-buffer', 'render')
+    for download_method in ('copy-to-buffer', 'render')
 )
 
 template = dedent("""
@@ -78,6 +78,9 @@ copyright = dedent("""\
     // IN THE SOFTWARE.
     """)
 
+def to_caps(s):
+    return s.upper().replace('-', '_')
+
 def main():
     out_filename = __file__.replace('.py', '.c')
 
@@ -91,9 +94,9 @@ def main():
                 array_length = p.array_length,
                 upload = p.upload,
                 download = p.download,
-                view_caps = p.view.upper().replace('-', '_'),
-                upload_caps = p.upload.upper(),
-                download_caps = p.download.upper())
+                view_caps = to_caps(p.view),
+                upload_caps = to_caps(p.upload),
+                download_caps = to_caps(p.download))
             out_file.write(test_def)
 
 main()

@@ -56,12 +56,12 @@ typedef struct miptree miptree_t;
 typedef struct mipslice mipslice_t;
 
 enum miptree_upload_method {
-    MIPTREE_UPLOAD_METHOD_COPY,
+    MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
     MIPTREE_UPLOAD_METHOD_RENDER,
 };
 
 enum miptree_download_method {
-    MIPTREE_DOWNLOAD_METHOD_COPY,
+    MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
     MIPTREE_DOWNLOAD_METHOD_RENDER,
 };
 
@@ -340,7 +340,7 @@ miptree_create(void)
 }
 
 static void
-miptree_upload_with_copy(const miptree_t *mt)
+miptree_upload_copy_from_buffer(const miptree_t *mt)
 {
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
@@ -372,7 +372,7 @@ miptree_upload_with_copy(const miptree_t *mt)
 }
 
 static void
-miptree_download_with_copy(const miptree_t *mt)
+miptree_download_copy_to_buffer(const miptree_t *mt)
 {
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
@@ -701,7 +701,7 @@ miptree_create_tex_images(const miptree_t *mt, VkImage *tex_images)
 }
 
 static void
-miptree_upload_with_render(const miptree_t *mt)
+miptree_upload_render(const miptree_t *mt)
 {
     VkImage tex_images[mt->num_slices];
     VkImageView tex_views[mt->num_slices];
@@ -743,7 +743,7 @@ miptree_upload_with_render(const miptree_t *mt)
 }
 
 static void
-miptree_download_with_render(const miptree_t *mt)
+miptree_download_render(const miptree_t *mt)
 {
     VkImage tex_images[mt->num_slices];
     VkImageView tex_views[mt->num_slices];
@@ -779,11 +779,11 @@ miptree_upload(const miptree_t *mt)
     const test_params_t *params = t_user_data;
 
     switch (params->upload_method) {
-    case MIPTREE_UPLOAD_METHOD_COPY:
-        miptree_upload_with_copy(mt);
+    case MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER:
+        miptree_upload_copy_from_buffer(mt);
         break;
     case MIPTREE_UPLOAD_METHOD_RENDER:
-        miptree_upload_with_render(mt);
+        miptree_upload_render(mt);
         break;
     }
 }
@@ -794,11 +794,11 @@ miptree_download(const miptree_t *mt)
     const test_params_t *params = t_user_data;
 
     switch (params->download_method) {
-    case MIPTREE_DOWNLOAD_METHOD_COPY:
-        miptree_download_with_copy(mt);
+    case MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER:
+        miptree_download_copy_to_buffer(mt);
         break;
     case MIPTREE_DOWNLOAD_METHOD_RENDER:
-        miptree_download_with_render(mt);
+        miptree_download_render(mt);
         break;
     }
 }
