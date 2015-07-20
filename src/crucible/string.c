@@ -368,15 +368,6 @@ path_is_abs(const string_t *path)
 }
 
 void
-path_get_abs(string_t *dest, const string_t *path)
-{
-    if (path_is_abs(path)) {
-        string_copy(dest, path);
-        return;
-    }
-}
-
-void
 path_append(string_t *dest, const string_t *tail)
 {
     path_append_raw(dest, string_data(tail), tail->len);
