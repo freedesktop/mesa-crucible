@@ -65,8 +65,8 @@ cru_png_image_read_file_info(FILE *file, const char *debug_filename,
     png_structp png_reader = NULL;
     png_infop png_info = NULL;
 
-    assert(file >= 0);
-    assert(debug_filename);
+    assert(file != NULL);
+    assert(debug_filename != NULL);
 
     // FINISHME: Error callbacks for libpng
     png_reader = png_create_read_struct(PNG_LIBPNG_VER_STRING,
