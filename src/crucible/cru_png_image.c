@@ -40,6 +40,7 @@ struct cru_png_image {
 
     /// Value is one of PNG_COLOR_TYPE_*.
     uint8_t png_color_type;
+    uint8_t png_bit_depth;
 
     struct {
         /// When mapping the cru_png_image for reading, we decode the file into
@@ -58,6 +59,7 @@ struct cru_png_image {
 static bool
 cru_png_image_read_file_info(FILE *file, const char *debug_filename,
                              uint8_t *out_png_color_type,
+                             uint8_t *out_bit_depth,
                              uint32_t *out_width,
                              uint32_t *out_height)
 {
@@ -99,6 +101,7 @@ cru_png_image_read_file_info(FILE *file, const char *debug_filename,
     }
 
     *out_png_color_type = color_type;
+    *out_bit_depth = bit_depth;
     *out_width = png_get_image_width(png_reader, png_info);
     *out_height = png_get_image_height(png_reader, png_info);
 
@@ -271,6 +274,7 @@ cru_png_image_load_file(const char *filename)
     char *abs_filename = NULL;
     FILE *file = NULL;
     uint8_t png_color_type; // PNG_COLOR_TYPE_*
+    uint8_t png_bit_depth;
     uint32_t width, height;
 
     abs_filename = cru_image_get_abspath(filename);
@@ -283,7 +287,8 @@ cru_png_image_load_file(const char *filename)
         goto fail_fopen;
     }
 
-    if (!cru_png_image_read_file_info(file, filename, &png_color_type,
+    if (!cru_png_image_read_file_info(file, filename,
+                                      &png_color_type, &png_bit_depth,
                                       &width, &height)) {
         goto fail_read_file;
     }
