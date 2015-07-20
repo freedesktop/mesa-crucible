@@ -56,6 +56,7 @@ struct cru_format_info {
     VkFormat stencil_format;
 
     bool is_color:1;
+    bool has_alpha:1;
 };
 
 /// \brief Lookup info for VkFormat.

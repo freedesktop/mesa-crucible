@@ -31,6 +31,7 @@ cru_format_info_table[] = {
         .num_channels = 4,
         .cpp = 4,
         .is_color = true,
+        .has_alpha = true,
     },
     {
         FMT(VK_FORMAT_D32_SFLOAT),
