@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <crucible/cru_format.h>
 #include <crucible/cru_image.h>
 #include <crucible/cru_refcount.h>
 
@@ -31,8 +32,7 @@ enum cru_image_type {
 };
 
 struct cru_image {
-   uint32_t format;
-   uint32_t cpp;
+   const cru_format_info_t *format_info;
    uint32_t width;
    uint32_t height;
    bool read_only;

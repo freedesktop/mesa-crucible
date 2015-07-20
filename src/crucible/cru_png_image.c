@@ -118,7 +118,7 @@ cru_png_image_copy_to_pixels(cru_image_t *image, cru_image_t *dest)
 
     const uint32_t width = image->width;
     const uint32_t height = image->height;
-    const uint32_t stride = width * image->cpp;
+    const uint32_t stride = width * image->format_info->cpp;
     uint8_t *dest_pixels = NULL;
     uint8_t *dest_rows[height];
 
@@ -153,7 +153,7 @@ cru_png_image_copy_to_pixels(cru_image_t *image, cru_image_t *dest)
     png_read_info(png_reader, png_info);
 
     // Transform the file's pixel format to the crucible image's pixel format.
-    assert(kpng_image->image.format == VK_FORMAT_R8G8B8A8_UNORM);
+    assert(kpng_image->image.format_info->format == VK_FORMAT_R8G8B8A8_UNORM);
     switch (kpng_image->png_color_type) {
     case PNG_COLOR_TYPE_RGB:
         png_set_add_alpha(png_reader, UINT32_MAX, PNG_FILLER_AFTER);
@@ -208,8 +208,9 @@ cru_png_image_map_pixels(cru_image_t *image, uint32_t access)
         return kpng_image->map.pixels;
     }
 
-    pixels = xmalloc(image->cpp * width * height);
-    pixel_image = cru_image_from_pixels(pixels, image->format, width, height);
+    pixels = xmalloc(image->format_info->cpp * width * height);
+    pixel_image = cru_image_from_pixels(pixels, image->format_info->format,
+                                        width, height);
     if (!pixel_image)
         goto fail;
 

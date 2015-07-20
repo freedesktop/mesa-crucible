@@ -136,20 +136,19 @@ cru_image_get_height(cru_image_t *image)
 VkFormat
 cru_image_get_format(cru_image_t *image)
 {
-    return image->format;
+    return image->format_info->format;
 }
 
 bool
 cru_image_init(cru_image_t *image, enum cru_image_type type,
-                VkFormat format, uint32_t width, uint32_t height,
-                bool read_only)
+               VkFormat format, uint32_t width, uint32_t height,
+               bool read_only)
 {
     cru_refcount_init(&image->refcount);
 
-    if (format != VK_FORMAT_R8G8B8A8_UNORM) {
-        // FINISHME: Maybe one day we'll want to support more formats.
-        cru_loge("cannot create crucible image with unsupported "
-                "format=0x%x", format);
+    image->format_info = cru_format_get_info(format);
+    if (!image->format_info) {
+        cru_loge("cannot crucible image with VkFormat %d", format);
         return false;
     }
 
@@ -163,8 +162,6 @@ cru_image_init(cru_image_t *image, enum cru_image_type type,
         return false;
     }
 
-    image->format = format;
-    image->cpp = 4; // RGBA8
     image->width = width;
     image->height = height;
     image->type = type;
@@ -182,12 +179,10 @@ cru_image_check_compatible(const char *func,
         return false;
     }
 
-    if (a->format != b->format) {
+    if (a->format_info != b->format_info) {
         // Maybe one day we'll want to support more formats.
         cru_loge("%s: image formats differ", func);
         return false;
-    } else {
-        assert(a->cpp == b->cpp);
     }
 
     if (a->width != b->width) {
@@ -200,7 +195,7 @@ cru_image_check_compatible(const char *func,
         return false;
     }
 
-    if (a->format != b->format) {
+    if (a->format_info != b->format_info) {
         cru_loge("%s: image formats differ", func);
         return false;
     }
@@ -224,7 +219,7 @@ cru_image_write_file(cru_image_t *image, const char *filename)
     char *abspath = NULL;
     const uint32_t src_width = image->width;
     const uint32_t src_height = image->height;
-    const uint32_t src_stride = image->cpp * src_width;
+    const uint32_t src_stride = image->format_info->cpp * src_width;
     uint8_t *src_pixels = NULL;
     uint8_t *src_rows[src_height];
 
@@ -313,7 +308,7 @@ cru_image_copy_pixels_to_pixels(cru_image_t *dest, cru_image_t *src)
 
     // src and dest must have the same size. Should be checked earlier with
     // cru_image_check_compatible().
-    image_size = src->cpp * src->width * src->height;
+    image_size = src->format_info->cpp * src->width * src->height;
 
     memcpy(dest, src, image_size);
     result = true;
@@ -374,12 +369,10 @@ cru_image_compare_rect(cru_image_t *a, uint32_t a_x, uint32_t a_y,
     if (a == b)
         return true;
 
-    if (a->format != b->format) {
+    if (a->format_info != b->format_info) {
         // Maybe one day we'll want to support more formats.
         cru_loge("%s: image formats differ", __func__);
         goto cleanup;
-    } else {
-        assert(a->cpp == b->cpp);
     }
 
     if (a_x + width > a->width || a_y + height > a->height ||
@@ -388,7 +381,7 @@ cru_image_compare_rect(cru_image_t *a, uint32_t a_x, uint32_t a_y,
         goto cleanup;
     }
 
-    const uint32_t cpp = a->cpp;
+    const uint32_t cpp = a->format_info->cpp;
     const uint32_t row_size = cpp * width;
     const uint32_t a_stride = cpp * a->width;
     const uint32_t b_stride = cpp * b->width;
