@@ -29,13 +29,14 @@
 #include <crucible/string.h>
 #include <crucible/xalloc.h>
 
-char string_dummy[1] = {0};
+#define STRING_INIT_CAPACITY 64
 
 void
 string_finish(string_t *s)
 {
-    if (!string_is_ro(s))
-        free(s->buf);
+    if (!s->is_short) {
+        free(s->long_buf.data);
+    }
 }
 
 string_t * cru_malloclike
@@ -57,11 +58,24 @@ string_free(string_t *s)
 }
 
 void
+string_make_long(string_t *s)
+{
+    char *new_data;
+
+    if (!s->is_short)
+        return;
+
+    new_data = xzalloc(STRING_INIT_CAPACITY);
+    memcpy(new_data, s->short_buf.data, s->len + 1);
+
+    s->is_short = false;
+    s->long_buf.data = new_data;
+    s->long_buf.cap = STRING_INIT_CAPACITY;
+}
+
+void
 string_truncate(string_t *s, size_t len)
 {
-    if (string_is_ro(s))
-        string_copy_raw(s, s->buf, s->len);
-
     if (s->len < len)
         return;
 
@@ -71,38 +85,43 @@ string_truncate(string_t *s, size_t len)
 void
 string_attach(string_t *s, char *cstr, size_t len, size_t cap)
 {
-    if (!string_is_ro(s)) {
-        free(s->buf);
-    }
+    string_finish(s);
 
-    s->buf = cstr;
+    s->is_short = false;
     s->len = len;
-    s->cap = cap;
-}
-
-void
-string_attach_ro(string_t *s, char *cstr, size_t len)
-{
-    string_attach(s, cstr, len, 0);
+    s->long_buf.data = cstr;
+    s->long_buf.cap = cap;
 }
 
 char *
 string_detach(string_t *s)
 {
-    char *cstr = s->buf;
+    char *cstr;
+
+    string_make_long(s);
+    cstr = s->long_buf.data;
     string_init(s);
+    assert(s->is_short);
+
     return cstr;
 }
 
 void
 string_grow_to_len(string_t *s, size_t len)
 {
-    static const size_t initial_capacity = 64;
-    const size_t old_cap = s->cap;
+    size_t old_cap;
     size_t new_cap = len + 1;
 
-    if (new_cap == 0) {
-        new_cap = initial_capacity;
+    if (s->is_short) {
+        old_cap = sizeof(s->short_buf.data);
+    } else {
+        old_cap = s->long_buf.cap;
+    }
+
+    if (new_cap <= old_cap) {
+        return;
+    } else {
+        new_cap = MAX(STRING_INIT_CAPACITY, new_cap);
     }
 
     // Round up new_cap to a power of 2.
@@ -122,19 +141,21 @@ string_grow_to_len(string_t *s, size_t len)
     }
 
     if (old_cap < new_cap) {
-        if (string_is_ro(s)) {
-            const char *const old_buf = s->buf;
-            char *new_buf = xzalloc(new_cap);
-            memcpy(new_buf, old_buf, s->len);
-            new_buf[s->len] = 0;
-            s->buf = new_buf;
-        } else {
-            s->buf = xrealloc(s->buf, new_cap);
-            // Be safe! Zero-fill the newly allocated bytes.
-            memset(s->buf + old_cap, 0, new_cap - old_cap);
-        }
+        if (s->is_short) {
+            char *new_data = xzalloc(new_cap);
+            memcpy(new_data, s->short_buf.data, s->len);
 
-        s->cap = new_cap;
+            s->is_short = false;
+            s->long_buf.data = new_data;
+            s->long_buf.data[s->len] = 0;
+            s->long_buf.cap = new_cap;
+        } else {
+            s->long_buf.data = xrealloc(s->long_buf.data, new_cap);
+            s->long_buf.cap = new_cap;
+
+            // Be safe! Zero-fill the newly allocated bytes.
+            memset(s->long_buf.data + old_cap, 0, new_cap - old_cap);
+        }
     }
 }
 
@@ -147,7 +168,7 @@ string_grow(string_t *s, size_t len)
 void
 string_append(string_t *s, const string_t *tail)
 {
-    string_append_raw(s, tail->buf, tail->len);
+    string_append_raw(s, string_data(tail), tail->len);
 }
 
 void
@@ -160,7 +181,7 @@ void
 string_append_raw(string_t *s, const void *restrict src, size_t len)
 {
     string_grow(s, len);
-    memcpy(s->buf + s->len, src, len);
+    memcpy(string_data(s) + s->len, src, len);
     string_set_len(s, s->len + len);
 }
 
@@ -168,14 +189,14 @@ void
 string_append_char(string_t *s, char c)
 {
     string_grow(s, 1);
-    s->buf[s->len] = c;
+    string_data(s)[s->len] = c;
     string_set_len(s, s->len + 1);
 }
 
 void
 string_copy(string_t *dest, const string_t *src)
 {
-    string_copy_raw(dest, src->buf, src->len);
+    string_copy_raw(dest, string_data(src), src->len);
 }
 
 void
@@ -188,14 +209,14 @@ void
 string_copy_raw(string_t *dest, const void *restrict src, size_t len)
 {
     string_grow_to_len(dest, len);
-    memcpy(dest->buf, src, len);
+    memcpy(string_data(dest), src, len);
     string_set_len(dest, len);
 }
 
 int
 string_cmp(const string_t *a, const string_t *b)
 {
-    int cmp = memcmp(a->buf, b->buf, MIN(a->len, b->len));
+    int cmp = memcmp(string_data(a), string_data(b), MIN(a->len, b->len));
 
     if (cmp != 0) {
         return cmp;
@@ -212,13 +233,13 @@ string_startswith_raw(const string_t *s, const char *head, size_t head_len)
     if (s->len < head_len)
         return false;
     else
-        return !memcmp(s->buf, head, head_len);
+        return !memcmp(string_data(s), head, head_len);
 }
 
 bool
 string_startswith(const string_t *s, const string_t *head)
 {
-    return string_startswith_raw(s, head->buf, head->len);
+    return string_startswith_raw(s, string_data(head), head->len);
 }
 
 bool
@@ -233,13 +254,13 @@ string_endswith_raw(const string_t *s, const char *tail, size_t tail_len)
     if (s->len < tail_len)
         return false;
     else
-        return !memcmp(s->buf + (s->len - tail_len), tail, tail_len);
+        return !memcmp(string_data(s) + (s->len - tail_len), tail, tail_len);
 }
 
 bool
 string_endswith(const string_t *s, const string_t *tail)
 {
-    return string_endswith_raw(s, tail->buf, tail->len);
+    return string_endswith_raw(s, string_data(tail), tail->len);
 }
 
 bool
@@ -251,8 +272,10 @@ string_endswith_cstr(const string_t *s, const char *tail)
 int64_t
 string_rfind_char(const string_t *s, char c)
 {
+    const char *data = string_data(s);
+
     for (int64_t i = s->len - 1; i >= 0; --i) {
-        if (s->buf[i] == c) {
+        if (data[i] == c) {
             return i;
         }
     }
@@ -274,9 +297,14 @@ string_rfind_char(const string_t *s, char c)
 void
 string_rstrip_char(string_t *s, char c)
 {
-    while (s->len > 0 && s->buf[s->len - 1] == c) {
-        string_set_len(s, s->len - 1);
+    const char *data = string_data(s);
+    ssize_t new_len = s->len;
+
+    while (new_len > 0 && data[new_len - 1] == c) {
+        --new_len;
     }
+
+    string_set_len(s, new_len);
 }
 
 /// Like sprintf, but resized the string as needed.
@@ -324,7 +352,8 @@ string_vappendf(string_t *s, const char *format, va_list va)
 
     string_grow(s, len);
 
-    if (vsnprintf(s->buf + s->len, s->cap, format, va) != len) {
+    if (vsnprintf(string_data(s) + s->len,
+                  string_capacity(s), format, va) != len) {
         cru_loge("vsnprintf failed");
         abort();
     }
@@ -335,7 +364,7 @@ string_vappendf(string_t *s, const char *format, va_list va)
 bool
 path_is_abs(const string_t *path)
 {
-    return path->buf[0] == '/';
+    return string_data(path)[0] == '/';
 }
 
 void
@@ -350,7 +379,7 @@ path_get_abs(string_t *dest, const string_t *path)
 void
 path_append(string_t *dest, const string_t *tail)
 {
-    path_append_raw(dest, tail->buf, tail->len);
+    path_append_raw(dest, string_data(tail), tail->len);
 }
 
 void

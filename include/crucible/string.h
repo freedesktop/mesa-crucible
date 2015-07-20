@@ -22,6 +22,8 @@
 #pragma once
 
 #include <assert.h>
+#include <endian.h>
+#include <limits.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -34,52 +36,107 @@ extern "C" {
 
 typedef struct string string_t;
 
+/// The string has a "short" and "long" layout. In the short layout, the
+/// string's character array is embedded in the struct. In the long layout, the
+/// character array is allocated separately.
+///
+/// The short layout exists mainly not to increase performance but:
+///   * To ensure that statically initialized strings are always valid, and
+///   * To allow static initialization of non-empty strings.
+///
 struct string {
-    char *buf;
-
+#if BYTE_ORDER == LITTLE_ENDIAN
     /// Length of string. Agrees with strlen().
-    size_t len;
+    size_t len:(CHAR_BIT * sizeof(size_t) - 1);
 
-    /// Total allocated size of \ref data.
-    size_t cap;
+    bool is_short:1;
+#else
+#   error untested endianness
+#endif
+
+    union {
+        /// If the string is "short", then short_buf::data holds
+        /// a null-terminated string.
+        struct {
+            char data[3 * sizeof(void*)];
+        } short_buf;
+
+        /// If the string is "long", then long_buf::data holds
+        /// a null-terminated string whose allocated size is long_buf::cap;
+        struct {
+            char *data;
+            size_t cap;
+        } long_buf;
+    };
 };
 
-extern char string_dummy[1];
+/// Statically initialize as a "short" string.
+#define STRING_INIT_SHORT(__str_literal) \
+    (string_t) { \
+        .len = sizeof(__str_literal) - 1, \
+        .is_short = true, \
+        .short_buf.data = {(__str_literal)}, \
+    }
 
-/// Statically initialize to the dummy string.
-#define STRING_INIT ((string_t) {.buf = string_dummy})
+/// Statically initialize as a "short" empty string.
+#define STRING_INIT STRING_INIT_SHORT("")
 
-/// Is the string read-only?
-static inline bool
-string_is_ro(const string_t *s)
-{
-    return s->cap == 0;
-}
-
-/// Initialize to the dummy string.
+/// Initialize to an empty string.
 static inline void
 string_init(string_t *s)
 {
     *s = STRING_INIT;
-    assert(string_is_ro(s));
 }
+
+static inline size_t
+string_capacity(const string_t *s)
+{
+    if (s->is_short) {
+        return sizeof(s->short_buf.data);
+    } else {
+        return s->long_buf.cap;
+    }
+}
+
+static inline char *
+__string_data(string_t *s)
+{
+    if (s->is_short) {
+        return s->short_buf.data;
+    } else {
+        return s->long_buf.data;
+    }
+}
+
+static inline const char *
+__string_data_const(const string_t *s)
+{
+    if (s->is_short) {
+        return s->short_buf.data;
+    } else {
+        return s->long_buf.data;
+    }
+}
+
+#define string_data(s) \
+    _Generic((s), \
+        const string_t *: __string_data_const, \
+        string_t *: __string_data \
+    )(s)
 
 static inline void
 string_set_len(string_t *s, size_t len)
 {
-    if (s->buf == string_dummy) {
-        assert(len == 0);
-        return;
-    }
+    assert(len < string_capacity(s));
 
-    assert(len < s->cap);
     s->len = len;
-    s->buf[s->len] = 0;
+    string_data(s)[s->len] = 0;
 }
 
 void string_finish(string_t *s);
 string_t *string_new(void) cru_malloclike;
 void string_free(string_t *s);
+void string_make_long(string_t *s);
 void string_truncate(string_t *s, size_t len);
 void string_attach(string_t *s, char *cstr, size_t len, size_t cap);
 void string_attach_ro(string_t *s, char *cstr, size_t len);

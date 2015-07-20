@@ -93,7 +93,7 @@ cru_command_page_help(const cru_command_t *cmd)
     string_append_cstr(&help_path, ".1");
 
     struct stat help_stat;
-    err = stat(help_path.buf, &help_stat);
+    err = stat(string_data(&help_path), &help_stat);
     if (err) {
         int stat_errno = errno;
         switch (stat_errno) {
@@ -101,13 +101,14 @@ cru_command_page_help(const cru_command_t *cmd)
             cru_loge("no help text for crucible-%s", cmd->name);
             exit(1);
         default:
-            cru_loge("failed to read help text at %s", help_path.buf);
+            cru_loge("failed to read help text at %s",
+                     string_data(&help_path));
             cru_loge("%s", strerror(stat_errno));
             exit(1);
         }
     }
 
-    char *man_args[] = {"man", "--local-file", help_path.buf, NULL};
+    char *man_args[] = {"man", "--local-file", string_data(&help_path), NULL};
 
     err = execvp(man_args[0], man_args);
     if (err) {

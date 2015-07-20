@@ -172,7 +172,7 @@ cru_test_load_image_file(void)
     assert(!t->def->no_image);
     assert(t->ref_image_filename.len > 0);
 
-    t->image = cru_image_load_file(t->ref_image_filename.buf);
+    t->image = cru_image_load_file(string_data(&t->ref_image_filename));
     t_assert(t->image);
 
     t_cleanup_push(t->image);
@@ -557,7 +557,7 @@ t_dump_seq_image(cru_image_t *image)
 
     string_t filename = STRING_INIT;
     string_printf(&filename, "%s.seq%04lu.png", t_name, seq);
-    cru_image_write_file(image, filename.buf);
+    cru_image_write_file(image, string_data(&filename));
 }
 
 void cru_printflike(2, 3)
@@ -583,7 +583,7 @@ t_dump_image_fv(cru_image_t *image, const char *format, va_list va)
     string_append_char(&filename, '.');
     string_vappendf(&filename, format, va);
 
-    cru_image_write_file(image, filename.buf);
+    cru_image_write_file(image, string_data(&filename));
 }
 
 const cru_format_info_t *
@@ -656,7 +656,8 @@ t_compare_image(void)
 
     if (t->bootstrap) {
         assert(!t->image);
-        t_assert(cru_image_write_file(actual_image, t->ref_image_filename.buf));
+        t_assert(cru_image_write_file(actual_image,
+                                      string_data(&t->ref_image_filename)));
         t_pass();
     }
 
@@ -674,7 +675,7 @@ t_compare_image(void)
         path_append_cstr(&actual_path, "data");
         path_append_cstr(&actual_path, t_name);
         string_append_cstr(&actual_path, ".actual.png");
-        cru_image_write_file(actual_image, actual_path.buf);
+        cru_image_write_file(actual_image, string_data(&actual_path));
 
         t_fail_silent();
     }
@@ -719,7 +720,7 @@ __t_skipfv(const char *file, int line, const char *format, va_list va)
         string_vappendf(&s, format, va);
     }
 
-    cru_logi(s.buf);
+    cru_logi(string_data(&s));
     string_finish(&s);
 
     __t_skip_silent();
@@ -762,7 +763,7 @@ __t_failfv(const char *file, int line, const char *format, va_list va)
         string_vappendf(&s, format, va);
     }
 
-    cru_loge(s.buf);
+    cru_loge(string_data(&s));
     string_finish(&s);
 
     __t_fail_silent();
@@ -808,7 +809,7 @@ __t_assertfv(const char *file, int line, bool cond, const char *cond_string,
         string_t s = STRING_INIT;
         string_appendf(&s, "%s:%d: ", file, line);
         string_vappendf(&s, format, va);
-        cru_loge(s.buf);
+        cru_loge(string_data(&s));
         string_finish(&s);
     }
 

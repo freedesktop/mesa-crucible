@@ -351,11 +351,11 @@ cru_png_image_write_file(cru_image_t *image, const string_t *filename)
 
     if (!string_endswith_cstr(filename, ".png")) {
         cru_loge("%s: filename does have '.png' extension: %s",
-                 __func__, filename->buf);
+                 __func__, string_data(filename));
         return false;
     }
 
-    abspath = cru_image_get_abspath(filename->buf);
+    abspath = cru_image_get_abspath(string_data(filename));
     if (!abspath)
         goto fail_get_abspath;
 

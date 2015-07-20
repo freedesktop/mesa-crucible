@@ -50,7 +50,7 @@ cru_image_get_abspath(const char *filename)
         path_append_cstr(&abspath, filename);
     }
 
-    return abspath.buf;
+    return string_detach(&abspath);
 }
 
 void
