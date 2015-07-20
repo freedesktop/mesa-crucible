@@ -57,6 +57,7 @@ extern "C" {
 #include <crucible/cru_cleanup.h>
 #include <crucible/cru_macros.h>
 
+typedef struct cru_format_info cru_format_info_t;
 typedef struct cru_test_def cru_test_def_t;
 
 typedef enum cru_test_result {
@@ -173,6 +174,11 @@ void t_dump_image_f(cru_image_t *image, const char *format, ...)
 
 /// \copydoc t_image_dump_f()
 void t_dump_image_fv(cru_image_t *image, const char *format, va_list va);
+
+/// \brief Lookup info for VkFormat.
+///
+/// If Crucible does not have info for the given format, then the test fails.
+const cru_format_info_t *t_format_info(VkFormat format);
 
 /// \defgroup Test data
 ///

@@ -48,6 +48,7 @@ bin_crucible_SOURCES = \
 	src/crucible/cru_cmd_main.c \
 	src/crucible/cru_cmd_run.c \
 	src/crucible/cru_cmd_version.c \
+	src/crucible/cru_format.c \
 	src/crucible/cru_image.c \
 	src/crucible/cru_log.c \
 	src/crucible/cru_misc.c \

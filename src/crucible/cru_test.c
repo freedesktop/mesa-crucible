@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <crucible/cru_format.h>
 #include <crucible/cru_image.h>
 #include <crucible/cru_log.h>
 #include <crucible/cru_misc.h>
@@ -583,6 +584,17 @@ t_dump_image_fv(cru_image_t *image, const char *format, va_list va)
     string_vappendf(&filename, format, va);
 
     cru_image_write_file(image, filename.buf);
+}
+
+const cru_format_info_t *
+t_format_info(VkFormat format)
+{
+    const cru_format_info_t *info;
+
+    info = cru_format_get_info(format);
+    t_assertf(info, "failed to find cru_format_info for VkFormat %d", format);
+
+    return info;
 }
 
 void

@@ -21,16 +21,48 @@
 
 #pragma once
 
-#include <crucible/cru_array.h>
-#include <crucible/cru_cleanup.h>
-#include <crucible/cru_format.h>
-#include <crucible/cru_image.h>
-#include <crucible/cru_log.h>
-#include <crucible/cru_macros.h>
-#include <crucible/cru_misc.h>
-#include <crucible/cru_refcount.h>
-#include <crucible/cru_slist.h>
-#include <crucible/cru_test.h>
-#include <crucible/qonos.h>
-#include <crucible/string.h>
-#include <crucible/xalloc.h>
+#include <stdbool.h>
+#include <stdint.h>
+
+#include <crucible/vk_wrapper.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct cru_format_info cru_format_info_t;
+
+enum cru_num_type {
+    CRU_NUM_TYPE_UNDEFINED = 0,
+    CRU_NUM_TYPE_UNORM,
+    CRU_NUM_TYPE_SFLOAT,
+};
+
+struct cru_format_info {
+    /// For example, "VK_FORMAT_R8_UNORM".
+    const char *name;
+
+    VkFormat format;
+    enum cru_num_type num_type;
+    uint8_t num_channels;
+    uint8_t cpp;
+
+    /// This is zero (VK_FORMAT_UNDEFINED) if and only if the format has no
+    /// depth component.
+    VkFormat depth_format;
+
+    /// This is zero (VK_FORMAT_UNDEFINED) if and only if the format has no
+    /// stencil component.
+    VkFormat stencil_format;
+
+    bool is_color:1;
+};
+
+/// \brief Lookup info for VkFormat.
+///
+/// If Crucible does not have info for the given format, then return NULL.
+const struct cru_format_info *cru_format_get_info(VkFormat format);
+
+#ifdef __cplusplus
+}
+#endif

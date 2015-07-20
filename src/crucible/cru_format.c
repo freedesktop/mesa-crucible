@@ -19,18 +19,44 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#pragma once
-
-#include <crucible/cru_array.h>
-#include <crucible/cru_cleanup.h>
 #include <crucible/cru_format.h>
-#include <crucible/cru_image.h>
-#include <crucible/cru_log.h>
-#include <crucible/cru_macros.h>
-#include <crucible/cru_misc.h>
-#include <crucible/cru_refcount.h>
-#include <crucible/cru_slist.h>
-#include <crucible/cru_test.h>
-#include <crucible/qonos.h>
-#include <crucible/string.h>
-#include <crucible/xalloc.h>
+
+#define FMT(__vk_token) .format = __vk_token, .name = #__vk_token
+
+static const struct cru_format_info
+cru_format_info_table[] = {
+    {
+        FMT(VK_FORMAT_R8G8B8A8_UNORM),
+        .num_type = CRU_NUM_TYPE_UNORM,
+        .num_channels = 4,
+        .cpp = 4,
+        .is_color = true,
+    },
+    {
+        FMT(VK_FORMAT_D32_SFLOAT),
+        .num_type = CRU_NUM_TYPE_SFLOAT,
+        .num_channels = 1,
+        .cpp = 4,
+        .depth_format = VK_FORMAT_D32_SFLOAT,
+    },
+    {
+        FMT(VK_FORMAT_UNDEFINED),
+    },
+};
+
+#undef FMT
+
+const struct cru_format_info *
+cru_format_get_info(VkFormat format)
+{
+    const struct cru_format_info *info;
+
+    for (info = cru_format_info_table;
+         info->format != VK_FORMAT_UNDEFINED; ++info) {
+        if (info->format == format) {
+            return info;
+        }
+    }
+
+    return NULL;
+}

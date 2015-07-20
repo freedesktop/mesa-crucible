@@ -51,7 +51,6 @@
 
 #include "miptree-spirv.h"
 
-typedef struct cru_format_info cru_format_info_t;
 typedef struct test_params test_params_t;
 typedef struct miptree miptree_t;
 typedef struct mipslice mipslice_t;
@@ -77,16 +76,6 @@ struct test_params {
     uint32_t array_length;
     enum miptree_upload_method upload_method;
     enum miptree_download_method download_method;
-};
-
-// FINISHME: Move me to core Crucible.
-struct cru_format_info {
-    VkFormat format;
-    uint8_t num_channels;
-    uint8_t cpp;
-    bool has_color:1;
-    bool has_depth:1;
-    bool has_stencil:1;
 };
 
 struct miptree {
@@ -136,36 +125,6 @@ static const char *image512x512_filenames[] = {
     "mandrill-2x2.png",
     "mandrill-1x1.png",
 };
-
-// FINISHME: Move me to core Crucible.
-static const struct cru_format_info
-cru_format_info_table[] = {
-    {
-        .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .num_channels = 4,
-        .cpp = 4,
-        .has_color = 1,
-    },
-    {
-        .format = VK_FORMAT_UNDEFINED,
-    },
-};
-
-// FINISHME: Move me to core Crucible.
-static const struct cru_format_info *
-cru_format_get_info(VkFormat format)
-{
-    const struct cru_format_info *info;
-
-    for (info = cru_format_info_table;
-         info->format != VK_FORMAT_UNDEFINED; ++info) {
-        if (info->format == format) {
-            return info;
-        }
-    }
-
-    t_failf("failed to find cru_format_info for VkFormat %d", format);
-}
 
 // Fill the pixels with a canary color.
 static void
@@ -253,7 +212,7 @@ miptree_create(void)
     t_assert(params->view_type == VK_IMAGE_VIEW_TYPE_2D);
 
     const VkFormat format = params->format;
-    const cru_format_info_t *format_info = cru_format_get_info(format);
+    const cru_format_info_t *format_info = t_format_info(format);
     const uint32_t cpp = format_info->cpp;
     const uint32_t levels = params->levels;
     const uint32_t width = params->width;
