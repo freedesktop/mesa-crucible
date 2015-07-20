@@ -26,31 +26,33 @@
 #include <crucible/cru_refcount.h>
 
 enum cru_image_type {
-   CRU_IMAGE_TYPE_PIXELS,
-   CRU_IMAGE_TYPE_PNG,
-   CRU_IMAGE_TYPE_TEXTURE,
+    CRU_IMAGE_TYPE_PIXELS,
+    CRU_IMAGE_TYPE_PNG,
+    CRU_IMAGE_TYPE_TEXTURE,
 };
 
 struct cru_image {
-   const cru_format_info_t *format_info;
-   uint32_t width;
-   uint32_t height;
-   bool read_only;
+    const cru_format_info_t *format_info;
+    uint32_t width;
+    uint32_t height;
+    bool read_only;
 
-   cru_refcount_t refcount;
-   enum cru_image_type type;
+    cru_refcount_t refcount;
+    enum cru_image_type type;
 
-   void (*destroy)(cru_image_t *image);
+    void (*destroy)(cru_image_t *image);
 
-   /// \see cru_image_map()
-   uint8_t *(*map_pixels)(cru_image_t *image, uint32_t access_mask);
+    /// \see cru_image_map()
+    uint8_t *(*map_pixels)(cru_image_t *image, uint32_t access_mask);
 
-   /// \see cru_image_unmap()
-   bool (*unmap_pixels)(cru_image_t *image);
+    /// \see cru_image_unmap()
+    bool (*unmap_pixels)(cru_image_t *image);
 };
 
 // file: cru_image.c
-bool cru_image_init(cru_image_t *image, enum cru_image_type type, VkFormat format, uint32_t width, uint32_t height, bool read_only);
+bool
+cru_image_init(cru_image_t *image, enum cru_image_type type, VkFormat format,
+               uint32_t width, uint32_t height, bool read_only);
 char *cru_image_get_abspath(const char *filename);
 
 // file: cru_png_image.c
