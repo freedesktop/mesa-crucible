@@ -114,7 +114,7 @@ fail_format:
 bool
 cru_png_image_copy_to_pixels(cru_image_t *image, cru_image_t *dest)
 {
-    cru_png_image_t *kpng_image;
+    cru_png_image_t *png_image;
 
     bool result = false;
     png_structp png_reader = NULL;
@@ -127,7 +127,7 @@ cru_png_image_copy_to_pixels(cru_image_t *image, cru_image_t *dest)
     uint8_t *dest_rows[height];
 
     assert(image->type == CRU_IMAGE_TYPE_PNG);
-    kpng_image = (cru_png_image_t *) image;
+    png_image = (cru_png_image_t *) image;
 
     assert(!dest->read_only);
     dest_pixels = dest->map_pixels(dest, CRU_IMAGE_MAP_ACCESS_WRITE);
@@ -152,13 +152,13 @@ cru_png_image_copy_to_pixels(cru_image_t *image, cru_image_t *dest)
         goto fail_create_png_info;
     }
 
-    rewind(kpng_image->file);
-    png_init_io(png_reader, kpng_image->file);
+    rewind(png_image->file);
+    png_init_io(png_reader, png_image->file);
     png_read_info(png_reader, png_info);
 
     // Transform the file's pixel format to the crucible image's pixel format.
-    assert(kpng_image->image.format_info->format == VK_FORMAT_R8G8B8A8_UNORM);
-    switch (kpng_image->png_color_type) {
+    assert(png_image->image.format_info->format == VK_FORMAT_R8G8B8A8_UNORM);
+    switch (png_image->png_color_type) {
     case PNG_COLOR_TYPE_RGB:
         png_set_add_alpha(png_reader, UINT32_MAX, PNG_FILLER_AFTER);
         break;
@@ -191,14 +191,14 @@ fail_create_png_reader:
 static uint8_t *
 cru_png_image_map_pixels(cru_image_t *image, uint32_t access)
 {
-    cru_png_image_t *kpng_image = (cru_png_image_t *) image;
+    cru_png_image_t *png_image = (cru_png_image_t *) image;
 
     const uint32_t width = image->width;
     const uint32_t height = image->height;
     cru_image_t *pixel_image = NULL;
     void *pixels = NULL;
 
-    assert(kpng_image->map.access == 0);
+    assert(png_image->map.access == 0);
     assert(access != 0);
 
     if (access & CRU_IMAGE_MAP_ACCESS_WRITE) {
@@ -206,10 +206,10 @@ cru_png_image_map_pixels(cru_image_t *image, uint32_t access)
         goto fail;
     }
 
-    if (kpng_image->map.pixels) {
+    if (png_image->map.pixels) {
         // We've already mapped the image. Since cru_png_image is read-only, we
         // keep the map alive for the image's lifetime.
-        return kpng_image->map.pixels;
+        return png_image->map.pixels;
     }
 
     pixels = xmalloc(image->format_info->cpp * width * height);
@@ -218,12 +218,12 @@ cru_png_image_map_pixels(cru_image_t *image, uint32_t access)
     if (!pixel_image)
         goto fail;
 
-    if (!cru_png_image_copy_to_pixels(&kpng_image->image, pixel_image))
+    if (!cru_png_image_copy_to_pixels(&png_image->image, pixel_image))
         goto fail;
 
-    kpng_image->map.access = access;
-    kpng_image->map.pixels = pixels;
-    kpng_image->map.pixel_image = pixel_image;
+    png_image->map.access = access;
+    png_image->map.pixels = pixels;
+    png_image->map.pixel_image = pixel_image;
 
     return pixels;
 
@@ -236,12 +236,12 @@ fail:
 static bool
 cru_png_image_unmap_pixels(cru_image_t *image)
 {
-    cru_png_image_t *kpng_image = (cru_png_image_t *) image;
+    cru_png_image_t *png_image = (cru_png_image_t *) image;
 
     // PNG images are always read-only.
-    assert(!(kpng_image->map.access & CRU_IMAGE_MAP_ACCESS_WRITE));
-    assert(kpng_image->map.pixel_image != NULL);
-    kpng_image->map.access = 0;
+    assert(!(png_image->map.access & CRU_IMAGE_MAP_ACCESS_WRITE));
+    assert(png_image->map.pixel_image != NULL);
+    png_image->map.access = 0;
 
     return true;
 }
@@ -249,20 +249,20 @@ cru_png_image_unmap_pixels(cru_image_t *image)
 static void
 cru_png_image_destroy(cru_image_t *image)
 {
-    cru_png_image_t *kpng_image = (cru_png_image_t *) image;
+    cru_png_image_t *png_image = (cru_png_image_t *) image;
 
-    if (!kpng_image)
+    if (!png_image)
         return;
 
-    if (kpng_image->map.pixel_image)
-        cru_image_release(kpng_image->map.pixel_image);
+    if (png_image->map.pixel_image)
+        cru_image_release(png_image->map.pixel_image);
 
-    assert(kpng_image->file >= 0);
-    fclose(kpng_image->file);
+    assert(png_image->file >= 0);
+    fclose(png_image->file);
 
-    free(kpng_image->map.pixels);
-    free(kpng_image->filename);
-    free(kpng_image);
+    free(png_image->map.pixels);
+    free(png_image->filename);
+    free(png_image);
 }
 
 cru_image_t *
@@ -288,9 +288,9 @@ cru_png_image_load_file(const char *filename)
         goto fail_read_file;
     }
 
-    cru_png_image_t *kpng_image = xmalloc(sizeof(*kpng_image));
+    cru_png_image_t *png_image = xmalloc(sizeof(*png_image));
 
-    if (!cru_image_init(&kpng_image->image,
+    if (!cru_image_init(&png_image->image,
                         CRU_IMAGE_TYPE_PNG,
                         VK_FORMAT_R8G8B8A8_UNORM,
                         width, height,
@@ -298,21 +298,21 @@ cru_png_image_load_file(const char *filename)
         goto fail_image_init;
     }
 
-    kpng_image->image.destroy = cru_png_image_destroy;
-    kpng_image->image.map_pixels = cru_png_image_map_pixels;
-    kpng_image->image.unmap_pixels = cru_png_image_unmap_pixels;
+    png_image->image.destroy = cru_png_image_destroy;
+    png_image->image.map_pixels = cru_png_image_map_pixels;
+    png_image->image.unmap_pixels = cru_png_image_unmap_pixels;
 
-    kpng_image->filename = abs_filename;
-    kpng_image->file = file;
-    kpng_image->png_color_type = png_color_type;
-    kpng_image->map.access = 0;
-    kpng_image->map.pixels = NULL;
-    kpng_image->map.pixel_image = NULL;
+    png_image->filename = abs_filename;
+    png_image->file = file;
+    png_image->png_color_type = png_color_type;
+    png_image->map.access = 0;
+    png_image->map.pixels = NULL;
+    png_image->map.pixel_image = NULL;
 
-    return &kpng_image->image;
+    return &png_image->image;
 
 fail_image_init:
-    free(kpng_image);
+    free(png_image);
 fail_read_file:
     fclose(file);
 fail_fopen:
