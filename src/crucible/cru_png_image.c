@@ -56,14 +56,17 @@ struct cru_png_image {
 };
 
 static bool
-cru_png_image_read_file_info(cru_png_image_t *kpng_image)
+cru_png_image_read_file_info(FILE *file, const char *debug_filename,
+                             uint8_t *out_png_color_type,
+                             uint32_t *out_width,
+                             uint32_t *out_height)
 {
     bool result = false;
     png_structp png_reader = NULL;
     png_infop png_info = NULL;
 
-    assert(kpng_image->file >= 0);
-    rewind(kpng_image->file);
+    assert(file >= 0);
+    assert(debug_filename);
 
     // FINISHME: Error callbacks for libpng
     png_reader = png_create_read_struct(PNG_LIBPNG_VER_STRING,
@@ -75,7 +78,8 @@ cru_png_image_read_file_info(cru_png_image_t *kpng_image)
     if (!png_info)
         goto fail_create_png_info;
 
-    png_init_io(png_reader, kpng_image->file);
+    rewind(file);
+    png_init_io(png_reader, file);
     png_read_info(png_reader, png_info);
 
     uint8_t bit_depth = png_get_bit_depth(png_reader, png_info);
@@ -83,20 +87,20 @@ cru_png_image_read_file_info(cru_png_image_t *kpng_image)
 
     if (bit_depth != 8) {
         cru_loge("png file must have bit depth 8 but has bit depth %u (filename=%s)",
-                bit_depth, kpng_image->filename);
+                bit_depth, debug_filename);
         goto fail_format;
     }
 
     if (color_type != PNG_COLOR_TYPE_RGB_ALPHA &&
        color_type != PNG_COLOR_TYPE_RGB) {
         cru_loge("png file must have color type RGB or RGBA (filename=%s)",
-                kpng_image->filename);
+                 debug_filename);
         goto fail_format;
     }
 
-    kpng_image->png_color_type = color_type;
-    kpng_image->image.width = png_get_image_width(png_reader, png_info);
-    kpng_image->image.height = png_get_image_height(png_reader, png_info);
+    *out_png_color_type = color_type;
+    *out_width = png_get_image_width(png_reader, png_info);
+    *out_height = png_get_image_height(png_reader, png_info);
 
     result = true;
 
@@ -264,45 +268,54 @@ cru_png_image_destroy(cru_image_t *image)
 cru_image_t *
 cru_png_image_load_file(const char *filename)
 {
+    char *abs_filename = NULL;
+    FILE *file = NULL;
+    uint8_t png_color_type; // PNG_COLOR_TYPE_*
+    uint32_t width, height;
+
+    abs_filename = cru_image_get_abspath(filename);
+    if (!abs_filename)
+        goto fail_filename;
+
+    file = fopen(abs_filename, "rb");
+    if (!file) {
+        cru_loge("failed to open file for reading: %s", abs_filename);
+        goto fail_fopen;
+    }
+
+    if (!cru_png_image_read_file_info(file, filename, &png_color_type,
+                                      &width, &height)) {
+        goto fail_read_file;
+    }
+
     cru_png_image_t *kpng_image = xmalloc(sizeof(*kpng_image));
 
     if (!cru_image_init(&kpng_image->image,
                         CRU_IMAGE_TYPE_PNG,
                         VK_FORMAT_R8G8B8A8_UNORM,
-                        /*width, height*/ 1, 1,
+                        width, height,
                         /*read_only*/ true)) {
         goto fail_image_init;
     }
-
-    kpng_image->map.access = 0;
-    kpng_image->map.pixels = NULL;
-    kpng_image->map.pixel_image = NULL;
-
-    kpng_image->filename = cru_image_get_abspath(filename);
-    if (!kpng_image->filename)
-        goto fail_filename;
-
-    kpng_image->file = fopen(kpng_image->filename, "rb");
-    if (!kpng_image->file) {
-        cru_loge("failed to open file for reading: %s", filename);
-        goto fail_fopen;
-    }
-
-    if (!cru_png_image_read_file_info(kpng_image))
-        goto fail_read_file;
 
     kpng_image->image.destroy = cru_png_image_destroy;
     kpng_image->image.map_pixels = cru_png_image_map_pixels;
     kpng_image->image.unmap_pixels = cru_png_image_unmap_pixels;
 
+    kpng_image->filename = abs_filename;
+    kpng_image->file = file;
+    kpng_image->png_color_type = png_color_type;
+    kpng_image->map.access = 0;
+    kpng_image->map.pixels = NULL;
+    kpng_image->map.pixel_image = NULL;
+
     return &kpng_image->image;
 
-fail_read_file:
-    fclose(kpng_image->file);
-fail_fopen:
-    free(kpng_image->filename);
-fail_filename:
 fail_image_init:
     free(kpng_image);
+fail_read_file:
+    fclose(file);
+fail_fopen:
+fail_filename:
     return NULL;
 }
