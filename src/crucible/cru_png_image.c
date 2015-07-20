@@ -56,6 +56,26 @@ struct cru_png_image {
     } map;
 };
 
+static VkFormat
+choose_vk_format(uint8_t png_color_type, uint8_t png_bit_depth,
+                 const char *debug_filename)
+{
+    if (png_bit_depth != 8) {
+        cru_loge("png file must have bit depth 8 but has bit depth %u "
+                 "(filename=%s)", png_bit_depth, debug_filename);
+        return VK_FORMAT_UNDEFINED;
+    }
+
+    if (png_color_type != PNG_COLOR_TYPE_RGB_ALPHA &&
+        png_color_type != PNG_COLOR_TYPE_RGB) {
+        cru_loge("png file must have color type RGB or RGBA (filename=%s)",
+                 debug_filename);
+        return VK_FORMAT_UNDEFINED;
+    }
+
+    return VK_FORMAT_R8G8B8A8_UNORM;
+}
+
 static bool
 cru_png_image_read_file_info(FILE *file, const char *debug_filename,
                              uint8_t *out_png_color_type,
@@ -84,24 +104,8 @@ cru_png_image_read_file_info(FILE *file, const char *debug_filename,
     png_init_io(png_reader, file);
     png_read_info(png_reader, png_info);
 
-    uint8_t bit_depth = png_get_bit_depth(png_reader, png_info);
-    uint8_t color_type = png_get_color_type(png_reader, png_info);
-
-    if (bit_depth != 8) {
-        cru_loge("png file must have bit depth 8 but has bit depth %u (filename=%s)",
-                bit_depth, debug_filename);
-        goto fail_format;
-    }
-
-    if (color_type != PNG_COLOR_TYPE_RGB_ALPHA &&
-       color_type != PNG_COLOR_TYPE_RGB) {
-        cru_loge("png file must have color type RGB or RGBA (filename=%s)",
-                 debug_filename);
-        goto fail_format;
-    }
-
-    *out_png_color_type = color_type;
-    *out_bit_depth = bit_depth;
+    *out_png_color_type = png_get_color_type(png_reader, png_info);
+    *out_bit_depth = png_get_bit_depth(png_reader, png_info);
     *out_width = png_get_image_width(png_reader, png_info);
     *out_height = png_get_image_height(png_reader, png_info);
 
@@ -110,7 +114,6 @@ cru_png_image_read_file_info(FILE *file, const char *debug_filename,
 fail_create_png_info:
     png_destroy_read_struct(&png_reader, &png_info, NULL);
 fail_create_png_reader:
-fail_format:
     return result;
 }
 
@@ -276,6 +279,7 @@ cru_png_image_load_file(const char *filename)
     uint8_t png_color_type; // PNG_COLOR_TYPE_*
     uint8_t png_bit_depth;
     uint32_t width, height;
+    VkFormat format;
 
     abs_filename = cru_image_get_abspath(filename);
     if (!abs_filename)
@@ -292,6 +296,10 @@ cru_png_image_load_file(const char *filename)
                                       &width, &height)) {
         goto fail_read_file;
     }
+
+    format = choose_vk_format(png_color_type, png_bit_depth, filename);
+    if (!format)
+        goto fail_format;
 
     cru_png_image_t *png_image = xzalloc(sizeof(*png_image));
 
@@ -318,6 +326,7 @@ cru_png_image_load_file(const char *filename)
 
 fail_image_init:
     free(png_image);
+fail_format:
 fail_read_file:
     fclose(file);
 fail_fopen:
