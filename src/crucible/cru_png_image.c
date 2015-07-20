@@ -288,7 +288,7 @@ cru_png_image_load_file(const char *filename)
         goto fail_read_file;
     }
 
-    cru_png_image_t *png_image = xmalloc(sizeof(*png_image));
+    cru_png_image_t *png_image = xzalloc(sizeof(*png_image));
 
     if (!cru_image_init(&png_image->image,
                         CRU_IMAGE_TYPE_PNG,
