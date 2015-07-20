@@ -24,6 +24,7 @@
 #include <crucible/cru_format.h>
 #include <crucible/cru_image.h>
 #include <crucible/cru_refcount.h>
+#include <crucible/string.h>
 
 enum cru_image_type {
     CRU_IMAGE_TYPE_PIXELS,
@@ -57,4 +58,5 @@ char *cru_image_get_abspath(const char *filename);
 
 // file: cru_png_image.c
 cru_image_t *cru_png_image_load_file(const char *filename);
+bool cru_png_image_write_file(cru_image_t *image, const string_t *filename);
 bool cru_png_image_copy_to_pixels(cru_image_t *png_image, cru_image_t *dest);

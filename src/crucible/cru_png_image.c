@@ -333,3 +333,82 @@ fail_fopen:
 fail_filename:
     return NULL;
 }
+
+bool
+cru_png_image_write_file(cru_image_t *image, const string_t *filename)
+{
+    bool result = false;
+    char *abspath = NULL;
+    const uint32_t src_width = image->width;
+    const uint32_t src_height = image->height;
+    const uint32_t src_stride = image->format_info->cpp * src_width;
+    uint8_t *src_pixels = NULL;
+    uint8_t *src_rows[src_height];
+
+    FILE *f = NULL;
+    png_structp png_writer = NULL;
+    png_infop png_info = NULL;
+
+    if (!string_endswith_cstr(filename, ".png")) {
+        cru_loge("%s: filename does have '.png' extension: %s",
+                 __func__, filename->buf);
+        return false;
+    }
+
+    abspath = cru_image_get_abspath(filename->buf);
+    if (!abspath)
+        goto fail_get_abspath;
+
+    src_pixels = image->map_pixels(image, CRU_IMAGE_MAP_ACCESS_READ);
+    if (!src_pixels)
+        goto fail_map_pixels;
+
+    for (uint32_t y = 0; y < src_height; ++y) {
+        src_rows[y] = src_pixels + y * src_stride;
+    }
+
+    f = fopen(abspath, "wb");
+    if (!f) {
+        cru_loge("failed to open file for writing: %s", abspath);
+        goto fail_fopen;
+    }
+
+    // FINISHME: Error callbacks for libpng
+    png_writer = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+                                        NULL, NULL, NULL);
+    if (!png_writer) {
+        cru_loge("failed to create png writer");
+        goto fail_create_png_writer;
+    }
+
+    png_info = png_create_info_struct(png_writer);
+    if (!png_info) {
+        cru_loge("failed to create png writer info");
+        goto fail_create_png_info;
+    }
+
+    png_init_io(png_writer, f);
+    png_set_IHDR(png_writer, png_info,
+                 src_width, src_height,
+                 8, PNG_COLOR_TYPE_RGBA,
+                 PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+                 PNG_FILTER_TYPE_DEFAULT);
+    png_write_info(png_writer, png_info);
+    png_set_rows(png_writer, png_info, src_rows);
+    png_write_png(png_writer, png_info, PNG_TRANSFORM_IDENTITY, NULL);
+
+    result = true;
+
+fail_create_png_info:
+    png_destroy_write_struct(&png_writer, &png_info);
+fail_create_png_writer:
+    fclose(f);
+fail_fopen:
+    // Ignore the result of unmap because no write-back occurs when unmapping
+    // a read-only map.
+    image->unmap_pixels(image);
+fail_map_pixels:
+    free(abspath);
+fail_get_abspath:
+    return result;
+}
