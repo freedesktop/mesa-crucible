@@ -26,12 +26,26 @@
 static const struct cru_format_info
 cru_format_info_table[] = {
     {
+        FMT(VK_FORMAT_R8_UNORM),
+        .num_type = CRU_NUM_TYPE_UNORM,
+        .num_channels = 1,
+        .cpp = 1,
+        .is_color = true,
+    },
+    {
         FMT(VK_FORMAT_R8G8B8A8_UNORM),
         .num_type = CRU_NUM_TYPE_UNORM,
         .num_channels = 4,
         .cpp = 4,
         .is_color = true,
         .has_alpha = true,
+    },
+    {
+        FMT(VK_FORMAT_R16_UNORM),
+        .num_type = CRU_NUM_TYPE_UNORM,
+        .num_channels = 1,
+        .cpp = 2,
+        .is_color = true,
     },
     {
         FMT(VK_FORMAT_D32_SFLOAT),
