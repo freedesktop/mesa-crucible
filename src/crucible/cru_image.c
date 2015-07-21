@@ -19,13 +19,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include <pthread.h>
-#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <libpng16/png.h>
 
 #include <crucible/cru_log.h>
 #include <crucible/cru_misc.h>
