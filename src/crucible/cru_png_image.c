@@ -388,11 +388,20 @@ cru_png_image_write_file(cru_image_t *image, const string_t *filename)
     }
 
     png_init_io(png_writer, f);
+
+    // From man:libpng(3):
+    //
+    //     If you call png_set_IHDR(), the call must appear before any of the
+    //     other png_set_*() functions, because they might require access to
+    //     some of  the  IHDR  settings.   The  remaining png_set_*()
+    //     functions can be called in any order.
+    //
     png_set_IHDR(png_writer, png_info,
                  src_width, src_height,
                  8, PNG_COLOR_TYPE_RGBA,
                  PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
                  PNG_FILTER_TYPE_DEFAULT);
+
     png_write_info(png_writer, png_info);
     png_set_rows(png_writer, png_info, src_rows);
     png_write_png(png_writer, png_info, PNG_TRANSFORM_IDENTITY, NULL);
