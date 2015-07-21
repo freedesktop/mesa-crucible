@@ -207,7 +207,7 @@ cru_image_copy_pixels_to_pixels(cru_image_t *dest, cru_image_t *src)
     // cru_image_check_compatible().
     image_size = src->format_info->cpp * src->width * src->height;
 
-    memcpy(dest, src, image_size);
+    memcpy(dest_pixels, src_pixels, image_size);
     result = true;
 
     // Check the result of unmapping the destination image because writeback
