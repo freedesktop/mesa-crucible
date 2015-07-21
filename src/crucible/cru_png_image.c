@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 
 #include <alloca.h>
+#include <endian.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -60,20 +61,31 @@ static VkFormat
 choose_vk_format(uint8_t png_color_type, uint8_t png_bit_depth,
                  const char *debug_filename)
 {
-    if (png_bit_depth != 8) {
-        cru_loge("png file must have bit depth 8 but has bit depth %u "
-                 "(filename=%s)", png_bit_depth, debug_filename);
-        return VK_FORMAT_UNDEFINED;
+    switch (png_color_type) {
+    case PNG_COLOR_TYPE_RGB_ALPHA:
+    case PNG_COLOR_TYPE_RGB:
+        switch (png_bit_depth) {
+        case 8:
+            return VK_FORMAT_R8G8B8A8_UNORM;
+        default:
+            goto fail;
+        }
+    case PNG_COLOR_TYPE_GRAY:
+        switch (png_bit_depth) {
+        case 8:
+            return VK_FORMAT_R8_UNORM;
+        default:
+            goto fail;
+        }
+    default:
+        goto fail;
     }
 
-    if (png_color_type != PNG_COLOR_TYPE_RGB_ALPHA &&
-        png_color_type != PNG_COLOR_TYPE_RGB) {
-        cru_loge("png file must have color type RGB or RGBA (filename=%s)",
-                 debug_filename);
-        return VK_FORMAT_UNDEFINED;
-    }
-
-    return VK_FORMAT_R8G8B8A8_UNORM;
+fail:
+    cru_loge("unsuppoted (png_color_type, png_bit_depth) = (%u, %u)",
+             png_color_type, png_bit_depth);
+    cru_loge("in PNG file %s", debug_filename);
+    return VK_FORMAT_UNDEFINED;
 }
 
 static bool
@@ -133,6 +145,10 @@ cru_png_image_copy_to_pixels(cru_image_t *image, cru_image_t *dest)
     uint8_t *dest_rows[height];
 
     assert(image->type == CRU_IMAGE_TYPE_PNG);
+    assert(image->width == dest->width);
+    assert(image->height == dest->height);
+    assert(image->format_info->cpp == dest->format_info->cpp);
+
     png_image = (cru_png_image_t *) image;
 
     assert(!dest->read_only);
@@ -166,10 +182,16 @@ cru_png_image_copy_to_pixels(cru_image_t *image, cru_image_t *dest)
     assert(png_image->image.format_info->format == VK_FORMAT_R8G8B8A8_UNORM);
     switch (png_image->png_color_type) {
     case PNG_COLOR_TYPE_RGB:
-        png_set_add_alpha(png_reader, UINT32_MAX, PNG_FILLER_AFTER);
+    case PNG_COLOR_TYPE_GRAY:
+        if (dest->format_info->has_alpha) {
+            png_set_add_alpha(png_reader, UINT32_MAX, PNG_FILLER_AFTER);
+        }
         break;
     case PNG_COLOR_TYPE_RGB_ALPHA:
-        // No transformation needed.
+    case PNG_COLOR_TYPE_GRAY_ALPHA:
+        if (!dest->format_info->has_alpha) {
+            png_set_strip_alpha(png_reader);
+        }
         break;
     default:
         assert(!"internal error");
@@ -345,9 +367,26 @@ cru_png_image_write_file(cru_image_t *image, const string_t *filename)
     uint8_t *src_pixels = NULL;
     uint8_t *src_rows[src_height];
 
+    uint8_t png_color_type;
+    uint8_t png_bit_depth;
+
     FILE *f = NULL;
     png_structp png_writer = NULL;
     png_infop png_info = NULL;
+
+    switch (image->format_info->format) {
+    case VK_FORMAT_R8_UNORM:
+        png_color_type = PNG_COLOR_TYPE_GRAY;
+        png_bit_depth = 8;
+        break;
+    case VK_FORMAT_R8G8B8A8_UNORM:
+        png_color_type = PNG_COLOR_TYPE_RGBA;
+        png_bit_depth = 8;
+        break;
+    default:
+        cru_loge("cannot write %s to PNG file", image->format_info->name);
+        return false;
+    }
 
     if (!string_endswith_cstr(filename, ".png")) {
         cru_loge("%s: filename does have '.png' extension: %s",
@@ -398,7 +437,7 @@ cru_png_image_write_file(cru_image_t *image, const string_t *filename)
     //
     png_set_IHDR(png_writer, png_info,
                  src_width, src_height,
-                 8, PNG_COLOR_TYPE_RGBA,
+                 png_bit_depth, png_color_type,
                  PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
                  PNG_FILTER_TYPE_DEFAULT);
 
