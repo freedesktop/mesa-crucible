@@ -544,6 +544,12 @@ t_end(enum cru_test_result result)
     pthread_exit(NULL);
 }
 
+bool
+t_is_dump_enabled(void)
+{
+    return !cru_current_test->no_dump;
+}
+
 void
 t_dump_seq_image(cru_image_t *image)
 {

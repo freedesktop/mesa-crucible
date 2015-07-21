@@ -151,6 +151,9 @@ void __t_assertfv(const char *file, int line, bool cond, const char *cond_string
 /// \see t_ref_image
 void t_compare_image(void) cru_noreturn;
 
+/// Is image dumping enabled on the cmdline?
+bool t_is_dump_enabled(void);
+
 /// Dump images to sequentially named files.
 ///
 /// Each call dumps the image to a sequentially named file. The filename is
