@@ -24,30 +24,61 @@
 from textwrap import dedent
 from collections import namedtuple
 
-Params = namedtuple('Params', ('format', 'aspect', 'view', 'levels',
-                    'array_length', 'upload', 'download'))
+Extent2D = namedtuple('Extent2D', ('width', 'height'))
+Format = namedtuple('Format', ('short_name', 'vk_name'))
+Params = namedtuple('Params', ('format', 'aspect', 'view', 'extent',
+                    'levels', 'array_length', 'upload', 'download'))
 
-params_iter = (
-    Params(format, aspect, view, levels, array_length, upload_method, download_method)
-    for format in (('r8g8b8a8-unorm', 'VK_FORMAT_R8G8B8A8_UNORM'),)
+color_params_iter = (
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    for format in (Format('r8g8b8a8-unorm', 'VK_FORMAT_R8G8B8A8_UNORM'),)
     for aspect in ('color',)
     for view in ('2d',)
+    for extent in (Extent2D(512, 512),)
     for levels in (1, 2)
     for array_length in (1, 2)
     for upload_method in (
         'copy-from-buffer',
         'copy-from-linear-image',
-        'render')
+        'render',
+    )
     for download_method in (
         'copy-to-buffer',
         'copy-to-linear-image',
-        'render')
+        'render',
+    )
 )
+
+depth_params_iter = (
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    for format in (Format('d32-sfloat', 'VK_FORMAT_D32_SFLOAT'),)
+    for aspect in ('depth',)
+    for view in ('2d',)
+    for extent in (Extent2D(1024, 512),)
+    for levels in (1, 2)
+    for array_length in (1, 2)
+    for upload_method in (
+        'copy-from-buffer',
+        'copy-from-linear-image',
+    )
+    for download_method in (
+        'copy-to-buffer',
+        'copy-to-linear-image',
+    )
+)
+
+def all_params_iter():
+    for p in color_params_iter:
+        yield p
+    for p in depth_params_iter:
+        yield p
 
 template = dedent("""
     cru_define_test {{
         .name = "func.miptree"
                 ".{format[0]}"
+                ".aspect-{aspect}"
+                ".extent-{extent.width}x{extent.height}"
                 ".view-{view}.levels{levels:02}.array{array_length:02}"
                 ".upload-{upload}.download-{download}",
         .start = test,
@@ -57,8 +88,8 @@ template = dedent("""
             .aspect = VK_IMAGE_ASPECT_{aspect_caps},
             .view_type = VK_IMAGE_VIEW_TYPE_{view_caps},
             .levels = {levels},
-            .width = 512,
-            .height = 512,
+            .width = {extent.width},
+            .height = {extent.height},
             .array_length = {array_length},
             .upload_method = MIPTREE_UPLOAD_METHOD_{upload_caps},
             .download_method = MIPTREE_DOWNLOAD_METHOD_{download_caps},
@@ -98,10 +129,12 @@ def main():
     with open(out_filename, 'w') as out_file:
         out_file.write(copyright)
 
-        for p in params_iter:
+        for p in all_params_iter():
             test_def = template.format(
                 format = p.format,
+                aspect = p.aspect,
                 view = p.view,
+                extent = p.extent,
                 levels = p.levels,
                 array_length = p.array_length,
                 upload = p.upload,

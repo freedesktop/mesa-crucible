@@ -47,6 +47,7 @@
 /// TODO: Test multisampled images.
 /// TODO: Test non-square, non-power-of-two image sizes.
 
+#include <math.h>
 #include <crucible/cru.h>
 
 #include "miptree-spirv.h"
@@ -122,16 +123,23 @@ fill_rect_with_canary(void *pixels,
 {
     static const float peach[] = {1.0, 0.4, 0.2, 1.0};
 
-    // Maybe we'll want to test other formats in the future.
-    t_assertf(format_info->format == VK_FORMAT_R8G8B8A8_UNORM, "FINISHME");
-
-    for (uint32_t i = 0; i < width * height; ++i) {
-        uint8_t *rgba = pixels + (4 * i);
-
-        rgba[0] = 255 * peach[0];
-        rgba[1] = 255 * peach[1];
-        rgba[2] = 255 * peach[2];
-        rgba[3] = 255 * peach[3];
+    if (format_info->num_type == CRU_NUM_TYPE_UNORM &&
+        format_info->num_channels == 4) {
+        for (uint32_t i = 0; i < width * height; ++i) {
+            uint8_t *rgba = pixels + (4 * i);
+            rgba[0] = 255 * peach[0];
+            rgba[1] = 255 * peach[1];
+            rgba[2] = 255 * peach[2];
+            rgba[3] = 255 * peach[3];
+        }
+    } else if (format_info->num_type == CRU_NUM_TYPE_SFLOAT &&
+               format_info->num_channels == 1) {
+        for (uint32_t i = 0; i < width * height; ++i) {
+            float *f = pixels + (sizeof(float) * i);
+            f[0] = M_1_PI;
+        }
+    } else {
+        t_failf("unsupported cru_format_info");
     }
 }
 
@@ -147,42 +155,60 @@ mipslice_perturb_pixels(void *pixels,
     float red_scale = 1.0f - (float) level / num_levels;
     float blue_scale = 1.0f - (float) layer / num_layers;
 
-    t_assertf(format_info->format == VK_FORMAT_R8G8B8A8_UNORM, "FINISHME");
-
-    for (uint32_t i = 0; i < width * height; ++i) {
-        uint8_t *rgba = pixels + 4 * i;
-
-        rgba[0] *= red_scale;
-        rgba[2] *= blue_scale;
-    }
+    if (format_info->num_type == CRU_NUM_TYPE_UNORM &&
+        format_info->num_channels == 4) {
+        for (uint32_t i = 0; i < width * height; ++i) {
+            uint8_t *rgba = pixels + 4 * i;
+            rgba[0] *= red_scale;
+            rgba[2] *= blue_scale;
+        }
+    } else if (format_info->num_type == CRU_NUM_TYPE_SFLOAT &&
+               format_info->num_channels == 1) {
+        for (uint32_t i = 0; i < width * height; ++i) {
+            float *f = pixels + (sizeof(float) * i);
+            f[0] *= red_scale;
+        }
+    } else {
+        t_failf("unsupported cru_format_info");
+     }
 }
 
-static const char *
-miplevel_get_template_filename(uint32_t level, uint32_t num_levels,
+static string_t
+miplevel_get_template_filename(const cru_format_info_t *format_info,
+                               uint32_t image_width, uint32_t image_height,
+                               uint32_t level, uint32_t num_levels,
                                uint32_t layer, uint32_t num_layers)
 {
-    const test_params_t *p = t_user_data;
+    string_t filename = STRING_INIT;
 
-    static const char *mandrill_filenames[] = {
-        "mandrill-512x512.png",
-        "mandrill-256x256.png",
-        "mandrill-128x128.png",
-        "mandrill-64x64.png",
-        "mandrill-32x32.png",
-        "mandrill-16x16.png",
-        "mandrill-8x8.png",
-        "mandrill-4x4.png",
-        "mandrill-2x2.png",
-        "mandrill-1x1.png",
-    };
+    const uint32_t level_width = cru_minify(image_width, level);
+    const uint32_t level_height = cru_minify(image_height, level);
 
-    if (p->width == 512 && p->height == 512) {
-        t_assert(level < ARRAY_LENGTH(mandrill_filenames));
-        return mandrill_filenames[level];
-    } else {
-        t_failf("test does support (width, height) = (%u, %u)",
-                p->width, p->height);
+    switch (format_info->format) {
+    case VK_FORMAT_R8G8B8A8_UNORM:
+        string_appendf(&filename, "mandrill");
+        break;
+    case VK_FORMAT_D32_SFLOAT:
+        switch (layer) {
+        case 0:
+            string_appendf(&filename, "grass-grayscale");
+            break;
+        case 1:
+            string_appendf(&filename, "pink-leaves-grayscale");
+            break;
+        default:
+            t_failf("no image file exists for depth layer");
+            break;
+        }
+        break;
+    default:
+        t_failf("unsuppported %s", format_info->name);
+        break;
     }
+
+    string_appendf(&filename, "-%ux%u.png", level_width, level_height);
+
+    return filename;
 }
 
 /// Calculate a buffer size that can hold all subimages of the miptree.
@@ -206,23 +232,22 @@ miptree_calc_buffer_size(void)
 }
 
 static cru_image_t *
-mipslice_make_template_image(uint32_t width, uint32_t height,
+mipslice_make_template_image(const struct cru_format_info *format_info,
+                             uint32_t image_width, uint32_t image_height,
                              uint32_t level, uint32_t num_levels,
                              uint32_t layer, uint32_t num_layers)
 {
-    const test_params_t *p = t_user_data;
-    VkFormat format = p->format;
+    string_t filename;
+    cru_image_t *image;
 
-    // Maybe we'll want to test other formats in the future.
-    t_assertf(format == VK_FORMAT_R8G8B8A8_UNORM, "FINISHME");
-    t_assertf(p->aspect == VK_IMAGE_ASPECT_COLOR, "FINISHME");
-
-    const char *filename = miplevel_get_template_filename(level, num_levels,
-                                                          layer, num_layers);
+    filename = miplevel_get_template_filename(format_info,
+                                              image_width, image_height,
+                                              level, num_levels,
+                                              layer, num_layers);
 
     // FIXME: Don't load the same file multiple times. It slows down the test
     // run.
-    cru_image_t *image = cru_image_load_file(filename);
+    image = cru_image_load_file(string_data(&filename));
     t_assert(image);
     t_cleanup_push(image);
 
@@ -361,9 +386,10 @@ miptree_create(void)
             cru_image_t *src_image;
             cru_image_t *dest_image;
 
-            templ_image =
-                mipslice_make_template_image(level_width, level_height,
-                                             l, levels, a, array_length);
+            templ_image = mipslice_make_template_image(format_info,
+                                                       width, height,
+                                                       l, levels,
+                                                       a, array_length);
             t_assert(level_width == cru_image_get_width(templ_image));
             t_assert(level_height == cru_image_get_height(templ_image));
 
