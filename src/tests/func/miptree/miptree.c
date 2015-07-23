@@ -204,6 +204,25 @@ miptree_calc_buffer_size(void)
     return buffer_size;
 }
 
+static cru_image_t *
+miplevel_make_template_image(uint32_t width, uint32_t height,
+                             uint32_t level, uint32_t num_levels)
+{
+    const test_params_t *p = t_user_data;
+    VkFormat format = p->format;
+
+    // Maybe we'll want to test other formats in the future.
+    t_assertf(format == VK_FORMAT_R8G8B8A8_UNORM, "FINISHME");
+    t_assertf(p->aspect == VK_IMAGE_ASPECT_COLOR, "FINISHME");
+
+    const char *filename = get_image_filename(level);
+    cru_image_t *image = cru_image_load_file(filename);
+    t_assert(image);
+    t_cleanup_push(image);
+
+    return image;
+}
+
 static const miptree_t *
 miptree_create(void)
 {
@@ -280,12 +299,12 @@ miptree_create(void)
         const uint32_t level_width = cru_minify(width, l);
         const uint32_t level_height = cru_minify(height, l);
 
-        const char *filename = get_image_filename(l);
-        cru_image_t *file_image = cru_image_load_file(filename);
-        t_cleanup_push(file_image);
+        cru_image_t *templ_image =
+            miplevel_make_template_image(level_width, level_height,
+                                         l, levels);
 
-        t_assert(level_width == cru_image_get_width(file_image));
-        t_assert(level_height == cru_image_get_height(file_image));
+        t_assert(level_width == cru_image_get_width(templ_image));
+        t_assert(level_height == cru_image_get_height(templ_image));
 
         for (uint32_t a = 0; a < array_length; ++a) {
             VkAttachmentView color_view = qoCreateAttachmentView(
@@ -345,7 +364,7 @@ miptree_create(void)
             src_image = cru_image_from_pixels(src_pixels, format,
                                               level_width, level_height);
             t_cleanup_push(src_image);
-            t_assert(cru_image_copy(src_image, file_image));
+            t_assert(cru_image_copy(src_image, templ_image));
 
             dest_image = cru_image_from_pixels(dest_pixels, format,
                                                level_width, level_height);
