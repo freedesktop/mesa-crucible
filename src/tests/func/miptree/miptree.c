@@ -69,6 +69,7 @@ enum miptree_download_method {
 
 struct test_params {
     VkFormat format;
+    VkImageAspect aspect;
     VkImageViewType view_type;
     uint32_t levels;
     uint32_t width;
@@ -299,7 +300,7 @@ miptree_create(void)
                 .viewType = VK_IMAGE_VIEW_TYPE_2D,
                 .format = format,
                 .subresourceRange = {
-                    .aspect = VK_IMAGE_ASPECT_COLOR,
+                    .aspect = params->aspect,
                     .baseMipLevel = l,
                     .mipLevels = 1,
                     .baseArraySlice = a,
@@ -384,6 +385,8 @@ miptree_create(void)
 static void
 miptree_upload_copy_from_buffer(const miptree_t *mt)
 {
+    const test_params_t *params = t_user_data;
+
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
@@ -393,7 +396,7 @@ miptree_upload_copy_from_buffer(const miptree_t *mt)
         VkBufferImageCopy copy = {
             .bufferOffset = slice->buffer_offset,
             .imageSubresource = {
-                .aspect = VK_IMAGE_ASPECT_COLOR,
+                .aspect = params->aspect,
                 .mipLevel = slice->level,
                 .arraySlice = slice->array_slice,
             },
@@ -416,6 +419,8 @@ miptree_upload_copy_from_buffer(const miptree_t *mt)
 static void
 miptree_download_copy_to_buffer(const miptree_t *mt)
 {
+    const test_params_t *params = t_user_data;
+
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
@@ -425,7 +430,7 @@ miptree_download_copy_to_buffer(const miptree_t *mt)
         VkBufferImageCopy copy = {
             .bufferOffset = slice->buffer_offset,
             .imageSubresource = {
-                .aspect = VK_IMAGE_ASPECT_COLOR,
+                .aspect = params->aspect,
                 .mipLevel = slice->level,
                 .arraySlice = slice->array_slice,
             },
@@ -449,6 +454,8 @@ miptree_download_copy_to_buffer(const miptree_t *mt)
 static void
 miptree_upload_copy_from_linear_image(const miptree_t *mt)
 {
+    const test_params_t *params = t_user_data;
+
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
@@ -457,14 +464,14 @@ miptree_upload_copy_from_linear_image(const miptree_t *mt)
 
         VkImageCopy copy = {
             .srcSubresource = {
-                .aspect = VK_IMAGE_ASPECT_COLOR,
+                .aspect = params->aspect,
                 .mipLevel = 0,
                 .arraySlice = 0,
             },
             .srcOffset = { .x = 0, .y = 0, .z = 0 },
 
             .destSubresource = {
-                .aspect = VK_IMAGE_ASPECT_COLOR,
+                .aspect = params->aspect,
                 .mipLevel = slice->level,
                 .arraySlice = slice->array_slice,
             },
@@ -489,6 +496,8 @@ miptree_upload_copy_from_linear_image(const miptree_t *mt)
 static void
 miptree_download_copy_to_linear_image(const miptree_t *mt)
 {
+    const test_params_t *params = t_user_data;
+
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
@@ -497,14 +506,14 @@ miptree_download_copy_to_linear_image(const miptree_t *mt)
 
         VkImageCopy copy = {
             .srcSubresource = {
-                .aspect = VK_IMAGE_ASPECT_COLOR,
+                .aspect = params->aspect,
                 .mipLevel = slice->level,
                 .arraySlice = slice->array_slice,
             },
             .srcOffset = { .x = 0, .y = 0, .z = 0 },
 
             .destSubresource = {
-                .aspect = VK_IMAGE_ASPECT_COLOR,
+                .aspect = params->aspect,
                 .mipLevel = 0,
                 .arraySlice = 0,
             },
@@ -740,6 +749,8 @@ render_textures(const cru_format_info_t *format_info,
 static void
 miptree_upload_render(const miptree_t *mt)
 {
+    const test_params_t *params = t_user_data;
+
     VkImageView tex_views[mt->num_slices];
     VkAttachmentView color_views[mt->num_slices];
     VkExtent2D extents[mt->num_slices];
@@ -763,7 +774,7 @@ miptree_upload_render(const miptree_t *mt)
                 VK_CHANNEL_SWIZZLE_A,
             },
             .subresourceRange = {
-                .aspect = VK_IMAGE_ASPECT_COLOR,
+                .aspect = params->aspect,
                 .baseMipLevel = 0,
                 .mipLevels = 1,
                 .baseArraySlice = 0,

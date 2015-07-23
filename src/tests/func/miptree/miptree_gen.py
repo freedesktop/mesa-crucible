@@ -24,12 +24,13 @@
 from textwrap import dedent
 from collections import namedtuple
 
-Params = namedtuple('Params', ('format', 'view', 'levels', 'array_length',
-                    'upload', 'download'))
+Params = namedtuple('Params', ('format', 'aspect', 'view', 'levels',
+                    'array_length', 'upload', 'download'))
 
 params_iter = (
-    Params(format, view, levels, array_length, upload_method, download_method)
+    Params(format, aspect, view, levels, array_length, upload_method, download_method)
     for format in (('r8g8b8a8-unorm', 'VK_FORMAT_R8G8B8A8_UNORM'),)
+    for aspect in ('color',)
     for view in ('2d',)
     for levels in (1, 2)
     for array_length in (1, 2)
@@ -53,6 +54,7 @@ template = dedent("""
         .no_image = true,
         .user_data = &(test_params_t) {{
             .format = {format[1]},
+            .aspect = VK_IMAGE_ASPECT_{aspect_caps},
             .view_type = VK_IMAGE_VIEW_TYPE_{view_caps},
             .levels = {levels},
             .width = 512,
@@ -104,6 +106,7 @@ def main():
                 array_length = p.array_length,
                 upload = p.upload,
                 download = p.download,
+                aspect_caps = to_caps(p.aspect),
                 view_caps = to_caps(p.view),
                 upload_caps = to_caps(p.upload),
                 download_caps = to_caps(p.download))
