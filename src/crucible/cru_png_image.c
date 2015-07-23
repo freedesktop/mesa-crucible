@@ -179,7 +179,6 @@ cru_png_image_copy_to_pixels(cru_image_t *image, cru_image_t *dest)
     png_read_info(png_reader, png_info);
 
     // Transform the file's pixel format to the crucible image's pixel format.
-    assert(png_image->image.format_info->format == VK_FORMAT_R8G8B8A8_UNORM);
     switch (png_image->png_color_type) {
     case PNG_COLOR_TYPE_RGB:
     case PNG_COLOR_TYPE_GRAY:
@@ -327,8 +326,7 @@ cru_png_image_load_file(const char *filename)
 
     if (!cru_image_init(&png_image->image,
                         CRU_IMAGE_TYPE_PNG,
-                        VK_FORMAT_R8G8B8A8_UNORM,
-                        width, height,
+                        format, width, height,
                         /*read_only*/ true)) {
         goto fail_image_init;
     }
