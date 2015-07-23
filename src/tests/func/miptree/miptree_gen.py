@@ -67,10 +67,30 @@ depth_params_iter = (
     )
 )
 
+stencil_params_iter = (
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    for format in (Format('s8-uint', 'VK_FORMAT_S8_UINT'),)
+    for aspect in ('stencil',)
+    for view in ('2d',)
+    for extent in (Extent2D(1024, 512),)
+    for levels in (1, 2)
+    for array_length in (1, 2)
+    for upload_method in (
+        'copy-from-buffer',
+        'copy-from-linear-image',
+    )
+    for download_method in (
+        'copy-to-buffer',
+        'copy-to-linear-image',
+    )
+)
+
 def all_params_iter():
     for p in color_params_iter:
         yield p
     for p in depth_params_iter:
+        yield p
+    for p in stencil_params_iter:
         yield p
 
 template = dedent("""
@@ -82,6 +102,7 @@ template = dedent("""
                 ".view-{view}.levels{levels:02}.array{array_length:02}"
                 ".upload-{upload}.download-{download}",
         .start = test,
+        .skip = {skip},
         .no_image = true,
         .user_data = &(test_params_t) {{
             .format = {format[1]},
@@ -130,6 +151,13 @@ def main():
         out_file.write(copyright)
 
         for p in all_params_iter():
+
+            # FINISHME: Stencil buffers cause Mesa to abort.
+            if p.format.vk_name == 'VK_FORMAT_S8_UINT':
+                skip = 'true'
+            else:
+                skip = 'false'
+
             test_def = template.format(
                 format = p.format,
                 aspect = p.aspect,
@@ -142,7 +170,8 @@ def main():
                 aspect_caps = to_caps(p.aspect),
                 view_caps = to_caps(p.view),
                 upload_caps = to_caps(p.upload),
-                download_caps = to_caps(p.download))
+                download_caps = to_caps(p.download),
+                skip = skip)
             out_file.write(test_def)
 
 main()
