@@ -172,6 +172,7 @@ qoMapMemory(VkDevice dev, VkDeviceMemory mem,
 
     t_assert(result == VK_SUCCESS);
     t_assert(map);
+    t_cleanup_push_vk_device_memory_map(dev, mem);
 
     return map;
 }
