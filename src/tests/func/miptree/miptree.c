@@ -114,19 +114,6 @@ struct mipslice {
     cru_image_t *dest_cru_image;
 };
 
-static const char *image512x512_filenames[] = {
-    "mandrill-512x512.png",
-    "mandrill-256x256.png",
-    "mandrill-128x128.png",
-    "mandrill-64x64.png",
-    "mandrill-32x32.png",
-    "mandrill-16x16.png",
-    "mandrill-8x8.png",
-    "mandrill-4x4.png",
-    "mandrill-2x2.png",
-    "mandrill-1x1.png",
-};
-
 // Fill the pixels with a canary color.
 static void
 fill_rect_with_canary(void *pixels,
@@ -171,13 +158,27 @@ mipslice_perturb_pixels(void *pixels,
 }
 
 static const char *
-get_image_filename(uint32_t level)
+miplevel_get_template_filename(uint32_t level, uint32_t num_levels,
+                               uint32_t layer, uint32_t num_layers)
 {
     const test_params_t *p = t_user_data;
 
+    static const char *mandrill_filenames[] = {
+        "mandrill-512x512.png",
+        "mandrill-256x256.png",
+        "mandrill-128x128.png",
+        "mandrill-64x64.png",
+        "mandrill-32x32.png",
+        "mandrill-16x16.png",
+        "mandrill-8x8.png",
+        "mandrill-4x4.png",
+        "mandrill-2x2.png",
+        "mandrill-1x1.png",
+    };
+
     if (p->width == 512 && p->height == 512) {
-        t_assert(level < ARRAY_LENGTH(image512x512_filenames));
-        return image512x512_filenames[level];
+        t_assert(level < ARRAY_LENGTH(mandrill_filenames));
+        return mandrill_filenames[level];
     } else {
         t_failf("test does support (width, height) = (%u, %u)",
                 p->width, p->height);
@@ -205,8 +206,9 @@ miptree_calc_buffer_size(void)
 }
 
 static cru_image_t *
-miplevel_make_template_image(uint32_t width, uint32_t height,
-                             uint32_t level, uint32_t num_levels)
+mipslice_make_template_image(uint32_t width, uint32_t height,
+                             uint32_t level, uint32_t num_levels,
+                             uint32_t layer, uint32_t num_layers)
 {
     const test_params_t *p = t_user_data;
     VkFormat format = p->format;
@@ -215,7 +217,11 @@ miplevel_make_template_image(uint32_t width, uint32_t height,
     t_assertf(format == VK_FORMAT_R8G8B8A8_UNORM, "FINISHME");
     t_assertf(p->aspect == VK_IMAGE_ASPECT_COLOR, "FINISHME");
 
-    const char *filename = get_image_filename(level);
+    const char *filename = miplevel_get_template_filename(level, num_levels,
+                                                          layer, num_layers);
+
+    // FIXME: Don't load the same file multiple times. It slows down the test
+    // run.
     cru_image_t *image = cru_image_load_file(filename);
     t_assert(image);
     t_cleanup_push(image);
@@ -299,13 +305,6 @@ miptree_create(void)
         const uint32_t level_width = cru_minify(width, l);
         const uint32_t level_height = cru_minify(height, l);
 
-        cru_image_t *templ_image =
-            miplevel_make_template_image(level_width, level_height,
-                                         l, levels);
-
-        t_assert(level_width == cru_image_get_width(templ_image));
-        t_assert(level_height == cru_image_get_height(templ_image));
-
         for (uint32_t a = 0; a < array_length; ++a) {
             VkAttachmentView color_view = qoCreateAttachmentView(
                 t_device,
@@ -358,13 +357,23 @@ miptree_create(void)
             qoBindImageMemory(t_device, dest_vk_image, dest_buffer_mem,
                               buffer_offset);
 
+            cru_image_t *templ_image;
             cru_image_t *src_image;
             cru_image_t *dest_image;
+
+            templ_image =
+                mipslice_make_template_image(level_width, level_height,
+                                             l, levels, a, array_length);
+            t_assert(level_width == cru_image_get_width(templ_image));
+            t_assert(level_height == cru_image_get_height(templ_image));
 
             src_image = cru_image_from_pixels(src_pixels, format,
                                               level_width, level_height);
             t_cleanup_push(src_image);
             t_assert(cru_image_copy(src_image, templ_image));
+            mipslice_perturb_pixels(src_pixels, format_info,
+                                    level_width, level_height,
+                                    l, levels, a, array_length);
 
             dest_image = cru_image_from_pixels(dest_pixels, format,
                                                level_width, level_height);
@@ -389,10 +398,6 @@ miptree_create(void)
                 .src_cru_image = src_image,
                 .dest_cru_image = dest_image,
             };
-
-            mipslice_perturb_pixels(src_pixels, format_info,
-                                    level_width, level_height,
-                                    l, levels, a, array_length);
 
             buffer_offset += cpp * level_width * level_height;
         }
