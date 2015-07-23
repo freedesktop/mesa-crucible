@@ -86,13 +86,13 @@ BUILT_SOURCES = \
 	src/tests/func/miptree/miptree_gen.c \
 	src/tests/stress/lots-of-surface-state-spirv.h
 
+bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread -lpng16
+
 %-spirv.h: %.c misc/glsl_scraper.py
 	$(AM_V_GEN) $(PYTHON2) $(srcdir)/misc/glsl_scraper.py --with-glslang=$(GLSLANG) -o $@ $<
 
 %_gen.c: %_gen.py
 	$(AM_V_GEN) $(PYTHON3) $<
-
-bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread -lpng16
 
 man1_MANS = \
     doc/crucible-bootstrap.1 \
@@ -109,4 +109,62 @@ man: $(man1_MANS)
 %.1: %.1.txt
 	$(AM_V_GEN)$(A2X) --format manpage $^
 
-CLEANFILES = $(man1_MANS) $(BUILT_SOURCES)
+built_data_files = \
+	data/grass-2048x1024.jpg \
+	data/grass-grayscale-2048x1024.png \
+	data/grass-grayscale-1024x512.png \
+	data/grass-grayscale-512x256.png \
+	data/grass-grayscale-256x128.png \
+	data/grass-grayscale-128x64.png \
+	data/grass-grayscale-64x32.png \
+	data/grass-grayscale-32x16.png \
+	data/grass-grayscale-16x8.png \
+	data/grass-grayscale-8x4.png \
+	data/grass-grayscale-4x2.png \
+	data/grass-grayscale-2x1.png \
+	data/grass-grayscale-1x1.png \
+	data/pink-leaves-2048x1024.jpg \
+	data/pink-leaves-grayscale-2048x1024.png \
+	data/pink-leaves-grayscale-1024x512.png \
+	data/pink-leaves-grayscale-512x256.png \
+	data/pink-leaves-grayscale-256x128.png \
+	data/pink-leaves-grayscale-128x64.png \
+	data/pink-leaves-grayscale-64x32.png \
+	data/pink-leaves-grayscale-32x16.png \
+	data/pink-leaves-grayscale-16x8.png \
+	data/pink-leaves-grayscale-8x4.png \
+	data/pink-leaves-grayscale-4x2.png \
+	data/pink-leaves-grayscale-2x1.png \
+	data/pink-leaves-grayscale-1x1.png \
+	$(NULL)
+
+.PHONY: data
+all: data
+data: $(built_data_files)
+	@
+
+data/grass-2048x1024.jpg: $(srcdir)/data/grass-2014x1536.jpg
+	$(AM_V_GEN)
+	@$(IMAGEMAGICK_CONVERT) $< -crop 2048x1024 $@
+	@cp data/grass-2048x1024-0.jpg $@
+
+data/grass-%.png: \
+    $(srcdir)/data/grass-2048x1024.jpg \
+    $(srcdir)/misc/gen_image
+	$(AM_V_GEN) $(PYTHON3) $(srcdir)/misc/gen_image \
+	    --convert-tool="$(IMAGEMAGICK_CONVERT)" \
+	    $< $@
+
+data/pink-leaves-2048x1024.jpg: $(srcdir)/data/pink-leaves-3264x2448.jpg
+	$(AM_V_GEN)
+	@$(IMAGEMAGICK_CONVERT) $< -crop 2048x1024 $@
+	@cp data/pink-leaves-2048x1024-2.jpg $@
+
+data/pink-leaves-%.png: \
+    $(srcdir)/data/pink-leaves-2048x1024.jpg \
+    $(srcdir)/misc/gen_image
+	$(AM_V_GEN) $(PYTHON3) $(srcdir)/misc/gen_image \
+	    --convert-tool="$(IMAGEMAGICK_CONVERT)" \
+	    $< $@
+
+CLEANFILES = $(man1_MANS) $(BUILT_SOURCES) $(built_data_files)

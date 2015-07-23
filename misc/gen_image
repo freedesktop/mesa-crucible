@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import re
+import sys
+
+from subprocess import check_call
+
+PROG_NAME = os.path.basename(sys.argv[0])
+
+def die(msg):
+    print('{}: error: {}'.format(PROG_NAME, msg), file=sys.stderr)
+    sys.exit(1)
+
+def parse_args():
+    p = argparse.ArgumentParser()
+    p.add_argument('--convert-tool', default='convert')
+    p.add_argument('-d', '--debug', action='store_true')
+    p.add_argument('src_filename')
+    p.add_argument('dest_filename')
+    return p.parse_args()
+
+def main():
+    args = parse_args()
+
+    src_filename = args.src_filename
+    dest_filename = args.dest_filename
+
+    # The badly named "convert" tool is an ImageMagick tool.
+    convert_args = [args.convert_tool, src_filename]
+
+    if re.search('grayscale', dest_filename):
+        convert_args += [
+            '-set', 'colorspace', 'Gray',
+            '-separate',
+            '-average',
+        ]
+
+    match = re.search(r'(\d+)x(\d+)', dest_filename)
+    if match is None:
+        die('dest_filename {!r} contains no size'.format(dest_filename))
+
+    width = match.groups(0)[0]
+    height = match.groups(0)[1]
+
+    convert_args += [
+        '-adaptive-resize', '{}x{}'.format(width, height),
+        dest_filename,
+    ]
+
+    if args.debug:
+        print('run: ' + ' '.join(map(repr, convert_args)))
+
+    check_call(convert_args)
+
+if __name__ == '__main__':
+    main()

@@ -9,6 +9,12 @@
 *_gen.c
 *_gen.h
 *-spirv.h
+/data/grass-*.jpg
+/data/grass-*.png
+/data/pink-leaves-*.jpg
+/data/pink-leaves-*.png
+!/data/grass-2014x1536.jpg
+!/data/pink-leaves-3264x2448.jpg
 
 # emacs
 .dir-locals.el
