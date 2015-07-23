@@ -105,6 +105,12 @@ struct cmd_vk_descriptor_pool {
     VkDescriptorPool x;
 };
 
+struct cmd_vk_descriptor_set {
+    VkDevice dev;
+    VkDescriptorPool pool;
+    VkDescriptorSet set;
+};
+
 struct cmd_vk_descriptor_set_layout {
     VkDevice dev;
     VkDescriptorSetLayout x;
@@ -336,6 +342,13 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
             CMD_SET(x);
             break;
         }
+        case CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET: {
+            CMD_CREATE(struct cmd_vk_descriptor_set);
+            CMD_SET(dev);
+            CMD_SET(pool);
+            CMD_SET(set);
+            break;
+        }
         case CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET_LAYOUT: {
             CMD_CREATE(struct cmd_vk_descriptor_set_layout);
             CMD_SET(dev);
@@ -546,6 +559,11 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
         case CRU_CLEANUP_CMD_VK_DESCRIPTOR_POOL: {
             CMD_GET(struct cmd_vk_descriptor_pool);
             vkDestroyDescriptorPool(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET: {
+            CMD_GET(struct cmd_vk_descriptor_set);
+            vkFreeDescriptorSets(cmd->dev, cmd->pool, 1, &cmd->set);
             break;
         }
         case CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET_LAYOUT: {

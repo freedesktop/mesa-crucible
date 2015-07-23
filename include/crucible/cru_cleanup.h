@@ -45,6 +45,7 @@ enum cru_cleanup_cmd {
     CRU_CLEANUP_CMD_VK_CMD_BUFFER,
     CRU_CLEANUP_CMD_VK_CMD_POOL,
     CRU_CLEANUP_CMD_VK_DESCRIPTOR_POOL,
+    CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET,
     CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET_LAYOUT,
     CRU_CLEANUP_CMD_VK_DEVICE,
     CRU_CLEANUP_CMD_VK_DEVICE_MEMORY,
@@ -102,6 +103,7 @@ static inline void cru_cleanup_push_vk_buffer_view(cru_cleanup_stack_t *c, VkDev
 static inline void cru_cleanup_push_vk_color_attachment_view(cru_cleanup_stack_t *c, VkDevice dev, VkAttachmentView x)                      { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_ATTACHMENT_VIEW,               dev, x); }
 static inline void cru_cleanup_push_vk_command_buffer(cru_cleanup_stack_t *c, VkDevice dev, VkCmdBuffer x)                                  { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_CMD_BUFFER,                    dev, x); }
 static inline void cru_cleanup_push_vk_descriptor_pool(cru_cleanup_stack_t *c, VkDevice dev, VkDescriptorPool x)                            { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DESCRIPTOR_POOL,               dev, x); }
+static inline void cru_cleanup_push_vk_descriptor_set(cru_cleanup_stack_t *c, VkDevice dev, VkDescriptorPool pool, VkDescriptorSet set)     { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET,                dev, pool, set); }
 static inline void cru_cleanup_push_vk_descriptor_set_layout(cru_cleanup_stack_t *c, VkDevice dev, VkDescriptorSetLayout x)                 { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET_LAYOUT,         dev, x); }
 static inline void cru_cleanup_push_vk_dynamic_color_blend_state(cru_cleanup_stack_t *c, VkDevice dev, VkDynamicColorBlendState x)          { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DYNAMIC_COLOR_BLEND_STATE,     dev, x); }
 static inline void cru_cleanup_push_vk_dynamic_depth_stencil_state(cru_cleanup_stack_t *c, VkDevice dev, VkDynamicDepthStencilState x)      { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DYNAMIC_DEPTH_STENCIL_STATE,   dev, x); }
