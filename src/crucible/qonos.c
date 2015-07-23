@@ -254,6 +254,7 @@ qoAllocDescriptorSets(VkDevice dev, VkDescriptorPool descriptorPool,
 
     for (uint32_t i = 0; i < count; ++i) {
         t_assert(sets[i].handle);
+        t_cleanup_push_vk_descriptor_set(dev, descriptorPool, sets[i]);
     }
 
     return result;
