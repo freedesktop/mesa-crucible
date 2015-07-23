@@ -35,6 +35,7 @@ typedef struct cru_format_info cru_format_info_t;
 enum cru_num_type {
     CRU_NUM_TYPE_UNDEFINED = 0,
     CRU_NUM_TYPE_UNORM,
+    CRU_NUM_TYPE_UINT,
     CRU_NUM_TYPE_SFLOAT,
 };
 

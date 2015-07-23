@@ -55,6 +55,13 @@ cru_format_info_table[] = {
         .depth_format = VK_FORMAT_D32_SFLOAT,
     },
     {
+        FMT(VK_FORMAT_S8_UINT),
+        .num_type = CRU_NUM_TYPE_UINT,
+        .num_channels = 1,
+        .cpp = 1,
+        .stencil_format = VK_FORMAT_S8_UINT,
+    },
+    {
         FMT(VK_FORMAT_UNDEFINED),
     },
 };
