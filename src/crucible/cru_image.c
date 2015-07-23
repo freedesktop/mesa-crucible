@@ -187,6 +187,44 @@ cru_image_write_file(cru_image_t *image, const char *_filename)
 }
 
 static bool
+copy_unorm8_to_uint8(
+    uint32_t width, uint32_t height,
+    void *src, uint32_t src_x, uint32_t src_y, uint32_t src_stride,
+    void *dest, uint32_t dest_x, uint32_t dest_y, uint32_t dest_stride)
+{
+    const uint32_t src_cpp = 1;
+    const uint32_t dest_cpp = 1;
+
+    for (uint32_t y = 0; y < height; ++y) {
+        void *src_row = src + ((src_y + y) * src_stride +
+                               src_x * src_cpp);
+
+        void *dest_row = dest + ((dest_y + y) * dest_stride +
+                                 dest_x * dest_cpp);
+
+        for (uint32_t x = 0; x < width; ++x) {
+            void *src_pix = src_row + (x * src_cpp);
+            void *dest_pix = dest_row + (x * dest_cpp);
+
+            memcpy(dest_pix, src_pix, width);
+        }
+    }
+
+    return true;
+}
+
+static bool
+copy_uint8_to_unorm8(
+    uint32_t width, uint32_t height,
+    void *src, uint32_t src_x, uint32_t src_y, uint32_t src_stride,
+    void *dest, uint32_t dest_x, uint32_t dest_y, uint32_t dest_stride)
+{
+    return copy_unorm8_to_uint8(width, height,
+                                src, src_x, src_y, src_stride,
+                                dest, dest_x, dest_y, dest_stride);
+}
+
+static bool
 copy_unorm8_to_f32(
     uint32_t width, uint32_t height,
     void *src, uint32_t src_x, uint32_t src_y, uint32_t src_stride,
@@ -300,6 +338,12 @@ cru_image_copy_pixels_to_pixels(cru_image_t *dest, cru_image_t *src)
     } else if (src_format == VK_FORMAT_D32_SFLOAT &&
                dest_format == VK_FORMAT_R8_UNORM) {
         copy_func = copy_f32_to_unorm8;
+    } else if (src_format == VK_FORMAT_R8_UNORM &&
+               dest_format == VK_FORMAT_S8_UINT) {
+        copy_func = copy_unorm8_to_uint8;
+    } else if (src_format == VK_FORMAT_S8_UINT &&
+               dest_format == VK_FORMAT_R8_UNORM) {
+        copy_func = copy_uint8_to_unorm8;
     } else {
         cru_loge("%s: unsupported format combination", __func__);
         goto fail_no_copy_func;
