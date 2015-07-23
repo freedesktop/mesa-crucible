@@ -129,8 +129,8 @@ fail_create_png_reader:
     return result;
 }
 
-bool
-cru_png_image_copy_to_pixels(cru_image_t *image, cru_image_t *dest)
+static bool
+copy_direct_from_png(cru_image_t *src, cru_image_t *dest)
 {
     cru_png_image_t *png_image;
 
@@ -138,18 +138,18 @@ cru_png_image_copy_to_pixels(cru_image_t *image, cru_image_t *dest)
     png_structp png_reader = NULL;
     png_infop png_info = NULL;
 
-    const uint32_t width = image->width;
-    const uint32_t height = image->height;
-    const uint32_t stride = width * image->format_info->cpp;
+    const uint32_t width = src->width;
+    const uint32_t height = src->height;
+    const uint32_t stride = width * src->format_info->cpp;
     uint8_t *dest_pixels = NULL;
     uint8_t *dest_rows[height];
 
-    assert(image->type == CRU_IMAGE_TYPE_PNG);
-    assert(image->width == dest->width);
-    assert(image->height == dest->height);
-    assert(image->format_info->cpp == dest->format_info->cpp);
+    assert(src->format_info == dest->format_info);
+    assert(src->type == CRU_IMAGE_TYPE_PNG);
+    assert(src->width == dest->width);
+    assert(src->height == dest->height);
 
-    png_image = (cru_png_image_t *) image;
+    png_image = (cru_png_image_t *) src;
 
     assert(!dest->read_only);
     dest_pixels = dest->map_pixels(dest, CRU_IMAGE_MAP_ACCESS_WRITE);
@@ -213,6 +213,46 @@ fail_create_png_reader:
     }
 
     return result;
+}
+
+static bool
+copy_indirect_from_png(cru_image_t *src, cru_image_t *dest)
+{
+    void *tmp_pixels = NULL;
+    cru_image_t *tmp_image = NULL;
+    bool result = false;
+
+    tmp_pixels = xmalloc(src->format_info->cpp * src->width * src->height);
+
+    tmp_image = cru_image_from_pixels(tmp_pixels,
+                                      src->format_info->format,
+                                      src->width, src->height);
+    if (!tmp_image)
+        goto cleanup;
+
+    if (!copy_direct_from_png(src, tmp_image))
+        goto cleanup;
+
+    if (!cru_image_copy(dest, tmp_image))
+        goto cleanup;
+
+    result = true;
+
+cleanup:
+    cru_image_release(tmp_image);
+    free(tmp_pixels);
+
+    return result;
+}
+
+bool
+cru_png_image_copy_to_pixels(cru_image_t *src, cru_image_t *dest)
+{
+    if (src->format_info == dest->format_info) {
+        return copy_direct_from_png(src, dest);
+    } else {
+        return copy_indirect_from_png(src, dest);
+    }
 }
 
 static uint8_t *
@@ -354,8 +394,8 @@ fail_filename:
     return NULL;
 }
 
-bool
-cru_png_image_write_file(cru_image_t *image, const string_t *filename)
+static bool
+write_direct_to_png(cru_image_t *image, const string_t *filename)
 {
     bool result = false;
     char *abspath = NULL;
@@ -457,4 +497,67 @@ fail_map_pixels:
     free(abspath);
 fail_get_abspath:
     return result;
+}
+
+static bool
+write_indirect_to_png(cru_image_t *image, const string_t *filename)
+{
+    VkFormat tmp_format;
+    const cru_format_info_t *tmp_format_info;
+    void *tmp_pixels = NULL;
+    cru_image_t *tmp_image = NULL;
+    bool result = false;
+
+    switch (image->format_info->format) {
+    case VK_FORMAT_R8G8B8A8_UNORM:
+    case VK_FORMAT_R8_UNORM:
+        tmp_format = image->format_info->format;
+        break;
+    case VK_FORMAT_D32_SFLOAT:
+        tmp_format = VK_FORMAT_R8_UNORM;
+        break;
+    default:
+        cru_loge("cannot write %s to PNG", image->format_info->name);
+        return false;
+    }
+
+    tmp_format_info = cru_format_get_info(tmp_format);
+    if (!tmp_format_info) {
+        cru_loge("unknown VkFormat %d", tmp_format);
+        return false;
+    }
+
+    tmp_pixels = xmalloc(tmp_format_info->cpp * image->width * image->height);
+
+    tmp_image = cru_image_from_pixels(tmp_pixels,
+                                      tmp_format_info->format,
+                                      image->width, image->height);
+    if (!tmp_image)
+        goto cleanup;
+
+    if (!cru_image_copy(tmp_image, image))
+        goto cleanup;
+
+    if (!write_direct_to_png(tmp_image, filename))
+        goto cleanup;
+
+    result = true;
+
+cleanup:
+    cru_image_release(tmp_image);
+    free(tmp_pixels);
+
+    return result;
+}
+
+bool
+cru_png_image_write_file(cru_image_t *image, const string_t *filename)
+{
+    switch (image->format_info->format) {
+    case VK_FORMAT_R8G8B8A8_UNORM:
+    case VK_FORMAT_R8_UNORM:
+        return write_direct_to_png(image, filename);
+    default:
+        return write_indirect_to_png(image, filename);
+    }
 }

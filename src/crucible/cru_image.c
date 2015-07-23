@@ -30,6 +30,11 @@
 
 #include "cru_image.h"
 
+typedef bool (*pixel_copy_func_t)(
+                uint32_t width, uint32_t height,
+                void *src, uint32_t src_x, uint32_t src_y, uint32_t src_stride,
+                void *dest, uint32_t dest_x, uint32_t dest_y, uint32_t dest_stride);
+
 /// Caller must free the returned string.
 char *
 cru_image_get_abspath(const char *filename)
@@ -122,11 +127,12 @@ cru_image_check_compatible(const char *func,
         return false;
     }
 
-    if (a->format_info != b->format_info) {
-        // Maybe one day we'll want to support more formats.
-        cru_loge("%s: image formats differ", func);
+    if (a->format_info->num_channels != b->format_info->num_channels) {
+        cru_loge("%s: image formats differ in number of channels", func);
         return false;
     }
+
+    // FIXME: Reject images whose channel order differs.
 
     if (a->width != b->width) {
         cru_loge("%s: image widths differ", func);
@@ -135,11 +141,6 @@ cru_image_check_compatible(const char *func,
 
     if (a->height != b->height) {
         cru_loge("%s: image heights differ", func);
-        return false;
-    }
-
-    if (a->format_info != b->format_info) {
-        cru_loge("%s: image formats differ", func);
         return false;
     }
 
@@ -186,14 +187,101 @@ cru_image_write_file(cru_image_t *image, const char *_filename)
 }
 
 static bool
+copy_unorm8_to_f32(
+    uint32_t width, uint32_t height,
+    void *src, uint32_t src_x, uint32_t src_y, uint32_t src_stride,
+    void *dest, uint32_t dest_x, uint32_t dest_y, uint32_t dest_stride)
+{
+    const uint32_t src_cpp = 1;
+    const uint32_t dest_cpp = 4;
+
+    for (uint32_t y = 0; y < height; ++y) {
+        void *src_row = src + ((src_y + y) * src_stride +
+                               src_x * src_cpp);
+
+        void *dest_row = dest + ((dest_y + y) * dest_stride +
+                                 dest_x * dest_cpp);
+
+        for (uint32_t x = 0; x < width; ++x) {
+            uint8_t *src_pix = src_row + (x * src_cpp);
+            float *dest_pix = dest_row + (x * dest_cpp);
+
+            dest_pix[0] = (float) src_pix[0] / UINT8_MAX;
+        }
+    }
+
+    return true;
+}
+
+static bool
+copy_f32_to_unorm8(
+    uint32_t width, uint32_t height,
+    void *src, uint32_t src_x, uint32_t src_y, uint32_t src_stride,
+    void *dest, uint32_t dest_x, uint32_t dest_y, uint32_t dest_stride)
+{
+    const uint32_t src_cpp = 4;
+    const uint32_t dest_cpp = 1;
+
+    for (uint32_t y = 0; y < height; ++y) {
+        void *src_row = src + ((src_y + y) * src_stride +
+                               src_x * src_cpp);
+
+        void *dest_row = dest + ((dest_y + y) * dest_stride +
+                                 dest_x * dest_cpp);
+
+        for (uint32_t x = 0; x < width; ++x) {
+            float *src_pix = src_row + (x * src_cpp);
+            uint8_t *dest_pix = dest_row + (x * dest_cpp);
+
+            dest_pix[0] = UINT8_MAX * src_pix[0];
+        }
+    }
+
+    return true;
+}
+
+static bool
+copy_oneshot_memcpy(
+    uint32_t width, uint32_t height,
+    void *src, uint32_t src_x, uint32_t src_y, uint32_t src_stride,
+    void *dest, uint32_t dest_x, uint32_t dest_y, uint32_t dest_stride)
+{
+    assert(src_x == 0);
+    assert(src_y == 0);
+    assert(dest_x == 0);
+    assert(dest_y == 0);
+    assert(src_stride == dest_stride);
+
+    memcpy(dest, src, height * src_stride);
+
+    return true;
+}
+
+static bool
 cru_image_copy_pixels_to_pixels(cru_image_t *dest, cru_image_t *src)
 {
     bool result = false;
     uint8_t *src_pixels = NULL;
     uint8_t *dest_pixels = NULL;
-    size_t image_size;
+    pixel_copy_func_t copy_func;
+
+    const VkFormat src_format = src->format_info->format;
+    const VkFormat dest_format = dest->format_info->format;
+
+    const uint32_t width = src->width;
+    const uint32_t height = src->height;
+
+    const uint32_t src_cpp = src->format_info->cpp;
+    const uint32_t src_stride = src_cpp * width;
+
+    const uint32_t dest_cpp = dest->format_info->cpp;
+    const uint32_t dest_stride = dest_cpp * width;
 
     assert(!dest->read_only);
+
+    // Extent equality is enforced by cru_image_check_compatible().
+    assert(src->width == dest->width);
+    assert(src->height == dest->height);
 
     src_pixels = src->map_pixels(src, CRU_IMAGE_MAP_ACCESS_READ);
     if (!src_pixels)
@@ -203,12 +291,25 @@ cru_image_copy_pixels_to_pixels(cru_image_t *dest, cru_image_t *src)
     if (!dest_pixels)
         goto fail_map_dest_pixels;
 
-    // src and dest must have the same size. Should be checked earlier with
-    // cru_image_check_compatible().
-    image_size = src->format_info->cpp * src->width * src->height;
+    if (src->format_info == dest->format_info
+        && src_stride == dest_stride) {
+        copy_func = copy_oneshot_memcpy;
+    } else if (src_format == VK_FORMAT_R8_UNORM &&
+               dest_format == VK_FORMAT_D32_SFLOAT) {
+        copy_func = copy_unorm8_to_f32;
+    } else if (src_format == VK_FORMAT_D32_SFLOAT &&
+               dest_format == VK_FORMAT_R8_UNORM) {
+        copy_func = copy_f32_to_unorm8;
+    } else {
+        cru_loge("%s: unsupported format combination", __func__);
+        goto fail_no_copy_func;
+    }
 
-    memcpy(dest_pixels, src_pixels, image_size);
-    result = true;
+    result = copy_func(width, height,
+                       src_pixels, 0, 0, src_stride,
+                       dest_pixels, 0, 0, dest_stride);
+
+fail_no_copy_func:
 
     // Check the result of unmapping the destination image because writeback
     // can fail during unmap.
