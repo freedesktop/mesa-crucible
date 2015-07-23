@@ -151,11 +151,11 @@ fill_rect_with_canary(void *pixels,
 /// Ensure that each mipslice's image is unique, and that each pair of images
 /// is easily distinguishable visually.
 static void
-adjust_mipslice_color(void *pixels,
-                      const cru_format_info_t *format_info,
-                      uint32_t width, uint32_t height,
-                      uint32_t level, uint32_t num_levels,
-                      uint32_t layer, uint32_t num_layers)
+mipslice_perturb_pixels(void *pixels,
+                       const cru_format_info_t *format_info,
+                       uint32_t width, uint32_t height,
+                       uint32_t level, uint32_t num_levels,
+                       uint32_t layer, uint32_t num_layers)
 {
     float red_scale = 1.0f - (float) level / num_levels;
     float blue_scale = 1.0f - (float) layer / num_layers;
@@ -390,9 +390,9 @@ miptree_create(void)
                 .dest_cru_image = dest_image,
             };
 
-            adjust_mipslice_color(src_pixels, format_info,
-                                  level_width, level_height,
-                                  l, levels, a, array_length);
+            mipslice_perturb_pixels(src_pixels, format_info,
+                                    level_width, level_height,
+                                    l, levels, a, array_length);
 
             buffer_offset += cpp * level_width * level_height;
         }
