@@ -361,6 +361,12 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
             CMD_SET(x);
             break;
         }
+        case CRU_CLEANUP_CMD_VK_DEVICE_MEMORY_MAP: {
+            CMD_CREATE(struct cmd_vk_device_memory);
+            CMD_SET(dev);
+            CMD_SET(x);
+            break;
+        }
         case CRU_CLEANUP_CMD_VK_DYNAMIC_COLOR_BLEND_STATE: {
             CMD_CREATE(struct cmd_vk_dynamic_color_blend_state);
             CMD_SET(dev);
@@ -574,6 +580,11 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
         case CRU_CLEANUP_CMD_VK_DEVICE_MEMORY: {
             CMD_GET(struct cmd_vk_device_memory);
             vkFreeMemory(cmd->dev, cmd->x);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_DEVICE_MEMORY_MAP: {
+            CMD_GET(struct cmd_vk_device_memory);
+            vkUnmapMemory(cmd->dev, cmd->x);
             break;
         }
         case CRU_CLEANUP_CMD_VK_DYNAMIC_COLOR_BLEND_STATE: {
