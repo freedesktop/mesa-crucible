@@ -37,7 +37,7 @@
 
 #include "cru_test.h"
 
-typedef struct cru_test_thread_arg cru_test_thread_arg_t;
+typedef struct user_thread_arg user_thread_arg_t;
 
 /// Tests proceed through the stages in the order listed.
 enum cru_test_phase {
@@ -107,7 +107,7 @@ struct cru_test {
     uint32_t mem_type_index_for_device_access;
 };
 
-struct cru_test_thread_arg {
+struct user_thread_arg {
     cru_test_t *test;
     void (*start_func)(void *start_arg);
     void *start_arg;
@@ -1041,7 +1041,7 @@ cru_test_create_framebuffer(cru_test_t *t)
 }
 
 static void *
-cru_test_start_main_thread(void *arg)
+main_thread_start(void *arg)
 {
     cru_test_t *t = arg;
 
@@ -1135,24 +1135,29 @@ cru_test_start_main_thread(void *arg)
     // returns. Otherwise, cru_test_wait() will deadlock waiting for test
     // cancellation unless the test created a subthread that cancels later.
     t_pass();
-}
-
-static void *
-cru_test_start_user_thread(void *arg)
-{
-    cru_test_thread_arg_t test_arg;
-
-    test_arg = *(cru_test_thread_arg_t*) arg;
-    free(arg);
-
-    cru_test_setup_thread(test_arg.test);
-    test_arg.start_func(test_arg.start_arg);
 
     return NULL;
 }
 
 static void *
-cru_test_start_cleanup_thread(void *arg)
+user_thread_start(void *_arg)
+{
+    user_thread_arg_t arg;
+
+    arg = *(user_thread_arg_t*) _arg;
+    free(_arg);
+
+    // Connect this newly created thread to the test framework before giving
+    // control to the user-supplied thread start function.
+    cru_test_setup_thread(arg.test);
+
+    arg.start_func(arg.start_arg);
+
+    return NULL;
+}
+
+static void *
+cleanup_thread_start(void *arg)
 {
     cru_test_t *t = arg;
     cru_cleanup_stack_t *cleanup = NULL;
@@ -1171,12 +1176,36 @@ cru_test_start_cleanup_thread(void *arg)
     return NULL;
 }
 
+static bool
+cru_test_create_thread(cru_test_t *t, void *(*start)(void *arg), void *arg)
+{
+    pthread_t *thread = NULL;
+    int err;
+
+    thread = xmalloc(sizeof(pthread_t));
+
+    err = pthread_create(thread, NULL, start, arg);
+    if (err) {
+        cru_loge("%s: failed to start thread", t->def->name);
+        goto fail;
+    }
+
+    if (!cru_slist_prepend(&t->threads, thread)) {
+        cru_loge("%s: leaked a test thread", t->def->name);
+        pthread_cancel(*thread);
+        goto fail;
+    }
+
+    return true;
+
+fail:
+    free(thread);
+    return false;
+}
+
 void
 cru_test_start(cru_test_t *t)
 {
-    pthread_t *start_thread = NULL;
-    int err;
-
     assert(t->phase == CRU_TEST_PHASE_PRESTART);
     t->phase = CRU_TEST_PHASE_SETUP;
 
@@ -1186,27 +1215,11 @@ cru_test_start(cru_test_t *t)
         return;
     }
 
-    start_thread = xmalloc(sizeof(pthread_t));
-    err = pthread_create(start_thread, NULL,
-                         cru_test_start_main_thread, t);
-    if (err) {
-        cru_loge("%s: failed to start main test thread", t->def->name);
-        goto fail;
+    if (!cru_test_create_thread(t, main_thread_start, t)) {
+        t->phase = CRU_TEST_PHASE_DEAD;
+        t->result = CRU_TEST_RESULT_FAIL;
+        return;
     }
-
-    if (!cru_slist_prepend(&t->threads, start_thread)) {
-        cru_loge("%s: leaked the main test thread", t->def->name);
-        pthread_cancel(*start_thread);
-        goto fail;
-    }
-
-    return;
-
-fail:
-    t->phase = CRU_TEST_PHASE_DEAD;
-    t->result = CRU_TEST_RESULT_FAIL;
-
-    free(start_thread);
 }
 
 /// Create a new test thread. Must be called from an existing test thread.
@@ -1216,12 +1229,11 @@ fail:
 void
 t_create_thread(void (*start)(void *arg), void *arg)
 {
-    cru_test_thread_arg_t *test_arg = NULL;
-    pthread_t *thread = NULL;
-    int err;
+    cru_test_t *t = cru_current_test;
+    user_thread_arg_t *test_arg = NULL;
 
     // Must be called from an existing test thread.
-    assert(cru_current_test);
+    assert(t);
     assert(start);
 
     test_arg = xzalloc(sizeof(*test_arg));
@@ -1229,24 +1241,9 @@ t_create_thread(void (*start)(void *arg), void *arg)
     test_arg->start_func = start;
     test_arg->start_arg = arg;
 
-    thread = xmalloc(sizeof(pthread_t));
-    err = pthread_create(thread, NULL, cru_test_start_user_thread, test_arg);
-    if (err) {
-        cru_loge("%s() failed to create thread", __func__);
-        goto fail;
+    if (!cru_test_create_thread(t, user_thread_start, test_arg)) {
+        t_fail_silent();
     }
-
-    if (!cru_slist_prepend(&cru_current_test->threads, thread)) {
-        cru_loge("%s() leaked the new thread", __func__);
-        pthread_cancel(*thread);
-        goto fail;
-    }
-
-    return;
-
-fail:
-    free(thread);
-    t_fail_silent();
 }
 
 static void
@@ -1284,7 +1281,7 @@ cru_test_run_cleanup_handlers(cru_test_t *t)
     assert(!cru_current_test);
     assert(t->phase == CRU_TEST_PHASE_CLEANUP);
 
-    err = pthread_create(&cleanup_thread, NULL, cru_test_start_cleanup_thread, t);
+    err = pthread_create(&cleanup_thread, NULL, cleanup_thread_start, t);
     if (err) {
         cru_loge("%s: failed to create cleanup thread", t->def->name);
         t->result = CRU_TEST_RESULT_FAIL;
