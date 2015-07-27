@@ -22,8 +22,12 @@
 #pragma once
 
 #include <crucible/cru_test.h>
+#include <crucible/cru_vec.h>
 
 typedef struct cru_test cru_test_t;
+typedef struct cru_test_def_vec cru_test_def_vec_t;
+
+CRU_VEC_DEFINE(struct cru_test_def_vec, const struct cru_test_def *);
 
 const char *cru_test_result_to_string(cru_test_result_t result);
 

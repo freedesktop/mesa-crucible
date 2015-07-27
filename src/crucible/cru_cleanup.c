@@ -25,10 +25,11 @@
 
 #include <pthread.h>
 
-#include <crucible/cru_array.h>
 #include <crucible/cru_cleanup.h>
 #include <crucible/cru_image.h>
+#include <crucible/cru_log.h>
 #include <crucible/cru_refcount.h>
+#include <crucible/cru_vec.h>
 #include <crucible/xalloc.h>
 
 struct cru_cleanup_stack {
@@ -43,7 +44,7 @@ struct cru_cleanup_stack {
     ///   ...
     ///
     /// Each header comes *after* its command.
-    cru_array_t commands;
+    cru_void_vec_t commands;
 
     cru_refcount_t refcount;
 };
@@ -218,11 +219,7 @@ cru_cleanup_create(void)
 
     c = xmalloc(sizeof(*c));
     cru_refcount_init(&c->refcount);
-
-    if (!cru_array_init(&c->commands)) {
-        free(c);
-        return NULL;
-    }
+    cru_vec_init(&c->commands);
 
     return c;
 }
@@ -241,8 +238,7 @@ cru_cleanup_release(cru_cleanup_stack_t *c)
         return;
 
     cru_cleanup_pop_all(c);
-
-    cru_array_finish(&c->commands);
+    cru_vec_finish(&c->commands);
     free(c);
 }
 
@@ -265,9 +261,7 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
     struct cmd_header *header;
 
    #define CMD_CREATE(T) \
-        T *cmd = cru_array_push(&c->commands, sizeof(*cmd)); \
-        if (!cmd) \
-            abort()
+        T *cmd = cru_vec_push(&c->commands, sizeof(*cmd))
 
    #define CMD_SET(var) \
         cmd->var = va_arg(va, __typeof__(cmd->var))
@@ -477,10 +471,7 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
         }
     }
 
-    header = cru_array_push(&c->commands, sizeof(*header));
-    if (!header)
-        abort();
-
+    header = cru_vec_push(&c->commands, sizeof(*header));
     header->cmd_type = cmd_type;
 
    #undef CMD_CREATE
@@ -493,16 +484,18 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
 {
     struct cmd_header *header;
 
-    header = cru_array_pop(&c->commands, sizeof(*header));
-    if (!header)
+    if (c->commands.len == 0)
         return false;
 
-    if (noop)
-        return true;
+    header = cru_vec_pop(&c->commands, sizeof(*header));
+
+    if (noop) {
+        cru_loge("%s: noop=true is broken", __func__);
+        abort();
+    }
 
    #define CMD_GET(T) \
-        T *cmd = cru_array_pop(&c->commands, sizeof(*cmd)); \
-        assert(cmd)
+        T *cmd = cru_vec_pop(&c->commands, sizeof(*cmd))
 
     switch (header->cmd_type) {
         // Misc objects

@@ -19,7 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include <crucible/cru_array.h>
+#include <crucible/cru_vec.h>
 
 #include "cru_cmd.h"
 #include "cru_test.h"
@@ -52,9 +52,8 @@ static const struct option longopts[] = {
     {0},
 };
 
-// Array of `const char*`.
-static cru_array_t test_patterns = CRU_ARRAY_INIT;
-static cru_array_t test_matches = CRU_ARRAY_INIT;
+static cru_cstr_vec_t test_patterns = CRU_VEC_INIT;
+static cru_test_def_vec_t test_matches = CRU_VEC_INIT;
 
 static _Atomic uint32_t num_pass;
 static _Atomic uint32_t num_skip;
@@ -95,18 +94,14 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
 
 done_getopt:
     while (optind < argc) {
-        const char *arg = argv[optind++];
+        char *arg = argv[optind++];
 
         if (arg[0] == '-') {
             cru_usage_error(cmd, "option %s follows a non-option",
                             argv[optind-1]);
         }
 
-        if (!cru_array_memcpy(&test_patterns, &arg, sizeof(arg))) {
-            cru_loge("out of memory");
-            abort();
-        }
-
+        cru_vec_push_memcpy(&test_patterns, &arg, 1);
         opt_all_tests = false;
     }
 }
@@ -177,14 +172,11 @@ collect_tests(void)
         }
     } else {
         cru_foreach_test_def(def) {
-            const char **pattern;
-            cru_array_foreach(pattern, &test_patterns) {
-                if (cru_test_def_match(def, *pattern)) {
-                    if (!cru_array_memcpy(&test_matches, &def, sizeof(def))) {
-                        cru_loge("out of memory");
-                        abort();
-                    }
+            char **pattern;
 
+            cru_vec_foreach(pattern, &test_patterns) {
+                if (cru_test_def_match(def, *pattern)) {
+                    cru_vec_push_memcpy(&test_matches, &def, 1);
                     ++num_tests;
                     break;
                 }
@@ -200,8 +192,9 @@ run_matching_tests(void)
 {
     const cru_test_def_t **def;
 
-    cru_array_foreach(def, &test_matches)
+    cru_vec_foreach(def, &test_matches) {
         run_single_test(*def);
+    }
 }
 
 static int
