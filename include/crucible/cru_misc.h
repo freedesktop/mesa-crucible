@@ -27,6 +27,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "cru_macros.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,6 +41,11 @@ typedef int cru_err_t;
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define CLAMP(x, a, b) MIN(MAX(x, a), b)
+
+/// \brief Out-of-memory handler.
+///
+/// Print an error message and exit.
+void cru_oom(void) cru_noreturn;
 
 cru_err_t cru_getenv_bool(const char *name, bool default_, bool *result);
 

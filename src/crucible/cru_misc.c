@@ -19,6 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <libgen.h>
@@ -30,6 +31,14 @@
 #include <crucible/string.h>
 
 static string_t cru_prefix_path_ = STRING_INIT;
+
+void cru_noreturn
+cru_oom(void)
+{
+    fprintf(stderr, "crucible: out of memory\n");
+    abort();
+}
+
 
 /// Set \a result and return 0 if and only if the environment variable is
 /// unset, the empty string, "0", or "1". Otherwise return -EINVAL and leave

@@ -128,14 +128,14 @@ string_grow_to_len(string_t *s, size_t len)
     uint8_t high_bit = CHAR_BIT * sizeof(new_cap) - __builtin_clzl(new_cap);
     if (new_cap != 1 << (high_bit - 1)) {
         if (high_bit == CHAR_BIT * sizeof(new_cap)) {
-            xdie_oom();
+            cru_oom();
         }
         new_cap = 1 << high_bit;
     }
 
     while (new_cap < len + 1) {
         if (cru_unlikely(new_cap > SIZE_MAX / 2)) {
-            xdie_oom();
+            cru_oom();
         }
         new_cap *= 2;
     }

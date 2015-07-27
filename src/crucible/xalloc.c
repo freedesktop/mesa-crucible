@@ -19,24 +19,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include <stdio.h>
 #include <stdlib.h>
 
+#include <crucible/cru_misc.h>
 #include <crucible/xalloc.h>
-
-void cru_noreturn
-xdie_oom(void)
-{
-    fprintf(stderr, "out of memory\n");
-    abort();
-}
 
 void *
 xmalloc(size_t size)
 {
     void *p = malloc(size);
     if (!p)
-        xdie_oom();
+        cru_oom();
     return p;
 }
 
@@ -45,7 +38,7 @@ xrealloc(void *mem, size_t size)
 {
     void *p = realloc(mem, size);
     if (!p)
-        xdie_oom();
+        cru_oom();
     return p;
 }
 
@@ -60,6 +53,6 @@ xcalloc(size_t n, size_t size)
 {
     void *p = calloc(n, size);
     if (!p)
-        xdie_oom();
+        cru_oom();
     return p;
 }

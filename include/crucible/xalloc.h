@@ -35,9 +35,6 @@ void *xrealloc(void *mem, size_t size) cru_malloclike;
 void *xzalloc(size_t size) cru_malloclike;
 void *xcalloc(size_t n, size_t size) cru_malloclike;
 
-/// Out of memory handler.
-void xdie_oom(void) cru_noreturn;
-
 #ifdef __cplusplus
 }
 #endif
