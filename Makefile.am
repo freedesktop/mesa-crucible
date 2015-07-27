@@ -58,6 +58,7 @@ bin_crucible_SOURCES = \
 	src/crucible/cru_png_image.c \
 	src/crucible/cru_slist.c \
 	src/crucible/cru_test.c \
+	src/crucible/cru_vec.c \
 	src/crucible/qonos.c \
 	src/crucible/qonos_pipeline.c \
 	src/crucible/string.c \
