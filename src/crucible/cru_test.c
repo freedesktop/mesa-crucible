@@ -119,6 +119,21 @@ static __thread cru_test_t *cru_current_test
 static __thread cru_cleanup_stack_t *cru_current_test_cleanup
     __attribute__((tls_model("local-exec")));
 
+/// Document and assert that this thread is inside a running test.
+#define ASSERT_IN_TEST_THREAD assert(cru_current_test)
+
+/// Document and assert that this thread is not inside a running test.
+///
+/// Usually, this assertion will be called by the test runner.
+#define ASSERT_NOT_IN_TEST_THREAD assert(!cru_current_test)
+
+/// Document that this function is legal to call from inside or outside a test
+/// thread.
+#define MAYBE_IN_TEST_THREAD ((void) 0)
+
+#define GET_CURRENT_TEST(__var) \
+        cru_test_t *__var = cru_current_test
+
 const char *
 cru_test_result_to_string(cru_test_result_t result)
 {
@@ -137,12 +152,16 @@ cru_test_result_to_string(cru_test_result_t result)
 cru_test_t *
 cru_test_get_current(void)
 {
+    MAYBE_IN_TEST_THREAD;
+
     return cru_current_test;
 }
 
 static void
 cru_test_set_image_filename(cru_test_t *t)
 {
+    ASSERT_NOT_IN_TEST_THREAD;
+
     // Always define the reference image's filename, even when
     // cru_test_def_t::no_image is set. This will be useful for tests that
     // generate their reference images at runtime and wish to dump them to
@@ -162,9 +181,10 @@ cru_test_set_image_filename(cru_test_t *t)
 }
 
 static void
-cru_test_load_image_file(void)
+t_load_image_file(void)
 {
-    cru_test_t *t = cru_current_test;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
 
     if (t->image)
         return;
@@ -186,6 +206,8 @@ cru_test_load_image_file(void)
 void
 cru_test_destroy(cru_test_t *t)
 {
+    ASSERT_NOT_IN_TEST_THREAD;
+
     if (!t)
         return;
 
@@ -201,6 +223,8 @@ cru_test_destroy(cru_test_t *t)
 cru_test_t *
 cru_test_create(const cru_test_def_t *def)
 {
+    ASSERT_NOT_IN_TEST_THREAD;
+
     cru_test_t *t = NULL;
     int err;
 
@@ -248,8 +272,9 @@ bool
 cru_test_enable_bootstrap(cru_test_t *t,
                           uint32_t image_width, uint32_t image_height)
 {
+    ASSERT_NOT_IN_TEST_THREAD;
+
     assert(t->phase == CRU_TEST_PHASE_PRESTART);
-    assert(!cru_current_test);
 
     if (!t->def->no_image && (image_width == 0 || image_height == 0)) {
         cru_loge("%s: bootstrap image must have non-zero size", t->def->name);
@@ -267,8 +292,9 @@ cru_test_enable_bootstrap(cru_test_t *t,
 void
 cru_test_enable_dump(cru_test_t *t)
 {
+    ASSERT_NOT_IN_TEST_THREAD;
+
     assert(t->phase == CRU_TEST_PHASE_PRESTART);
-    assert(!cru_current_test);
 
     t->no_dump = false;
 }
@@ -276,8 +302,9 @@ cru_test_enable_dump(cru_test_t *t)
 bool
 cru_test_disable_cleanup(cru_test_t *t)
 {
+    ASSERT_NOT_IN_TEST_THREAD;
+
     assert(t->phase == CRU_TEST_PHASE_PRESTART);
-    assert(!cru_current_test);
 
     t->no_cleanup = true;
     return true;
@@ -286,8 +313,9 @@ cru_test_disable_cleanup(cru_test_t *t)
 void
 cru_test_enable_spir_v(cru_test_t *t)
 {
+    ASSERT_NOT_IN_TEST_THREAD;
+
     assert(t->phase == CRU_TEST_PHASE_PRESTART);
-    assert(!cru_current_test);
 
     t->use_spir_v = true;
 }
@@ -295,196 +323,285 @@ cru_test_enable_spir_v(cru_test_t *t)
 const VkInstance *
 __t_instance(void)
 {
-    return &cru_current_test->instance;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return &t->instance;
 }
 
 const VkDevice *
 __t_device(void)
 {
-    return &cru_current_test->device;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return &t->device;
 }
 
 const VkPhysicalDevice *
 __t_physical_dev(void)
 {
-    return &cru_current_test->physical_dev;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return &t->physical_dev;
 }
 
 const VkPhysicalDeviceMemoryProperties *
 __t_physical_dev_mem_props(void)
 {
-    return &cru_current_test->physical_dev_mem_props;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return &t->physical_dev_mem_props;
 }
 
 const uint32_t
 __t_mem_type_index_for_mmap(void)
 {
-    return cru_current_test->mem_type_index_for_mmap;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return t->mem_type_index_for_mmap;
 }
 
 const uint32_t
 __t_mem_type_index_for_device_access(void)
 {
-    return cru_current_test->mem_type_index_for_device_access;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return t->mem_type_index_for_device_access;
 }
 
 const VkQueue *
 __t_queue(void)
 {
-    return &cru_current_test->queue;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return &t->queue;
 }
 
 const VkCmdPool *
 __t_cmd_pool(void)
 {
-    return &cru_current_test->cmd_pool;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return &t->cmd_pool;
 }
 
 const VkCmdBuffer *
 __t_cmd_buffer(void)
 {
-    return &cru_current_test->cmd_buffer;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return &t->cmd_buffer;
 }
 
 const VkDynamicViewportState *
 __t_dynamic_vp_state(void)
 {
-    return &cru_current_test->dynamic_vp_state;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return &t->dynamic_vp_state;
 }
 
 const VkDynamicRasterState *
 __t_dynamic_rs_state(void)
 {
-    return &cru_current_test->dynamic_rs_state;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return &t->dynamic_rs_state;
 }
 
 const VkDynamicColorBlendState *
 __t_dynamic_cb_state(void)
 {
-    return &cru_current_test->dynamic_cb_state;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return &t->dynamic_cb_state;
 }
 
 const VkDynamicDepthStencilState *
 __t_dynamic_ds_state(void)
 {
-    return &cru_current_test->dynamic_ds_state;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return &t->dynamic_ds_state;
 }
 
 const VkImage *
 __t_color_image(void)
 {
-    t_assert(!cru_current_test->def->no_image);
-    return &cru_current_test->rt_image;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    t_assert(!t->def->no_image);
+
+    return &t->rt_image;
 }
 
 const VkAttachmentView *
 __t_color_attachment_view(void)
 {
-    t_assert(!cru_current_test->def->no_image);
-    return &cru_current_test->color_attachment_view;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    t_assert(!t->def->no_image);
+
+    return &t->color_attachment_view;
 }
 
 const VkImageView *
 __t_color_image_view(void)
 {
-    t_assert(!cru_current_test->def->no_image);
-    return &cru_current_test->color_texture_view;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    t_assert(!t->def->no_image);
+
+    return &t->color_texture_view;
 }
 
 const VkImage *
 __t_ds_image(void)
 {
-    const cru_test_t *t = cru_current_test;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
 
     t_assert(!t->def->no_image);
     t_assert(t->ds_image.handle);
+
     return &t->ds_image;
 }
 
 const VkAttachmentView *
 __t_ds_attachment_view(void)
 {
-    const cru_test_t *t = cru_current_test;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
 
     t_assert(!t->def->no_image);
     t_assert(t->ds_attachment_view.handle);
+
     return &t->ds_attachment_view;
 }
 
 const VkImageView *
 __t_depth_image_view(void)
 {
-    const cru_test_t *t = cru_current_test;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
 
     t_assert(!t->def->no_image);
     t_assert(t->depth_image_view.handle);
+
     return &t->depth_image_view;
 }
 
 const VkFramebuffer *
 __t_framebuffer(void)
 {
-    t_assert(!cru_current_test->def->no_image);
-    return &cru_current_test->framebuffer;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    t_assert(!t->def->no_image);
+
+    return &t->framebuffer;
 }
 
 const VkPipelineCache *
 __t_pipeline_cache(void)
 {
-    return &cru_current_test->pipeline_cache;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return &t->pipeline_cache;
 }
 
 const uint32_t *
 __t_height(void)
 {
-    t_assert(!cru_current_test->def->no_image);
-    return &cru_current_test->height;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    t_assert(!t->def->no_image);
+
+    return &t->height;
 }
 
 const uint32_t *
 __t_width(void)
 {
-    t_assert(!cru_current_test->def->no_image);
-    return &cru_current_test->width;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    t_assert(!t->def->no_image);
+
+    return &t->width;
 }
 
 const bool *
 __t_use_spir_v(void)
 {
-    return &cru_current_test->use_spir_v;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return &t->use_spir_v;
 }
 
 const char *
 __t_name(void)
 {
-    return cru_current_test->def->name;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return t->def->name;
 }
 
 const void *
 __t_user_data(void)
 {
-    return cru_current_test->def->user_data;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return t->def->user_data;
 }
 
 cru_image_t *
 t_ref_image(void)
 {
-    t_assert(!cru_current_test->def->no_image);
-    return cru_current_test->image;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    t_assert(!t->def->no_image);
+
+    return t->image;
 }
 
 /// Illegal to call before cru_test_wait().
 cru_test_result_t
 cru_test_get_result(cru_test_t *t)
 {
+    ASSERT_NOT_IN_TEST_THREAD;
+
     assert(t->phase == CRU_TEST_PHASE_DEAD);
+
     return t->result;
 }
 
 void
 t_check_cancelled(void)
 {
-    cru_test_t *t = cru_current_test;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
 
     // If this is called outside the range of phases below, then it's not
     // a test error but a framework bug.
@@ -498,7 +615,9 @@ t_check_cancelled(void)
 void cru_noreturn
 t_end(enum cru_test_result result)
 {
-    cru_test_t *t = cru_current_test;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
     int err;
 
     // If this is called outside the range of phases below, then it's not
@@ -547,13 +666,17 @@ t_end(enum cru_test_result result)
 bool
 t_is_dump_enabled(void)
 {
-    return !cru_current_test->no_dump;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
+    return !t->no_dump;
 }
 
 void
 t_dump_seq_image(cru_image_t *image)
 {
-    cru_test_t *t = cru_current_test;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
 
     if (t->no_dump)
         return;
@@ -569,6 +692,8 @@ t_dump_seq_image(cru_image_t *image)
 void cru_printflike(2, 3)
 t_dump_image_f(cru_image_t *image, const char *format, ...)
 {
+    ASSERT_IN_TEST_THREAD;
+
     va_list va;
 
     va_start(va, format);
@@ -579,7 +704,8 @@ t_dump_image_f(cru_image_t *image, const char *format, ...)
 void
 t_dump_image_fv(cru_image_t *image, const char *format, va_list va)
 {
-    cru_test_t *t = cru_current_test;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
 
     if (t->no_dump)
         return;
@@ -595,6 +721,8 @@ t_dump_image_fv(cru_image_t *image, const char *format, va_list va)
 const cru_format_info_t *
 t_format_info(VkFormat format)
 {
+    ASSERT_IN_TEST_THREAD;
+
     const cru_format_info_t *info;
 
     info = cru_format_get_info(format);
@@ -606,7 +734,8 @@ t_format_info(VkFormat format)
 void
 t_compare_image(void)
 {
-    cru_test_t *t = cru_current_test;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
 
     t_check_cancelled();
 
@@ -692,18 +821,22 @@ t_compare_image(void)
 void cru_noreturn
 t_pass(void)
 {
+    ASSERT_IN_TEST_THREAD;
     t_end(CRU_TEST_RESULT_PASS);
 }
 
 void cru_noreturn
 __t_skip(const char *file, int line)
 {
+    ASSERT_IN_TEST_THREAD;
     __t_skipf(file, line, NULL);
 }
 
 void cru_noreturn
 __t_skipf(const char *file, int line, const char *format, ...)
 {
+    ASSERT_IN_TEST_THREAD;
+
     va_list va;
 
     va_start(va, format);
@@ -714,6 +847,8 @@ __t_skipf(const char *file, int line, const char *format, ...)
 void cru_noreturn
 __t_skipfv(const char *file, int line, const char *format, va_list va)
 {
+    ASSERT_IN_TEST_THREAD;
+
     // Check for cancellation because cancelled tests should produce no
     // messages.
     t_check_cancelled();
@@ -735,18 +870,22 @@ __t_skipfv(const char *file, int line, const char *format, va_list va)
 void cru_noreturn
 __t_skip_silent(void)
 {
+    ASSERT_IN_TEST_THREAD;
     t_end(CRU_TEST_RESULT_SKIP);
 }
 
 void cru_noreturn
 __t_fail(const char *file, int line)
 {
+    ASSERT_IN_TEST_THREAD;
     __t_failf(file, line, NULL);
 }
 
 void cru_noreturn
 __t_failf(const char *file, int line, const char *format, ...)
 {
+    ASSERT_IN_TEST_THREAD;
+
     va_list va;
 
     va_start(va, format);
@@ -757,6 +896,8 @@ __t_failf(const char *file, int line, const char *format, ...)
 void cru_noreturn
 __t_failfv(const char *file, int line, const char *format, va_list va)
 {
+    ASSERT_IN_TEST_THREAD;
+
     // Check for cancellation because cancelled tests should produce no
     // messages.
     t_check_cancelled();
@@ -778,12 +919,14 @@ __t_failfv(const char *file, int line, const char *format, va_list va)
 void cru_noreturn
 __t_fail_silent(void)
 {
+    ASSERT_IN_TEST_THREAD;
     t_end(CRU_TEST_RESULT_FAIL);
 }
 
 void
 __t_assert(const char *file, int line, bool cond, const char *cond_string)
 {
+    ASSERT_IN_TEST_THREAD;
     __t_assertf(file, line, cond, cond_string, NULL);
 }
 
@@ -791,6 +934,8 @@ void cru_printflike(5, 6)
 __t_assertf(const char *file, int line, bool cond, const char *cond_string,
             const char *format, ...)
 {
+    ASSERT_IN_TEST_THREAD;
+
     va_list va;
 
     va_start(va, format);
@@ -802,6 +947,8 @@ void
 __t_assertfv(const char *file, int line, bool cond, const char *cond_string,
              const char *format, va_list va)
 {
+    ASSERT_IN_TEST_THREAD;
+
     // Check for cancellation because cancelled tests should produce no
     // messages.
     t_check_cancelled();
@@ -861,8 +1008,11 @@ find_best_mem_type_index(
 }
 
 static void
-cru_test_init_physical_dev(cru_test_t *t)
+t_init_physical_dev(void)
 {
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
     // Crucible uses only the first physical device.
     // FINISHME: Add a command-line option to use non-default physical device.
 
@@ -876,8 +1026,11 @@ cru_test_init_physical_dev(cru_test_t *t)
 }
 
 static void
-cru_test_init_physical_dev_mem_props(cru_test_t *t)
+t_init_physical_dev_mem_props(void)
 {
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
     qoGetPhysicalDeviceMemoryProperties(t->physical_dev,
                                         &t->physical_dev_mem_props);
 
@@ -912,14 +1065,12 @@ cru_test_init_physical_dev_mem_props(cru_test_t *t)
 }
 
 static void
-cru_test_setup_thread(cru_test_t *t)
+t_setup_thread(void)
 {
-    assert(t);
-    assert(!cru_current_test);
-    assert(!cru_current_test_cleanup);
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
 
-    // Bind this thread to the test.
-    cru_current_test = t;
+    assert(!cru_current_test_cleanup);
 
     // Kill this thread if the test is already done.
     t_check_cancelled();
@@ -946,14 +1097,14 @@ fail_create_cleanup_stack:
 }
 
 static void
-create_attachment(VkDevice dev,
-                  VkFormat format,
-                  VkImageUsageFlags image_usage_flags,
-                  VkImageAspect image_aspect,
-                  uint32_t width, uint32_t height,
-                  VkImage *out_image,
-                  VkAttachmentView *out_attachment_view,
-                  VkImageView *out_image_view)
+t_create_attachment(VkDevice dev,
+                    VkFormat format,
+                    VkImageUsageFlags image_usage_flags,
+                    VkImageAspect image_aspect,
+                    uint32_t width, uint32_t height,
+                    VkImage *out_image,
+                    VkAttachmentView *out_attachment_view,
+                    VkImageView *out_image_view)
 {
     if (format == VK_FORMAT_UNDEFINED) {
         *out_image = QO_NULL_IMAGE;
@@ -997,21 +1148,24 @@ create_attachment(VkDevice dev,
 }
 
 static void
-cru_test_create_framebuffer(cru_test_t *t)
+t_create_framebuffer(void)
 {
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
     VkAttachmentBindInfo bind_info[2];
     uint32_t att_count = 0;
 
     if (t->def->no_image)
         return;
 
-    create_attachment(t->device, VK_FORMAT_R8G8B8A8_UNORM,
-                      VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-                      VK_IMAGE_ASPECT_COLOR,
-                      t->width, t->height,
-                      &t->rt_image,
-                      &t->color_attachment_view,
-                      &t->color_texture_view);
+    t_create_attachment(t->device, VK_FORMAT_R8G8B8A8_UNORM,
+                        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+                        VK_IMAGE_ASPECT_COLOR,
+                        t->width, t->height,
+                        &t->rt_image,
+                        &t->color_attachment_view,
+                        &t->color_texture_view);
 
     bind_info[att_count++] = (VkAttachmentBindInfo) {
         .view = t->color_attachment_view,
@@ -1019,13 +1173,13 @@ cru_test_create_framebuffer(cru_test_t *t)
     };
 
     if (t->def->depthstencil_format != VK_FORMAT_UNDEFINED) {
-        create_attachment(t->device, t->def->depthstencil_format,
-                          VK_IMAGE_USAGE_DEPTH_STENCIL_BIT,
-                          VK_IMAGE_ASPECT_DEPTH,
-                          t->width, t->height,
-                          &t->ds_image,
-                          &t->ds_attachment_view,
-                          &t->depth_image_view);
+        t_create_attachment(t->device, t->def->depthstencil_format,
+                            VK_IMAGE_USAGE_DEPTH_STENCIL_BIT,
+                            VK_IMAGE_ASPECT_DEPTH,
+                            t->width, t->height,
+                            &t->ds_image,
+                            &t->ds_attachment_view,
+                            &t->depth_image_view);
 
         bind_info[att_count++] = (VkAttachmentBindInfo) {
             .view = t->ds_attachment_view,
@@ -1043,15 +1197,20 @@ cru_test_create_framebuffer(cru_test_t *t)
 static void *
 main_thread_start(void *arg)
 {
-    cru_test_t *t = arg;
+    // Bind this thread to the test.
+    ASSERT_NOT_IN_TEST_THREAD;
+    cru_current_test = (cru_test_t *) arg;
+    ASSERT_IN_TEST_THREAD;
+
+    GET_CURRENT_TEST(t);
 
     assert(t->phase == CRU_TEST_PHASE_SETUP);
-    cru_test_setup_thread(t);
+    t_setup_thread();
 
     t_assertf(t->def->start, "test defines no start function");
 
     if (!t->bootstrap && !t->def->no_image)
-        cru_test_load_image_file();
+        t_load_image_file();
 
     vkCreateInstance(
         &(VkInstanceCreateInfo) {
@@ -1064,8 +1223,8 @@ main_thread_start(void *arg)
         &t->instance);
     t_cleanup_push_vk_instance(t_instance);
 
-    cru_test_init_physical_dev(t);
-    cru_test_init_physical_dev_mem_props(t);
+    t_init_physical_dev();
+    t_init_physical_dev_mem_props();
 
     vkCreateDevice(t->physical_dev,
         &(VkDeviceCreateInfo) {
@@ -1120,7 +1279,7 @@ main_thread_start(void *arg)
     vkCmdBindDynamicColorBlendState(t->cmd_buffer, t->dynamic_cb_state);
     vkCmdBindDynamicDepthStencilState(t->cmd_buffer, t->dynamic_ds_state);
 
-    cru_test_create_framebuffer(t);
+    t_create_framebuffer();
 
     t->phase = CRU_TEST_PHASE_MAIN;
     t->def->start();
@@ -1144,27 +1303,39 @@ user_thread_start(void *_arg)
 {
     user_thread_arg_t arg;
 
+    // To avoid leaking the thread argument, we must copy it.
     arg = *(user_thread_arg_t*) _arg;
     free(_arg);
 
+    // Bind this thread to the test.
+    ASSERT_NOT_IN_TEST_THREAD;
+    cru_current_test = arg.test;
+    ASSERT_IN_TEST_THREAD;
+
     // Connect this newly created thread to the test framework before giving
     // control to the user-supplied thread start function.
-    cru_test_setup_thread(arg.test);
+    t_setup_thread();
 
     arg.start_func(arg.start_arg);
 
     return NULL;
 }
 
+/// \brief The cleanup thread's start function.
+///
+/// The cleanup thread runs after all other test thread's have exited
+/// and unwinds all the test's cleanup stacks.
+///
+/// CAUTION: The cleanup thread is not a test thread. That is, inside the
+/// cleanup thread there exists no thread-local test. As a consequence, the
+/// thread can call no function whose name begins with "t_".
 static void *
 cleanup_thread_start(void *arg)
 {
+    ASSERT_NOT_IN_TEST_THREAD;
+
     cru_test_t *t = arg;
     cru_cleanup_stack_t *cleanup = NULL;
-
-    // The cleanup thread executes outside the test.
-    assert(!cru_current_test);
-    assert(!cru_current_test_cleanup);
 
     while ((cleanup = cru_slist_pop(&t->cleanup_stacks))) {
         if (t->no_cleanup)
@@ -1179,6 +1350,8 @@ cleanup_thread_start(void *arg)
 static bool
 cru_test_create_thread(cru_test_t *t, void *(*start)(void *arg), void *arg)
 {
+    MAYBE_IN_TEST_THREAD;
+
     pthread_t *thread = NULL;
     int err;
 
@@ -1206,6 +1379,8 @@ fail:
 void
 cru_test_start(cru_test_t *t)
 {
+    ASSERT_NOT_IN_TEST_THREAD;
+
     assert(t->phase == CRU_TEST_PHASE_PRESTART);
     t->phase = CRU_TEST_PHASE_SETUP;
 
@@ -1229,11 +1404,11 @@ cru_test_start(cru_test_t *t)
 void
 t_create_thread(void (*start)(void *arg), void *arg)
 {
-    cru_test_t *t = cru_current_test;
+    ASSERT_IN_TEST_THREAD;
+    GET_CURRENT_TEST(t);
+
     user_thread_arg_t *test_arg = NULL;
 
-    // Must be called from an existing test thread.
-    assert(t);
     assert(start);
 
     test_arg = xzalloc(sizeof(*test_arg));
@@ -1249,11 +1424,12 @@ t_create_thread(void (*start)(void *arg), void *arg)
 static void
 cru_test_join_threads(cru_test_t *t)
 {
+    // Test threads cannot join themselves.
+    ASSERT_NOT_IN_TEST_THREAD;
+
     int err;
     pthread_t *thread = NULL;
 
-    // Test threads cannot join themselves.
-    assert(!cru_current_test);
     assert(t->phase == CRU_TEST_PHASE_CANCELLED);
 
     while ((thread = cru_slist_pop(&t->threads))) {
@@ -1270,6 +1446,9 @@ cru_test_join_threads(cru_test_t *t)
 static void
 cru_test_run_cleanup_handlers(cru_test_t *t)
 {
+    // Cleanup handlers are ran by the runner, outside the test itself.
+    ASSERT_NOT_IN_TEST_THREAD;
+
     pthread_t cleanup_thread;
     int err;
 
@@ -1277,8 +1456,6 @@ cru_test_run_cleanup_handlers(cru_test_t *t)
     // TODO: Document that cleanup handlers run outside of test.
     // TODO: Maybe fail test if cleanup handler tries to access test data.
 
-    // Cleanup handlers are ran by the runner, outside the test itself.
-    assert(!cru_current_test);
     assert(t->phase == CRU_TEST_PHASE_CLEANUP);
 
     err = pthread_create(&cleanup_thread, NULL, cleanup_thread_start, t);
@@ -1300,6 +1477,8 @@ cru_test_run_cleanup_handlers(cru_test_t *t)
 static void
 cru_test_wait_for_phase(cru_test_t *t, enum cru_test_phase phase)
 {
+    ASSERT_NOT_IN_TEST_THREAD;
+
     int err;
 
     while (t->phase < phase) {
@@ -1314,6 +1493,8 @@ cru_test_wait_for_phase(cru_test_t *t, enum cru_test_phase phase)
 void
 cru_test_wait(cru_test_t *t)
 {
+    ASSERT_NOT_IN_TEST_THREAD;
+
     int err;
 
     if (t->phase >= CRU_TEST_PHASE_DEAD)
@@ -1342,6 +1523,8 @@ cru_test_wait(cru_test_t *t)
 void
 t_cleanup_push_command(enum cru_cleanup_cmd cmd, ...)
 {
+    ASSERT_IN_TEST_THREAD;
+
     va_list va;
 
     va_start(va, cmd);
@@ -1352,6 +1535,8 @@ t_cleanup_push_command(enum cru_cleanup_cmd cmd, ...)
 void
 t_cleanup_push_commandv(enum cru_cleanup_cmd cmd, va_list va)
 {
+    ASSERT_IN_TEST_THREAD;
+
     assert(cru_current_test_cleanup);
     cru_cleanup_push_commandv(cru_current_test_cleanup, cmd, va);
 }
@@ -1359,6 +1544,8 @@ t_cleanup_push_commandv(enum cru_cleanup_cmd cmd, va_list va)
 void
 t_cleanup_pop(void)
 {
+    ASSERT_IN_TEST_THREAD;
+
     assert(cru_current_test_cleanup);
     cru_cleanup_pop(cru_current_test_cleanup);
 }
@@ -1366,12 +1553,15 @@ t_cleanup_pop(void)
 void
 t_cleanup_pop_all(void)
 {
+    ASSERT_IN_TEST_THREAD;
+
     cru_cleanup_pop_all(cru_current_test_cleanup);
 }
 
 bool
 cru_test_def_match(const cru_test_def_t *def, const char *glob)
 {
+    MAYBE_IN_TEST_THREAD;
     return fnmatch(glob, def->name, 0) == 0;
 }
 
