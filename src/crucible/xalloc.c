@@ -34,6 +34,17 @@ xmalloc(size_t size)
 }
 
 void *
+xmallocn(size_t n, size_t size)
+{
+    size_t total_size;
+
+    if (!cru_unlikely(cru_mul_size_checked(&total_size, n, size)))
+        cru_oom();
+
+    return xmalloc(total_size);
+}
+
+void *
 xrealloc(void *mem, size_t size)
 {
     void *p = realloc(mem, size);
@@ -43,9 +54,31 @@ xrealloc(void *mem, size_t size)
 }
 
 void *
+xreallocn(void *mem, size_t n, size_t size)
+{
+    size_t total_size;
+
+    if (!cru_unlikely(cru_mul_size_checked(&total_size, n, size)))
+        cru_oom();
+
+    return xrealloc(mem, total_size);
+}
+
+void *
 xzalloc(size_t size)
 {
     return xcalloc(1, size);
+}
+
+void *
+xzallocn(size_t n, size_t size)
+{
+    size_t total_size;
+
+    if (!cru_unlikely(cru_mul_size_checked(&total_size, n, size)))
+        cru_oom();
+
+    return xzalloc(total_size);
 }
 
 void *

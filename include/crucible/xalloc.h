@@ -31,8 +31,11 @@ extern "C" {
 #endif
 
 void *xmalloc(size_t size) cru_malloclike;
+void *xmallocn(size_t n, size_t size) cru_malloclike;
 void *xrealloc(void *mem, size_t size) cru_malloclike;
+void *xreallocn(void *mem, size_t n, size_t size) cru_malloclike;
 void *xzalloc(size_t size) cru_malloclike;
+void *xzallocn(size_t n, size_t size) cru_malloclike;
 void *xcalloc(size_t n, size_t size) cru_malloclike;
 
 #ifdef __cplusplus
