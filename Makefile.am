@@ -31,6 +31,7 @@ common_CFLAGS = -Wall -O0 -g3
 CFLAGS = -std=gnu11 \
 	 $(common_CFLAGS) \
 	-Werror=implicit-function-declaration \
+	-Werror=implicit-int \
 	-Werror=missing-prototypes
 
 CXXFLAGS = -std=c++11 $(common_CFLAGS)
