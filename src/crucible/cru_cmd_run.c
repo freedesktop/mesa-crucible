@@ -27,7 +27,6 @@
 static int opt_no_cleanup = 0;
 static int opt_dump = 0;
 static int opt_use_spir_v = 0;
-static int opt_all_tests = 1;
 
 // From man:getopt(3) :
 //
@@ -101,8 +100,7 @@ done_getopt:
                             argv[optind-1]);
         }
 
-        cru_vec_push_memcpy(&test_patterns, &arg, 1);
-        opt_all_tests = false;
+        *cru_vec_push(&test_patterns, 1) = arg;
     }
 }
 
@@ -119,113 +117,90 @@ report_result(const const char *name, cru_test_result_t result)
 }
 
 static void
-run_single_test(const cru_test_def_t *def)
-{
-    cru_test_t *test;
-
-    cru_log_tag("start", "%s", def->name);
-
-    test = cru_test_create(def);
-    if (!test) {
-        report_result(def->name, CRU_TEST_RESULT_FAIL);
-        return;
-    }
-
-    cru_test_enable_dump(test, opt_dump);
-
-    if (opt_no_cleanup)
-        cru_test_disable_cleanup(test);
-
-    if (opt_use_spir_v)
-        cru_test_enable_spir_v(test);
-
-    cru_test_start(test);
-    cru_test_wait(test);
-    report_result(def->name, cru_test_get_result(test));
-    cru_test_destroy(test);
-}
-
-static void
-run_all_tests(void)
-{
-    const cru_test_def_t *def;
-
-    cru_foreach_test_def(def) {
-        if (!cru_test_def_match(def, "example.*")) {
-          run_single_test(def);
-        }
-    }
-}
-
-/// Return number of tests.
-static uint32_t
 collect_tests(void)
 {
-    uint32_t num_tests = 0;
     const cru_test_def_t *def;
 
-    if (opt_all_tests) {
+    if (test_patterns.len == 0) {
+        // Run all non-example tests.
         cru_foreach_test_def(def) {
             if (!cru_test_def_match(def, "example.*")) {
-                ++num_tests;
+                *cru_vec_push(&test_defs, 1) = def;
             }
         }
     } else {
+        // Run all test that match a glob pattern.
         cru_foreach_test_def(def) {
             char **pattern;
 
             cru_vec_foreach(pattern, &test_patterns) {
                 if (cru_test_def_match(def, *pattern)) {
-                    cru_vec_push_memcpy(&test_defs, &def, 1);
-                    ++num_tests;
+                    *cru_vec_push(&test_defs, 1) = def;
                     break;
                 }
             }
         }
     }
-
-    return num_tests;
 }
 
 static void
-run_matching_tests(void)
+run_tests(void)
 {
     const cru_test_def_t **def;
 
     cru_vec_foreach(def, &test_defs) {
-        run_single_test(*def);
+        cru_test_t *test;
+
+        cru_log_tag("start", "%s", (*def)->name);
+
+        test = cru_test_create(*def);
+        if (!test) {
+            report_result((*def)->name, CRU_TEST_RESULT_FAIL);
+            continue;
+        }
+
+        cru_test_enable_dump(test, opt_dump);
+
+        if (opt_no_cleanup)
+            cru_test_disable_cleanup(test);
+
+        if (opt_use_spir_v)
+            cru_test_enable_spir_v(test);
+
+        cru_test_start(test);
+        cru_test_wait(test);
+        report_result((*def)->name, cru_test_get_result(test));
+        cru_test_destroy(test);
     }
 }
 
 static int
 cmd_start(const cru_command_t *cmd, int argc, char **argv)
 {
-    uint32_t num_tests;
     uint32_t num_missing;
     const char *tests_str;
 
     parse_args(cmd, argc, argv);
-    num_tests = collect_tests();
 
-    if (num_tests == 1)
+    collect_tests();
+
+    if (test_defs.len == 1) {
         tests_str = "test";
-    else
+    } else {
         tests_str = "tests";
+    }
 
     cru_log_align_tags(true);
-    cru_logi("running %u %s", num_tests, tests_str);
+    cru_logi("running %zu %s", test_defs.len, tests_str);
 
-    if (opt_all_tests)
-        run_all_tests();
-    else
-        run_matching_tests();
+    run_tests();
 
-    cru_logi("ran %u %s", num_tests, tests_str);
+    cru_logi("ran %zu %s", test_defs.len, tests_str);
     cru_logi("pass %u", num_pass);
     cru_logi("fail %u", num_fail);
     cru_logi("skip %u", num_skip);
 
-    num_missing = num_tests - (num_pass + num_fail + num_skip);
+    num_missing = test_defs.len - (num_pass + num_fail + num_skip);
     if (num_missing > 0)
         cru_logi("missing %u", num_missing);
 
