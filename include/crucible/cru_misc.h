@@ -70,6 +70,20 @@ cru_align_size(size_t n, size_t a)
     return (n + a - 1) & ~(a - 1);
 }
 
+static inline bool
+cru_add_size_checked(size_t *result, size_t a, size_t b)
+{
+    *result = a + b;
+    return a <= SIZE_MAX - b;
+}
+
+static inline bool
+cru_mul_size_checked(size_t *result, size_t a, size_t b)
+{
+    *result = a * b;
+    return a <= SIZE_MAX / b;
+}
+
 /// The path that contains all of Crucible's files. This is normally the top of
 /// the git repository.
 const string_t * cru_prefix_path(void);
