@@ -67,7 +67,10 @@ xreallocn(void *mem, size_t n, size_t size)
 void *
 xzalloc(size_t size)
 {
-    return xcalloc(1, size);
+    void *p = calloc(1, size);
+    if (!p)
+        cru_oom();
+    return p;
 }
 
 void *
@@ -79,13 +82,4 @@ xzallocn(size_t n, size_t size)
         cru_oom();
 
     return xzalloc(total_size);
-}
-
-void *
-xcalloc(size_t n, size_t size)
-{
-    void *p = calloc(n, size);
-    if (!p)
-        cru_oom();
-    return p;
 }
