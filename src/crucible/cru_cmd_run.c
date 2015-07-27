@@ -159,7 +159,8 @@ run_tests(void)
             continue;
         }
 
-        cru_test_enable_dump(test, opt_dump);
+        if (opt_dump)
+            cru_test_enable_dump(test);
 
         if (opt_no_cleanup)
             cru_test_disable_cleanup(test);

@@ -265,12 +265,12 @@ cru_test_enable_bootstrap(cru_test_t *t,
 }
 
 void
-cru_test_enable_dump(cru_test_t *t, bool enable)
+cru_test_enable_dump(cru_test_t *t)
 {
     assert(t->phase == CRU_TEST_PHASE_PRESTART);
     assert(!cru_current_test);
 
-    t->no_dump = !enable;
+    t->no_dump = false;
 }
 
 bool
