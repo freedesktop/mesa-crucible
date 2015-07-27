@@ -149,12 +149,12 @@ cru_test_result_to_string(cru_test_result_t result)
     cru_unreachable;
 }
 
-cru_test_t *
-cru_test_get_current(void)
+bool
+cru_test_is_current(void)
 {
     MAYBE_IN_TEST_THREAD;
 
-    return cru_current_test;
+    return cru_current_test != NULL;
 }
 
 static void

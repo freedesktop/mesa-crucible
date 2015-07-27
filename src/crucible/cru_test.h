@@ -31,7 +31,7 @@ CRU_VEC_DEFINE(struct cru_test_def_vec, const struct cru_test_def *);
 
 const char *cru_test_result_to_string(cru_test_result_t result);
 
-cru_test_t *cru_test_get_current(void);
+bool cru_test_is_current(void);
 cru_test_t *cru_test_create(const cru_test_def_t *def);
 void cru_test_destroy(cru_test_t *test);
 void cru_test_enable_dump(cru_test_t *t);

@@ -92,7 +92,7 @@ cru_log_tag_v(const char *tag, const char *format, va_list va)
         printf("crucible: %s: ", tag);
     }
 
-    if (cru_test_get_current()) {
+    if (cru_test_is_current()) {
         printf("%s: ", t_name);
     }
 
