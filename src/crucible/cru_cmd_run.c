@@ -53,7 +53,7 @@ static const struct option longopts[] = {
 };
 
 static cru_cstr_vec_t test_patterns = CRU_VEC_INIT;
-static cru_test_def_vec_t test_matches = CRU_VEC_INIT;
+static cru_test_def_vec_t test_defs = CRU_VEC_INIT;
 
 static _Atomic uint32_t num_pass;
 static _Atomic uint32_t num_skip;
@@ -176,7 +176,7 @@ collect_tests(void)
 
             cru_vec_foreach(pattern, &test_patterns) {
                 if (cru_test_def_match(def, *pattern)) {
-                    cru_vec_push_memcpy(&test_matches, &def, 1);
+                    cru_vec_push_memcpy(&test_defs, &def, 1);
                     ++num_tests;
                     break;
                 }
@@ -192,7 +192,7 @@ run_matching_tests(void)
 {
     const cru_test_def_t **def;
 
-    cru_vec_foreach(def, &test_matches) {
+    cru_vec_foreach(def, &test_defs) {
         run_single_test(*def);
     }
 }
