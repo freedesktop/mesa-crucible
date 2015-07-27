@@ -40,6 +40,10 @@ typedef int cru_err_t;
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
+
+#define MIN3(a, b, c) MIN(a, MIN(b, c))
+#define MAX3(a, b, c) MAX(a, MAX(b, c))
+
 #define CLAMP(x, a, b) MIN(MAX(x, a), b)
 
 /// \brief Out-of-memory handler.
