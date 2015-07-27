@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <crucible/cru_array.h>
 #include <crucible/cru_cleanup.h>
 #include <crucible/cru_format.h>
 #include <crucible/cru_image.h>

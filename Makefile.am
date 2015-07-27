@@ -40,7 +40,6 @@ noinst_PROGRAMS = \
 	bin/crucible
 
 bin_crucible_SOURCES = \
-	src/crucible/cru_array.c \
 	src/crucible/cru_cleanup.c \
 	src/crucible/cru_cmd.c \
 	src/crucible/cru_cmd_bootstrap.c \
