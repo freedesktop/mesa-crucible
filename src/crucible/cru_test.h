@@ -48,10 +48,5 @@ const cru_test_def_t *cru_find_def(const char *name);
 bool cru_test_def_match(const cru_test_def_t *def, const char *glob);
 
 #define cru_foreach_test_def(def) \
-   \
-   cru_static_assert( \
-      __builtin_types_compatible_p(__typeof__(def), \
-                                   const cru_test_def_t *)); \
-   \
    for (def = &__start_cru_test_defs; \
         def < &__stop_cru_test_defs; ++def)
