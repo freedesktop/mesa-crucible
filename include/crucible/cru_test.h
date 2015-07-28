@@ -66,35 +66,39 @@ typedef enum cru_test_result {
     CRU_TEST_RESULT_FAIL,
 } cru_test_result_t;
 
+/// \brief A test definition.
+///
+/// All public members are const. This prevents a test from modifying its
+/// definition while running.
 struct cru_test_def {
     /// The test name must be a valid filename with no path separator.
-    const char *name;
+    const char *const name;
 
     /// Reserved for the test author. The test framework never touches this
     /// data.
-    const void *user_data;
+    const void *const user_data;
 
     /// \brief Filename of the test's reference image.
     ///
     /// The filename is relative to Crucible's "img" directory. If unset, then
     /// the default filename "{test_name}.ref.png" is used.
-    const char *image_filename;
+    const char *const image_filename;
 
-    void (*start)(void);
-    uint32_t samples;
-    bool no_image;
+    void (*const start)(void);
+    const uint32_t samples;
+    const bool no_image;
 
     /// \brief Create a default depthstencil attachment.
     ///
     /// If and only if depthstencil_format is set, then the test's default
     /// framebuffer (t_framebuffer) will have a depthstencil attachment; and
     /// t_ds_image, t_ds_attachment_view, and t_depth_view will be non-null.
-    VkFormat depthstencil_format;
+    const VkFormat depthstencil_format;
 
     /// \brief Skip this test.
     ///
     /// This is useful for work-in-progress tests.
-    bool skip;
+    const bool skip;
 } __attribute__((aligned(32)));
 
 /// Example usage:
