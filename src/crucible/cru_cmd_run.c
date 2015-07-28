@@ -54,9 +54,9 @@ static const struct option longopts[] = {
 static cru_cstr_vec_t test_patterns = CRU_VEC_INIT;
 static cru_test_def_vec_t test_defs = CRU_VEC_INIT;
 
-static _Atomic uint32_t num_pass;
-static _Atomic uint32_t num_skip;
-static _Atomic uint32_t num_fail;
+static uint32_t num_pass;
+static uint32_t num_skip;
+static uint32_t num_fail;
 
 static void
 parse_args(const cru_command_t *cmd, int argc, char **argv)
