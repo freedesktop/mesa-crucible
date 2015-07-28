@@ -22,7 +22,7 @@
 #include <crucible/cru_vec.h>
 
 #include "cru_cmd.h"
-#include "cru_test.h"
+#include "cru_runner.h"
 
 static int opt_no_cleanup = 0;
 static int opt_dump = 0;
@@ -52,11 +52,6 @@ static const struct option longopts[] = {
 };
 
 static cru_cstr_vec_t test_patterns = CRU_VEC_INIT;
-
-static uint32_t num_tests;
-static uint32_t num_pass;
-static uint32_t num_skip;
-static uint32_t num_fail;
 
 static void
 parse_args(const cru_command_t *cmd, int argc, char **argv)
@@ -104,116 +99,25 @@ done_getopt:
     }
 }
 
-static void
-report_result(const const char *name, cru_test_result_t result)
-{
-    switch (result) {
-        case CRU_TEST_RESULT_PASS: num_pass++; break;
-        case CRU_TEST_RESULT_FAIL: num_fail++; break;
-        case CRU_TEST_RESULT_SKIP: num_skip++; break;
-    }
-
-    cru_log_tag(cru_test_result_to_string(result), "%s", name);
-}
-
-static void
-collect_tests(void)
-{
-    cru_test_def_t *def;
-
-    if (test_patterns.len == 0) {
-        // Run all non-example tests.
-        cru_foreach_test_def(def) {
-            if (!cru_test_def_match(def, "example.*")) {
-                def->priv.run = true;
-                ++num_tests;
-            }
-        }
-    } else {
-        // Run all test that match a glob pattern.
-        cru_foreach_test_def(def) {
-            char **pattern;
-
-            cru_vec_foreach(pattern, &test_patterns) {
-                if (cru_test_def_match(def, *pattern)) {
-                    def->priv.run = true;
-                    ++num_tests;
-                    break;
-                }
-            }
-        }
-    }
-}
-
-static void
-run_tests(void)
-{
-    const cru_test_def_t *def;
-
-    cru_foreach_test_def(def) {
-        cru_test_t *test;
-
-        if (!def->priv.run)
-            continue;
-
-        cru_log_tag("start", "%s", def->name);
-
-        test = cru_test_create(def);
-        if (!test) {
-            report_result(def->name, CRU_TEST_RESULT_FAIL);
-            continue;
-        }
-
-        if (opt_dump)
-            cru_test_enable_dump(test);
-
-        if (opt_no_cleanup)
-            cru_test_disable_cleanup(test);
-
-        if (opt_use_spir_v)
-            cru_test_enable_spir_v(test);
-
-        cru_test_start(test);
-        cru_test_wait(test);
-        report_result(def->name, cru_test_get_result(test));
-        cru_test_destroy(test);
-    }
-}
-
 static int
 cmd_start(const cru_command_t *cmd, int argc, char **argv)
 {
-    uint32_t num_missing;
-    const char *tests_str;
-
     parse_args(cmd, argc, argv);
 
-    collect_tests();
+    cru_runner_do_cleanup_phase = !opt_no_cleanup;
+    cru_runner_do_image_dumps = opt_dump;
+    cru_runner_use_spir_v = opt_use_spir_v;
 
-    if (num_tests == 1) {
-        tests_str = "test";
+    if (test_patterns.len == 0) {
+        cru_runner_mark_all_nonexample_tests();
     } else {
-        tests_str = "tests";
+        cru_runner_mark_matching_tests(&test_patterns);
     }
 
-    cru_log_align_tags(true);
-    cru_logi("running %u %s", num_tests, tests_str);
-
-    run_tests();
-
-    cru_logi("ran %u %s", num_tests, tests_str);
-    cru_logi("pass %u", num_pass);
-    cru_logi("fail %u", num_fail);
-    cru_logi("skip %u", num_skip);
-
-    num_missing = num_tests - (num_pass + num_fail + num_skip);
-    if (num_missing > 0)
-        cru_logi("missing %u", num_missing);
-
-    if (num_pass == 0 || num_fail > 0 || num_missing > 0) {
-        exit(1);
+    if (cru_runner_run_tests()) {
+        exit(EXIT_SUCCESS);
     } else {
-        exit(0);
+        exit(EXIT_FAILURE);
     }
 }
 
