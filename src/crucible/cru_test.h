@@ -42,7 +42,7 @@ void cru_test_start(cru_test_t *test);
 void cru_test_wait(cru_test_t *test);
 cru_test_result_t cru_test_get_result(cru_test_t *test);
 
-extern const cru_test_def_t __start_cru_test_defs, __stop_cru_test_defs;
+extern cru_test_def_t __start_cru_test_defs, __stop_cru_test_defs;
 uint32_t cru_num_defs(void);
 const cru_test_def_t *cru_find_def(const char *name);
 bool cru_test_def_match(const cru_test_def_t *def, const char *glob);

@@ -99,6 +99,17 @@ struct cru_test_def {
     ///
     /// This is useful for work-in-progress tests.
     const bool skip;
+
+    /// \brief Private data for the test framework.
+    ///
+    /// Test authors shouldn't touch this struct.
+    ///
+    /// The test runner walks twice over the global list of test definitions.
+    /// In the first pass, it marks each test that it plans to run by setting
+    /// cru_test_def::priv::run. In the second pass, it runs the tests.
+    struct cru_test_def_priv {
+        bool run;
+    } priv;
 } __attribute__((aligned(32)));
 
 /// Example usage:
@@ -115,7 +126,7 @@ struct cru_test_def {
 ///    }
 ///
 #define cru_define_test \
-    static const cru_test_def_t \
+    static cru_test_def_t \
     CRU_CAT(__cru_test_def_, __COUNTER__) \
         __attribute__((__section__("cru_test_defs"))) \
         __attribute__((__used__)) =

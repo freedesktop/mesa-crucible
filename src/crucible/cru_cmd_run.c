@@ -52,8 +52,8 @@ static const struct option longopts[] = {
 };
 
 static cru_cstr_vec_t test_patterns = CRU_VEC_INIT;
-static cru_test_def_vec_t test_defs = CRU_VEC_INIT;
 
+static uint32_t num_tests;
 static uint32_t num_pass;
 static uint32_t num_skip;
 static uint32_t num_fail;
@@ -119,13 +119,14 @@ report_result(const const char *name, cru_test_result_t result)
 static void
 collect_tests(void)
 {
-    const cru_test_def_t *def;
+    cru_test_def_t *def;
 
     if (test_patterns.len == 0) {
         // Run all non-example tests.
         cru_foreach_test_def(def) {
             if (!cru_test_def_match(def, "example.*")) {
-                *cru_vec_push(&test_defs, 1) = def;
+                def->priv.run = true;
+                ++num_tests;
             }
         }
     } else {
@@ -135,7 +136,8 @@ collect_tests(void)
 
             cru_vec_foreach(pattern, &test_patterns) {
                 if (cru_test_def_match(def, *pattern)) {
-                    *cru_vec_push(&test_defs, 1) = def;
+                    def->priv.run = true;
+                    ++num_tests;
                     break;
                 }
             }
@@ -146,16 +148,19 @@ collect_tests(void)
 static void
 run_tests(void)
 {
-    const cru_test_def_t **def;
+    const cru_test_def_t *def;
 
-    cru_vec_foreach(def, &test_defs) {
+    cru_foreach_test_def(def) {
         cru_test_t *test;
 
-        cru_log_tag("start", "%s", (*def)->name);
+        if (!def->priv.run)
+            continue;
 
-        test = cru_test_create(*def);
+        cru_log_tag("start", "%s", def->name);
+
+        test = cru_test_create(def);
         if (!test) {
-            report_result((*def)->name, CRU_TEST_RESULT_FAIL);
+            report_result(def->name, CRU_TEST_RESULT_FAIL);
             continue;
         }
 
@@ -170,7 +175,7 @@ run_tests(void)
 
         cru_test_start(test);
         cru_test_wait(test);
-        report_result((*def)->name, cru_test_get_result(test));
+        report_result(def->name, cru_test_get_result(test));
         cru_test_destroy(test);
     }
 }
@@ -185,23 +190,23 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
 
     collect_tests();
 
-    if (test_defs.len == 1) {
+    if (num_tests == 1) {
         tests_str = "test";
     } else {
         tests_str = "tests";
     }
 
     cru_log_align_tags(true);
-    cru_logi("running %zu %s", test_defs.len, tests_str);
+    cru_logi("running %u %s", num_tests, tests_str);
 
     run_tests();
 
-    cru_logi("ran %zu %s", test_defs.len, tests_str);
+    cru_logi("ran %u %s", num_tests, tests_str);
     cru_logi("pass %u", num_pass);
     cru_logi("fail %u", num_fail);
     cru_logi("skip %u", num_skip);
 
-    num_missing = test_defs.len - (num_pass + num_fail + num_skip);
+    num_missing = num_tests - (num_pass + num_fail + num_skip);
     if (num_missing > 0)
         cru_logi("missing %u", num_missing);
 
