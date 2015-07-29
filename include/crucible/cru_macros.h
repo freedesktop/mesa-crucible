@@ -33,6 +33,7 @@ extern "C" {
 #define cru_noreturn __attribute__((__noreturn__))
 #define cru_constructor __attribute__((__constructor__))
 #define cru_printflike(a, b) __attribute__((__format__(__printf__, a, b)))
+#define cru_pure __attribute__((__pure__))
 #define cru_malloclike __attribute__((__malloc__))
 
 #define cru_static_assert(expr) _Static_assert((expr), "")
