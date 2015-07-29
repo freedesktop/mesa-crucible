@@ -19,7 +19,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include <fnmatch.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1556,31 +1555,4 @@ t_cleanup_pop_all(void)
     ASSERT_IN_TEST_THREAD;
 
     cru_cleanup_pop_all(cru_current_test_cleanup);
-}
-
-bool
-cru_test_def_match(const cru_test_def_t *def, const char *glob)
-{
-    MAYBE_IN_TEST_THREAD;
-    return fnmatch(glob, def->name, 0) == 0;
-}
-
-uint32_t
-cru_num_defs(void)
-{
-    return &__stop_cru_test_defs - &__start_cru_test_defs;
-}
-
-const cru_test_def_t *
-cru_find_def(const char *name)
-{
-    const cru_test_def_t *def;
-
-    cru_foreach_test_def(def) {
-        if (cru_streq(def->name, name)) {
-            return def;
-        }
-    }
-
-    return NULL;
 }

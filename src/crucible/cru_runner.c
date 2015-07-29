@@ -41,6 +41,7 @@
 
 #include "cru_runner.h"
 #include "cru_test.h"
+#include "cru_test_def.h"
 
 typedef struct cru_runch cru_runch_t;
 typedef struct cru_runch_packet cru_runch_packet_t;

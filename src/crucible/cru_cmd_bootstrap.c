@@ -19,8 +19,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include "cru_test.h"
 #include "cru_cmd.h"
+#include "cru_test.h"
+#include "cru_test_def.h"
 
 enum {
     OPT_HELP = 'h',
