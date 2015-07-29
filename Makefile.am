@@ -28,7 +28,9 @@ CPPFLAGS = \
    -Iinclude
 
 common_CFLAGS = -Wall -O0 -g3 \
-	-Werror=int-conversion
+	-Werror=incompatible-pointer-types \
+	-Werror=int-conversion \
+	$(NULL)
 
 CFLAGS = -std=gnu11 \
 	 $(common_CFLAGS) \
