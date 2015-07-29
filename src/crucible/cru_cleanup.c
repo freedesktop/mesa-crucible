@@ -35,7 +35,7 @@
 struct cru_cleanup_stack {
     /// \brief Stack of commands
     ///
-    /// The array contents look like:
+    /// The stack's memory layout is:
     ///
     ///   struct cmd_FOO1;
     ///   struct cmd_header;
@@ -43,7 +43,9 @@ struct cru_cleanup_stack {
     ///   struct cmd_header;
     ///   ...
     ///
-    /// Each header comes *after* its command.
+    /// The metadata (the header) must come *after* its command because (1)
+    /// commands are variable length and (2) the stack is unwound in LIFO
+    /// order.
     cru_void_vec_t commands;
 
     cru_refcount_t refcount;
