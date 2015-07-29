@@ -70,6 +70,7 @@ bin_crucible_SOURCES = \
 	src/tests/example/basic.c \
 	src/tests/example/images.c \
 	src/tests/example/messages.c \
+	src/tests/func/cmd-buffer/secondary.c \
 	src/tests/func/copy/copy-buffer.c \
 	src/tests/func/depthstencil/basic.c \
 	src/tests/func/desc/dynamic.c \
