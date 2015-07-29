@@ -27,7 +27,8 @@ CPPFLAGS = \
    -D_XOPEN_SOURCE=700 \
    -Iinclude
 
-common_CFLAGS = -Wall -O0 -g3
+common_CFLAGS = -Wall -O0 -g3 \
+	-Werror=int-conversion
 
 CFLAGS = -std=gnu11 \
 	 $(common_CFLAGS) \
