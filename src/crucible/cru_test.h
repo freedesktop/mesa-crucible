@@ -47,6 +47,24 @@ uint32_t cru_num_defs(void);
 const cru_test_def_t *cru_find_def(const char *name);
 bool cru_test_def_match(const cru_test_def_t *def, const char *glob);
 
+static inline uint64_t cru_pure
+cru_test_def_get_id(const cru_test_def_t *def)
+{
+    return def - &__start_cru_test_defs;
+}
+
+static inline cru_test_def_t * cru_pure
+cru_test_def_from_id(uint64_t id)
+{
+    cru_test_def_t *def = &__start_cru_test_defs + id;
+
+    if (def < &__stop_cru_test_defs) {
+        return def;
+    } else {
+        return NULL;
+    }
+}
+
 #define cru_foreach_test_def(def) \
    for (def = &__start_cru_test_defs; \
         def < &__stop_cru_test_defs; ++def)
