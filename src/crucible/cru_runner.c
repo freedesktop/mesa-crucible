@@ -89,15 +89,18 @@ struct cru_result_packet {
 #define ASSERT_IN_SLAVE_PROCESS(slave) \
     assert((slave)->pid == 0)
 
+struct cru_master {
+    uint32_t num_tests;
+    uint32_t num_pass;
+    uint32_t num_fail;
+    uint32_t num_skip;
+};
+
+static struct cru_master master = {0};
+
 bool cru_runner_do_cleanup_phase = true;
 bool cru_runner_do_image_dumps = false;
 bool cru_runner_use_spir_v = false;
-
-// Only the master process touches these test counts.
-static uint32_t num_tests = 0;
-static uint32_t num_pass = 0;
-static uint32_t num_fail = 0;
-static uint32_t num_skip = 0;
 
 static bool
 cru_pipe_init(cru_pipe_t *p)
@@ -254,9 +257,9 @@ master_recv_result(cru_slave_t *slave)
     fflush(stdout);
 
     switch (pk.result) {
-    case CRU_TEST_RESULT_PASS: num_pass++; break;
-    case CRU_TEST_RESULT_FAIL: num_fail++; break;
-    case CRU_TEST_RESULT_SKIP: num_skip++; break;
+    case CRU_TEST_RESULT_PASS: master.num_pass++; break;
+    case CRU_TEST_RESULT_FAIL: master.num_fail++; break;
+    case CRU_TEST_RESULT_SKIP: master.num_skip++; break;
     }
 
     return true;
@@ -450,13 +453,13 @@ bool
 cru_runner_run_tests(void)
 {
     cru_log_align_tags(true);
-    cru_logi("running %u tests", num_tests);
+    cru_logi("running %u tests", master.num_tests);
     cru_logi("================================");
 
     master_loop();
 
-    uint32_t num_ran = num_pass + num_fail + num_skip;
-    uint32_t num_missing = num_tests - num_ran;
+    uint32_t num_ran = master.num_pass + master.num_fail + master.num_skip;
+    uint32_t num_missing = master.num_tests - num_ran;
 
     // A big, and perhaps unneeded, hammer.
     fflush(stdout);
@@ -464,21 +467,21 @@ cru_runner_run_tests(void)
 
     cru_logi("================================");
     cru_logi("ran %u tests", num_ran);
-    cru_logi("pass %u", num_pass);
-    cru_logi("fail %u", num_fail);
-    cru_logi("skip %u", num_skip);
+    cru_logi("pass %u", master.num_pass);
+    cru_logi("fail %u", master.num_fail);
+    cru_logi("skip %u", master.num_skip);
 
     if (num_missing > 0)
         cru_logi("missing %u", num_missing);
 
-    return num_pass + num_skip == num_tests;
+    return master.num_pass + master.num_skip == master.num_tests;
 }
 
 static inline void
 enable_test_def(cru_test_def_t *def)
 {
     if (!def->priv.enable)
-        ++num_tests;
+        ++master.num_tests;
 
     def->priv.enable = true;
 }
