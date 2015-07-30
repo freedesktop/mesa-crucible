@@ -427,6 +427,11 @@ master_loop(void)
         if (!def->priv.enable)
             continue;
 
+        if (def->skip) {
+            master_report_result(def, CRU_TEST_RESULT_SKIP);
+            continue;
+        }
+
         cru_log_tag("start", "%s", def->name);
 
         if (!master_send_dispatch(&slave, def)) {
