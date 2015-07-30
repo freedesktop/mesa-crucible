@@ -36,7 +36,16 @@
 
 #include "cru_test.h"
 
+typedef struct cru_current_test cru_current_test_t;
 typedef struct user_thread_arg user_thread_arg_t;
+
+struct cru_current_test {
+    cru_test_t *test;
+    cru_cleanup_stack_t *cleanup;
+};
+
+static __thread cru_current_test_t current
+    __attribute__((tls_model("local-exec"))) = {0};
 
 /// Tests proceed through the stages in the order listed.
 enum cru_test_phase {
@@ -57,7 +66,7 @@ struct cru_test {
     /// The list's element type is `cru_cleanup_stack_t *`.
     ///
     /// When each test thread is created, a new thread-local cleanup stack,
-    /// \ref cru_current_test_cleanup, is assigned to it. During
+    /// \ref cru_current_test::cleanup, is assigned to it. During
     /// CRU_TEST_PHASE_CLEANUP, all cleanup stacks are unwound.
     ///
     /// CAUTION: During CRU_TEST_PHASE_CLEANUP the the test is, by intentional
@@ -125,27 +134,20 @@ struct user_thread_arg {
     void *start_arg;
 };
 
-static __thread cru_test_t *cru_current_test
-    __attribute__((tls_model("local-exec")));
-
-/// \see cru_test::cleanup_stacks
-static __thread cru_cleanup_stack_t *cru_current_test_cleanup
-    __attribute__((tls_model("local-exec")));
-
 /// Document and assert that this thread is inside a running test.
-#define ASSERT_IN_TEST_THREAD assert(cru_current_test)
+#define ASSERT_IN_TEST_THREAD assert(current.test != NULL)
 
 /// Document and assert that this thread is not inside a running test.
 ///
 /// Usually, this assertion will be called by the test runner.
-#define ASSERT_NOT_IN_TEST_THREAD assert(!cru_current_test)
+#define ASSERT_NOT_IN_TEST_THREAD assert(current.test == NULL)
 
 /// Document that this function is legal to call from inside or outside a test
 /// thread.
 #define MAYBE_IN_TEST_THREAD ((void) 0)
 
 #define GET_CURRENT_TEST(__var) \
-        cru_test_t *__var = cru_current_test
+        cru_test_t *__var = current.test
 
 const char *
 cru_test_result_to_string(cru_test_result_t result)
@@ -167,7 +169,7 @@ cru_test_is_current(void)
 {
     MAYBE_IN_TEST_THREAD;
 
-    return cru_current_test != NULL;
+    return current.test != NULL;
 }
 
 static void
@@ -1083,17 +1085,17 @@ t_setup_thread(void)
     ASSERT_IN_TEST_THREAD;
     GET_CURRENT_TEST(t);
 
-    assert(!cru_current_test_cleanup);
+    assert(current.cleanup == NULL);
 
     // Kill this thread if the test is already done.
     t_check_cancelled();
 
     // Create a cleanup stack for this thread.
-    cru_current_test_cleanup = cru_cleanup_create();
-    if (!cru_current_test_cleanup)
+    current.cleanup = cru_cleanup_create();
+    if (!current.cleanup)
         goto fail_create_cleanup_stack;
 
-    if (!cru_slist_prepend(&t->cleanup_stacks, cru_current_test_cleanup))
+    if (!cru_slist_prepend(&t->cleanup_stacks, current.cleanup))
         goto fail_create_cleanup_stack;
 
     return;
@@ -1101,9 +1103,9 @@ t_setup_thread(void)
 fail_create_cleanup_stack:
     cru_loge("failed to create cleanup stack for test thread");
 
-    if (cru_current_test_cleanup) {
-        cru_cleanup_release(cru_current_test_cleanup);
-        cru_current_test_cleanup = NULL;
+    if (current.cleanup) {
+        cru_cleanup_release(current.cleanup);
+        current.cleanup = NULL;
     }
 
     t_fail_silent();
@@ -1232,7 +1234,10 @@ main_thread_start(void *arg)
 {
     // Bind this thread to the test.
     ASSERT_NOT_IN_TEST_THREAD;
-    cru_current_test = (cru_test_t *) arg;
+    current = (cru_current_test_t) {
+        .test = (cru_test_t *) arg,
+        .cleanup = NULL,
+    };
     ASSERT_IN_TEST_THREAD;
 
     GET_CURRENT_TEST(t);
@@ -1343,7 +1348,10 @@ user_thread_start(void *_arg)
 
     // Bind this thread to the test.
     ASSERT_NOT_IN_TEST_THREAD;
-    cru_current_test = arg.test;
+    current = (cru_current_test_t) {
+        .test = (cru_test_t *) arg.test,
+        .cleanup = NULL,
+    };
     ASSERT_IN_TEST_THREAD;
 
     // Connect this newly created thread to the test framework before giving
@@ -1444,7 +1452,7 @@ t_create_thread(void (*start)(void *arg), void *arg)
     assert(start);
 
     test_arg = xzalloc(sizeof(*test_arg));
-    test_arg->test = cru_current_test;
+    test_arg->test = t;
     test_arg->start_func = start;
     test_arg->start_arg = arg;
 
@@ -1569,8 +1577,7 @@ t_cleanup_push_commandv(enum cru_cleanup_cmd cmd, va_list va)
 {
     ASSERT_IN_TEST_THREAD;
 
-    assert(cru_current_test_cleanup);
-    cru_cleanup_push_commandv(cru_current_test_cleanup, cmd, va);
+    cru_cleanup_push_commandv(current.cleanup, cmd, va);
 }
 
 void
@@ -1578,8 +1585,7 @@ t_cleanup_pop(void)
 {
     ASSERT_IN_TEST_THREAD;
 
-    assert(cru_current_test_cleanup);
-    cru_cleanup_pop(cru_current_test_cleanup);
+    cru_cleanup_pop(current.cleanup);
 }
 
 void
@@ -1587,5 +1593,5 @@ t_cleanup_pop_all(void)
 {
     ASSERT_IN_TEST_THREAD;
 
-    cru_cleanup_pop_all(cru_current_test_cleanup);
+    cru_cleanup_pop_all(current.cleanup);
 }
