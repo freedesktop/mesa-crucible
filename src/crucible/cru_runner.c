@@ -189,6 +189,21 @@ cru_pipe_atomic_read_n(const cru_pipe_t *p, void *data, size_t n)
 #define cru_pipe_atomic_read(p, data) \
     cru_pipe_atomic_read_n((p), (data), sizeof(*(data)))
 
+/// Return false if the pipe is empty or has errors.
+static void
+master_report_result(const cru_test_def_t *def, cru_test_result_t result)
+{
+    cru_log_tag(cru_test_result_to_string(result),
+                "%s", def->name);
+    fflush(stdout);
+
+    switch (result) {
+    case CRU_TEST_RESULT_PASS: master.num_pass++; break;
+    case CRU_TEST_RESULT_FAIL: master.num_fail++; break;
+    case CRU_TEST_RESULT_SKIP: master.num_skip++; break;
+    }
+}
+
 /// Return false on failure.
 static bool
 master_send_dispatch(cru_slave_t *slave, const cru_test_def_t *def)
@@ -251,16 +266,7 @@ master_recv_result(cru_slave_t *slave)
         return false;
 
     slave->num_active_tests -= 1;
-
-    cru_log_tag(cru_test_result_to_string(pk.result),
-                "%s", pk.test_def->name);
-    fflush(stdout);
-
-    switch (pk.result) {
-    case CRU_TEST_RESULT_PASS: master.num_pass++; break;
-    case CRU_TEST_RESULT_FAIL: master.num_fail++; break;
-    case CRU_TEST_RESULT_SKIP: master.num_skip++; break;
-    }
+    master_report_result(pk.test_def, pk.result);
 
     return true;
 }
