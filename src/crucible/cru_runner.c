@@ -170,49 +170,6 @@ cru_runch_read(const cru_runch_t *ch,
     return sz == sizeof(*out_pk);
 }
 
-/// Mark that the test should be run.
-static inline void
-enable_test_def(cru_test_def_t *def)
-{
-    ASSERT_IN_MASTER_PROCESS;
-
-    if (!def->priv.enable)
-        ++num_tests;
-
-    def->priv.enable = true;
-}
-
-void
-cru_runner_enable_all_nonexample_tests(void)
-{
-    ASSERT_IN_MASTER_PROCESS;
-
-    cru_test_def_t *def;
-
-    cru_foreach_test_def(def) {
-        if (!cru_test_def_match(def, "example.*")) {
-            enable_test_def(def);
-        }
-    }
-}
-
-void
-cru_runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
-{
-    ASSERT_IN_MASTER_PROCESS;
-
-    cru_test_def_t *def;
-    char **glob;
-
-    cru_foreach_test_def(def) {
-        cru_vec_foreach(glob, testname_globs) {
-            if (cru_test_def_match(def, *glob)) {
-                enable_test_def(def);
-            }
-        }
-    }
-}
-
 /// Return false if there exist no remaining tests to run.
 static bool
 slave_run_one_test(const cru_runch_t *ch)
@@ -356,4 +313,46 @@ print_summary:
         cru_logi("missing %u", num_missing);
 
     return num_pass + num_skip == num_tests;
+}
+
+static inline void
+enable_test_def(cru_test_def_t *def)
+{
+    ASSERT_IN_MASTER_PROCESS;
+
+    if (!def->priv.enable)
+        ++num_tests;
+
+    def->priv.enable = true;
+}
+
+void
+cru_runner_enable_all_nonexample_tests(void)
+{
+    ASSERT_IN_MASTER_PROCESS;
+
+    cru_test_def_t *def;
+
+    cru_foreach_test_def(def) {
+        if (!cru_test_def_match(def, "example.*")) {
+            enable_test_def(def);
+        }
+    }
+}
+
+void
+cru_runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
+{
+    ASSERT_IN_MASTER_PROCESS;
+
+    cru_test_def_t *def;
+    char **glob;
+
+    cru_foreach_test_def(def) {
+        cru_vec_foreach(glob, testname_globs) {
+            if (cru_test_def_match(def, *glob)) {
+                enable_test_def(def);
+            }
+        }
+    }
 }
