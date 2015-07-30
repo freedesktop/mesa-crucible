@@ -50,8 +50,21 @@ enum cru_test_phase {
 
 struct cru_test {
     const cru_test_def_t *def;
-    cru_slist_t *cleanup_stacks; ///< List of `cru_cleanup_stack_t *`.
     cru_slist_t *threads; ///< List of `pthread_t *`.
+
+    /// \brief List of cleanup stacks, one for each test thread.
+    ///
+    /// The list's element type is `cru_cleanup_stack_t *`.
+    ///
+    /// When each test thread is created, a new thread-local cleanup stack,
+    /// \ref cru_current_test_cleanup, is assigned to it. During
+    /// CRU_TEST_PHASE_CLEANUP, all cleanup stacks are unwound.
+    ///
+    /// CAUTION: During CRU_TEST_PHASE_CLEANUP the the test is, by intentional
+    /// design, current in no thread.  As a consequence, during
+    /// CRU_TEST_PHASE_CLEANUP it is illegal to call functions whose names
+    /// begins with "t_".
+    cru_slist_t *cleanup_stacks;
 
     /// Threads coordinate activity with the phase.
     _Atomic enum cru_test_phase phase;
@@ -115,6 +128,7 @@ struct user_thread_arg {
 static __thread cru_test_t *cru_current_test
     __attribute__((tls_model("local-exec")));
 
+/// \see cru_test::cleanup_stacks
 static __thread cru_cleanup_stack_t *cru_current_test_cleanup
     __attribute__((tls_model("local-exec")));
 
@@ -1346,9 +1360,7 @@ user_thread_start(void *_arg)
 /// The cleanup thread runs after all other test thread's have exited
 /// and unwinds all the test's cleanup stacks.
 ///
-/// CAUTION: The cleanup thread is not a test thread. That is, inside the
-/// cleanup thread there exists no thread-local test. As a consequence, the
-/// thread can call no function whose name begins with "t_".
+/// \see cru_test::cleanup_stacks
 static void *
 cleanup_thread_start(void *arg)
 {
