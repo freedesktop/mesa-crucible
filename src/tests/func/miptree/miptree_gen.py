@@ -151,13 +151,6 @@ def main():
         out_file.write(copyright)
 
         for p in all_params_iter():
-
-            # FINISHME: Stencil buffers cause Mesa to abort.
-            if p.format.vk_name == 'VK_FORMAT_S8_UINT':
-                skip = 'true'
-            else:
-                skip = 'false'
-
             test_def = template.format(
                 format = p.format,
                 aspect = p.aspect,
@@ -171,7 +164,7 @@ def main():
                 view_caps = to_caps(p.view),
                 upload_caps = to_caps(p.upload),
                 download_caps = to_caps(p.download),
-                skip = skip)
+                skip = 'false')
             out_file.write(test_def)
 
 main()
