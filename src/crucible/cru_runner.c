@@ -43,45 +43,51 @@
 #include "cru_test.h"
 #include "cru_test_def.h"
 
-typedef struct cru_runch cru_runch_t;
-typedef struct cru_runch_packet cru_runch_packet_t;
+typedef union cru_pipe cru_pipe_t;
+typedef struct cru_slave cru_slave_t;
+typedef struct cru_dispatch_packet cru_dispatch_packet_t;
+typedef struct cru_result_packet cru_result_packet_t;
 
-/// Communication channel among the runner's processes.
-struct cru_runch {
-    int pipe[2];
-};
+union cru_pipe {
+    int fd[2];
 
-struct cru_runch_packet {
-    enum {
-        CRU_RUNCH_PACKET_TYPE_TEST_STARTED,
-        CRU_RUNCH_PACKET_TYPE_TEST_DONE,
-    } type;
-
-    union {
-        struct {
-            uint64_t test_def_id;
-        } test_started;
-
-        struct {
-            uint64_t test_def_id;
-            cru_test_result_t result;
-        } test_done;
+    struct {
+        int read_fd;
+        int write_fd;
     };
 };
 
-/// \brief PID of the runner's slave process.
-///
-/// \par Values
-///     - if -1: In the runner's master process before forking.
-///     - if 0: In the runner's master process after forking.
-///     - if > 0: In the runner's slave process.
-static pid_t slave_pid = -1;
+/// Channel between the master process and a slave process.
+struct cru_slave {
+    /// \brief PID of the slave process.
+    ///
+    /// If -1, in the runner's master process before forking.
+    /// If 0, in the runner's master process after forking.
+    /// If > 0, in the runner's slave process.
+    pid_t pid;
+
+    uint32_t num_active_tests;
+
+    cru_pipe_t dispatch_pipe;
+    cru_pipe_t result_pipe;
+};
+
+struct cru_dispatch_packet {
+    const cru_test_def_t *test_def;
+};
+
+struct cru_result_packet {
+    const cru_test_def_t *test_def;
+    cru_test_result_t result;
+};
 
 /// Document and assert that this is the runner's master process.
-#define ASSERT_IN_MASTER_PROCESS assert(slave_pid == -1 || slave_pid > 0)
+#define ASSERT_IN_MASTER_PROCESS(slave) \
+    assert((slave)->pid == -1 || (slave)->pid > 0)
 
 /// Document and assert that this is the runner's slave process.
-#define ASSERT_IN_SLAVE_PROCESS assert(slave_pid == 0)
+#define ASSERT_IN_SLAVE_PROCESS(slave) \
+    assert((slave)->pid == 0)
 
 bool cru_runner_do_cleanup_phase = true;
 bool cru_runner_do_image_dumps = false;
@@ -94,15 +100,13 @@ static uint32_t num_fail = 0;
 static uint32_t num_skip = 0;
 
 static bool
-cru_runch_init(cru_runch_t *ch)
+cru_pipe_init(cru_pipe_t *p)
 {
-    ASSERT_IN_MASTER_PROCESS;
-
     int err;
 
-    err = pipe2(ch->pipe, O_CLOEXEC);
+    err = pipe2(p->fd, O_CLOEXEC);
     if (err) {
-        cru_loge("%s: failed to create pipe", __func__);
+        cru_loge("failed to create pipe");
         return false;
     }
 
@@ -110,92 +114,164 @@ cru_runch_init(cru_runch_t *ch)
 }
 
 static void
-cru_runch_send(const cru_runch_t *ch, const cru_runch_packet_t *pk)
+cru_pipe_finish(cru_pipe_t *p)
 {
-    ASSERT_IN_SLAVE_PROCESS;
-
-    // POSIX ensures that writes less than PIPE_BUF are atomic.
-    cru_static_assert(sizeof(*pk) < PIPE_BUF);
-
-    write(ch->pipe[1], pk, sizeof(*pk));
-
+    for (int i = 0; i < 2; ++i) {
+        if (p->fd[i] != -1) {
+            close(p->fd[i]);
+        }
+    }
 }
 
-static void
-cru_runch_send_start_test(const cru_runch_t *ch,
-                          uint64_t test_def_id)
-{
-    ASSERT_IN_SLAVE_PROCESS;
-
-    cru_runch_send(ch,
-        &(cru_runch_packet_t) {
-            .type = CRU_RUNCH_PACKET_TYPE_TEST_STARTED,
-            .test_started = {
-                .test_def_id = test_def_id,
-            },
-        });
-}
-
-static void
-cru_runch_send_end_test(const cru_runch_t *ch, uint64_t test_def_id,
-                        cru_test_result_t result)
-{
-    ASSERT_IN_SLAVE_PROCESS;
-
-    cru_runch_send(ch,
-        &(cru_runch_packet_t) {
-            .type = CRU_RUNCH_PACKET_TYPE_TEST_DONE,
-            .test_done = {
-                .test_def_id = test_def_id,
-                .result = result,
-            },
-        });
-}
-
-/// Return true if there are no remaining packets to read.
 static bool
-cru_runch_read(const cru_runch_t *ch,
-               cru_runch_packet_t *out_pk)
+cru_pipe_become_reader(cru_pipe_t *p)
 {
-    ASSERT_IN_MASTER_PROCESS;
+    int err;
 
-    ssize_t sz;
+    assert(p->read_fd != -1);
+    assert(p->write_fd != -1);
 
-    // POSIX ensures that writes less than PIPE_BUF are atomic. And cru_runch
-    // never writes more than PIPE_BUF. Therefore reads are atomic too.
-    cru_static_assert(sizeof(*out_pk) < PIPE_BUF);
-
-    sz = read(ch->pipe[0], out_pk, sizeof(*out_pk));
-
-    return sz == sizeof(*out_pk);
-}
-
-/// Return false if there exist no remaining tests to run.
-static bool
-slave_run_one_test(const cru_runch_t *ch)
-{
-    ASSERT_IN_SLAVE_PROCESS;
-
-    static uint64_t def_id = 0;
-
-    const cru_test_def_t *def;
-    cru_test_t *test;
-
-    def = cru_test_def_from_id(def_id);
-    if (!def) {
-        // No more tests.
+    err = close(p->write_fd);
+    if (err == -1) {
+        cru_loge("runner failed to close pipe's write fd");
         return false;
     }
 
-    if (!def->priv.enable)
-        goto done;
+    p->write_fd = -1;
 
-    cru_runch_send_start_test(ch, def_id);
+    return true;
+}
+
+static bool
+cru_pipe_become_writer(cru_pipe_t *p)
+{
+    int err;
+
+    assert(p->read_fd != -1);
+    assert(p->write_fd != -1);
+
+    err = close(p->read_fd);
+    if (err == -1) {
+        cru_loge("runner failed to close pipe's read fd");
+        return false;
+    }
+
+    p->read_fd = -1;
+
+    return true;
+}
+
+static bool
+cru_pipe_atomic_write_n(const cru_pipe_t *p, const void *data, size_t n)
+{
+    // POSIX.1-2001 says that writes of less than PIPE_BUF bytes are atomic.
+    // We assume that, if all writes to a pipe are atomic, then all reads will
+    // be atomic also.
+    assert(n < PIPE_BUF);
+
+    return write(p->write_fd, data, n) == n;
+}
+
+static bool
+cru_pipe_atomic_read_n(const cru_pipe_t *p, void *data, size_t n)
+{
+    assert(n < PIPE_BUF);
+
+    return read(p->read_fd, data, n) == n;
+}
+
+#define cru_pipe_atomic_write(p, data) \
+    cru_pipe_atomic_write_n((p), (data), sizeof(*(data)))
+
+#define cru_pipe_atomic_read(p, data) \
+    cru_pipe_atomic_read_n((p), (data), sizeof(*(data)))
+
+/// Return false on failure.
+static bool
+master_send_dispatch(cru_slave_t *slave, const cru_test_def_t *def)
+{
+    ASSERT_IN_MASTER_PROCESS(slave);
+
+    const cru_dispatch_packet_t pk = { .test_def = def };
+
+    if (!cru_pipe_atomic_write(&slave->dispatch_pipe, &pk))
+        return false;
+
+    slave->num_active_tests += 1;
+
+    return true;
+}
+
+/// Return NULL if the pipe is empty or has errors.
+static const cru_test_def_t *
+slave_recv_dispatch(const cru_slave_t *slave)
+{
+    ASSERT_IN_SLAVE_PROCESS(slave);
+
+    cru_dispatch_packet_t pk;
+
+    if (!cru_pipe_atomic_read(&slave->dispatch_pipe, &pk))
+        return false;
+
+    return pk.test_def;
+}
+
+/// Return false if the pipe is empty or has errors.
+static bool
+master_recv_result(cru_slave_t *slave)
+{
+    ASSERT_IN_MASTER_PROCESS(slave);
+
+    cru_result_packet_t pk;
+
+    if (!cru_pipe_atomic_read(&slave->result_pipe, &pk))
+        return false;
+
+    slave->num_active_tests -= 1;
+
+    cru_log_tag(cru_test_result_to_string(pk.result),
+                "%s", pk.test_def->name);
+    fflush(stdout);
+
+    switch (pk.result) {
+    case CRU_TEST_RESULT_PASS: num_pass++; break;
+    case CRU_TEST_RESULT_FAIL: num_fail++; break;
+    case CRU_TEST_RESULT_SKIP: num_skip++; break;
+    }
+
+    return true;
+}
+
+/// Return false on failure.
+static bool
+slave_send_result(const cru_slave_t *slave,
+                  const cru_test_def_t *def, cru_test_result_t result)
+{
+    ASSERT_IN_SLAVE_PROCESS(slave);
+
+    const cru_result_packet_t pk = {
+        .test_def = def,
+        .result = result,
+    };
+
+    return cru_pipe_atomic_write(&slave->result_pipe, &pk);
+}
+
+static void
+slave_run_test(const cru_slave_t *slave,
+               const cru_test_def_t *def)
+{
+    ASSERT_IN_SLAVE_PROCESS(slave);
+
+    cru_test_t *test;
+
+    // The slave should not receive disabled tests.
+    assert(def->priv.enable);
 
     test = cru_test_create(def);
     if (!test) {
-        cru_runch_send_end_test(ch, def_id, CRU_TEST_RESULT_FAIL);
-        goto done;
+        slave_send_result(slave, def, CRU_TEST_RESULT_FAIL);
+        return;
     }
 
     if (cru_runner_do_image_dumps)
@@ -209,99 +285,179 @@ slave_run_one_test(const cru_runch_t *ch)
 
     cru_test_start(test);
     cru_test_wait(test);
-
-    cru_runch_send_end_test(ch, def_id, cru_test_get_result(test));
-
+    slave_send_result(slave, def, cru_test_get_result(test));
     cru_test_destroy(test);
+}
 
-done:
-    ++def_id;
+static void
+slave_loop(const cru_slave_t *slave)
+{
+    ASSERT_IN_SLAVE_PROCESS(slave);
+
+    const cru_test_def_t *def;
+
+    while (true) {
+        def = slave_recv_dispatch(slave);
+        if (!def)
+            return;
+
+        slave_run_test(slave, def);
+    }
+}
+
+static void
+master_drain_result_pipe(cru_slave_t *slave)
+{
+    ASSERT_IN_MASTER_PROCESS(slave);
+
+    while (slave->num_active_tests > 0) {
+        if (!master_recv_result(slave)) {
+            break;
+        }
+    }
+}
+
+static bool
+master_init_slave(cru_slave_t *slave)
+{
+    ASSERT_IN_MASTER_PROCESS(slave);
+    assert(slave->pid == -1);
+
+    int err;
+
+    slave->num_active_tests = 0;
+
+    if (!cru_pipe_init(&slave->dispatch_pipe))
+        return false;
+
+    if (!cru_pipe_init(&slave->result_pipe))
+        return false;
+
+    err = sigaction(SIGPIPE, &(struct sigaction) { .sa_handler = SIG_IGN},
+                    NULL);
+    if (err == -1) {
+        cru_loge("test runner failed to disable SIGPIPE");
+        return false;
+    }
+
+    slave->pid = fork();
+
+    if (slave->pid == -1) {
+        cru_loge("test runner failed to fork slave process");
+        return false;
+    }
+
+    if (slave->pid == 0) {
+        // The slave process dies on SIGPIPE.
+    err = sigaction(SIGPIPE, &(struct sigaction) { .sa_handler = SIG_DFL},
+                    NULL);
+    if (err == -1) {
+        cru_loge("test runner failed to reenable SIGPIPE for child");
+        return false;
+    }
+
+        if (!cru_pipe_become_reader(&slave->dispatch_pipe))
+            exit(EXIT_FAILURE);
+
+        if (!cru_pipe_become_writer(&slave->result_pipe))
+            exit(EXIT_FAILURE);
+
+        slave_loop(slave);
+
+        exit(EXIT_SUCCESS);
+    }
+
+    if (!cru_pipe_become_writer(&slave->dispatch_pipe))
+        return false;
+
+    if (!cru_pipe_become_reader(&slave->result_pipe))
+        return false;
+
     return true;
 }
 
-/// Return false if there exist no remaining packets to read.
-static bool
-master_read_one_packet(const cru_runch_t *ch)
+static void
+master_cleanup_slave(cru_slave_t *slave)
 {
-    ASSERT_IN_MASTER_PROCESS;
+    ASSERT_IN_MASTER_PROCESS(slave);
 
-    const cru_test_def_t *def;
-    cru_runch_packet_t pk;
+    if (slave->pid == -1)
+        return;
 
-    if (!cru_runch_read(ch, &pk))
-        return false;
+    master_drain_result_pipe(slave);
 
-    switch (pk.type) {
-    case CRU_RUNCH_PACKET_TYPE_TEST_STARTED:
-        def = cru_test_def_from_id(pk.test_started.test_def_id);
-        cru_log_tag("start", "%s", def->name);
-        break;
-    case CRU_RUNCH_PACKET_TYPE_TEST_DONE:
-        switch (pk.test_done.result) {
-        case CRU_TEST_RESULT_PASS: num_pass++; break;
-        case CRU_TEST_RESULT_FAIL: num_fail++; break;
-        case CRU_TEST_RESULT_SKIP: num_skip++; break;
-        }
+    slave->num_active_tests = 0;
+    cru_pipe_finish(&slave->dispatch_pipe);
+    cru_pipe_finish(&slave->result_pipe);
 
-        def = cru_test_def_from_id(pk.test_done.test_def_id);
-        cru_log_tag(cru_test_result_to_string(pk.test_done.result),
-                    "%s", def->name);
-        break;
+    if (waitpid(slave->pid, /*status*/ NULL, /*flags*/ 0) == -1) {
+        cru_loge("runner failed to wait for slave process");
     }
 
-    return true;
+    slave->pid = -1;
+}
+
+/// Dispatch tests to slave processes.
+static void
+master_loop(void)
+{
+    cru_slave_t slave = { .pid = -1 };
+    const cru_test_def_t *def;
+
+    if (!master_init_slave(&slave))
+        return;
+
+    // Dispatch each test to the current slave process. Interleave the
+    // dispatching and result collection.
+    cru_foreach_test_def(def) {
+        ASSERT_IN_MASTER_PROCESS(&slave);
+
+        if (!def->priv.enable)
+            continue;
+
+        cru_log_tag("start", "%s", def->name);
+
+        if (!master_send_dispatch(&slave, def)) {
+            // The slave is probably be dead. Reap the zombie and spawn a new
+            // one.  Re-dispatch this test to the new slave.
+            master_drain_result_pipe(&slave);
+            master_cleanup_slave(&slave);
+
+            if (!master_init_slave(&slave)) {
+                // Can't recover.
+                return;
+            }
+
+            if (!master_send_dispatch(&slave, def)) {
+                // We twice failed to dispatch this test. Give up.
+                return;
+            }
+        }
+
+        master_drain_result_pipe(&slave);
+    }
+
+    // Tell the slave that it will receive no more tests.
+    master_send_dispatch(&slave, NULL);
+    master_cleanup_slave(&slave);
 }
 
 /// Return true if and only all tests pass or skip.
 bool
 cru_runner_run_tests(void)
 {
-    ASSERT_IN_MASTER_PROCESS;
-
-    cru_runch_t ch;
-
     cru_log_align_tags(true);
     cru_logi("running %u tests", num_tests);
     cru_logi("================================");
 
-    if (!cru_runch_init(&ch))
-        goto print_summary;
-
-    slave_pid = fork();
-
-    if (slave_pid == -1) {
-        cru_loge("test runner failed to fork");
-        goto print_summary;
-    } else if (slave_pid == 0) {
-        ASSERT_IN_SLAVE_PROCESS;
-
-        close(ch.pipe[0]);
-        while (slave_run_one_test(&ch)) {}
-
-        // A big, and perhaps unneeded, hammer.
-        fflush(stdout);
-        fflush(stderr);
-
-        exit(EXIT_SUCCESS);
-    }
-
-    ASSERT_IN_MASTER_PROCESS;
-
-    close(ch.pipe[1]);
-    while (master_read_one_packet(&ch)) {}
-
-    if (waitpid(slave_pid, /*status*/ NULL, /*flags*/ 0) == -1) {
-        cru_loge("runner failed to wait for slave process");
-    }
-
-print_summary:
-    // A big, and perhaps unneeded, hammer.
-    fflush(stdout);
-    fflush(stderr);
+    master_loop();
 
     uint32_t num_ran = num_pass + num_fail + num_skip;
     uint32_t num_missing = num_tests - num_ran;
 
+    // A big, and perhaps unneeded, hammer.
+    fflush(stdout);
+    fflush(stderr);
 
     cru_logi("================================");
     cru_logi("ran %u tests", num_ran);
@@ -318,8 +474,6 @@ print_summary:
 static inline void
 enable_test_def(cru_test_def_t *def)
 {
-    ASSERT_IN_MASTER_PROCESS;
-
     if (!def->priv.enable)
         ++num_tests;
 
@@ -329,8 +483,6 @@ enable_test_def(cru_test_def_t *def)
 void
 cru_runner_enable_all_nonexample_tests(void)
 {
-    ASSERT_IN_MASTER_PROCESS;
-
     cru_test_def_t *def;
 
     cru_foreach_test_def(def) {
@@ -343,8 +495,6 @@ cru_runner_enable_all_nonexample_tests(void)
 void
 cru_runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
 {
-    ASSERT_IN_MASTER_PROCESS;
-
     cru_test_def_t *def;
     char **glob;
 
