@@ -172,18 +172,18 @@ cru_runch_read(const cru_runch_t *ch,
 
 /// Mark that the test should be run.
 static inline void
-mark_test_def(cru_test_def_t *def)
+enable_test_def(cru_test_def_t *def)
 {
     ASSERT_IN_MASTER_PROCESS;
 
-    if (!def->priv.run)
+    if (!def->priv.enable)
         ++num_tests;
 
-    def->priv.run = true;
+    def->priv.enable = true;
 }
 
 void
-cru_runner_mark_all_nonexample_tests(void)
+cru_runner_enable_all_nonexample_tests(void)
 {
     ASSERT_IN_MASTER_PROCESS;
 
@@ -191,13 +191,13 @@ cru_runner_mark_all_nonexample_tests(void)
 
     cru_foreach_test_def(def) {
         if (!cru_test_def_match(def, "example.*")) {
-            mark_test_def(def);
+            enable_test_def(def);
         }
     }
 }
 
 void
-cru_runner_mark_matching_tests(const cru_cstr_vec_t *testname_globs)
+cru_runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
 {
     ASSERT_IN_MASTER_PROCESS;
 
@@ -207,7 +207,7 @@ cru_runner_mark_matching_tests(const cru_cstr_vec_t *testname_globs)
     cru_foreach_test_def(def) {
         cru_vec_foreach(glob, testname_globs) {
             if (cru_test_def_match(def, *glob)) {
-                mark_test_def(def);
+                enable_test_def(def);
             }
         }
     }
@@ -230,7 +230,7 @@ slave_run_one_test(const cru_runch_t *ch)
         return false;
     }
 
-    if (!def->priv.run)
+    if (!def->priv.enable)
         goto done;
 
     cru_runch_send_start_test(ch, def_id);

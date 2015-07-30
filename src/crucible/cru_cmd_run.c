@@ -109,9 +109,9 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
     cru_runner_use_spir_v = opt_use_spir_v;
 
     if (test_patterns.len == 0) {
-        cru_runner_mark_all_nonexample_tests();
+        cru_runner_enable_all_nonexample_tests();
     } else {
-        cru_runner_mark_matching_tests(&test_patterns);
+        cru_runner_enable_matching_tests(&test_patterns);
     }
 
     if (cru_runner_run_tests()) {

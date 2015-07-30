@@ -32,6 +32,6 @@ extern bool cru_runner_use_spir_v;
 void cru_runner_enable_cleanup(bool b);
 void cru_runner_enable_image_dumps(bool b);
 void cru_runner_enable_spir_v(bool b);
-void cru_runner_mark_all_nonexample_tests(void);
-void cru_runner_mark_matching_tests(const cru_cstr_vec_t *testname_globs);
+void cru_runner_enable_all_nonexample_tests(void);
+void cru_runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs);
 bool cru_runner_run_tests(void);

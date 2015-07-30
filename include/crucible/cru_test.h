@@ -105,10 +105,10 @@ struct cru_test_def {
     /// Test authors shouldn't touch this struct.
     ///
     /// The test runner walks twice over the global list of test definitions.
-    /// In the first pass, it marks each test that it plans to run by setting
-    /// cru_test_def::priv::run. In the second pass, it runs the tests.
+    /// In the first pass, it enables each test that it plans to run.  In the
+    /// second pass, it runs the enabled tests.
     struct cru_test_def_priv {
-        bool run;
+        bool enable;
     } priv;
 } __attribute__((aligned(32)));
 
