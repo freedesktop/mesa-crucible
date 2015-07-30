@@ -192,14 +192,34 @@ master_send_dispatch(cru_slave_t *slave, const cru_test_def_t *def)
 {
     ASSERT_IN_MASTER_PROCESS(slave);
 
+    bool result = false;
     const cru_dispatch_packet_t pk = { .test_def = def };
+    const struct sigaction ignore_sa = { .sa_handler = SIG_IGN };
+    struct sigaction old_sa;
+    int err;
+
+    // If the slave process died, then writing to its dispatch pipe will emit
+    // SIGPIPE. Ignore it, because the master should never die.
+    err = sigaction(SIGPIPE, &ignore_sa, &old_sa);
+    if (err == -1) {
+        cru_loge("test runner failed to disable SIGPIPE");
+        abort();
+    }
 
     if (!cru_pipe_atomic_write(&slave->dispatch_pipe, &pk))
-        return false;
+        goto cleanup;
 
+    result = true;
     slave->num_active_tests += 1;
 
-    return true;
+cleanup:
+    err = sigaction(SIGPIPE, &old_sa, NULL);
+    if (err == -1) {
+        cru_loge("test runner failed to re-enable SIGPIPE");
+        abort();
+    }
+
+    return result;
 }
 
 /// Return NULL if the pipe is empty or has errors.
@@ -323,8 +343,6 @@ master_init_slave(cru_slave_t *slave)
     ASSERT_IN_MASTER_PROCESS(slave);
     assert(slave->pid == -1);
 
-    int err;
-
     slave->num_active_tests = 0;
 
     if (!cru_pipe_init(&slave->dispatch_pipe))
@@ -332,13 +350,6 @@ master_init_slave(cru_slave_t *slave)
 
     if (!cru_pipe_init(&slave->result_pipe))
         return false;
-
-    err = sigaction(SIGPIPE, &(struct sigaction) { .sa_handler = SIG_IGN},
-                    NULL);
-    if (err == -1) {
-        cru_loge("test runner failed to disable SIGPIPE");
-        return false;
-    }
 
     slave->pid = fork();
 
@@ -348,14 +359,6 @@ master_init_slave(cru_slave_t *slave)
     }
 
     if (slave->pid == 0) {
-        // The slave process dies on SIGPIPE.
-    err = sigaction(SIGPIPE, &(struct sigaction) { .sa_handler = SIG_DFL},
-                    NULL);
-    if (err == -1) {
-        cru_loge("test runner failed to reenable SIGPIPE for child");
-        return false;
-    }
-
         if (!cru_pipe_become_reader(&slave->dispatch_pipe))
             exit(EXIT_FAILURE);
 
