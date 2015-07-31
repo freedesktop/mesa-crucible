@@ -44,6 +44,22 @@
 #include "cru_test.h"
 #include "cru_test_def.h"
 
+#ifdef NDEBUG
+#   define ASSERT_MASTER_NOT_RUNNING ((void) 0)
+#   define ASSERT_IN_MASTER_PROCESS ((void) 0)
+#   define ASSERT_IN_SLAVE_PROCESS ((void) 0)
+#else
+#   define ASSERT_MASTER_NOT_RUNNING assert(master.pid == 0)
+
+#   define ASSERT_IN_MASTER_PROCESS assert(getpid() == master.pid)
+
+#   define ASSERT_IN_SLAVE_PROCESS \
+        do { \
+            assert(master.pid > 0); \
+            assert(getppid() == master.pid); \
+        } while (0)
+#endif
+
 typedef union cru_pipe cru_pipe_t;
 typedef struct cru_slave cru_slave_t;
 typedef struct cru_dispatch_packet cru_dispatch_packet_t;
@@ -82,13 +98,6 @@ struct cru_result_packet {
     cru_test_result_t result;
 };
 
-/// Document and assert that this is the runner's master process.
-#define ASSERT_IN_MASTER_PROCESS(slave) \
-    assert((slave)->pid == -1 || (slave)->pid > 0)
-
-/// Document and assert that this is the runner's slave process.
-#define ASSERT_IN_SLAVE_PROCESS(slave) \
-    assert((slave)->pid == 0)
 
 struct cru_master {
     cru_slave_t slaves[1];
@@ -99,12 +108,22 @@ struct cru_master {
     uint32_t num_skip;
 
     atomic_bool sigint_flag;
+
+#ifndef NDEBUG
+    /// This is set only for the duration of cru_runner_run_tests().
+    pid_t pid;
+#endif
+
 };
 
 static struct cru_master master = {
     .slaves = {
         { .pid = -1 },
     },
+
+#ifndef NDEBUG
+    .pid = 0,
+#endif
 };
 
 bool cru_runner_do_cleanup_phase = true;
@@ -215,6 +234,8 @@ cru_pipe_atomic_read_n(const cru_pipe_t *p, void *data, size_t n)
 static void
 master_report_result(const cru_test_def_t *def, cru_test_result_t result)
 {
+    ASSERT_IN_MASTER_PROCESS;
+
     cru_log_tag(cru_test_result_to_string(result),
                 "%s", def->name);
     fflush(stdout);
@@ -230,7 +251,7 @@ master_report_result(const cru_test_def_t *def, cru_test_result_t result)
 static bool
 master_send_dispatch(cru_slave_t *slave, const cru_test_def_t *def)
 {
-    ASSERT_IN_MASTER_PROCESS(slave);
+    ASSERT_IN_MASTER_PROCESS;
 
     bool result = false;
     const cru_dispatch_packet_t pk = { .test_def = def };
@@ -266,7 +287,7 @@ cleanup:
 static const cru_test_def_t *
 slave_recv_dispatch(const cru_slave_t *slave)
 {
-    ASSERT_IN_SLAVE_PROCESS(slave);
+    ASSERT_IN_SLAVE_PROCESS;
 
     cru_dispatch_packet_t pk;
 
@@ -280,7 +301,7 @@ slave_recv_dispatch(const cru_slave_t *slave)
 static bool
 master_recv_result(cru_slave_t *slave)
 {
-    ASSERT_IN_MASTER_PROCESS(slave);
+    ASSERT_IN_MASTER_PROCESS;
 
     cru_result_packet_t pk;
 
@@ -298,7 +319,7 @@ static bool
 slave_send_result(const cru_slave_t *slave,
                   const cru_test_def_t *def, cru_test_result_t result)
 {
-    ASSERT_IN_SLAVE_PROCESS(slave);
+    ASSERT_IN_SLAVE_PROCESS;
 
     const cru_result_packet_t pk = {
         .test_def = def,
@@ -312,7 +333,7 @@ static void
 slave_run_test(const cru_slave_t *slave,
                const cru_test_def_t *def)
 {
-    ASSERT_IN_SLAVE_PROCESS(slave);
+    ASSERT_IN_SLAVE_PROCESS;
 
     cru_test_t *test;
 
@@ -343,7 +364,7 @@ slave_run_test(const cru_slave_t *slave,
 static void
 slave_loop(const cru_slave_t *slave)
 {
-    ASSERT_IN_SLAVE_PROCESS(slave);
+    ASSERT_IN_SLAVE_PROCESS;
 
     const cru_test_def_t *def;
 
@@ -359,7 +380,7 @@ slave_loop(const cru_slave_t *slave)
 static void
 master_drain_result_pipe(cru_slave_t *slave)
 {
-    ASSERT_IN_MASTER_PROCESS(slave);
+    ASSERT_IN_MASTER_PROCESS;
 
     while (slave->num_active_tests > 0) {
         if (!master_recv_result(slave)) {
@@ -371,7 +392,8 @@ master_drain_result_pipe(cru_slave_t *slave)
 static bool
 master_init_slave(cru_slave_t *slave)
 {
-    ASSERT_IN_MASTER_PROCESS(slave);
+    ASSERT_IN_MASTER_PROCESS;
+
     assert(slave->pid == -1);
 
     slave->num_active_tests = 0;
@@ -415,7 +437,7 @@ master_init_slave(cru_slave_t *slave)
 static void
 master_cleanup_slave(cru_slave_t *slave)
 {
-    ASSERT_IN_MASTER_PROCESS(slave);
+    ASSERT_IN_MASTER_PROCESS;
 
     if (slave->pid == -1)
         return;
@@ -436,6 +458,8 @@ master_cleanup_slave(cru_slave_t *slave)
 static void
 master_kill_slaves(void)
 {
+    ASSERT_IN_MASTER_PROCESS;
+
     int err;
 
     for (uint32_t i = 0; i < ARRAY_LENGTH(master.slaves); ++i) {
@@ -457,6 +481,8 @@ master_kill_slaves(void)
 static void
 master_handle_sigint(int sig)
 {
+    ASSERT_IN_MASTER_PROCESS;
+
     assert(sig == SIGINT);
     atomic_store(&master.sigint_flag, true);
 }
@@ -465,6 +491,8 @@ master_handle_sigint(int sig)
 static void
 master_loop(void)
 {
+    ASSERT_IN_MASTER_PROCESS;
+
     const cru_test_def_t *def;
     cru_slave_t *slave = &master.slaves[0];
 
@@ -474,7 +502,6 @@ master_loop(void)
     // Dispatch each test to the current slave process. Interleave the
     // dispatching and result collection.
     cru_foreach_test_def(def) {
-        ASSERT_IN_MASTER_PROCESS(slave);
 
         // SIGINT kills all running tests. A second SIGINT, if received before
         // the runner resumes running tests, kills the testrun and prints the
@@ -530,6 +557,12 @@ master_loop(void)
 bool
 cru_runner_run_tests(void)
 {
+    ASSERT_MASTER_NOT_RUNNING;
+
+#ifndef NDEBUG
+    master.pid = getpid();
+#endif
+
     cru_log_align_tags(true);
     cru_logi("running %u tests", master.num_tests);
     cru_logi("================================");
@@ -552,12 +585,18 @@ cru_runner_run_tests(void)
     cru_logi("skip %u", master.num_skip);
     cru_logi("lost %u", num_lost);
 
+#ifndef NDEBUG
+    master.pid = 0;
+#endif
+
     return master.num_pass + master.num_skip == master.num_tests;
 }
 
 static inline void
 enable_test_def(cru_test_def_t *def)
 {
+    ASSERT_MASTER_NOT_RUNNING;
+
     if (!def->priv.enable)
         ++master.num_tests;
 
@@ -567,6 +606,8 @@ enable_test_def(cru_test_def_t *def)
 void
 cru_runner_enable_all_nonexample_tests(void)
 {
+    ASSERT_MASTER_NOT_RUNNING;
+
     cru_test_def_t *def;
 
     cru_foreach_test_def(def) {
@@ -579,6 +620,8 @@ cru_runner_enable_all_nonexample_tests(void)
 void
 cru_runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
 {
+    ASSERT_MASTER_NOT_RUNNING;
+
     cru_test_def_t *def;
     char **glob;
 
