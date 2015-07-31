@@ -52,9 +52,9 @@ enum cru_test_phase {
     CRU_TEST_PHASE_PRESTART,
     CRU_TEST_PHASE_SETUP,
     CRU_TEST_PHASE_MAIN,
-    CRU_TEST_PHASE_CANCELLED,
+    CRU_TEST_PHASE_PENDING_CLEANUP,
     CRU_TEST_PHASE_CLEANUP,
-    CRU_TEST_PHASE_DEAD,
+    CRU_TEST_PHASE_STOPPED,
 };
 
 struct cru_test {
@@ -227,7 +227,7 @@ cru_test_destroy(cru_test_t *t)
         return;
 
     assert(t->phase == CRU_TEST_PHASE_PRESTART ||
-           t->phase == CRU_TEST_PHASE_DEAD);
+           t->phase == CRU_TEST_PHASE_STOPPED);
 
     pthread_mutex_destroy(&t->result_mutex);
     pthread_cond_destroy(&t->result_cond);
@@ -278,7 +278,7 @@ cru_test_create(const cru_test_def_t *def)
     return t;
 
 fail:
-    t->result = CRU_TEST_PHASE_DEAD;
+    t->result = CRU_TEST_PHASE_STOPPED;
     t->result = CRU_TEST_RESULT_FAIL;
     return t;
 }
@@ -607,7 +607,7 @@ cru_test_get_result(cru_test_t *t)
 {
     ASSERT_NOT_IN_TEST_THREAD;
 
-    assert(t->phase == CRU_TEST_PHASE_DEAD);
+    assert(t->phase == CRU_TEST_PHASE_STOPPED);
 
     return t->result;
 }
@@ -621,9 +621,9 @@ t_check_cancelled(void)
     // If this is called outside the range of phases below, then it's not
     // a test error but a framework bug.
     assert(t->phase >= CRU_TEST_PHASE_SETUP);
-    assert(t->phase <= CRU_TEST_PHASE_CANCELLED);
+    assert(t->phase <= CRU_TEST_PHASE_PENDING_CLEANUP);
 
-    if (t->phase == CRU_TEST_PHASE_CANCELLED)
+    if (t->phase == CRU_TEST_PHASE_PENDING_CLEANUP)
         pthread_exit(NULL);
 }
 
@@ -638,9 +638,9 @@ t_end(enum cru_test_result result)
     // If this is called outside the range of phases below, then it's not
     // a test error but a framework bug.
     assert(t->phase >= CRU_TEST_PHASE_SETUP);
-    assert(t->phase <= CRU_TEST_PHASE_CANCELLED);
+    assert(t->phase <= CRU_TEST_PHASE_PENDING_CLEANUP);
 
-    if (t->phase == CRU_TEST_PHASE_CANCELLED) {
+    if (t->phase == CRU_TEST_PHASE_PENDING_CLEANUP) {
         // A previous call to cru_test_end already cancelled the test and set
         // the test result.
         pthread_exit(NULL);
@@ -652,7 +652,7 @@ t_end(enum cru_test_result result)
         abort();
     }
 
-    if (t->phase >= CRU_TEST_PHASE_CANCELLED) {
+    if (t->phase >= CRU_TEST_PHASE_PENDING_CLEANUP) {
         err = pthread_mutex_unlock(&t->result_mutex);
         if (err) {
             cru_loge("%s: failed to unlock mutex", t->def->name);
@@ -664,7 +664,7 @@ t_end(enum cru_test_result result)
         pthread_exit(NULL);
     }
 
-    t->phase = CRU_TEST_PHASE_CANCELLED;
+    t->phase = CRU_TEST_PHASE_PENDING_CLEANUP;
     t->result = result;
 
     err = pthread_mutex_unlock(&t->result_mutex);
@@ -1425,13 +1425,13 @@ cru_test_start(cru_test_t *t)
     t->phase = CRU_TEST_PHASE_SETUP;
 
     if (t->def->skip) {
-        t->phase = CRU_TEST_PHASE_DEAD;
+        t->phase = CRU_TEST_PHASE_STOPPED;
         t->result = CRU_TEST_RESULT_SKIP;
         return;
     }
 
     if (!cru_test_create_thread(t, main_thread_start, t)) {
-        t->phase = CRU_TEST_PHASE_DEAD;
+        t->phase = CRU_TEST_PHASE_STOPPED;
         t->result = CRU_TEST_RESULT_FAIL;
         return;
     }
@@ -1470,7 +1470,7 @@ cru_test_join_threads(cru_test_t *t)
     int err;
     pthread_t *thread = NULL;
 
-    assert(t->phase == CRU_TEST_PHASE_CANCELLED);
+    assert(t->phase == CRU_TEST_PHASE_PENDING_CLEANUP);
 
     while ((thread = cru_slist_pop(&t->threads))) {
         err = pthread_join(*thread, NULL);
@@ -1537,7 +1537,7 @@ cru_test_wait(cru_test_t *t)
 
     int err;
 
-    if (t->phase >= CRU_TEST_PHASE_DEAD)
+    if (t->phase >= CRU_TEST_PHASE_STOPPED)
         return;
 
     err = pthread_mutex_lock(&t->result_mutex);
@@ -1546,16 +1546,16 @@ cru_test_wait(cru_test_t *t)
         abort();
     }
 
-    cru_test_wait_for_phase(t, CRU_TEST_PHASE_CANCELLED);
+    cru_test_wait_for_phase(t, CRU_TEST_PHASE_PENDING_CLEANUP);
 
-    if (t->phase == CRU_TEST_PHASE_CANCELLED) {
+    if (t->phase == CRU_TEST_PHASE_PENDING_CLEANUP) {
         cru_test_join_threads(t);
         t->phase = CRU_TEST_PHASE_CLEANUP;
         cru_test_run_cleanup_handlers(t);
-        t->phase = CRU_TEST_PHASE_DEAD;
+        t->phase = CRU_TEST_PHASE_STOPPED;
     }
 
-    cru_test_wait_for_phase(t, CRU_TEST_PHASE_DEAD);
+    cru_test_wait_for_phase(t, CRU_TEST_PHASE_STOPPED);
 
     pthread_mutex_unlock(&t->result_mutex);
 }
