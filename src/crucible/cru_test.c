@@ -1194,6 +1194,26 @@ t_create_framebuffer(void)
 }
 
 static void *
+cru_alloc(void *pUserData, size_t size, size_t alignment,
+          VkSystemAllocType allocType)
+{
+    void *mem = malloc(size);
+    memset(mem, 139, size);
+    return mem;
+}
+
+static void
+cru_free(void *pUserData, void *pMem)
+{
+    free(pMem);
+}
+
+static const VkAllocCallbacks cru_alloc_cb = {
+    .pfnAlloc = cru_alloc,
+    .pfnFree = cru_free,
+};
+
+static void *
 main_thread_start(void *arg)
 {
     // Bind this thread to the test.
@@ -1218,6 +1238,7 @@ main_thread_start(void *arg)
                 .pAppName = "crucible",
                 .apiVersion = 1,
             },
+            .pAllocCb = &cru_alloc_cb,
         },
         &t->instance);
     t_cleanup_push_vk_instance(t_instance);
