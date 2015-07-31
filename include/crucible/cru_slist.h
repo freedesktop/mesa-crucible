@@ -21,7 +21,9 @@
 
 #pragma once
 
+#include <stdatomic.h>
 #include <stdbool.h>
+
 #include <crucible/xalloc.h>
 
 #ifdef __cplusplus
@@ -68,9 +70,9 @@ cru_slist_prepend_atomic(cru_slist_t **list, void *data)
 
     elem = xmalloc(sizeof(*elem));
     elem->data = data;
+    elem->next = atomic_load(list);
 
     while (true) {
-        elem->next = *list;
         if (__atomic_compare_exchange(list, &elem->next, &elem,
                                       false /*weak*/,
                                       __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
