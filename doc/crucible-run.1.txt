@@ -9,7 +9,8 @@ crucible-run - run tests
 SYNOPSIS
 --------
 [verse]
-*crucible run* [--no-cleanup] [--dump|--no-dump] [<pattern>...]
+*crucible run* [--fork|--no-fork] [--no-cleanup] [--dump|--no-dump]
+               [<pattern>...]
 
 DESCRIPTION
 -----------
@@ -23,6 +24,11 @@ whose names match "example.*").
 
 OPTIONS
 -------
+--fork, --no-fork [default: enabled]::
+    Run tests outside or inside the test runner's master process. With forking
+    enabled, the test runner's master process is protected from test crashes.
+    However, forking also makes debugging tests more difficult.
+
 --no-cleanup::
     Disable each test's cleanup phase. This is useful because a test may crash
     during cleanup but otherwise pass.

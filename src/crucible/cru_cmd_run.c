@@ -24,6 +24,7 @@
 #include "cru_cmd.h"
 #include "cru_runner.h"
 
+static int opt_fork = 1;
 static int opt_no_cleanup = 0;
 static int opt_dump = 0;
 static int opt_use_spir_v = 0;
@@ -44,6 +45,8 @@ static const char *shortopts = "+:h";
 
 static const struct option longopts[] = {
     {"help",          no_argument,       NULL,           'h'},
+    {"fork",          no_argument,       &opt_fork,       true},
+    {"no-fork",       no_argument,       &opt_fork,       false},
     {"no-cleanup",    no_argument,       &opt_no_cleanup, true},
     {"dump",          no_argument,       &opt_dump,       true},
     {"no-dump",       no_argument,       &opt_dump,       false},
@@ -104,6 +107,7 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
 {
     parse_args(cmd, argc, argv);
 
+    cru_runner_do_forking = opt_fork;
     cru_runner_do_cleanup_phase = !opt_no_cleanup;
     cru_runner_do_image_dumps = opt_dump;
     cru_runner_use_spir_v = opt_use_spir_v;
