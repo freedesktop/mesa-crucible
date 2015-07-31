@@ -1212,8 +1212,7 @@ thread_bind_to_test(cru_test_t *t)
     if (!cleanup)
         goto fail_create_cleanup_stack;
 
-    if (!cru_slist_prepend(&t->cleanup_stacks, cleanup))
-        goto fail_create_cleanup_stack;
+    cru_slist_prepend(&t->cleanup_stacks, cleanup);
 
     current = (cru_current_test_t) {
         .test = t,
@@ -1520,11 +1519,7 @@ cru_test_create_thread(cru_test_t *t, void *(*start)(void *arg), void *arg,
         goto fail;
     }
 
-    if (!cru_slist_prepend(&t->threads, thread)) {
-        cru_loge("%s: leaked a test thread", t->def->name);
-        pthread_cancel(*thread);
-        goto fail;
-    }
+    cru_slist_prepend(&t->threads, thread);
 
     if (out_thread)
         *out_thread = *thread;

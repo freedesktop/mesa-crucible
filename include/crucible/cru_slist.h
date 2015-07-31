@@ -52,7 +52,7 @@ cru_slist_length(cru_slist_t *list)
 /// Prepend \a data onto the \a list.
 ///
 /// Threadsafe and lockless.
-static inline bool
+static inline void
 cru_slist_prepend(cru_slist_t **list, void *data)
 {
     cru_slist_t *elem;
@@ -67,8 +67,6 @@ cru_slist_prepend(cru_slist_t **list, void *data)
                                       __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
             break;
     }
-
-    return true;
 }
 
 /// Pop off the list's first node and return the node's data.
