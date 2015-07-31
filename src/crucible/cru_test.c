@@ -75,6 +75,14 @@ struct cru_test {
     /// begins with "t_".
     cru_slist_t *cleanup_stacks;
 
+    /// This remains zero until a thread promotes itself to become the result
+    /// thread. It remains set until cru_test_destroy().
+    pthread_t result_thread;
+
+    /// This remains zero until the cleanup thread is created. It remains set
+    /// until cru_test_destroy().
+    pthread_t cleanup_thread;
+
     /// Threads coordinate activity with the phase.
     _Atomic enum cru_test_phase phase;
 
@@ -135,12 +143,36 @@ struct user_thread_arg {
 };
 
 /// Document and assert that this thread is inside a running test.
-#define ASSERT_IN_TEST_THREAD assert(current.test != NULL)
+#define ASSERT_IN_TEST_THREAD \
+    do { \
+        assert(current.test != NULL); \
+        assert(current.cleanup != NULL); \
+    } while (0)
 
 /// Document and assert that this thread is not inside a running test.
 ///
 /// Usually, this assertion will be called by the test runner.
-#define ASSERT_NOT_IN_TEST_THREAD assert(current.test == NULL)
+#define ASSERT_NOT_IN_TEST_THREAD \
+    do { \
+        assert(current.test == NULL); \
+        assert(current.cleanup == NULL); \
+    } while (0)
+
+#define ASSERT_IN_RESULT_THREAD(t) \
+    do { \
+        assert(current.test == NULL); \
+        assert(current.cleanup == NULL); \
+        assert(pthread_equal(pthread_self(), (t)->result_thread)); \
+        assert(!pthread_equal(pthread_self(), (t)->cleanup_thread)); \
+    } while (0)
+
+#define ASSERT_IN_CLEANUP_THREAD(t) \
+    do { \
+        assert(current.test == NULL); \
+        assert(current.cleanup == NULL); \
+        assert(!pthread_equal(pthread_self(), (t)->result_thread)); \
+        assert(pthread_equal(pthread_self(), (t)->cleanup_thread)); \
+    } while (0)
 
 /// Document that this function is legal to call from inside or outside a test
 /// thread.
@@ -148,6 +180,26 @@ struct user_thread_arg {
 
 #define GET_CURRENT_TEST(__var) \
         cru_test_t *__var = current.test
+
+static bool
+cru_test_create_thread(cru_test_t *t, void *(*start)(void *arg), void *arg,
+                       pthread_t *out_thread);
+
+static void * cru_noreturn
+cleanup_thread_start(void *arg);
+
+static void
+join_thread(pthread_t thread)
+{
+    int err;
+
+    err = pthread_join(thread, NULL);
+    if (err) {
+        // Abort because there is no safe way to recover.
+        cru_loge("failed to join thread... abort!");
+        abort();
+    }
+}
 
 const char *
 cru_test_result_to_string(cru_test_result_t result)
@@ -229,9 +281,15 @@ cru_test_destroy(cru_test_t *t)
     assert(t->phase == CRU_TEST_PHASE_PRESTART ||
            t->phase == CRU_TEST_PHASE_STOPPED);
 
+    // This test must own no running threads:
+    //   - In the "prestart" phase, no test threads have been created yet.
+    //   - In the "stopped" phase, all test threads have been joined.
+    assert(t->threads == NULL);
+
     pthread_mutex_destroy(&t->result_mutex);
     pthread_cond_destroy(&t->result_cond);
     string_finish(&t->ref_image_filename);
+
     free(t);
 }
 
@@ -627,6 +685,23 @@ t_check_cancelled(void)
         pthread_exit(NULL);
 }
 
+static void
+result_thread_join_others(cru_test_t *t)
+{
+    ASSERT_IN_RESULT_THREAD(t);
+    assert(t->phase == CRU_TEST_PHASE_PENDING_CLEANUP);
+
+    pthread_t *thread = NULL;
+
+    while ((thread = cru_slist_pop(&t->threads))) {
+        if (!pthread_equal(*thread, t->result_thread)) {
+            join_thread(*thread);
+        }
+
+        free(thread);
+    }
+}
+
 void cru_noreturn
 t_end(enum cru_test_result result)
 {
@@ -664,8 +739,16 @@ t_end(enum cru_test_result result)
         pthread_exit(NULL);
     }
 
-    t->phase = CRU_TEST_PHASE_PENDING_CLEANUP;
+    // This thread wins! It now unbinds itself from the test and becomes the
+    // "result" thread.
+    ASSERT_IN_TEST_THREAD;
+    current = (cru_current_test_t) {0};
+    t->result_thread = pthread_self();
     t->result = result;
+    ASSERT_NOT_IN_TEST_THREAD;
+    ASSERT_IN_RESULT_THREAD(t);
+
+    t->phase = CRU_TEST_PHASE_PENDING_CLEANUP;
 
     err = pthread_mutex_unlock(&t->result_mutex);
     if (err) {
@@ -673,8 +756,31 @@ t_end(enum cru_test_result result)
         abort();
     }
 
-    // FINISHME: Run the cleanup handlers here if this is the last test thread.
-    pthread_cond_broadcast(&t->result_cond);
+    result_thread_join_others(t);
+
+    // This thread, the "result" thread, is the test's sole remaining thread.
+    assert(cru_slist_length(t->threads) == 0);
+    assert(pthread_equal(pthread_self(), t->result_thread));
+
+    // Enter the cleanup phase.
+    assert(t->phase == CRU_TEST_PHASE_PENDING_CLEANUP);
+    t->phase = CRU_TEST_PHASE_CLEANUP;
+
+    err = pthread_create(&t->cleanup_thread, NULL, cleanup_thread_start, t);
+    if (err) {
+        cru_loge("%s: failed to start cleanup thread", t->def->name);
+
+        t->phase = CRU_TEST_PHASE_STOPPED;
+        t->result = CRU_TEST_RESULT_FAIL;
+
+        pthread_cond_broadcast(&t->result_cond);
+        pthread_exit(NULL);
+    }
+
+    // The cleanup thread is now responsible for broadcasting the test result.
+    // Broadcasting in the cleanup thread instead of here, in the result
+    // thread, avoids the overhead of an extra context switch and
+    // pthread_join().
     pthread_exit(NULL);
 }
 
@@ -1080,36 +1186,39 @@ t_init_physical_dev_mem_props(void)
 }
 
 static void
-t_setup_thread(void)
+thread_bind_to_test(cru_test_t *t)
 {
+    ASSERT_NOT_IN_TEST_THREAD;
+
+    cru_cleanup_stack_t *cleanup;
+
+    cleanup = cru_cleanup_create();
+    if (!cleanup)
+        goto fail_create_cleanup_stack;
+
+    if (!cru_slist_prepend(&t->cleanup_stacks, cleanup))
+        goto fail_create_cleanup_stack;
+
+    current = (cru_current_test_t) {
+        .test = t,
+        .cleanup = cleanup,
+    };
+
     ASSERT_IN_TEST_THREAD;
-    GET_CURRENT_TEST(t);
 
-    assert(current.cleanup == NULL);
-
-    // Kill this thread if the test is already done.
+    // Die now if a different thread cancelled the test.
     t_check_cancelled();
-
-    // Create a cleanup stack for this thread.
-    current.cleanup = cru_cleanup_create();
-    if (!current.cleanup)
-        goto fail_create_cleanup_stack;
-
-    if (!cru_slist_prepend(&t->cleanup_stacks, current.cleanup))
-        goto fail_create_cleanup_stack;
 
     return;
 
 fail_create_cleanup_stack:
+    // Without a cleanup stack, this is not a well-formed test thread. That
+    // prevents us from calling any "t_*" functions, even t_end(). So give up
+    // and die.
     cru_loge("failed to create cleanup stack for test thread");
-
-    if (current.cleanup) {
-        cru_cleanup_release(current.cleanup);
-        current.cleanup = NULL;
-    }
-
-    t_fail_silent();
+    abort();
 }
+
 
 static void
 t_create_attachment(VkDevice dev,
@@ -1232,18 +1341,13 @@ static const VkAllocCallbacks cru_alloc_cb = {
 static void *
 main_thread_start(void *arg)
 {
-    // Bind this thread to the test.
-    ASSERT_NOT_IN_TEST_THREAD;
-    current = (cru_current_test_t) {
-        .test = (cru_test_t *) arg,
-        .cleanup = NULL,
-    };
-    ASSERT_IN_TEST_THREAD;
-
-    GET_CURRENT_TEST(t);
+    cru_test_t *t = arg;
 
     assert(t->phase == CRU_TEST_PHASE_SETUP);
-    t_setup_thread();
+
+    ASSERT_NOT_IN_TEST_THREAD;
+    thread_bind_to_test(arg);
+    ASSERT_IN_TEST_THREAD;
 
     t_assertf(t->def->start, "test defines no start function");
 
@@ -1346,17 +1450,11 @@ user_thread_start(void *_arg)
     arg = *(user_thread_arg_t*) _arg;
     free(_arg);
 
-    // Bind this thread to the test.
-    ASSERT_NOT_IN_TEST_THREAD;
-    current = (cru_current_test_t) {
-        .test = (cru_test_t *) arg.test,
-        .cleanup = NULL,
-    };
-    ASSERT_IN_TEST_THREAD;
-
     // Connect this newly created thread to the test framework before giving
     // control to the user-supplied thread start function.
-    t_setup_thread();
+    ASSERT_NOT_IN_TEST_THREAD;
+    thread_bind_to_test(arg.test);
+    ASSERT_IN_TEST_THREAD;
 
     arg.start_func(arg.start_arg);
 
@@ -1369,13 +1467,13 @@ user_thread_start(void *_arg)
 /// and unwinds all the test's cleanup stacks.
 ///
 /// \see cru_test::cleanup_stacks
-static void *
+static void * cru_noreturn
 cleanup_thread_start(void *arg)
 {
-    ASSERT_NOT_IN_TEST_THREAD;
-
     cru_test_t *t = arg;
     cru_cleanup_stack_t *cleanup = NULL;
+
+    ASSERT_IN_CLEANUP_THREAD(t);
 
     while ((cleanup = cru_slist_pop(&t->cleanup_stacks))) {
         if (t->no_cleanup)
@@ -1384,11 +1482,15 @@ cleanup_thread_start(void *arg)
         cru_cleanup_release(cleanup);
     }
 
-    return NULL;
+    t->phase = CRU_TEST_PHASE_STOPPED;
+    pthread_cond_broadcast(&t->result_cond);
+
+    pthread_exit(NULL);
 }
 
 static bool
-cru_test_create_thread(cru_test_t *t, void *(*start)(void *arg), void *arg)
+cru_test_create_thread(cru_test_t *t, void *(*start)(void *arg), void *arg,
+                       pthread_t *out_thread)
 {
     MAYBE_IN_TEST_THREAD;
 
@@ -1408,6 +1510,9 @@ cru_test_create_thread(cru_test_t *t, void *(*start)(void *arg), void *arg)
         pthread_cancel(*thread);
         goto fail;
     }
+
+    if (out_thread)
+        *out_thread = *thread;
 
     return true;
 
@@ -1430,7 +1535,7 @@ cru_test_start(cru_test_t *t)
         return;
     }
 
-    if (!cru_test_create_thread(t, main_thread_start, t)) {
+    if (!cru_test_create_thread(t, main_thread_start, t, NULL)) {
         t->phase = CRU_TEST_PHASE_STOPPED;
         t->result = CRU_TEST_RESULT_FAIL;
         return;
@@ -1456,77 +1561,8 @@ t_create_thread(void (*start)(void *arg), void *arg)
     test_arg->start_func = start;
     test_arg->start_arg = arg;
 
-    if (!cru_test_create_thread(t, user_thread_start, test_arg)) {
+    if (!cru_test_create_thread(t, user_thread_start, test_arg, NULL)) {
         t_fail_silent();
-    }
-}
-
-static void
-cru_test_join_threads(cru_test_t *t)
-{
-    // Test threads cannot join themselves.
-    ASSERT_NOT_IN_TEST_THREAD;
-
-    int err;
-    pthread_t *thread = NULL;
-
-    assert(t->phase == CRU_TEST_PHASE_PENDING_CLEANUP);
-
-    while ((thread = cru_slist_pop(&t->threads))) {
-        err = pthread_join(*thread, NULL);
-        if (err) {
-            cru_loge("%s: failed to join a test thread", t->def->name);
-            t->result = CRU_TEST_RESULT_FAIL;
-        }
-
-        free(thread);
-    }
-}
-
-static void
-cru_test_run_cleanup_handlers(cru_test_t *t)
-{
-    // Cleanup handlers are ran by the runner, outside the test itself.
-    ASSERT_NOT_IN_TEST_THREAD;
-
-    pthread_t cleanup_thread;
-    int err;
-
-    // TODO: Document thread-safety of cleanup handlers.
-    // TODO: Document that cleanup handlers run outside of test.
-    // TODO: Maybe fail test if cleanup handler tries to access test data.
-
-    assert(t->phase == CRU_TEST_PHASE_CLEANUP);
-
-    err = pthread_create(&cleanup_thread, NULL, cleanup_thread_start, t);
-    if (err) {
-        cru_loge("%s: failed to create cleanup thread", t->def->name);
-        t->result = CRU_TEST_RESULT_FAIL;
-        return;
-    }
-
-    err = pthread_join(cleanup_thread, NULL);
-    if (err) {
-        cru_loge("%s: failed to join cleanup thread", t->def->name);
-        t->result = CRU_TEST_RESULT_FAIL;
-        return;
-    }
-}
-
-/// Caller must have `test->result_mutex`.
-static void
-cru_test_wait_for_phase(cru_test_t *t, enum cru_test_phase phase)
-{
-    ASSERT_NOT_IN_TEST_THREAD;
-
-    int err;
-
-    while (t->phase < phase) {
-        err = pthread_cond_wait(&t->result_cond, &t->result_mutex);
-        if (err) {
-            cru_loge("%s: failed to wait on thread condition", t->def->name);
-            abort();
-        }
     }
 }
 
@@ -1546,16 +1582,12 @@ cru_test_wait(cru_test_t *t)
         abort();
     }
 
-    cru_test_wait_for_phase(t, CRU_TEST_PHASE_PENDING_CLEANUP);
-
-    if (t->phase == CRU_TEST_PHASE_PENDING_CLEANUP) {
-        cru_test_join_threads(t);
-        t->phase = CRU_TEST_PHASE_CLEANUP;
-        cru_test_run_cleanup_handlers(t);
-        t->phase = CRU_TEST_PHASE_STOPPED;
+    err = pthread_cond_wait(&t->result_cond, &t->result_mutex);
+    if (err) {
+        cru_loge("%s: failed to wait on test's result condition",
+                 t->def->name);
+        abort();
     }
-
-    cru_test_wait_for_phase(t, CRU_TEST_PHASE_STOPPED);
 
     pthread_mutex_unlock(&t->result_mutex);
 }
