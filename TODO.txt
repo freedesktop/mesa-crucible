@@ -1,20 +1,9 @@
 Urgent
 ======
-- Support multiple command buffers after Mesa gets fixed.
 - Add a --diff option to crucible-run that dumps image diffs for failed tests.
   (Requires multiple command buffers).
 - Add an option to crucible-run that selects how the runner isolates tests:
   one thread per test, one process per test, or no isolation.
-
-Important
-=========
-- Add optional printf-style parameters to cru_assert() and cru_fail().
-- Let reference images generated at runtime be first class citizens, just like
-  reference images loaded from disk. (Miptree tests will want this).
-- Generate some wrapper headers for the Vulkan API that provide type-safety and
-  reduce boilerplate. Having real types would simplify the test cleanup API too.
-- Fail test if any vk function fails, unless the test explicitly expects an
-  error.
 
 Rainy Day
 =========
