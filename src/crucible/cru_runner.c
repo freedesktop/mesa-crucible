@@ -90,13 +90,19 @@ struct cru_result_packet {
     assert((slave)->pid == 0)
 
 struct cru_master {
+    cru_slave_t slaves[1];
+
     uint32_t num_tests;
     uint32_t num_pass;
     uint32_t num_fail;
     uint32_t num_skip;
 };
 
-static struct cru_master master = {0};
+static struct cru_master master = {
+    .slaves = {
+        { .pid = -1 },
+    },
+};
 
 bool cru_runner_do_cleanup_phase = true;
 bool cru_runner_do_image_dumps = false;
@@ -413,16 +419,16 @@ master_cleanup_slave(cru_slave_t *slave)
 static void
 master_loop(void)
 {
-    cru_slave_t slave = { .pid = -1 };
     const cru_test_def_t *def;
+    cru_slave_t *slave = &master.slaves[0];
 
-    if (!master_init_slave(&slave))
+    if (!master_init_slave(slave))
         return;
 
     // Dispatch each test to the current slave process. Interleave the
     // dispatching and result collection.
     cru_foreach_test_def(def) {
-        ASSERT_IN_MASTER_PROCESS(&slave);
+        ASSERT_IN_MASTER_PROCESS(slave);
 
         if (!def->priv.enable)
             continue;
@@ -434,29 +440,29 @@ master_loop(void)
 
         cru_log_tag("start", "%s", def->name);
 
-        if (!master_send_dispatch(&slave, def)) {
+        if (!master_send_dispatch(slave, def)) {
             // The slave is probably be dead. Reap the zombie and spawn a new
             // one.  Re-dispatch this test to the new slave.
-            master_drain_result_pipe(&slave);
-            master_cleanup_slave(&slave);
+            master_drain_result_pipe(slave);
+            master_cleanup_slave(slave);
 
-            if (!master_init_slave(&slave)) {
+            if (!master_init_slave(slave)) {
                 // Can't recover.
                 return;
             }
 
-            if (!master_send_dispatch(&slave, def)) {
+            if (!master_send_dispatch(slave, def)) {
                 // We twice failed to dispatch this test. Give up.
                 return;
             }
         }
 
-        master_drain_result_pipe(&slave);
+        master_drain_result_pipe(slave);
     }
 
     // Tell the slave that it will receive no more tests.
-    master_send_dispatch(&slave, NULL);
-    master_cleanup_slave(&slave);
+    master_send_dispatch(slave, NULL);
+    master_cleanup_slave(slave);
 }
 
 /// Return true if and only all tests pass or skip.
