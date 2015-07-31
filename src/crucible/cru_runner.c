@@ -470,20 +470,18 @@ cru_runner_run_tests(void)
     master_loop();
 
     uint32_t num_ran = master.num_pass + master.num_fail + master.num_skip;
-    uint32_t num_missing = master.num_tests - num_ran;
+    uint32_t num_lost = master.num_tests - num_ran;
 
     // A big, and perhaps unneeded, hammer.
     fflush(stdout);
     fflush(stderr);
 
     cru_logi("================================");
-    cru_logi("ran %u tests", num_ran);
+    cru_logi("ran %u tests", master.num_tests);
     cru_logi("pass %u", master.num_pass);
     cru_logi("fail %u", master.num_fail);
     cru_logi("skip %u", master.num_skip);
-
-    if (num_missing > 0)
-        cru_logi("missing %u", num_missing);
+    cru_logi("lost %u", num_lost);
 
     return master.num_pass + master.num_skip == master.num_tests;
 }
