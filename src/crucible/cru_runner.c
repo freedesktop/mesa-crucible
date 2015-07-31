@@ -27,6 +27,7 @@
 /// test results and prints their summary. The separation ensures that test
 /// results and summary are printed even when a test crashes its process.
 
+#include <stdatomic.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -96,6 +97,8 @@ struct cru_master {
     uint32_t num_pass;
     uint32_t num_fail;
     uint32_t num_skip;
+
+    atomic_bool sigint_flag;
 };
 
 static struct cru_master master = {
@@ -107,6 +110,19 @@ static struct cru_master master = {
 bool cru_runner_do_cleanup_phase = true;
 bool cru_runner_do_image_dumps = false;
 bool cru_runner_use_spir_v = false;
+
+static void
+set_sigint_handler(sighandler_t handler)
+{
+    const struct sigaction sa = {
+        .sa_handler = handler,
+    };
+
+    if (sigaction(SIGINT, &sa, NULL) == -1) {
+        cru_loge("test runner failed to set SIGINT handler");
+        abort();
+    }
+}
 
 static bool
 cru_pipe_init(cru_pipe_t *p)
@@ -374,6 +390,8 @@ master_init_slave(cru_slave_t *slave)
     }
 
     if (slave->pid == 0) {
+        set_sigint_handler(SIG_DFL);
+
         if (!cru_pipe_become_reader(&slave->dispatch_pipe))
             exit(EXIT_FAILURE);
 
@@ -415,6 +433,34 @@ master_cleanup_slave(cru_slave_t *slave)
     slave->pid = -1;
 }
 
+static void
+master_kill_slaves(void)
+{
+    int err;
+
+    for (uint32_t i = 0; i < ARRAY_LENGTH(master.slaves); ++i) {
+        cru_slave_t *slave = &master.slaves[i];
+
+        if (slave->pid == -1)
+            continue;
+
+        err = kill(slave->pid, SIGINT);
+        if (err) {
+            cru_loge("runner failed to kill child process %d", slave->pid);
+            abort();
+        }
+
+        master_cleanup_slave(slave);
+    }
+}
+
+static void
+master_handle_sigint(int sig)
+{
+    assert(sig == SIGINT);
+    atomic_store(&master.sigint_flag, true);
+}
+
 /// Dispatch tests to slave processes.
 static void
 master_loop(void)
@@ -429,6 +475,21 @@ master_loop(void)
     // dispatching and result collection.
     cru_foreach_test_def(def) {
         ASSERT_IN_MASTER_PROCESS(slave);
+
+        // SIGINT kills all running tests. A second SIGINT, if received before
+        // the runner resumes running tests, kills the testrun and prints the
+        // result summary.
+        if (atomic_exchange(&master.sigint_flag, false)) {
+            master_kill_slaves();
+
+            // Give the user a short window in which to send SIGINT again
+            // before tests resume running.
+            nanosleep(&(struct timespec) { .tv_nsec = 500000000 }, NULL);
+
+            if (atomic_exchange(&master.sigint_flag, false)) {
+                return;
+            }
+        }
 
         if (!def->priv.enable)
             continue;
@@ -473,7 +534,9 @@ cru_runner_run_tests(void)
     cru_logi("running %u tests", master.num_tests);
     cru_logi("================================");
 
+    set_sigint_handler(master_handle_sigint);
     master_loop();
+    set_sigint_handler(SIG_DFL);
 
     uint32_t num_ran = master.num_pass + master.num_fail + master.num_skip;
     uint32_t num_lost = master.num_tests - num_ran;
