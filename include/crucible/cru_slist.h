@@ -49,11 +49,20 @@ cru_slist_length(cru_slist_t *list)
     return n;
 }
 
-/// Prepend \a data onto the \a list.
-///
-/// Threadsafe and lockless.
 static inline void
 cru_slist_prepend(cru_slist_t **list, void *data)
+{
+    cru_slist_t *elem;
+
+    elem = xmalloc(sizeof(*elem));
+    elem->data = data;
+
+    elem->next = *list;
+    *list = elem;
+}
+
+static inline void
+cru_slist_prepend_atomic(cru_slist_t **list, void *data)
 {
     cru_slist_t *elem;
 

@@ -1212,7 +1212,7 @@ thread_bind_to_test(cru_test_t *t)
     if (!cleanup)
         goto fail_create_cleanup_stack;
 
-    cru_slist_prepend(&t->cleanup_stacks, cleanup);
+    cru_slist_prepend_atomic(&t->cleanup_stacks, cleanup);
 
     current = (cru_current_test_t) {
         .test = t,
@@ -1519,7 +1519,7 @@ cru_test_create_thread(cru_test_t *t, void *(*start)(void *arg), void *arg,
         goto fail;
     }
 
-    cru_slist_prepend(&t->threads, thread);
+    cru_slist_prepend_atomic(&t->threads, thread);
 
     if (out_thread)
         *out_thread = *thread;
