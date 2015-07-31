@@ -25,6 +25,7 @@
 
 #include <crucible/cru_vec.h>
 
+extern bool cru_runner_do_forking;
 extern bool cru_runner_do_cleanup_phase;
 extern bool cru_runner_do_image_dumps;
 extern bool cru_runner_use_spir_v;

@@ -126,6 +126,7 @@ static struct cru_master master = {
 #endif
 };
 
+bool cru_runner_do_forking = true;
 bool cru_runner_do_cleanup_phase = true;
 bool cru_runner_do_image_dumps = false;
 bool cru_runner_use_spir_v = false;
@@ -329,22 +330,17 @@ slave_send_result(const cru_slave_t *slave,
     return cru_pipe_atomic_write(&slave->result_pipe, &pk);
 }
 
-static void
-slave_run_test(const cru_slave_t *slave,
-               const cru_test_def_t *def)
+static cru_test_result_t
+run_test_def(const cru_test_def_t *def)
 {
-    ASSERT_IN_SLAVE_PROCESS;
-
     cru_test_t *test;
+    cru_test_result_t result;
 
-    // The slave should not receive disabled tests.
     assert(def->priv.enable);
 
     test = cru_test_create(def);
-    if (!test) {
-        slave_send_result(slave, def, CRU_TEST_RESULT_FAIL);
-        return;
-    }
+    if (!test)
+        return CRU_TEST_RESULT_FAIL;
 
     if (cru_runner_do_image_dumps)
         cru_test_enable_dump(test);
@@ -357,8 +353,10 @@ slave_run_test(const cru_slave_t *slave,
 
     cru_test_start(test);
     cru_test_wait(test);
-    slave_send_result(slave, def, cru_test_get_result(test));
+    result = cru_test_get_result(test);
     cru_test_destroy(test);
+
+    return result;
 }
 
 static void
@@ -369,11 +367,14 @@ slave_loop(const cru_slave_t *slave)
     const cru_test_def_t *def;
 
     while (true) {
+        cru_test_result_t result;
+
         def = slave_recv_dispatch(slave);
         if (!def)
             return;
 
-        slave_run_test(slave, def);
+        result = run_test_def(def);
+        slave_send_result(slave, def, result);
     }
 }
 
@@ -489,7 +490,7 @@ master_handle_sigint(int sig)
 
 /// Dispatch tests to slave processes.
 static void
-master_loop(void)
+master_loop_with_forking(void)
 {
     ASSERT_IN_MASTER_PROCESS;
 
@@ -553,6 +554,46 @@ master_loop(void)
     master_cleanup_slave(slave);
 }
 
+/// Run all tests in the master process.
+static void
+master_loop_no_forking(void)
+{
+    ASSERT_IN_MASTER_PROCESS;
+
+    const cru_test_def_t *def;
+
+    cru_foreach_test_def(def) {
+        cru_test_result_t result;
+
+        if (!def->priv.enable)
+            continue;
+
+        if (def->skip) {
+            master_report_result(def, CRU_TEST_RESULT_SKIP);
+            continue;
+        }
+
+        cru_log_tag("start", "%s", def->name);
+        result = run_test_def(def);
+        master_report_result(def, result);
+    }
+}
+
+static void
+master_loop(void)
+{
+    ASSERT_IN_MASTER_PROCESS;
+
+    if (cru_runner_do_forking) {
+        set_sigint_handler(master_handle_sigint);
+        master_loop_with_forking();
+        set_sigint_handler(SIG_DFL);
+    } else {
+        master_loop_no_forking();
+    }
+}
+
+
 /// Return true if and only all tests pass or skip.
 bool
 cru_runner_run_tests(void)
@@ -567,9 +608,7 @@ cru_runner_run_tests(void)
     cru_logi("running %u tests", master.num_tests);
     cru_logi("================================");
 
-    set_sigint_handler(master_handle_sigint);
     master_loop();
-    set_sigint_handler(SIG_DFL);
 
     uint32_t num_ran = master.num_pass + master.num_fail + master.num_skip;
     uint32_t num_lost = master.num_tests - num_ran;
