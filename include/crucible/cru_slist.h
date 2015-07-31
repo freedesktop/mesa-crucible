@@ -22,6 +22,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <crucible/xalloc.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,9 +36,61 @@ struct cru_slist {
     cru_slist_t *next;
 };
 
-size_t cru_slist_length(cru_slist_t *list);
-bool cru_slist_prepend(cru_slist_t **list, void *data);
-void *cru_slist_pop(cru_slist_t **list);
+static inline size_t
+cru_slist_length(cru_slist_t *list)
+{
+    size_t n = 0;
+
+    while (list) {
+        ++n;
+        list = list->next;
+    }
+
+    return n;
+}
+
+/// Prepend \a data onto the \a list.
+///
+/// Threadsafe and lockless.
+static inline bool
+cru_slist_prepend(cru_slist_t **list, void *data)
+{
+    cru_slist_t *elem;
+
+    elem = xmalloc(sizeof(*elem));
+    elem->data = data;
+
+    while (true) {
+        elem->next = *list;
+        if (__atomic_compare_exchange(list, &elem->next, &elem,
+                                      false /*weak*/,
+                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
+            break;
+    }
+
+    return true;
+}
+
+/// Pop off the list's first node and return the node's data.
+///
+/// Not threadsafe. Return NULL if the list is empty or if the node has no
+/// data.
+static inline void *
+cru_slist_pop(cru_slist_t **list)
+{
+    cru_slist_t *old_list;
+    void *data;
+
+    if (!*list)
+        return NULL;
+
+    old_list = *list;
+    *list = old_list->next;
+    data = old_list->data;
+    free(old_list);
+
+    return data;
+}
 
 #ifdef __cplusplus
 }
