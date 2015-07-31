@@ -72,12 +72,7 @@ cru_slist_prepend_atomic(cru_slist_t **list, void *data)
     elem->data = data;
     elem->next = atomic_load(list);
 
-    while (true) {
-        if (__atomic_compare_exchange(list, &elem->next, &elem,
-                                      false /*weak*/,
-                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
-            break;
-    }
+    while (!atomic_compare_exchange_strong(list, &elem->next, elem)) {}
 }
 
 /// Pop off the list's first node and return the node's data.
