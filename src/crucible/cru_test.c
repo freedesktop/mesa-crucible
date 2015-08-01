@@ -151,19 +151,24 @@ struct cru_test {
     pthread_cond_t result_cond;
     enum cru_test_result result;
 
-    /// Run the test in bootstrap mode.
-    bool bootstrap;
-
-    /// Disable image dumps.
+    /// \brief Options that control the test's behavior.
     ///
-    /// \see t_dump_image()
-    bool no_dump;
+    /// These must be set, if at all, before the test starts.
+    struct cru_test_options {
+        /// Run the test in bootstrap mode.
+        bool bootstrap;
 
-    /// Don't run the cleanup commands in cru_test::cleanup_stacks.
-    bool no_cleanup;
+        /// Disable image dumps.
+        ///
+        /// \see t_dump_image()
+        bool no_dump;
 
-    /// Try and use SPIR-V shaders when available
-    bool use_spir_v;
+        /// Don't run the cleanup commands in cru_test::cleanup_stacks.
+        bool no_cleanup;
+
+        /// Try and use SPIR-V shaders when available
+        bool use_spir_v;
+    } opt;
 
     string_t ref_image_filename;
     cru_image_t *image;
@@ -324,9 +329,9 @@ cru_test_create(const cru_test_def_t *def)
     t->phase = CRU_TEST_PHASE_PRESTART;
     t->result = CRU_TEST_RESULT_PASS;
     t->ref_image_filename = STRING_INIT;
-    t->no_dump = true;
-    t->no_cleanup = false;
-    t->use_spir_v = false;
+    t->opt.no_dump = true;
+    t->opt.no_cleanup = false;
+    t->opt.use_spir_v = false;
 
     if (t->def->samples > 0) {
         cru_loge("%s: multisample tests not yet supported", t->def->name);
@@ -373,8 +378,8 @@ cru_test_enable_bootstrap(cru_test_t *t,
         return false;
     }
 
-    t->bootstrap = true;
-    t->no_cleanup = true;
+    t->opt.bootstrap = true;
+    t->opt.no_cleanup = true;
     t->width = image_width;
     t->height = image_height;
 
@@ -387,7 +392,7 @@ cru_test_enable_dump(cru_test_t *t)
     ASSERT_NOT_IN_TEST_THREAD;
     ASSERT_TEST_IN_PRESTART_PHASE(t);
 
-    t->no_dump = false;
+    t->opt.no_dump = false;
 }
 
 bool
@@ -396,7 +401,7 @@ cru_test_disable_cleanup(cru_test_t *t)
     ASSERT_NOT_IN_TEST_THREAD;
     ASSERT_TEST_IN_PRESTART_PHASE(t);
 
-    t->no_cleanup = true;
+    t->opt.no_cleanup = true;
 
     return true;
 }
@@ -407,7 +412,7 @@ cru_test_enable_spir_v(cru_test_t *t)
     ASSERT_NOT_IN_TEST_THREAD;
     ASSERT_TEST_IN_PRESTART_PHASE(t);
 
-    t->use_spir_v = true;
+    t->opt.use_spir_v = true;
 }
 
 const VkInstance *
@@ -644,7 +649,7 @@ __t_use_spir_v(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->use_spir_v;
+    return &t->opt.use_spir_v;
 }
 
 const char *
@@ -806,7 +811,7 @@ t_is_dump_enabled(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return !t->no_dump;
+    return !t->opt.no_dump;
 }
 
 void
@@ -815,7 +820,7 @@ t_dump_seq_image(cru_image_t *image)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    if (t->no_dump)
+    if (t->opt.no_dump)
         return;
 
     uint64_t seq = cru_refcount_get(&t->dump_seq);
@@ -844,7 +849,7 @@ t_dump_image_fv(cru_image_t *image, const char *format, va_list va)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    if (t->no_dump)
+    if (t->opt.no_dump)
         return;
 
     string_t filename = STRING_INIT;
@@ -926,7 +931,7 @@ t_compare_image(void)
     t_assert(actual_image);
     t_cleanup_push(actual_image);
 
-    if (t->bootstrap) {
+    if (t->opt.bootstrap) {
         assert(!t->image);
         t_assert(cru_image_write_file(actual_image,
                                       string_data(&t->ref_image_filename)));
@@ -1367,7 +1372,7 @@ main_thread_start(void *arg)
 
     t_assertf(t->def->start, "test defines no start function");
 
-    if (!t->bootstrap && !t->def->no_image)
+    if (!t->opt.bootstrap && !t->def->no_image)
         t_load_image_file();
 
     vkCreateInstance(
@@ -1492,7 +1497,7 @@ cleanup_thread_start(void *arg)
     ASSERT_IN_CLEANUP_THREAD(t);
 
     while ((cleanup = cru_slist_pop(&t->cleanup_stacks))) {
-        if (t->no_cleanup)
+        if (t->opt.no_cleanup)
             cru_cleanup_pop_all_noop(cleanup);
 
         cru_cleanup_release(cleanup);
