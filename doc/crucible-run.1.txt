@@ -10,7 +10,9 @@ SYNOPSIS
 --------
 [verse]
 *crucible run* [--fork|--no-fork] [--no-cleanup] [--dump|--no-dump]
-               [--[no-]separate-cleanup-threads] [<pattern>...]
+               [--[no-]separate-cleanup-threads]
+               [--isolation=<method> | -I <method>]
+               [<pattern>...]
 
 DESCRIPTION
 -----------
@@ -35,6 +37,11 @@ OPTIONS
 
 --dump, --no-dump [default: disabled]::
     Dump (or disable dumping) test images into Crucible's data directory.
+
+-I <method>, --isolation=<method> [default: method=process]::
+    Select the method the runner uses to isolate tests. The runner will start
+    each test in a separate process if <method> is "p" or "process", and in
+    a separate thread if <method> is "t" or "thread".
 
 --use-spir-v::
     Use SPIR-V shaders when available.

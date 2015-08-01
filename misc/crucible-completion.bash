@@ -23,6 +23,7 @@ __crucible_run()
       --no-fork
       --separate-cleanup-threads
       --no-separate-cleanup-threads
+      -I --isolation
       --dump
       --no-dump
       --no-cleanup

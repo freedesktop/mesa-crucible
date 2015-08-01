@@ -19,11 +19,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
+#include <crucible/cru_misc.h>
 #include <crucible/cru_vec.h>
 
 #include "cru_cmd.h"
 #include "cru_runner.h"
 
+static enum cru_test_isolation opt_isolation = CRU_TEST_ISOLATION_PROCESS;
 static int opt_fork = 1;
 static int opt_no_cleanup = 0;
 static int opt_dump = 0;
@@ -42,10 +44,11 @@ static int opt_separate_cleanup_thread = 1;
 //    above) of optstring is a colon (':'),  then getopt() returns ':' instead
 //    of '?' to indicate a missing option argument.
 //
-static const char *shortopts = "+:h";
+static const char *shortopts = "+:hI:";
 
 static const struct option longopts[] = {
     {"help",          no_argument,       NULL,           'h'},
+    {"isolation",     required_argument, NULL,           'I'},
     {"fork",          no_argument,       &opt_fork,       true},
     {"no-fork",       no_argument,       &opt_fork,       false},
     {"no-cleanup",    no_argument,       &opt_no_cleanup, true},
@@ -84,6 +87,16 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
             cru_command_page_help(cmd);
             exit(0);
             break;
+        case 'I':
+            if (cru_streq(optarg, "p") || cru_streq(optarg, "process")) {
+                opt_isolation = CRU_TEST_ISOLATION_PROCESS;
+            } else if (cru_streq(optarg, "t") || cru_streq(optarg, "thread")) {
+                opt_isolation = CRU_TEST_ISOLATION_THREAD;
+            } else {
+                cru_usage_error(cmd, "invalid value '%s' for --isolation",
+                                argv[optind-1]);
+            }
+            break;
         case ':':
             cru_usage_error(cmd, "%s requires an argument", argv[optind-1]);
             break;
@@ -112,6 +125,7 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
 {
     parse_args(cmd, argc, argv);
 
+    cru_runner_test_isolation = opt_isolation;
     cru_runner_do_forking = opt_fork;
     cru_runner_do_cleanup_phase = !opt_no_cleanup;
     cru_runner_use_separate_cleanup_threads = opt_separate_cleanup_thread;
