@@ -17,7 +17,19 @@ __crucible_ls_tests()
 
 __crucible_run()
 {
-   COMPREPLY=($(compgen -W "--help --fork --no-fork --dump --no-dump --no-cleanup --use-spir-v $($1 ls-tests)" -- ${COMP_WORDS[COMP_CWORD]}))
+   local flags="
+      --help
+      --fork
+      --no-fork
+      --separate-cleanup-threads
+      --no-separate-cleanup-threads
+      --dump
+      --no-dump
+      --no-cleanup
+      --use-spir-v
+   "
+
+   COMPREPLY=($(compgen -W "$flags $($1 ls-tests)" -- ${COMP_WORDS[COMP_CWORD]}))
 }
 
 __crucible()

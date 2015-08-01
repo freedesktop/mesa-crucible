@@ -29,6 +29,7 @@ extern bool cru_runner_do_forking;
 extern bool cru_runner_do_cleanup_phase;
 extern bool cru_runner_do_image_dumps;
 extern bool cru_runner_use_spir_v;
+extern bool cru_runner_use_separate_cleanup_threads;
 
 void cru_runner_enable_cleanup(bool b);
 void cru_runner_enable_image_dumps(bool b);

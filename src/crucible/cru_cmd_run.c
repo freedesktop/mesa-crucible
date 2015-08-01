@@ -28,6 +28,7 @@ static int opt_fork = 1;
 static int opt_no_cleanup = 0;
 static int opt_dump = 0;
 static int opt_use_spir_v = 0;
+static int opt_separate_cleanup_thread = 1;
 
 // From man:getopt(3) :
 //
@@ -51,6 +52,10 @@ static const struct option longopts[] = {
     {"dump",          no_argument,       &opt_dump,       true},
     {"no-dump",       no_argument,       &opt_dump,       false},
     {"use-spir-v",    no_argument,       &opt_use_spir_v, true},
+
+    {"separate-cleanup-threads",    no_argument, &opt_separate_cleanup_thread, true},
+    {"no-separate-cleanup-threads", no_argument, &opt_separate_cleanup_thread, false},
+
     {0},
 };
 
@@ -109,6 +114,7 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
 
     cru_runner_do_forking = opt_fork;
     cru_runner_do_cleanup_phase = !opt_no_cleanup;
+    cru_runner_use_separate_cleanup_threads = opt_separate_cleanup_thread;
     cru_runner_do_image_dumps = opt_dump;
     cru_runner_use_spir_v = opt_use_spir_v;
 

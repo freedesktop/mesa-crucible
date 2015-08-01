@@ -130,6 +130,7 @@ bool cru_runner_do_forking = true;
 bool cru_runner_do_cleanup_phase = true;
 bool cru_runner_do_image_dumps = false;
 bool cru_runner_use_spir_v = false;
+bool cru_runner_use_separate_cleanup_threads = true;
 
 static void
 set_sigint_handler(sighandler_t handler)
@@ -350,6 +351,9 @@ run_test_def(const cru_test_def_t *def)
 
     if (cru_runner_use_spir_v)
         cru_test_enable_spir_v(test);
+
+    if (!cru_runner_use_separate_cleanup_threads)
+        cru_test_disable_separate_cleanup_thread(test);
 
     cru_test_start(test);
     cru_test_wait(test);

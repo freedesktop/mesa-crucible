@@ -10,7 +10,7 @@ SYNOPSIS
 --------
 [verse]
 *crucible run* [--fork|--no-fork] [--no-cleanup] [--dump|--no-dump]
-               [<pattern>...]
+               [--[no-]separate-cleanup-threads] [<pattern>...]
 
 DESCRIPTION
 -----------
@@ -38,6 +38,18 @@ OPTIONS
 
 --use-spir-v::
     Use SPIR-V shaders when available.
+
+--[no-]separate-cleanup-threads [default: enabled]::
+    If enabled, then the test's "result" thread [1] will create a new thread
+    in which to run the test's cleanup handlers. If disabled, then the cleanup
+    handlers will run directly in the "result" thread.
+    +
+    This option is useful for detecting and investigating driver bugs that
+    occur when objects are created in one thread and destroyed in another.
+    +
+    [fn1] The test's "result" thread is the one that chooses the test result,
+    thus ending the test, usually by calling functions t_pass(), t_fail(), or
+    t_assert().
 
 EXAMPLES
 --------
