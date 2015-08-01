@@ -126,6 +126,7 @@ static struct cru_master master = {
 #endif
 };
 
+enum cru_test_isolation cru_runner_test_isolation = CRU_TEST_ISOLATION_THREAD;
 bool cru_runner_do_forking = true;
 bool cru_runner_do_cleanup_phase = true;
 bool cru_runner_do_image_dumps = false;
@@ -501,12 +502,12 @@ master_loop_with_forking(void)
     const cru_test_def_t *def;
     cru_slave_t *slave = &master.slaves[0];
 
-    if (!master_init_slave(slave))
-        return;
-
     // Dispatch each test to the current slave process. Interleave the
     // dispatching and result collection.
     cru_foreach_test_def(def) {
+        if (slave->pid == -1 && !master_init_slave(slave)) {
+            return;
+        }
 
         // SIGINT kills all running tests. A second SIGINT, if received before
         // the runner resumes running tests, kills the testrun and prints the
@@ -550,12 +551,22 @@ master_loop_with_forking(void)
             }
         }
 
-        master_drain_result_pipe(slave);
+
+        switch (cru_runner_test_isolation) {
+        case CRU_TEST_ISOLATION_PROCESS:
+            master_send_dispatch(slave, NULL);
+            master_cleanup_slave(slave);
+            break;
+        case CRU_TEST_ISOLATION_THREAD:
+            master_drain_result_pipe(slave);
+            break;
+        }
     }
 
-    // Tell the slave that it will receive no more tests.
-    master_send_dispatch(slave, NULL);
-    master_cleanup_slave(slave);
+    if (slave->pid != -1) {
+        master_send_dispatch(slave, NULL);
+        master_cleanup_slave(slave);
+    }
 }
 
 /// Run all tests in the master process.
@@ -603,6 +614,12 @@ bool
 cru_runner_run_tests(void)
 {
     ASSERT_MASTER_NOT_RUNNING;
+
+    if (!cru_runner_do_forking
+        && cru_runner_test_isolation == CRU_TEST_ISOLATION_THREAD) {
+        cru_loge("invalid options for test runner");
+        return false;
+    }
 
 #ifndef NDEBUG
     master.pid = getpid();

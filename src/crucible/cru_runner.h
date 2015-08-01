@@ -25,6 +25,15 @@
 
 #include <crucible/cru_vec.h>
 
+enum cru_test_isolation {
+    /// The runner will start each test in a separate process.
+    CRU_TEST_ISOLATION_PROCESS,
+
+    /// The runner will start each test in a separate thread.
+    CRU_TEST_ISOLATION_THREAD,
+};
+
+extern enum cru_test_isolation cru_runner_test_isolation;
 extern bool cru_runner_do_forking;
 extern bool cru_runner_do_cleanup_phase;
 extern bool cru_runner_do_image_dumps;
