@@ -84,17 +84,18 @@
 #define ASSERT_IN_RESULT_THREAD(t) \
     do { \
         ASSERT_NOT_IN_TEST_THREAD; \
+        assert((t)->phase == CRU_TEST_PHASE_PENDING_CLEANUP); \
         assert(pthread_equal(pthread_self(), (t)->result_thread)); \
         assert(!pthread_equal(pthread_self(), (t)->cleanup_thread)); \
-        assert((t)->phase == CRU_TEST_PHASE_PENDING_CLEANUP); \
     } while (0)
 
 #define ASSERT_IN_CLEANUP_THREAD(t) \
     do { \
         ASSERT_NOT_IN_TEST_THREAD; \
-        assert(!pthread_equal(pthread_self(), (t)->result_thread)); \
-        assert(pthread_equal(pthread_self(), (t)->cleanup_thread)); \
         assert((t)->phase == CRU_TEST_PHASE_CLEANUP); \
+        assert(pthread_equal(pthread_self(), (t)->cleanup_thread)); \
+        assert(pthread_equal(pthread_self(), (t)->result_thread) == \
+               t->opt.no_separate_cleanup_thread); \
     } while (0)
 
 typedef struct cru_current_test cru_current_test_t;
@@ -168,6 +169,11 @@ struct cru_test {
 
         /// Try and use SPIR-V shaders when available
         bool use_spir_v;
+
+        /// If set, the test's cleanup stacks will unwind in the result
+        /// thread. If unset, the result thread will create a separate cleanup
+        /// thread.
+        bool no_separate_cleanup_thread;
     } opt;
 
     string_t ref_image_filename;
@@ -212,7 +218,7 @@ static bool
 cru_test_create_thread(cru_test_t *t, void *(*start)(void *arg), void *arg,
                        pthread_t *out_thread);
 
-static void * cru_noreturn
+static void *
 cleanup_thread_start(void *arg);
 
 static void
@@ -332,6 +338,7 @@ cru_test_create(const cru_test_def_t *def)
     t->opt.no_dump = true;
     t->opt.no_cleanup = false;
     t->opt.use_spir_v = false;
+    t->opt.no_separate_cleanup_thread = false;
 
     if (t->def->samples > 0) {
         cru_loge("%s: multisample tests not yet supported", t->def->name);
@@ -413,6 +420,15 @@ cru_test_enable_spir_v(cru_test_t *t)
     ASSERT_TEST_IN_PRESTART_PHASE(t);
 
     t->opt.use_spir_v = true;
+}
+
+void
+cru_test_disable_separate_cleanup_thread(cru_test_t *t)
+{
+    ASSERT_NOT_IN_TEST_THREAD;
+    ASSERT_TEST_IN_PRESTART_PHASE(t);
+
+    t->opt.no_separate_cleanup_thread = true;
 }
 
 const VkInstance *
@@ -734,6 +750,40 @@ t_become_result_thread(cru_test_result_t result)
     ASSERT_NOT_IN_TEST_THREAD;
 }
 
+static void cru_noreturn
+result_thread_enter_cleanup_phase(cru_test_t *t)
+{
+    ASSERT_NOT_IN_TEST_THREAD;
+    ASSERT_IN_RESULT_THREAD(t);
+
+    int err;
+
+    t->phase = CRU_TEST_PHASE_CLEANUP;
+
+    if (t->opt.no_separate_cleanup_thread) {
+        t->cleanup_thread = pthread_self();
+        cleanup_thread_start(t);
+    } else {
+        err = pthread_create(&t->cleanup_thread, NULL, cleanup_thread_start, t);
+        if (err) {
+            cru_loge("%s: failed to start cleanup thread", t->def->name);
+
+            t->phase = CRU_TEST_PHASE_STOPPED;
+            t->result = CRU_TEST_RESULT_FAIL;
+
+            pthread_cond_broadcast(&t->result_cond);
+            pthread_exit(NULL);
+        }
+
+        // The cleanup thread is now responsible for broadcasting the test result.
+        // Broadcasting in the cleanup thread instead of here, in the result
+        // thread, avoids the overhead of an extra context switch and
+        // pthread_join().
+    }
+
+    pthread_exit(NULL);
+}
+
 void cru_noreturn
 t_end(enum cru_test_result result)
 {
@@ -783,26 +833,7 @@ t_end(enum cru_test_result result)
     // This thread, the "result" thread, is the test's sole remaining thread.
     assert(cru_slist_length(t->threads) == 0);
 
-    // Enter the cleanup phase.
-    assert(t->phase == CRU_TEST_PHASE_PENDING_CLEANUP);
-    t->phase = CRU_TEST_PHASE_CLEANUP;
-
-    err = pthread_create(&t->cleanup_thread, NULL, cleanup_thread_start, t);
-    if (err) {
-        cru_loge("%s: failed to start cleanup thread", t->def->name);
-
-        t->phase = CRU_TEST_PHASE_STOPPED;
-        t->result = CRU_TEST_RESULT_FAIL;
-
-        pthread_cond_broadcast(&t->result_cond);
-        pthread_exit(NULL);
-    }
-
-    // The cleanup thread is now responsible for broadcasting the test result.
-    // Broadcasting in the cleanup thread instead of here, in the result
-    // thread, avoids the overhead of an extra context switch and
-    // pthread_join().
-    pthread_exit(NULL);
+    result_thread_enter_cleanup_phase(t);
 }
 
 bool
@@ -1488,7 +1519,7 @@ user_thread_start(void *_arg)
 /// and unwinds all the test's cleanup stacks.
 ///
 /// \see cru_test::cleanup_stacks
-static void * cru_noreturn
+static void *
 cleanup_thread_start(void *arg)
 {
     cru_test_t *t = arg;
@@ -1506,7 +1537,7 @@ cleanup_thread_start(void *arg)
     t->phase = CRU_TEST_PHASE_STOPPED;
     pthread_cond_broadcast(&t->result_cond);
 
-    pthread_exit(NULL);
+    return NULL;
 }
 
 static bool
