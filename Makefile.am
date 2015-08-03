@@ -79,6 +79,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/compute.c \
 	src/tests/func/interleaved-cmd-buffers.c \
 	src/tests/func/miptree/miptree.c \
+	src/tests/stress/alloc-multithread.c \
 	src/tests/stress/lots-of-surface-state.c
 
 BUILT_SOURCES = \
