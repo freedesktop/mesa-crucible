@@ -378,8 +378,6 @@ cru_test_enable_bootstrap(cru_test_t *t,
     ASSERT_NOT_IN_TEST_THREAD;
     ASSERT_TEST_IN_PRESTART_PHASE(t);
 
-    assert(t->phase == CRU_TEST_PHASE_PRESTART);
-
     if (!t->def->no_image && (image_width == 0 || image_height == 0)) {
         cru_loge("%s: bootstrap image must have non-zero size", t->def->name);
         return false;
