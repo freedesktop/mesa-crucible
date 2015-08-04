@@ -342,6 +342,10 @@ static inline void t_cleanup_push_vk_semaphore(VkDevice dev, VkSemaphore x)     
 static inline void t_cleanup_push_vk_shader(VkDevice dev, VkShader x)                                               { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_SHADER, dev, x); }
 static inline void t_cleanup_push_vk_shader_module(VkDevice dev, VkShaderModule x)                                  { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_SHADER_MODULE, dev, x); }
 
+void
+cru_test_result_merge(cru_test_result_t *accum,
+                      cru_test_result_t new_result);
+
 #ifdef __cplusplus
 }
 #endif

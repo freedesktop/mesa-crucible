@@ -1671,3 +1671,10 @@ t_cleanup_pop_all(void)
 
     cru_cleanup_pop_all(current.cleanup);
 }
+
+void
+cru_test_result_merge(cru_test_result_t *accum,
+                      cru_test_result_t new_result)
+{
+    *accum = MAX(*accum, new_result);
+}
