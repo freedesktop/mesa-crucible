@@ -28,6 +28,7 @@ CPPFLAGS = \
    -Iinclude
 
 common_CFLAGS = -Wall -O0 -g3 \
+	-Werror=format \
 	-Werror=incompatible-pointer-types \
 	-Werror=int-conversion \
 	$(NULL)
