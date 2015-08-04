@@ -148,9 +148,14 @@ struct cru_test {
     /// Threads coordinate activity with the phase.
     _Atomic enum cru_test_phase phase;
 
-    pthread_mutex_t result_mutex;
-    pthread_cond_t result_cond;
     enum cru_test_result result;
+
+    /// The test broadcasts this condition when it enters
+    /// CRU_TEST_PHASE_STOPPED.
+    pthread_cond_t stop_cond;
+
+    /// Protects cru_test::stop_cond.
+    pthread_mutex_t stop_mutex;
 
     /// \brief Options that control the test's behavior.
     ///
@@ -315,8 +320,8 @@ cru_test_destroy(cru_test_t *t)
     //   - In the "stopped" phase, all test threads have been joined.
     assert(t->threads == NULL);
 
-    pthread_mutex_destroy(&t->result_mutex);
-    pthread_cond_destroy(&t->result_cond);
+    pthread_mutex_destroy(&t->stop_mutex);
+    pthread_cond_destroy(&t->stop_cond);
     string_finish(&t->ref_image_filename);
 
     free(t);
@@ -345,7 +350,7 @@ cru_test_create(const cru_test_def_t *def)
         goto fail;
     }
 
-    err = pthread_mutex_init(&t->result_mutex, NULL);
+    err = pthread_mutex_init(&t->stop_mutex, NULL);
     if (err) {
         // Abort to avoid destroying an uninitialized mutex later.
         cru_loge("%s: failed to init mutex during test creation",
@@ -353,7 +358,7 @@ cru_test_create(const cru_test_def_t *def)
         abort();
     }
 
-    err = pthread_cond_init(&t->result_cond, NULL);
+    err = pthread_cond_init(&t->stop_cond, NULL);
     if (err) {
         // Abort to avoid destroying an uninitialized cond later.
         cru_loge("%s: failed to init thread condition during test creation",
@@ -731,6 +736,14 @@ result_thread_join_others(cru_test_t *t)
     }
 }
 
+static void
+cru_test_stop(cru_test_t *t)
+{
+    assert(t->phase < CRU_TEST_PHASE_STOPPED);
+    t->phase = CRU_TEST_PHASE_STOPPED;
+    pthread_cond_broadcast(&t->stop_cond);
+}
+
 static void cru_noreturn
 result_thread_enter_cleanup_phase(cru_test_t *t)
 {
@@ -749,10 +762,9 @@ result_thread_enter_cleanup_phase(cru_test_t *t)
         if (err) {
             cru_loge("%s: failed to start cleanup thread", t->def->name);
 
-            t->phase = CRU_TEST_PHASE_STOPPED;
             t->result = CRU_TEST_RESULT_FAIL;
+            cru_test_stop(t);
 
-            pthread_cond_broadcast(&t->result_cond);
             pthread_exit(NULL);
         }
 
@@ -1493,8 +1505,7 @@ cleanup_thread_start(void *arg)
         cru_cleanup_release(cleanup);
     }
 
-    t->phase = CRU_TEST_PHASE_STOPPED;
-    pthread_cond_broadcast(&t->result_cond);
+    cru_test_stop(t);
 
     return NULL;
 }
@@ -1578,14 +1589,14 @@ cru_test_wait(cru_test_t *t)
 
     int err;
 
-    err = pthread_mutex_lock(&t->result_mutex);
+    err = pthread_mutex_lock(&t->stop_mutex);
     if (err) {
         cru_loge("%s: failed to lock test mutex", t->def->name);
         abort();
     }
 
     while (t->phase < CRU_TEST_PHASE_STOPPED) {
-        err = pthread_cond_wait(&t->result_cond, &t->result_mutex);
+        err = pthread_cond_wait(&t->stop_cond, &t->stop_mutex);
         if (err) {
             cru_loge("%s: failed to wait on test's result condition",
                      t->def->name);
@@ -1593,7 +1604,7 @@ cru_test_wait(cru_test_t *t)
         }
     }
 
-    pthread_mutex_unlock(&t->result_mutex);
+    pthread_mutex_unlock(&t->stop_mutex);
 }
 
 void
