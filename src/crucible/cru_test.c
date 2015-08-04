@@ -771,27 +771,8 @@ t_end(enum cru_test_result result)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    int err;
-
-    if (t->phase >= CRU_TEST_PHASE_PENDING_CLEANUP) {
-        // A previous call to cru_test_end already cancelled the test and set
-        // the test result.
-        pthread_exit(NULL);
-    }
-
-    err = pthread_mutex_lock(&t->result_mutex);
-    if (err) {
-        cru_loge("%s: failed to lock test mutex", t->def->name);
-        abort();
-    }
-
-    if (t->phase >= CRU_TEST_PHASE_PENDING_CLEANUP) {
-        err = pthread_mutex_unlock(&t->result_mutex);
-        if (err) {
-            cru_loge("%s: failed to unlock mutex", t->def->name);
-            abort();
-        }
-
+    if (atomic_exchange(&t->phase, CRU_TEST_PHASE_PENDING_CLEANUP)
+        >= CRU_TEST_PHASE_PENDING_CLEANUP) {
         // A previous call to cru_test_end already cancelled the test and set
         // the test result.
         pthread_exit(NULL);
@@ -805,12 +786,6 @@ t_end(enum cru_test_result result)
     t->result_thread = pthread_self();
     t->phase = CRU_TEST_PHASE_PENDING_CLEANUP;
     ASSERT_NOT_IN_TEST_THREAD;
-
-    err = pthread_mutex_unlock(&t->result_mutex);
-    if (err) {
-        cru_loge("%s: failed to unlock test mutex", t->def->name);
-        abort();
-    }
 
     result_thread_join_others(t);
 
