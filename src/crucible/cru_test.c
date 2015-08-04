@@ -731,23 +731,6 @@ result_thread_join_others(cru_test_t *t)
     }
 }
 
-static void
-t_become_result_thread(cru_test_result_t result)
-{
-    ASSERT_TEST_IN_MAJOR_PHASE;
-    GET_CURRENT_TEST(t);
-
-    // Unbind the test from this thread.
-    current = (cru_current_test_t) {0};
-
-    t->result = result;
-    t->result_thread = pthread_self();
-    t->phase = CRU_TEST_PHASE_PENDING_CLEANUP;
-
-    ASSERT_IN_RESULT_THREAD(t);
-    ASSERT_NOT_IN_TEST_THREAD;
-}
-
 static void cru_noreturn
 result_thread_enter_cleanup_phase(cru_test_t *t)
 {
@@ -817,7 +800,10 @@ t_end(enum cru_test_result result)
     // This thread wins! It now unbinds itself from the test and becomes the
     // "result" thread.
     ASSERT_IN_TEST_THREAD;
-    t_become_result_thread(result);
+    current = (cru_current_test_t) {0};
+    t->result = result;
+    t->result_thread = pthread_self();
+    t->phase = CRU_TEST_PHASE_PENDING_CLEANUP;
     ASSERT_NOT_IN_TEST_THREAD;
 
     err = pthread_mutex_unlock(&t->result_mutex);
