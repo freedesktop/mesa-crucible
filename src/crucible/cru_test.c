@@ -1617,20 +1617,19 @@ cru_test_wait(cru_test_t *t)
 
     int err;
 
-    if (t->phase >= CRU_TEST_PHASE_STOPPED)
-        return;
-
     err = pthread_mutex_lock(&t->result_mutex);
     if (err) {
         cru_loge("%s: failed to lock test mutex", t->def->name);
         abort();
     }
 
-    err = pthread_cond_wait(&t->result_cond, &t->result_mutex);
-    if (err) {
-        cru_loge("%s: failed to wait on test's result condition",
-                 t->def->name);
-        abort();
+    while (t->phase < CRU_TEST_PHASE_STOPPED) {
+        err = pthread_cond_wait(&t->result_cond, &t->result_mutex);
+        if (err) {
+            cru_loge("%s: failed to wait on test's result condition",
+                     t->def->name);
+            abort();
+        }
     }
 
     pthread_mutex_unlock(&t->result_mutex);
