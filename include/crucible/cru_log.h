@@ -51,7 +51,15 @@ void cru_log_align_tags(bool enable);
 #define cru_finishme(format, ...) \
     __cru_finishme(__FILE__, __LINE__, format, ##__VA_ARGS__)
 
+#define cru_log_internal_error(format, ...) \
+    cru_log_internal_error_loc(__FILE__, __LINE__, (format), ##__VA_ARGS__)
+
+#define cru_log_internal_error_v(format, va) \
+    cru_log_internal_error_loc_v(__FILE__, __LINE__, (format), (va))
+
 void __cru_finishme(const char *file, int line, const char *format, ...) cru_printflike(3, 4);
+void cru_log_internal_error_loc(const char *file, int line, const char *format, ...) cru_noreturn cru_printflike(3, 4);
+void cru_log_internal_error_loc_v(const char *file, int line, const char *format, va_list va) cru_noreturn;
 
 #ifdef __cplusplus
 }

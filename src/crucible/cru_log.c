@@ -21,6 +21,7 @@
 
 #include <pthread.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 #include <crucible/cru_log.h>
@@ -140,6 +141,30 @@ __cru_finishme(const char *file, int line, const char *format, ...)
     va_end(va);
 
     pthread_mutex_unlock(&cru_log_mutex);
+}
+
+void
+cru_log_internal_error_loc(const char *file, int line,
+                           const char *format, ...)
+{
+    va_list va;
+
+    va_start(va, format);
+    cru_log_internal_error_loc_v(file, line, format, va);
+    va_end(va);
+}
+
+void
+cru_log_internal_error_loc_v(const char *file, int line,
+                             const char *format, va_list va)
+{
+    pthread_mutex_lock(&cru_log_mutex);
+
+    printf("internal error: %s:%d: ", file, line);
+    vprintf(format, va);
+    printf("\n");
+
+    abort();
 }
 
 void
