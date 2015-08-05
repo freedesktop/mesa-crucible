@@ -1460,8 +1460,6 @@ main_thread_start(void *arg)
     // returns. Otherwise, cru_test_wait() will deadlock waiting for test
     // cancellation unless the test created a subthread that cancels later.
     t_pass();
-
-    return NULL;
 }
 
 static void *
