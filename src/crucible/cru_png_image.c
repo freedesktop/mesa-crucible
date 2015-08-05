@@ -193,7 +193,8 @@ copy_direct_from_png(cru_image_t *src, cru_image_t *dest)
         }
         break;
     default:
-        assert(!"internal error");
+        cru_log_internal_error("bad png color type %u",
+                               png_image->png_color_type);
         break;
     }
 
