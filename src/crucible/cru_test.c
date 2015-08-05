@@ -223,8 +223,8 @@ static bool
 cru_test_create_thread(cru_test_t *t, void *(*start)(void *arg), void *arg,
                        pthread_t *out_thread);
 
-static void *
-cleanup_thread_start(void *arg);
+static void *cleanup_thread_start(void *arg);
+static void cru_noreturn t_thread_exit(void);
 
 static void
 join_thread(pthread_t thread)
@@ -717,7 +717,7 @@ t_check_cancelled(void)
     GET_CURRENT_TEST(t);
 
     if (t->phase >= CRU_TEST_PHASE_PENDING_CLEANUP)
-        pthread_exit(NULL);
+        t_thread_exit();
 }
 
 static void
@@ -765,7 +765,7 @@ result_thread_enter_cleanup_phase(cru_test_t *t)
             t->result = CRU_TEST_RESULT_FAIL;
             cru_test_stop(t);
 
-            pthread_exit(NULL);
+            t_thread_exit();
         }
 
         // The cleanup thread is now responsible for broadcasting the test result.
@@ -774,7 +774,7 @@ result_thread_enter_cleanup_phase(cru_test_t *t)
         // pthread_join().
     }
 
-    pthread_exit(NULL);
+    t_thread_exit();
 }
 
 void cru_noreturn
@@ -787,7 +787,7 @@ t_end(enum cru_test_result result)
         >= CRU_TEST_PHASE_PENDING_CLEANUP) {
         // A previous call to cru_test_end already cancelled the test and set
         // the test result.
-        pthread_exit(NULL);
+        t_thread_exit();
     }
 
     // This thread wins! It now unbinds itself from the test and becomes the
@@ -1478,8 +1478,7 @@ user_thread_start(void *_arg)
     ASSERT_IN_TEST_THREAD;
 
     arg.start_func(arg.start_arg);
-
-    return NULL;
+    t_thread_exit();
 }
 
 /// \brief The cleanup thread's start function.
@@ -1578,6 +1577,13 @@ t_create_thread(void (*start)(void *arg), void *arg)
     if (!cru_test_create_thread(t, user_thread_start, test_arg, NULL)) {
         t_fail_silent();
     }
+}
+
+/// All test threads must exit through this function.
+static void cru_noreturn
+t_thread_exit(void)
+{
+    pthread_exit(NULL);
 }
 
 void
