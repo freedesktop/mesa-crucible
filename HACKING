@@ -26,19 +26,9 @@ Directory Layout
   Example tests that demonstrate how to use the framework or how to accomplish
   a tricky testing task.
 
-- src/tests/func
-  Functional tests, such as
-      - Draw a triangle, then verify the render target contains a triangle.
-      - Load an image file, generate a mipmap, then compare it against it
-        a reference image.
+- src/tests/func: Functional tests
 
-- src/tests/stress
-  Stress tests, such as
-      - Verify that the Vulkan driver can manage the maximium sizes that it
-        advertises. For example, query the maximum texture size, then do some
-        basic texturing with a texture that size.
-      - Concurrently construct and submit multiple command buffers, each in
-        a separate thread that renders to a subregion of shared render target.
+- src/tests/stress: Stress tests
 
 
 Writing Tests
