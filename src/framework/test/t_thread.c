@@ -90,11 +90,11 @@ t_init_physical_dev(void)
     // FINISHME: Add a command-line option to use non-default physical device.
 
     uint32_t count = 0;
-    qoEnumeratePhysicalDevices(t_instance, &count, NULL);
+    qoEnumeratePhysicalDevices(t->vk.instance, &count, NULL);
     t_assertf(count > 0, "failed to enumerate any physical devices");
 
     count = 1;
-    qoEnumeratePhysicalDevices(t_instance, &count, &t->physical_dev);
+    qoEnumeratePhysicalDevices(t->vk.instance, &count, &t->vk.physical_dev);
     t_assertf(count == 1, "enumerated %u physical devices, expected 1", count);
 }
 
@@ -104,37 +104,37 @@ t_init_physical_dev_mem_props(void)
     ASSERT_TEST_IN_SETUP_PHASE;
     GET_CURRENT_TEST(t);
 
-    qoGetPhysicalDeviceMemoryProperties(t->physical_dev,
-                                        &t->physical_dev_mem_props);
+    qoGetPhysicalDeviceMemoryProperties(t->vk.physical_dev,
+                                        &t->vk.physical_dev_mem_props);
 
     // The Vulkan spec (git aaed022) requires the implementation to expose at
     // least one host-visible and host-coherent memory type.
-    t->mem_type_index_for_mmap = find_best_mem_type_index(
-        &t->physical_dev_mem_props,
+    t->vk.mem_type_index_for_mmap = find_best_mem_type_index(
+        &t->vk.physical_dev_mem_props,
         /*require*/ VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
         /*allow*/ ~VK_MEMORY_PROPERTY_HOST_NON_COHERENT_BIT);
 
     // The best memory type for device-access is one which gives the best
     // performance, which is likely one that is device-visible but not
     // host-visible.
-    t->mem_type_index_for_device_access = find_best_mem_type_index(
-        &t->physical_dev_mem_props,
+    t->vk.mem_type_index_for_device_access = find_best_mem_type_index(
+        &t->vk.physical_dev_mem_props,
         /*require*/ VK_MEMORY_PROPERTY_DEVICE_ONLY,
         /*allow*/ VK_MEMORY_PROPERTY_DEVICE_ONLY);
 
-    if (t->mem_type_index_for_device_access == UINT32_MAX) {
+    if (t->vk.mem_type_index_for_device_access == UINT32_MAX) {
         // There exists no device-only memory type. For device-access, then,
         // simply prefer the overall "best" memory type.
-        t->mem_type_index_for_device_access = find_best_mem_type_index(
-            &t->physical_dev_mem_props,
+        t->vk.mem_type_index_for_device_access = find_best_mem_type_index(
+            &t->vk.physical_dev_mem_props,
             /*require*/ 0, /*allow*/ ~0);
     }
 
-    t_assertf(t->mem_type_index_for_mmap != UINT32_MAX,
+    t_assertf(t->vk.mem_type_index_for_mmap != UINT32_MAX,
               "failed to find a host-visible, host-coherent VkMemoryType in "
               "VkPhysicalDeviceMemoryProperties");
 
-    t_assert(t->mem_type_index_for_device_access != UINT32_MAX);
+    t_assert(t->vk.mem_type_index_for_device_access != UINT32_MAX);
 }
 
 static void
@@ -147,6 +147,7 @@ t_create_attachment(VkDevice dev,
                     VkAttachmentView *out_attachment_view,
                     VkImageView *out_image_view)
 {
+    GET_CURRENT_TEST(t);
     ASSERT_TEST_IN_SETUP_PHASE;
 
     if (format == VK_FORMAT_UNDEFINED) {
@@ -169,7 +170,7 @@ t_create_attachment(VkDevice dev,
         .usage = image_usage_flags);
 
     VkDeviceMemory mem = qoAllocImageMemory(dev, *out_image,
-        .memoryTypeIndex = t_mem_type_index_for_device_access);
+        .memoryTypeIndex = t->vk.mem_type_index_for_device_access);
 
     qoBindImageMemory(dev, *out_image, mem, /*offset*/ 0);
 
@@ -202,35 +203,35 @@ t_create_framebuffer(void)
     if (t->def->no_image)
         return;
 
-    t_create_attachment(t->device, VK_FORMAT_R8G8B8A8_UNORM,
+    t_create_attachment(t->vk.device, VK_FORMAT_R8G8B8A8_UNORM,
                         VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
                         VK_IMAGE_ASPECT_COLOR,
                         t->ref.width, t->ref.height,
-                        &t->rt_image,
-                        &t->color_attachment_view,
-                        &t->color_texture_view);
+                        &t->vk.color_image,
+                        &t->vk.color_attachment_view,
+                        &t->vk.color_texture_view);
 
     bind_info[att_count++] = (VkAttachmentBindInfo) {
-        .view = t->color_attachment_view,
+        .view = t->vk.color_attachment_view,
         .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
     };
 
     if (t->def->depthstencil_format != VK_FORMAT_UNDEFINED) {
-        t_create_attachment(t->device, t->def->depthstencil_format,
+        t_create_attachment(t->vk.device, t->def->depthstencil_format,
                             VK_IMAGE_USAGE_DEPTH_STENCIL_BIT,
                             VK_IMAGE_ASPECT_DEPTH,
                             t->ref.width, t->ref.height,
-                            &t->ds_image,
-                            &t->ds_attachment_view,
-                            &t->depth_image_view);
+                            &t->vk.ds_image,
+                            &t->vk.ds_attachment_view,
+                            &t->vk.depth_image_view);
 
         bind_info[att_count++] = (VkAttachmentBindInfo) {
-            .view = t->ds_attachment_view,
+            .view = t->vk.ds_attachment_view,
             .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
         };
     }
 
-    t->framebuffer = qoCreateFramebuffer(t_device,
+    t->vk.framebuffer = qoCreateFramebuffer(t->vk.device,
         .width = t->ref.width,
         .height = t->ref.height,
         .attachmentCount = att_count,
@@ -397,13 +398,13 @@ main_thread_start(void *arg)
             },
             .pAllocCb = &cru_alloc_cb,
         },
-        &t->instance);
-    t_cleanup_push_vk_instance(t_instance);
+        &t->vk.instance);
+    t_cleanup_push_vk_instance(t->vk.instance);
 
     t_init_physical_dev();
     t_init_physical_dev_mem_props();
 
-    vkCreateDevice(t->physical_dev,
+    vkCreateDevice(t->vk.physical_dev,
         &(VkDeviceCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             .queueRecordCount = 1,
@@ -412,14 +413,14 @@ main_thread_start(void *arg)
                 .queueCount = 1,
             },
         },
-        &t->device);
-    t_cleanup_push_vk_device(t_device);
+        &t->vk.device);
+    t_cleanup_push_vk_device(t->vk.device);
 
-    vkGetDeviceQueue(t_device, 0, 0, &t->queue);
+    vkGetDeviceQueue(t->vk.device, 0, 0, &t->vk.queue);
 
-    t->pipeline_cache = qoCreatePipelineCache(t->device);
+    t->vk.pipeline_cache = qoCreatePipelineCache(t->vk.device);
 
-    t->dynamic_vp_state = qoCreateDynamicViewportState(t->device,
+    t->vk.dynamic_vp_state = qoCreateDynamicViewportState(t->vk.device,
         .viewportAndScissorCount = 1,
         .pViewports = (VkViewport[]) {
             {
@@ -435,26 +436,26 @@ main_thread_start(void *arg)
             {{ 0, 0 }, { t->ref.width, t->ref.height }},
         }
     );
-    t->dynamic_rs_state = qoCreateDynamicRasterState(t_device);
-    t->dynamic_cb_state = qoCreateDynamicColorBlendState(t_device);
-    t->dynamic_ds_state = qoCreateDynamicDepthStencilState(t_device);
+    t->vk.dynamic_rs_state = qoCreateDynamicRasterState(t->vk.device);
+    t->vk.dynamic_cb_state = qoCreateDynamicColorBlendState(t->vk.device);
+    t->vk.dynamic_ds_state = qoCreateDynamicDepthStencilState(t->vk.device);
 
-    VkResult res = vkCreateCommandPool(t_device,
+    VkResult res = vkCreateCommandPool(t->vk.device,
         &(VkCmdPoolCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_CMD_POOL_CREATE_INFO,
             .queueFamilyIndex = 0,
             .flags = 0,
-        }, &t->cmd_pool);
+        }, &t->vk.cmd_pool);
     t_assert(res == VK_SUCCESS);
-    t_cleanup_push_vk_cmd_pool(t->device, t->cmd_pool);
+    t_cleanup_push_vk_cmd_pool(t->vk.device, t->vk.cmd_pool);
 
-    t->cmd_buffer = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    t->vk.cmd_buffer = qoCreateCommandBuffer(t->vk.device, t->vk.cmd_pool);
 
-    qoBeginCommandBuffer(t_cmd_buffer);
-    vkCmdBindDynamicViewportState(t->cmd_buffer, t->dynamic_vp_state);
-    vkCmdBindDynamicRasterState(t->cmd_buffer, t->dynamic_rs_state);
-    vkCmdBindDynamicColorBlendState(t->cmd_buffer, t->dynamic_cb_state);
-    vkCmdBindDynamicDepthStencilState(t->cmd_buffer, t->dynamic_ds_state);
+    qoBeginCommandBuffer(t->vk.cmd_buffer);
+    vkCmdBindDynamicViewportState(t->vk.cmd_buffer, t->vk.dynamic_vp_state);
+    vkCmdBindDynamicRasterState(t->vk.cmd_buffer, t->vk.dynamic_rs_state);
+    vkCmdBindDynamicColorBlendState(t->vk.cmd_buffer, t->vk.dynamic_cb_state);
+    vkCmdBindDynamicDepthStencilState(t->vk.cmd_buffer, t->vk.dynamic_ds_state);
 
     t_create_framebuffer();
 
@@ -465,7 +466,7 @@ main_thread_start(void *arg)
         t_compare_image();
 
     // Don't prematurely end the test before the test has completed executing.
-    vkQueueWaitIdle(t->queue);
+    vkQueueWaitIdle(t->vk.queue);
 
     // The framework must cancel the test when the test's start function
     // returns. Otherwise, test_wait() will deadlock waiting for test

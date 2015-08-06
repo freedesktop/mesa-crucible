@@ -135,28 +135,34 @@ struct test {
         uint32_t height;
     } ref;
 
-    VkInstance instance;
-    VkPhysicalDevice physical_dev;
-    VkPhysicalDeviceMemoryProperties physical_dev_mem_props;
-    VkDevice device;
-    VkQueue queue;
-    VkCmdPool cmd_pool;
-    VkCmdBuffer cmd_buffer;
-    VkDynamicViewportState dynamic_vp_state;
-    VkDynamicRasterState dynamic_rs_state;
-    VkDynamicColorBlendState dynamic_cb_state;
-    VkDynamicDepthStencilState dynamic_ds_state;
-    VkImage rt_image;
-    VkAttachmentView color_attachment_view;
-    VkImageView color_texture_view;
-    VkImage ds_image;
-    VkAttachmentView ds_attachment_view;
-    VkImageView depth_image_view;
-    VkFramebuffer framebuffer;
-    VkPipelineCache pipeline_cache;
+    /// Vulkan data
+    struct {
+        VkInstance instance;
+        VkPhysicalDevice physical_dev;
+        VkPhysicalDeviceMemoryProperties physical_dev_mem_props;
+        VkDevice device;
+        VkQueue queue;
+        VkPipelineCache pipeline_cache;
+        VkCmdPool cmd_pool;
+        VkCmdBuffer cmd_buffer;
+        VkFramebuffer framebuffer;
 
-    uint32_t mem_type_index_for_mmap;
-    uint32_t mem_type_index_for_device_access;
+        VkDynamicViewportState dynamic_vp_state;
+        VkDynamicRasterState dynamic_rs_state;
+        VkDynamicColorBlendState dynamic_cb_state;
+        VkDynamicDepthStencilState dynamic_ds_state;
+
+        VkImage color_image;
+        VkAttachmentView color_attachment_view;
+        VkImageView color_texture_view;
+
+        VkImage ds_image;
+        VkAttachmentView ds_attachment_view;
+        VkImageView depth_image_view;
+
+        uint32_t mem_type_index_for_mmap;
+        uint32_t mem_type_index_for_device_access;
+    } vk;
 };
 
 extern __thread cru_current_test_t current

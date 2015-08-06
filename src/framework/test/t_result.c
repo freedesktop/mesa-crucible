@@ -220,17 +220,17 @@ t_compare_image(void)
 
     size_t buffer_size = 4 * t->ref.width * t->ref.height;
 
-    VkBuffer buffer = qoCreateBuffer(t->device,
+    VkBuffer buffer = qoCreateBuffer(t->vk.device,
         .size = buffer_size,
         .usage = VK_BUFFER_USAGE_TRANSFER_DESTINATION_BIT);
 
-    VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+    VkDeviceMemory mem = qoAllocBufferMemory(t->vk.device, buffer,
+        .memoryTypeIndex = t->vk.mem_type_index_for_mmap);
 
-    void *map = qoMapMemory(t_device, mem, /*offset*/ 0,
+    void *map = qoMapMemory(t->vk.device, mem, /*offset*/ 0,
                             buffer_size, /*flags*/ 0);
 
-    qoBindBufferMemory(t_device, buffer, mem, /*offset*/ 0);
+    qoBindBufferMemory(t->vk.device, buffer, mem, /*offset*/ 0);
 
     VkBufferImageCopy copy = {
         .bufferOffset = 0,
@@ -247,13 +247,13 @@ t_compare_image(void)
         },
     };
 
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t->device, t->cmd_pool);
+    VkCmdBuffer cmd = qoCreateCommandBuffer(t->vk.device, t->vk.cmd_pool);
     qoBeginCommandBuffer(cmd);
-    vkCmdCopyImageToBuffer(cmd, t_color_image,
+    vkCmdCopyImageToBuffer(cmd, t->vk.color_image,
                            VK_IMAGE_LAYOUT_GENERAL, buffer, 1, &copy);
     qoEndCommandBuffer(cmd);
-    qoQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
-    vkQueueWaitIdle(t_queue);
+    qoQueueSubmit(t->vk.queue, 1, &cmd, QO_NULL_FENCE);
+    vkQueueWaitIdle(t->vk.queue);
 
     cru_image_t *actual_image =
         cru_image_from_pixels(map, VK_FORMAT_R8G8B8A8_UNORM,

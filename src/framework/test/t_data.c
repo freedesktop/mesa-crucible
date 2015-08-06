@@ -27,7 +27,7 @@ __t_instance(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->instance;
+    return &t->vk.instance;
 }
 
 const VkDevice *
@@ -36,7 +36,7 @@ __t_device(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->device;
+    return &t->vk.device;
 }
 
 const VkPhysicalDevice *
@@ -45,7 +45,7 @@ __t_physical_dev(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->physical_dev;
+    return &t->vk.physical_dev;
 }
 
 const VkPhysicalDeviceMemoryProperties *
@@ -54,7 +54,7 @@ __t_physical_dev_mem_props(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->physical_dev_mem_props;
+    return &t->vk.physical_dev_mem_props;
 }
 
 const uint32_t
@@ -63,7 +63,7 @@ __t_mem_type_index_for_mmap(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return t->mem_type_index_for_mmap;
+    return t->vk.mem_type_index_for_mmap;
 }
 
 const uint32_t
@@ -72,7 +72,7 @@ __t_mem_type_index_for_device_access(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return t->mem_type_index_for_device_access;
+    return t->vk.mem_type_index_for_device_access;
 }
 
 const VkQueue *
@@ -81,7 +81,7 @@ __t_queue(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->queue;
+    return &t->vk.queue;
 }
 
 const VkCmdPool *
@@ -90,7 +90,7 @@ __t_cmd_pool(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->cmd_pool;
+    return &t->vk.cmd_pool;
 }
 
 const VkCmdBuffer *
@@ -99,7 +99,7 @@ __t_cmd_buffer(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->cmd_buffer;
+    return &t->vk.cmd_buffer;
 }
 
 const VkDynamicViewportState *
@@ -108,7 +108,7 @@ __t_dynamic_vp_state(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->dynamic_vp_state;
+    return &t->vk.dynamic_vp_state;
 }
 
 const VkDynamicRasterState *
@@ -117,7 +117,7 @@ __t_dynamic_rs_state(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->dynamic_rs_state;
+    return &t->vk.dynamic_rs_state;
 }
 
 const VkDynamicColorBlendState *
@@ -126,7 +126,7 @@ __t_dynamic_cb_state(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->dynamic_cb_state;
+    return &t->vk.dynamic_cb_state;
 }
 
 const VkDynamicDepthStencilState *
@@ -135,7 +135,7 @@ __t_dynamic_ds_state(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->dynamic_ds_state;
+    return &t->vk.dynamic_ds_state;
 }
 
 const VkImage *
@@ -146,7 +146,7 @@ __t_color_image(void)
 
     t_assert(!t->def->no_image);
 
-    return &t->rt_image;
+    return &t->vk.color_image;
 }
 
 const VkAttachmentView *
@@ -157,7 +157,7 @@ __t_color_attachment_view(void)
 
     t_assert(!t->def->no_image);
 
-    return &t->color_attachment_view;
+    return &t->vk.color_attachment_view;
 }
 
 const VkImageView *
@@ -168,7 +168,7 @@ __t_color_image_view(void)
 
     t_assert(!t->def->no_image);
 
-    return &t->color_texture_view;
+    return &t->vk.color_texture_view;
 }
 
 const VkImage *
@@ -178,9 +178,9 @@ __t_ds_image(void)
     GET_CURRENT_TEST(t);
 
     t_assert(!t->def->no_image);
-    t_assert(t->ds_image.handle);
+    t_assert(t->vk.ds_image.handle);
 
-    return &t->ds_image;
+    return &t->vk.ds_image;
 }
 
 const VkAttachmentView *
@@ -190,9 +190,9 @@ __t_ds_attachment_view(void)
     GET_CURRENT_TEST(t);
 
     t_assert(!t->def->no_image);
-    t_assert(t->ds_attachment_view.handle);
+    t_assert(t->vk.ds_attachment_view.handle);
 
-    return &t->ds_attachment_view;
+    return &t->vk.ds_attachment_view;
 }
 
 const VkImageView *
@@ -202,9 +202,9 @@ __t_depth_image_view(void)
     GET_CURRENT_TEST(t);
 
     t_assert(!t->def->no_image);
-    t_assert(t->depth_image_view.handle);
+    t_assert(t->vk.depth_image_view.handle);
 
-    return &t->depth_image_view;
+    return &t->vk.depth_image_view;
 }
 
 const VkFramebuffer *
@@ -215,7 +215,7 @@ __t_framebuffer(void)
 
     t_assert(!t->def->no_image);
 
-    return &t->framebuffer;
+    return &t->vk.framebuffer;
 }
 
 const VkPipelineCache *
@@ -224,7 +224,7 @@ __t_pipeline_cache(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->pipeline_cache;
+    return &t->vk.pipeline_cache;
 }
 
 const uint32_t *
