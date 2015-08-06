@@ -235,7 +235,7 @@ __t_height(void)
 
     t_assert(!t->def->no_image);
 
-    return &t->height;
+    return &t->ref.height;
 }
 
 const uint32_t *
@@ -246,7 +246,7 @@ __t_width(void)
 
     t_assert(!t->def->no_image);
 
-    return &t->width;
+    return &t->ref.width;
 }
 
 const bool *
@@ -284,5 +284,5 @@ t_ref_image(void)
 
     t_assert(!t->def->no_image);
 
-    return t->image;
+    return t->ref.image;
 }

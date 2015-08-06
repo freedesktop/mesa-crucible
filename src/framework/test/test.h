@@ -124,14 +124,17 @@ struct test {
         bool no_separate_cleanup_thread;
     } opt;
 
-    string_t ref_image_filename;
-    cru_image_t *image;
-
     /// Atomic counter for t_dump_seq_image().
     cru_refcount_t dump_seq;
 
-    uint32_t width;
-    uint32_t height;
+    /// Reference image
+    struct {
+        string_t filename;
+        cru_image_t *image;
+        uint32_t width;
+        uint32_t height;
+    } ref;
+
     VkInstance instance;
     VkPhysicalDevice physical_dev;
     VkPhysicalDeviceMemoryProperties physical_dev_mem_props;

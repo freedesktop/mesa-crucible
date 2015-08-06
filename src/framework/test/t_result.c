@@ -215,10 +215,10 @@ t_compare_image(void)
     // test.
     t_assert(!t->def->no_image);
 
-    assert(t->width > 0);
-    assert(t->height > 0);
+    assert(t->ref.width > 0);
+    assert(t->ref.height > 0);
 
-    size_t buffer_size = 4 * t_width * t_height;
+    size_t buffer_size = 4 * t->ref.width * t->ref.height;
 
     VkBuffer buffer = qoCreateBuffer(t->device,
         .size = buffer_size,
@@ -241,8 +241,8 @@ t_compare_image(void)
         },
         .imageOffset = { .x = 0, .y = 0, .z = 0 },
         .imageExtent = {
-            .width = t_width,
-            .height = t_height,
+            .width = t->ref.width,
+            .height = t->ref.height,
             .depth = 1,
         },
     };
@@ -257,20 +257,20 @@ t_compare_image(void)
 
     cru_image_t *actual_image =
         cru_image_from_pixels(map, VK_FORMAT_R8G8B8A8_UNORM,
-                              t_width, t_height);
+                              t->ref.width, t->ref.height);
     t_assert(actual_image);
     t_cleanup_push(actual_image);
 
     if (t->opt.bootstrap) {
-        assert(!t->image);
+        assert(!t->ref.image);
         t_assert(cru_image_write_file(actual_image,
-                                      string_data(&t->ref_image_filename)));
+                                      string_data(&t->ref.filename)));
         t_pass();
     }
 
-    assert(t->image);
+    assert(t->ref.image);
 
-    if (!cru_image_compare(actual_image, t_ref_image())) {
+    if (!cru_image_compare(actual_image, t->ref.image)) {
         loge("actual and reference images differ");
 
         // Dump the actual image for inspection.

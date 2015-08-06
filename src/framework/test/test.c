@@ -55,15 +55,15 @@ test_set_image_filename(test_t *t)
     // test_def_t::no_image is set. This will be useful for tests that
     // generate their reference images at runtime and wish to dump them to
     // disk.
-    assert(t->ref_image_filename.len == 0);
+    assert(t->ref.filename.len == 0);
 
     if (t->def->image_filename) {
         // Test uses a custom filename.
-        string_copy_cstr(&t->ref_image_filename, t->def->image_filename);
+        string_copy_cstr(&t->ref.filename, t->def->image_filename);
     } else {
         // Test uses the default filename.
-        string_copy_cstr(&t->ref_image_filename, t->def->name);
-        string_append_cstr(&t->ref_image_filename, ".ref.png");
+        string_copy_cstr(&t->ref.filename, t->def->name);
+        string_append_cstr(&t->ref.filename, ".ref.png");
     }
 }
 
@@ -85,7 +85,7 @@ test_destroy(test_t *t)
 
     pthread_mutex_destroy(&t->stop_mutex);
     pthread_cond_destroy(&t->stop_cond);
-    string_finish(&t->ref_image_filename);
+    string_finish(&t->ref.filename);
 
     free(t);
 }
@@ -102,7 +102,7 @@ test_create(const test_def_t *def)
     t->def = def;
     t->phase = CRU_TEST_PHASE_PRESTART;
     t->result = TEST_RESULT_PASS;
-    t->ref_image_filename = STRING_INIT;
+    t->ref.filename = STRING_INIT;
     t->opt.no_dump = true;
     t->opt.no_cleanup = false;
     t->opt.use_spir_v = false;
@@ -153,8 +153,8 @@ test_enable_bootstrap(test_t *t,
 
     t->opt.bootstrap = true;
     t->opt.no_cleanup = true;
-    t->width = image_width;
-    t->height = image_height;
+    t->ref.width = image_width;
+    t->ref.height = image_height;
 
     return true;
 }

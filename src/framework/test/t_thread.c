@@ -205,7 +205,7 @@ t_create_framebuffer(void)
     t_create_attachment(t->device, VK_FORMAT_R8G8B8A8_UNORM,
                         VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
                         VK_IMAGE_ASPECT_COLOR,
-                        t->width, t->height,
+                        t->ref.width, t->ref.height,
                         &t->rt_image,
                         &t->color_attachment_view,
                         &t->color_texture_view);
@@ -219,7 +219,7 @@ t_create_framebuffer(void)
         t_create_attachment(t->device, t->def->depthstencil_format,
                             VK_IMAGE_USAGE_DEPTH_STENCIL_BIT,
                             VK_IMAGE_ASPECT_DEPTH,
-                            t->width, t->height,
+                            t->ref.width, t->ref.height,
                             &t->ds_image,
                             &t->ds_attachment_view,
                             &t->depth_image_view);
@@ -231,8 +231,8 @@ t_create_framebuffer(void)
     }
 
     t->framebuffer = qoCreateFramebuffer(t_device,
-        .width = t->width,
-        .height = t->height,
+        .width = t->ref.width,
+        .height = t->ref.height,
         .attachmentCount = att_count,
         .pAttachments = bind_info);
 }
@@ -356,21 +356,21 @@ t_load_image_file(void)
     ASSERT_TEST_IN_SETUP_PHASE;
     GET_CURRENT_TEST(t);
 
-    if (t->image)
+    if (t->ref.image)
         return;
 
     assert(!t->def->no_image);
-    assert(t->ref_image_filename.len > 0);
+    assert(t->ref.filename.len > 0);
 
-    t->image = cru_image_load_file(string_data(&t->ref_image_filename));
-    t_assert(t->image);
+    t->ref.image = cru_image_load_file(string_data(&t->ref.filename));
+    t_assert(t->ref.image);
 
-    t_cleanup_push(t->image);
-    t->width = cru_image_get_width(t->image);
-    t->height = cru_image_get_height(t->image);
+    t_cleanup_push(t->ref.image);
+    t->ref.width = cru_image_get_width(t->ref.image);
+    t->ref.height = cru_image_get_height(t->ref.image);
 
-    t_assert(t->width > 0);
-    t_assert(t->height > 0);
+    t_assert(t->ref.width > 0);
+    t_assert(t->ref.height > 0);
 }
 
 void *
@@ -425,14 +425,14 @@ main_thread_start(void *arg)
             {
                 .originX = 0,
                 .originY = 0,
-                .width = t->width,
-                .height = t->height,
+                .width = t->ref.width,
+                .height = t->ref.height,
                 .minDepth = 0,
                 .maxDepth = 1
             },
         },
         .pScissors = (VkRect2D[]) {
-            {{ 0, 0 }, { t->width, t->height }},
+            {{ 0, 0 }, { t->ref.width, t->ref.height }},
         }
     );
     t->dynamic_rs_state = qoCreateDynamicRasterState(t_device);
