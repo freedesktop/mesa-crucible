@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "util/cru_log.h"
+#include "util/log.h"
 #include "util/misc.h"
 #include "util/string.h"
 #include "util/xalloc.h"
@@ -96,17 +96,17 @@ cru_image_init(cru_image_t *image, enum cru_image_type type,
 
     image->format_info = cru_format_get_info(format);
     if (!image->format_info) {
-        cru_loge("cannot crucible image with VkFormat %d", format);
+        loge("cannot crucible image with VkFormat %d", format);
         return false;
     }
 
     if (width == 0) {
-        cru_loge("cannot create crucible image with zero width");
+        loge("cannot create crucible image with zero width");
         return false;
     }
 
     if (height == 0) {
-        cru_loge("cannot create crucible image with zero width");
+        loge("cannot create crucible image with zero width");
         return false;
     }
 
@@ -123,24 +123,24 @@ cru_image_check_compatible(const char *func,
                             cru_image_t *a, cru_image_t *b)
 {
     if (a == b) {
-        cru_loge("%s: images are same", func);
+        loge("%s: images are same", func);
         return false;
     }
 
     if (a->format_info->num_channels != b->format_info->num_channels) {
-        cru_loge("%s: image formats differ in number of channels", func);
+        loge("%s: image formats differ in number of channels", func);
         return false;
     }
 
     // FIXME: Reject images whose channel order differs.
 
     if (a->width != b->width) {
-        cru_loge("%s: image widths differ", func);
+        loge("%s: image widths differ", func);
         return false;
     }
 
     if (a->height != b->height) {
-        cru_loge("%s: image heights differ", func);
+        loge("%s: image heights differ", func);
         return false;
     }
 
@@ -158,7 +158,7 @@ cru_image_load_file(const char *_filename)
     if (string_endswith_cstr(&filename, ".png")) {
         image = cru_png_image_load_file(_filename);
     } else {
-        cru_loge("unknown file extension in %s", _filename);
+        loge("unknown file extension in %s", _filename);
     }
 
     string_finish(&filename);
@@ -177,7 +177,7 @@ cru_image_write_file(cru_image_t *image, const char *_filename)
     if (string_endswith_cstr(&filename, ".png")) {
         res = cru_png_image_write_file(image, &filename);
     } else {
-        cru_loge("unknown file extension in %s", _filename);
+        loge("unknown file extension in %s", _filename);
         res = false;
     }
 
@@ -345,7 +345,7 @@ cru_image_copy_pixels_to_pixels(cru_image_t *dest, cru_image_t *src)
                dest_format == VK_FORMAT_R8_UNORM) {
         copy_func = copy_uint8_to_unorm8;
     } else {
-        cru_loge("%s: unsupported format combination", __func__);
+        loge("%s: unsupported format combination", __func__);
         goto fail_no_copy_func;
     }
 
@@ -375,7 +375,7 @@ cru_image_copy(cru_image_t *dest, cru_image_t *src)
         return false;
 
     if (dest->read_only) {
-        cru_loge("%s: dest is read only", __func__);
+        loge("%s: dest is read only", __func__);
         return false;
     }
 
@@ -392,7 +392,7 @@ bool
 cru_image_compare(cru_image_t *a, cru_image_t *b)
 {
     if (a->width != b->width || a->height != b->height) {
-        cru_loge("%s: image dimensions differ", __func__);
+        loge("%s: image dimensions differ", __func__);
         return false;
     }
 
@@ -413,13 +413,13 @@ cru_image_compare_rect(cru_image_t *a, uint32_t a_x, uint32_t a_y,
 
     if (a->format_info != b->format_info) {
         // Maybe one day we'll want to support more formats.
-        cru_loge("%s: image formats differ", __func__);
+        loge("%s: image formats differ", __func__);
         goto cleanup;
     }
 
     if (a_x + width > a->width || a_y + height > a->height ||
         b_x + width > b->width || b_y + height > b->height) {
-        cru_loge("%s: rect exceeds image dimensions", __func__);
+        loge("%s: rect exceeds image dimensions", __func__);
         goto cleanup;
     }
 
@@ -443,7 +443,7 @@ cru_image_compare_rect(cru_image_t *a, uint32_t a_x, uint32_t a_y,
         const void *b_row = b_map + ((b_y + y) * b_stride + b_x * cpp);
 
         if (memcmp(a_row, b_row, row_size) != 0) {
-            cru_loge("%s: diff found in row %u of rect", __func__, y);
+            loge("%s: diff found in row %u of rect", __func__, y);
             result = false;
             goto cleanup;
         }

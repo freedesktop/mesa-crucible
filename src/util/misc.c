@@ -26,7 +26,7 @@
 #include <errno.h>
 #include <pthread.h>
 
-#include "util/cru_log.h"
+#include "util/log.h"
 #include "util/misc.h"
 #include "util/string.h"
 
@@ -82,16 +82,16 @@ cru_prefix_setup(void)
 
     ssize_t len = readlink("/proc/self/exe", buf, sizeof(buf));
     if (len <= 0) {
-        cru_loge("readlink(\"/proc/self/exe\") failed");
+        loge("readlink(\"/proc/self/exe\") failed");
         abort();
     } else if (len >= sizeof(buf)) {
-        cru_loge("real path of /proc/self/exe is too long");
+        loge("real path of /proc/self/exe is too long");
         abort();
     }
 
     string_attach(&cru_prefix_path_, buf, len, sizeof(buf));
     if (!string_endswith_cstr(&cru_prefix_path_, tail)) {
-        cru_loge("real path of /proc/self/exe doesn't end in %s", tail);
+        loge("real path of /proc/self/exe doesn't end in %s", tail);
         abort();
     }
 

@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "util/cru_log.h"
+#include "util/log.h"
 #include "util/misc.h"
 #include "util/string.h"
 #include "util/xalloc.h"
@@ -344,7 +344,7 @@ string_vappendf(string_t *s, const char *format, va_list va)
 
     int len = vsnprintf(NULL, 0, format, va_probe);
     if (len < 0) {
-        cru_loge("vsnprintf failed");
+        loge("vsnprintf failed");
         abort();
     }
 
@@ -354,7 +354,7 @@ string_vappendf(string_t *s, const char *format, va_list va)
 
     if (vsnprintf(string_data(s) + s->len,
                   string_capacity(s), format, va) != len) {
-        cru_loge("vsnprintf failed");
+        loge("vsnprintf failed");
         abort();
     }
 

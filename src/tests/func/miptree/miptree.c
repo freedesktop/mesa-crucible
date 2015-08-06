@@ -921,7 +921,7 @@ miptree_compare_images(const miptree_t *mt)
                        "level%02u.array%02u.actual.png", l, a);
 
         if (!cru_image_compare(slice->src_cru_image, slice->dest_cru_image)) {
-            cru_loge("image incorrect at level %u, array slice %u", l, a);
+            loge("image incorrect at level %u, array slice %u", l, a);
             result = TEST_RESULT_FAIL;
         }
     }

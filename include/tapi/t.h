@@ -35,7 +35,7 @@
 #include <string.h>
 
 #include "qonos/qonos.h"
-#include "util/cru_log.h"
+#include "util/log.h"
 #include "util/macros.h"
 #include "util/xalloc.h"
 

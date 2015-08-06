@@ -27,7 +27,7 @@
 
 #include "util/cru_cleanup.h"
 #include "util/cru_image.h"
-#include "util/cru_log.h"
+#include "util/log.h"
 #include "util/cru_refcount.h"
 #include "util/cru_vec.h"
 #include "util/xalloc.h"
@@ -492,7 +492,7 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
     header = cru_vec_pop(&c->commands, sizeof(*header));
 
     if (noop) {
-        cru_loge("%s: noop=true is broken", __func__);
+        loge("%s: noop=true is broken", __func__);
         abort();
     }
 

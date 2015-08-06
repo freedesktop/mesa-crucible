@@ -98,12 +98,12 @@ cru_command_page_help(const cru_command_t *cmd)
         int stat_errno = errno;
         switch (stat_errno) {
         case ENOENT:
-            cru_loge("no help text for crucible-%s", cmd->name);
+            loge("no help text for crucible-%s", cmd->name);
             exit(1);
         default:
-            cru_loge("failed to read help text at %s",
+            loge("failed to read help text at %s",
                      string_data(&help_path));
-            cru_loge("%s", strerror(stat_errno));
+            loge("%s", strerror(stat_errno));
             exit(1);
         }
     }
@@ -112,7 +112,7 @@ cru_command_page_help(const cru_command_t *cmd)
 
     err = execvp(man_args[0], man_args);
     if (err) {
-        cru_loge("exec failed: %s %s %s",
+        loge("exec failed: %s %s %s",
                  man_args[0], man_args[1], man_args[2]);
         exit(1);
     }

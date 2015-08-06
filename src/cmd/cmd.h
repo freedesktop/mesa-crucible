@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "util/cru_log.h"
+#include "util/log.h"
 #include "util/macros.h"
 
 typedef struct cru_command cru_command_t;

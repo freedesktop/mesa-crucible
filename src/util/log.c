@@ -25,67 +25,67 @@
 #include <stdio.h>
 
 #include "framework/test/test.h"
-#include "util/cru_log.h"
+#include "util/log.h"
 
-static pthread_mutex_t cru_log_mutex = PTHREAD_MUTEX_INITIALIZER;
-static bool align_tags = false;
+static pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
+static bool log_has_aligned_tags = false;
 
 void
-cru_log_tag(const char *tag, const char *format, ...)
+log_tag(const char *tag, const char *format, ...)
 {
     va_list va;
 
     va_start(va, format);
-    cru_log_tag_v(tag, format, va);
+    log_tag_v(tag, format, va);
     va_end(va);
 }
 
 void
-cru_loge(const char *format, ...)
+loge(const char *format, ...)
 {
     va_list va;
 
     va_start(va, format);
-    cru_loge_v(format, va);
+    loge_v(format, va);
     va_end(va);
 }
 
 void
-cru_logw(const char *format, ...)
+logw(const char *format, ...)
 {
     va_list va;
 
     va_start(va, format);
-    cru_logw_v(format, va);
+    logw_v(format, va);
     va_end(va);
 }
 
 void
-cru_logi(const char *format, ...)
+logi(const char *format, ...)
 {
     va_list va;
 
     va_start(va, format);
-    cru_logi_v(format, va);
+    logi_v(format, va);
     va_end(va);
 }
 
 void
-cru_logd(const char *format, ...)
+logd(const char *format, ...)
 {
     va_list va;
 
     va_start(va, format);
-    cru_logd_v(format, va);
+    logd_v(format, va);
     va_end(va);
 }
 
 void
-cru_log_tag_v(const char *tag, const char *format, va_list va)
+log_tag_v(const char *tag, const char *format, va_list va)
 {
-    pthread_mutex_lock(&cru_log_mutex);
+    pthread_mutex_lock(&log_mutex);
 
-    if (align_tags) {
+    if (log_has_aligned_tags) {
         // Align to 7 because that's wide enough for "warning".
         printf("crucible: %-7s: ", tag);
     } else {
@@ -99,39 +99,39 @@ cru_log_tag_v(const char *tag, const char *format, va_list va)
     vprintf(format, va);
     printf("\n");
 
-    pthread_mutex_unlock(&cru_log_mutex);
+    pthread_mutex_unlock(&log_mutex);
 }
 
 void
-cru_loge_v(const char *format, va_list va)
+loge_v(const char *format, va_list va)
 {
-    cru_log_tag_v("error", format, va);
+    log_tag_v("error", format, va);
 }
 
 void
-cru_logw_v(const char *format, va_list va)
+logw_v(const char *format, va_list va)
 {
-    cru_log_tag_v("warning", format, va);
+    log_tag_v("warning", format, va);
 }
 
 void
-cru_logi_v(const char *format, va_list va)
+logi_v(const char *format, va_list va)
 {
-    cru_log_tag_v("info", format, va);
+    log_tag_v("info", format, va);
 }
 
 void
-cru_logd_v(const char *format, va_list va)
+logd_v(const char *format, va_list va)
 {
-    cru_log_tag_v("debug", format, va);
+    log_tag_v("debug", format, va);
 }
 
 void
-__cru_finishme(const char *file, int line, const char *format, ...)
+__log_finishme(const char *file, int line, const char *format, ...)
 {
     va_list va;
 
-    pthread_mutex_lock(&cru_log_mutex);
+    pthread_mutex_lock(&log_mutex);
 
     va_start(va, format);
     printf("FINISHME: %s:%d: ", file, line);
@@ -139,25 +139,25 @@ __cru_finishme(const char *file, int line, const char *format, ...)
     printf("\n");
     va_end(va);
 
-    pthread_mutex_unlock(&cru_log_mutex);
+    pthread_mutex_unlock(&log_mutex);
 }
 
 void
-cru_log_internal_error_loc(const char *file, int line,
+log_internal_error_loc(const char *file, int line,
                            const char *format, ...)
 {
     va_list va;
 
     va_start(va, format);
-    cru_log_internal_error_loc_v(file, line, format, va);
+    log_internal_error_loc_v(file, line, format, va);
     va_end(va);
 }
 
 void
-cru_log_internal_error_loc_v(const char *file, int line,
+log_internal_error_loc_v(const char *file, int line,
                              const char *format, va_list va)
 {
-    pthread_mutex_lock(&cru_log_mutex);
+    pthread_mutex_lock(&log_mutex);
 
     printf("internal error: %s:%d: ", file, line);
     vprintf(format, va);
@@ -167,7 +167,7 @@ cru_log_internal_error_loc_v(const char *file, int line,
 }
 
 void
-cru_log_align_tags(bool enable)
+log_align_tags(bool enable)
 {
-    align_tags = enable;
+    log_has_aligned_tags = enable;
 }

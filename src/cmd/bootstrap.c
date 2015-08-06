@@ -115,24 +115,24 @@ start(const cru_command_t *cmd, int argc, char **argv)
 
     def = cru_find_def(opt_test_name);
     if (!def) {
-        cru_loge("failed to find test: %s", opt_test_name);
+        loge("failed to find test: %s", opt_test_name);
         exit(1);
     }
 
     test = test_create(def);
     if (!test) {
-        cru_loge("%s: failed to initialize", def->name);
+        loge("%s: failed to initialize", def->name);
         exit(1);
     }
 
     if (!def->no_image) {
         if (opt_image_width == 0) {
-            cru_loge("%s: test has image, --width must be non-zero",
+            loge("%s: test has image, --width must be non-zero",
                      def->name);
             exit(1);
         }
         if (opt_image_height == 0) {
-            cru_loge("%s: test has image, --height must be non-zero",
+            loge("%s: test has image, --height must be non-zero",
                      def->name);
             exit(1);
         }

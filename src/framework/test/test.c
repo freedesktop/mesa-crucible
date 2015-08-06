@@ -28,7 +28,7 @@
 #include "qonos/qonos.h"
 #include "util/cru_format.h"
 #include "util/cru_image.h"
-#include "util/cru_log.h"
+#include "util/log.h"
 #include "util/cru_refcount.h"
 #include "util/cru_slist.h"
 #include "util/misc.h"
@@ -233,7 +233,7 @@ join_thread(pthread_t thread)
     err = pthread_join(thread, NULL);
     if (err) {
         // Abort because there is no safe way to recover.
-        cru_loge("failed to join thread... abort!");
+        loge("failed to join thread... abort!");
         abort();
     }
 }
@@ -345,14 +345,14 @@ test_create(const test_def_t *def)
     t->opt.no_separate_cleanup_thread = false;
 
     if (t->def->samples > 0) {
-        cru_loge("%s: multisample tests not yet supported", t->def->name);
+        loge("%s: multisample tests not yet supported", t->def->name);
         goto fail;
     }
 
     err = pthread_mutex_init(&t->stop_mutex, NULL);
     if (err) {
         // Abort to avoid destroying an uninitialized mutex later.
-        cru_loge("%s: failed to init mutex during test creation",
+        loge("%s: failed to init mutex during test creation",
                  t->def->name);
         abort();
     }
@@ -360,7 +360,7 @@ test_create(const test_def_t *def)
     err = pthread_cond_init(&t->stop_cond, NULL);
     if (err) {
         // Abort to avoid destroying an uninitialized cond later.
-        cru_loge("%s: failed to init thread condition during test creation",
+        loge("%s: failed to init thread condition during test creation",
                  t->def->name);
         abort();
     }
@@ -383,7 +383,7 @@ test_enable_bootstrap(test_t *t,
     ASSERT_TEST_IN_PRESTART_PHASE(t);
 
     if (!t->def->no_image && (image_width == 0 || image_height == 0)) {
-        cru_loge("%s: bootstrap image must have non-zero size", t->def->name);
+        loge("%s: bootstrap image must have non-zero size", t->def->name);
         return false;
     }
 
@@ -759,7 +759,7 @@ result_thread_enter_cleanup_phase(test_t *t)
     } else {
         err = pthread_create(&t->cleanup_thread, NULL, cleanup_thread_start, t);
         if (err) {
-            cru_loge("%s: failed to start cleanup thread", t->def->name);
+            loge("%s: failed to start cleanup thread", t->def->name);
 
             t->result = TEST_RESULT_FAIL;
             test_stop(t);
@@ -942,7 +942,7 @@ t_compare_image(void)
     assert(t->image);
 
     if (!cru_image_compare(actual_image, t_ref_image())) {
-        cru_loge("actual and reference images differ");
+        loge("actual and reference images differ");
 
         // Dump the actual image for inspection.
         //
@@ -1004,7 +1004,7 @@ __t_skipfv(const char *file, int line, const char *format, va_list va)
         string_vappendf(&s, format, va);
     }
 
-    cru_logi(string_data(&s));
+    logi(string_data(&s));
     string_finish(&s);
 
     __t_skip_silent();
@@ -1053,7 +1053,7 @@ __t_failfv(const char *file, int line, const char *format, va_list va)
         string_vappendf(&s, format, va);
     }
 
-    cru_loge(string_data(&s));
+    loge(string_data(&s));
     string_finish(&s);
 
     __t_fail_silent();
@@ -1099,13 +1099,13 @@ __t_assertfv(const char *file, int line, bool cond, const char *cond_string,
     if (cond)
         return;
 
-    cru_loge("%s:%d: assertion failed: %s", file, line, cond_string);
+    loge("%s:%d: assertion failed: %s", file, line, cond_string);
 
     if (format) {
         string_t s = STRING_INIT;
         string_appendf(&s, "%s:%d: ", file, line);
         string_vappendf(&s, format, va);
-        cru_loge(string_data(&s));
+        loge(string_data(&s));
         string_finish(&s);
     }
 
@@ -1236,7 +1236,7 @@ fail_create_cleanup_stack:
     // Without a cleanup stack, this is not a well-formed test thread. That
     // prevents us from calling any "t_*" functions, even t_end(). So give up
     // and die.
-    cru_loge("failed to create cleanup stack for test thread");
+    loge("failed to create cleanup stack for test thread");
     abort();
 }
 
@@ -1517,7 +1517,7 @@ test_create_thread(test_t *t, void *(*start)(void *arg), void *arg,
 
     err = pthread_create(thread, NULL, start, arg);
     if (err) {
-        cru_loge("%s: failed to start thread", t->def->name);
+        loge("%s: failed to start thread", t->def->name);
         goto fail;
     }
 
@@ -1594,14 +1594,14 @@ test_wait(test_t *t)
 
     err = pthread_mutex_lock(&t->stop_mutex);
     if (err) {
-        cru_loge("%s: failed to lock test mutex", t->def->name);
+        loge("%s: failed to lock test mutex", t->def->name);
         abort();
     }
 
     while (t->phase < CRU_TEST_PHASE_STOPPED) {
         err = pthread_cond_wait(&t->stop_cond, &t->stop_mutex);
         if (err) {
-            cru_loge("%s: failed to wait on test's result condition",
+            loge("%s: failed to wait on test's result condition",
                      t->def->name);
             abort();
         }

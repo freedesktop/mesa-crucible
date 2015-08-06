@@ -26,7 +26,7 @@
 
 #include <libpng16/png.h>
 
-#include "util/cru_log.h"
+#include "util/log.h"
 #include "util/xalloc.h"
 
 #include "cru_image.h"
@@ -82,9 +82,9 @@ choose_vk_format(uint8_t png_color_type, uint8_t png_bit_depth,
     }
 
 fail:
-    cru_loge("unsuppoted (png_color_type, png_bit_depth) = (%u, %u)",
+    loge("unsuppoted (png_color_type, png_bit_depth) = (%u, %u)",
              png_color_type, png_bit_depth);
-    cru_loge("in PNG file %s", debug_filename);
+    loge("in PNG file %s", debug_filename);
     return VK_FORMAT_UNDEFINED;
 }
 
@@ -164,13 +164,13 @@ copy_direct_from_png(cru_image_t *src, cru_image_t *dest)
     png_reader = png_create_read_struct(PNG_LIBPNG_VER_STRING,
                                        NULL, NULL, NULL);
     if (!png_reader) {
-        cru_loge("failed to create png reader");
+        loge("failed to create png reader");
         goto fail_create_png_reader;
     }
 
     png_info = png_create_info_struct(png_reader);
     if (!png_info) {
-        cru_loge("failed to create png reader info");
+        loge("failed to create png reader info");
         goto fail_create_png_info;
     }
 
@@ -193,7 +193,7 @@ copy_direct_from_png(cru_image_t *src, cru_image_t *dest)
         }
         break;
     default:
-        cru_log_internal_error("bad png color type %u",
+        log_internal_error("bad png color type %u",
                                png_image->png_color_type);
         break;
     }
@@ -209,7 +209,7 @@ fail_create_png_info:
 fail_create_png_reader:
 
     if (!dest->unmap_pixels(dest)) {
-        cru_loge("failed to unmap pixel image");
+        loge("failed to unmap pixel image");
         abort();
     }
 
@@ -270,7 +270,7 @@ cru_png_image_map_pixels(cru_image_t *image, uint32_t access)
     assert(access != 0);
 
     if (access & CRU_IMAGE_MAP_ACCESS_WRITE) {
-        cru_loge("crucible png images are read-only; cannot image for writing");
+        loge("crucible png images are read-only; cannot image for writing");
         goto fail;
     }
 
@@ -349,7 +349,7 @@ cru_png_image_load_file(const char *filename)
 
     file = fopen(abs_filename, "rb");
     if (!file) {
-        cru_loge("failed to open file for reading: %s", abs_filename);
+        loge("failed to open file for reading: %s", abs_filename);
         goto fail_fopen;
     }
 
@@ -423,12 +423,12 @@ write_direct_to_png(cru_image_t *image, const string_t *filename)
         png_bit_depth = 8;
         break;
     default:
-        cru_loge("cannot write %s to PNG file", image->format_info->name);
+        loge("cannot write %s to PNG file", image->format_info->name);
         return false;
     }
 
     if (!string_endswith_cstr(filename, ".png")) {
-        cru_loge("%s: filename does have '.png' extension: %s",
+        loge("%s: filename does have '.png' extension: %s",
                  __func__, string_data(filename));
         return false;
     }
@@ -447,7 +447,7 @@ write_direct_to_png(cru_image_t *image, const string_t *filename)
 
     f = fopen(abspath, "wb");
     if (!f) {
-        cru_loge("failed to open file for writing: %s", abspath);
+        loge("failed to open file for writing: %s", abspath);
         goto fail_fopen;
     }
 
@@ -455,13 +455,13 @@ write_direct_to_png(cru_image_t *image, const string_t *filename)
     png_writer = png_create_write_struct(PNG_LIBPNG_VER_STRING,
                                         NULL, NULL, NULL);
     if (!png_writer) {
-        cru_loge("failed to create png writer");
+        loge("failed to create png writer");
         goto fail_create_png_writer;
     }
 
     png_info = png_create_info_struct(png_writer);
     if (!png_info) {
-        cru_loge("failed to create png writer info");
+        loge("failed to create png writer info");
         goto fail_create_png_info;
     }
 
@@ -519,13 +519,13 @@ write_indirect_to_png(cru_image_t *image, const string_t *filename)
         tmp_format = VK_FORMAT_R8_UNORM;
         break;
     default:
-        cru_loge("cannot write %s to PNG", image->format_info->name);
+        loge("cannot write %s to PNG", image->format_info->name);
         return false;
     }
 
     tmp_format_info = cru_format_get_info(tmp_format);
     if (!tmp_format_info) {
-        cru_loge("unknown VkFormat %d", tmp_format);
+        loge("unknown VkFormat %d", tmp_format);
         return false;
     }
 

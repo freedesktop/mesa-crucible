@@ -71,7 +71,7 @@ print_command_help(const char *cmd_name)
 
     cmd = cru_find_command(cmd_name);
     if (!cmd) {
-        cru_loge("failed to find command '%s'", cmd_name);
+        loge("failed to find command '%s'", cmd_name);
         exit(1);
     }
 

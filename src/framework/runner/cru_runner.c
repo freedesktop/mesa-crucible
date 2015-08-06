@@ -39,7 +39,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#include "util/cru_log.h"
+#include "util/log.h"
 
 #include "framework/runner/cru_runner.h"
 #include "framework/test/test.h"
@@ -142,7 +142,7 @@ set_sigint_handler(sighandler_t handler)
     };
 
     if (sigaction(SIGINT, &sa, NULL) == -1) {
-        cru_loge("test runner failed to set SIGINT handler");
+        loge("test runner failed to set SIGINT handler");
         abort();
     }
 }
@@ -154,7 +154,7 @@ cru_pipe_init(cru_pipe_t *p)
 
     err = pipe2(p->fd, O_CLOEXEC);
     if (err) {
-        cru_loge("failed to create pipe");
+        loge("failed to create pipe");
         return false;
     }
 
@@ -181,7 +181,7 @@ cru_pipe_become_reader(cru_pipe_t *p)
 
     err = close(p->write_fd);
     if (err == -1) {
-        cru_loge("runner failed to close pipe's write fd");
+        loge("runner failed to close pipe's write fd");
         return false;
     }
 
@@ -200,7 +200,7 @@ cru_pipe_become_writer(cru_pipe_t *p)
 
     err = close(p->read_fd);
     if (err == -1) {
-        cru_loge("runner failed to close pipe's read fd");
+        loge("runner failed to close pipe's read fd");
         return false;
     }
 
@@ -240,7 +240,7 @@ master_report_result(const test_def_t *def, test_result_t result)
 {
     ASSERT_IN_MASTER_PROCESS;
 
-    cru_log_tag(test_result_to_string(result),
+    log_tag(test_result_to_string(result),
                 "%s", def->name);
     fflush(stdout);
 
@@ -267,7 +267,7 @@ master_send_dispatch(cru_slave_t *slave, const test_def_t *def)
     // SIGPIPE. Ignore it, because the master should never die.
     err = sigaction(SIGPIPE, &ignore_sa, &old_sa);
     if (err == -1) {
-        cru_loge("test runner failed to disable SIGPIPE");
+        loge("test runner failed to disable SIGPIPE");
         abort();
     }
 
@@ -280,7 +280,7 @@ master_send_dispatch(cru_slave_t *slave, const test_def_t *def)
 cleanup:
     err = sigaction(SIGPIPE, &old_sa, NULL);
     if (err == -1) {
-        cru_loge("test runner failed to re-enable SIGPIPE");
+        loge("test runner failed to re-enable SIGPIPE");
         abort();
     }
 
@@ -414,7 +414,7 @@ master_init_slave(cru_slave_t *slave)
     slave->pid = fork();
 
     if (slave->pid == -1) {
-        cru_loge("test runner failed to fork slave process");
+        loge("test runner failed to fork slave process");
         return false;
     }
 
@@ -456,7 +456,7 @@ master_cleanup_slave(cru_slave_t *slave)
     cru_pipe_finish(&slave->result_pipe);
 
     if (waitpid(slave->pid, /*status*/ NULL, /*flags*/ 0) == -1) {
-        cru_loge("runner failed to wait for slave process");
+        loge("runner failed to wait for slave process");
     }
 
     slave->pid = -1;
@@ -477,7 +477,7 @@ master_kill_slaves(void)
 
         err = kill(slave->pid, SIGINT);
         if (err) {
-            cru_loge("runner failed to kill child process %d", slave->pid);
+            loge("runner failed to kill child process %d", slave->pid);
             abort();
         }
 
@@ -533,7 +533,7 @@ master_loop_with_forking(void)
             continue;
         }
 
-        cru_log_tag("start", "%s", def->name);
+        log_tag("start", "%s", def->name);
 
         if (!master_send_dispatch(slave, def)) {
             // The slave is probably be dead. Reap the zombie and spawn a new
@@ -589,7 +589,7 @@ master_loop_no_forking(void)
             continue;
         }
 
-        cru_log_tag("start", "%s", def->name);
+        log_tag("start", "%s", def->name);
         result = run_test_def(def);
         master_report_result(def, result);
     }
@@ -618,7 +618,7 @@ cru_runner_run_tests(void)
 
     if (!cru_runner_do_forking
         && cru_runner_test_isolation == CRU_TEST_ISOLATION_THREAD) {
-        cru_loge("invalid options for test runner");
+        loge("invalid options for test runner");
         return false;
     }
 
@@ -626,9 +626,9 @@ cru_runner_run_tests(void)
     master.pid = getpid();
 #endif
 
-    cru_log_align_tags(true);
-    cru_logi("running %u tests", master.num_tests);
-    cru_logi("================================");
+    log_align_tags(true);
+    logi("running %u tests", master.num_tests);
+    logi("================================");
 
     master_loop();
 
@@ -639,12 +639,12 @@ cru_runner_run_tests(void)
     fflush(stdout);
     fflush(stderr);
 
-    cru_logi("================================");
-    cru_logi("ran %u tests", master.num_tests);
-    cru_logi("pass %u", master.num_pass);
-    cru_logi("fail %u", master.num_fail);
-    cru_logi("skip %u", master.num_skip);
-    cru_logi("lost %u", num_lost);
+    logi("================================");
+    logi("ran %u tests", master.num_tests);
+    logi("pass %u", master.num_pass);
+    logi("fail %u", master.num_fail);
+    logi("skip %u", master.num_skip);
+    logi("lost %u", num_lost);
 
 #ifndef NDEBUG
     master.pid = 0;

@@ -30,36 +30,36 @@
 extern "C" {
 #endif
 
-void cru_log_tag(const char *tag, const char *format, ...) cru_printflike(2, 3);
-void cru_loge(const char *format, ...) cru_printflike(1, 2);
-void cru_logw(const char *format, ...) cru_printflike(1, 2);
-void cru_logi(const char *format, ...) cru_printflike(1, 2);
-void cru_logd(const char *format, ...) cru_printflike(1, 2);
+void log_tag(const char *tag, const char *format, ...) cru_printflike(2, 3);
+void loge(const char *format, ...) cru_printflike(1, 2);
+void logw(const char *format, ...) cru_printflike(1, 2);
+void logi(const char *format, ...) cru_printflike(1, 2);
+void logd(const char *format, ...) cru_printflike(1, 2);
 
-void cru_log_tag_v(const char *tag, const char *format, va_list va);
-void cru_loge_v(const char *format, va_list va);
-void cru_logw_v(const char *format, va_list va);
-void cru_logi_v(const char *format, va_list va);
-void cru_logd_v(const char *format, va_list va);
+void log_tag_v(const char *tag, const char *format, va_list va);
+void loge_v(const char *format, va_list va);
+void logw_v(const char *format, va_list va);
+void logi_v(const char *format, va_list va);
+void logd_v(const char *format, va_list va);
 
 /// \brief Right-align the tag separator for all log messages.
 ///
 /// Alignment is useful when running tests, because. it's easier to visually to
 /// parse the output if all test names to start on the same column.
-void cru_log_align_tags(bool enable);
+void log_align_tags(bool enable);
 
-#define cru_finishme(format, ...) \
-    __cru_finishme(__FILE__, __LINE__, format, ##__VA_ARGS__)
+#define log_finishme(format, ...) \
+    __log_finishme(__FILE__, __LINE__, format, ##__VA_ARGS__)
 
-#define cru_log_internal_error(format, ...) \
-    cru_log_internal_error_loc(__FILE__, __LINE__, (format), ##__VA_ARGS__)
+#define log_internal_error(format, ...) \
+    log_internal_error_loc(__FILE__, __LINE__, (format), ##__VA_ARGS__)
 
-#define cru_log_internal_error_v(format, va) \
-    cru_log_internal_error_loc_v(__FILE__, __LINE__, (format), (va))
+#define log_internal_error_v(format, va) \
+    log_internal_error_loc_v(__FILE__, __LINE__, (format), (va))
 
-void __cru_finishme(const char *file, int line, const char *format, ...) cru_printflike(3, 4);
-void cru_log_internal_error_loc(const char *file, int line, const char *format, ...) cru_noreturn cru_printflike(3, 4);
-void cru_log_internal_error_loc_v(const char *file, int line, const char *format, va_list va) cru_noreturn;
+void __log_finishme(const char *file, int line, const char *format, ...) cru_printflike(3, 4);
+void log_internal_error_loc(const char *file, int line, const char *format, ...) cru_noreturn cru_printflike(3, 4);
+void log_internal_error_loc_v(const char *file, int line, const char *format, va_list va) cru_noreturn;
 
 #ifdef __cplusplus
 }
