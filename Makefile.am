@@ -60,13 +60,13 @@ bin_crucible_SOURCES = \
 	src/crucible/cru_misc.c \
 	src/crucible/cru_pixel_image.c \
 	src/crucible/cru_png_image.c \
-	src/crucible/cru_runner.c \
-	src/crucible/cru_test.c \
 	src/crucible/cru_vec.c \
 	src/crucible/qonos.c \
 	src/crucible/qonos_pipeline.c \
 	src/crucible/string.c \
 	src/crucible/xalloc.c \
+	src/framework/runner/cru_runner.c \
+	src/framework/test/cru_test.c \
 	src/tests/example/basic.c \
 	src/tests/example/images.c \
 	src/tests/example/messages.c \

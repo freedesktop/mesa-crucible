@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 
 #include "cru_cmd.h"
-#include "cru_test.h"
-#include "cru_test_def.h"
+#include "framework/test/cru_test.h"
+#include "framework/test/cru_test_def.h"
 
 enum {
     OPT_HELP = 'h',

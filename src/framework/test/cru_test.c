@@ -34,7 +34,7 @@
 #include <crucible/string.h>
 #include <crucible/xalloc.h>
 
-#include "cru_test.h"
+#include "framework/test/cru_test.h"
 
 #define GET_CURRENT_TEST(__var) \
     ASSERT_IN_TEST_THREAD; \

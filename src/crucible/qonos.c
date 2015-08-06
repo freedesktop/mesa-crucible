@@ -23,7 +23,7 @@
 
 #include <string.h>
 
-#include "cru_test.h"
+#include "framework/test/cru_test.h"
 
 void
 qoEnumeratePhysicalDevices(VkInstance instance, uint32_t *count,

@@ -40,9 +40,9 @@
 
 #include <crucible/cru_log.h>
 
-#include "cru_runner.h"
-#include "cru_test.h"
-#include "cru_test_def.h"
+#include "framework/runner/cru_runner.h"
+#include "framework/test/cru_test.h"
+#include "framework/test/cru_test_def.h"
 
 #ifdef NDEBUG
 #   define ASSERT_MASTER_NOT_RUNNING ((void) 0)

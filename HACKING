@@ -1,5 +1,8 @@
 Directory Layout
 ================
+
+WARNING: IN FLUX!
+
 - data
   Data files for tests, such as reference images, vertex data, texture
   images, etc.
