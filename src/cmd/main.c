@@ -21,7 +21,7 @@
 
 #include <crucible/xalloc.h>
 
-#include "cru_cmd.h"
+#include "cmd.h"
 
 enum {
     OPT_VERSION = 1,

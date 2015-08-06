@@ -45,15 +45,15 @@ noinst_PROGRAMS = \
 	bin/crucible
 
 bin_crucible_SOURCES = \
+	src/cmd/cmd.c \
+	src/cmd/bootstrap.c \
+	src/cmd/help.c \
+	src/cmd/ls_example_tests.c \
+	src/cmd/ls_tests.c \
+	src/cmd/main.c \
+	src/cmd/run.c \
+	src/cmd/version.c \
 	src/crucible/cru_cleanup.c \
-	src/crucible/cru_cmd.c \
-	src/crucible/cru_cmd_bootstrap.c \
-	src/crucible/cru_cmd_help.c \
-	src/crucible/cru_cmd_ls_example_tests.c \
-	src/crucible/cru_cmd_ls_tests.c \
-	src/crucible/cru_cmd_main.c \
-	src/crucible/cru_cmd_run.c \
-	src/crucible/cru_cmd_version.c \
 	src/crucible/cru_format.c \
 	src/crucible/cru_image.c \
 	src/crucible/cru_log.c \

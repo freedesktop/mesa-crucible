@@ -22,7 +22,7 @@
 #include <crucible/cru_misc.h>
 #include <crucible/cru_vec.h>
 
-#include "cru_cmd.h"
+#include "cmd.h"
 #include "framework/runner/cru_runner.h"
 
 static enum cru_test_isolation opt_isolation = CRU_TEST_ISOLATION_PROCESS;

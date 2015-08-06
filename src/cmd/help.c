@@ -29,7 +29,7 @@
 #include <crucible/string.h>
 #include <crucible/cru_misc.h>
 
-#include "cru_cmd.h"
+#include "cmd.h"
 
 enum {
     OPT_HELP = 1,

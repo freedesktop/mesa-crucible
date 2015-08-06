@@ -29,7 +29,7 @@
 #include <crucible/cru_misc.h>
 #include <crucible/string.h>
 
-#include "cru_cmd.h"
+#include "cmd.h"
 
 const cru_command_t *
 cru_find_command(const char *name)

@@ -19,7 +19,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include "cru_cmd.h"
+#include "cmd.h"
+#include "framework/test/cru_test.h"
+#include "framework/test/cru_test_def.h"
 
 static const char *shortopts = "h";
 
@@ -65,12 +67,20 @@ done_getopt:
 static int
 start(const cru_command_t *cmd, int argc, char **argv)
 {
+    const cru_test_def_t *def;
+
     parse_args(cmd, argc, argv);
-    printf("crucible-%d.%d\n", CRU_VERSION_MAJOR, CRU_VERSION_MINOR);
+
+    cru_foreach_test_def(def) {
+        if (!cru_test_def_match(def, "example.*")) {
+            printf("%s\n", def->name);
+        }
+    }
+
     return 0;
 }
 
 cru_define_command {
-    .name = "version",
+    .name = "ls-tests",
     .start = start,
 };
