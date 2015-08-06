@@ -48,7 +48,7 @@ in 'include/crucible/cru.h'. (Headers in 'src/crucible' are private to
 Crucible's test framework and are not available to the tests themselves).
 
 After writing a test, you will likely need to generate a reference image for
-it.  The command 'crucible bootstrap-test' can generate one for you.
+it.  The command 'crucible bootstrap' can generate one for you.
 
 All images in the 'data' directory are available to tests. You can load an
 image with `cru_image_load_file(filename)`, where filename is relative to the
