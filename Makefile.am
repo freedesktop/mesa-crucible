@@ -61,12 +61,12 @@ bin_crucible_SOURCES = \
 	src/crucible/cru_pixel_image.c \
 	src/crucible/cru_png_image.c \
 	src/crucible/cru_vec.c \
-	src/crucible/qonos.c \
-	src/crucible/qonos_pipeline.c \
 	src/crucible/string.c \
 	src/crucible/xalloc.c \
 	src/framework/runner/cru_runner.c \
 	src/framework/test/cru_test.c \
+	src/qonos/qonos.c \
+	src/qonos/qonos_pipeline.c \
 	src/tests/example/basic.c \
 	src/tests/example/images.c \
 	src/tests/example/messages.c \
@@ -84,7 +84,7 @@ bin_crucible_SOURCES = \
 	src/tests/stress/lots-of-surface-state.c
 
 BUILT_SOURCES = \
-	src/crucible/qonos_pipeline-spirv.h \
+	src/qonos/qonos_pipeline-spirv.h \
 	src/tests/func/depthstencil/basic-spirv.h \
 	src/tests/func/desc/dynamic-spirv.h \
 	src/tests/func/draw-indexed-spirv.h \

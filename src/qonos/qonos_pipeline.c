@@ -19,7 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include <crucible/qonos.h>
+#include "qonos/qonos.h"
 #include <crucible/cru_test.h>
 #include <assert.h>
 #include <string.h>

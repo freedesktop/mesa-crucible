@@ -19,11 +19,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include <crucible/qonos.h>
-
 #include <string.h>
 
 #include "framework/test/cru_test.h"
+#include "qonos/qonos.h"
 
 void
 qoEnumeratePhysicalDevices(VkInstance instance, uint32_t *count,
