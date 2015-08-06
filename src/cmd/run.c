@@ -25,7 +25,7 @@
 #include "cmd.h"
 #include "framework/runner/cru_runner.h"
 
-static enum cru_test_isolation opt_isolation = CRU_TEST_ISOLATION_PROCESS;
+static enum test_isolation opt_isolation = CRU_TEST_ISOLATION_PROCESS;
 static int opt_fork = 1;
 static int opt_no_cleanup = 0;
 static int opt_dump = 0;

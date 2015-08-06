@@ -54,7 +54,7 @@ bin_crucible_SOURCES = \
 	src/cmd/run.c \
 	src/cmd/version.c \
 	src/framework/runner/cru_runner.c \
-	src/framework/test/cru_test.c \
+	src/framework/test/test.c \
 	src/qonos/qonos.c \
 	src/qonos/qonos_pipeline.c \
 	src/tests/example/basic.c \

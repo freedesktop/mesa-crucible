@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 
 #include "cmd.h"
-#include "framework/test/cru_test.h"
+#include "framework/test/test.h"
 #include "framework/test/test_def.h"
 
 static const char *shortopts = "h";

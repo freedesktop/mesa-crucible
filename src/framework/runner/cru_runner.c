@@ -42,7 +42,7 @@
 #include "util/cru_log.h"
 
 #include "framework/runner/cru_runner.h"
-#include "framework/test/cru_test.h"
+#include "framework/test/test.h"
 #include "framework/test/test_def.h"
 
 #ifdef NDEBUG
@@ -127,7 +127,7 @@ static struct cru_master master = {
 #endif
 };
 
-enum cru_test_isolation cru_runner_test_isolation = CRU_TEST_ISOLATION_THREAD;
+enum test_isolation cru_runner_test_isolation = CRU_TEST_ISOLATION_THREAD;
 bool cru_runner_do_forking = true;
 bool cru_runner_do_cleanup_phase = true;
 bool cru_runner_do_image_dumps = false;
@@ -336,31 +336,31 @@ slave_send_result(const cru_slave_t *slave,
 static test_result_t
 run_test_def(const test_def_t *def)
 {
-    cru_test_t *test;
+    test_t *test;
     test_result_t result;
 
     assert(def->priv.enable);
 
-    test = cru_test_create(def);
+    test = test_create(def);
     if (!test)
         return TEST_RESULT_FAIL;
 
     if (cru_runner_do_image_dumps)
-        cru_test_enable_dump(test);
+        test_enable_dump(test);
 
     if (!cru_runner_do_cleanup_phase)
-        cru_test_disable_cleanup(test);
+        test_disable_cleanup(test);
 
     if (cru_runner_use_spir_v)
-        cru_test_enable_spir_v(test);
+        test_enable_spir_v(test);
 
     if (!cru_runner_use_separate_cleanup_threads)
-        cru_test_disable_separate_cleanup_thread(test);
+        test_disable_separate_cleanup_thread(test);
 
-    cru_test_start(test);
-    cru_test_wait(test);
-    result = cru_test_get_result(test);
-    cru_test_destroy(test);
+    test_start(test);
+    test_wait(test);
+    result = test_get_result(test);
+    test_destroy(test);
 
     return result;
 }

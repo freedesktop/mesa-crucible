@@ -21,7 +21,7 @@
 
 #include <string.h>
 
-#include "framework/test/cru_test.h"
+#include "framework/test/test.h"
 #include "qonos/qonos.h"
 
 void

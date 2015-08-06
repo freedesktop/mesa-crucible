@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "framework/test/cru_test.h"
+#include "framework/test/test.h"
 #include "qonos/qonos.h"
 #include "util/cru_format.h"
 #include "util/cru_image.h"
@@ -37,7 +37,7 @@
 
 #define GET_CURRENT_TEST(__var) \
     ASSERT_IN_TEST_THREAD; \
-    cru_test_t *__var = current.test
+    test_t *__var = current.test
 
 #define ASSERT_IN_TEST_THREAD \
     do { \
@@ -101,7 +101,7 @@ typedef struct cru_current_test cru_current_test_t;
 typedef struct user_thread_arg user_thread_arg_t;
 
 struct cru_current_test {
-    cru_test_t *test;
+    test_t *test;
     cru_cleanup_stack_t *cleanup;
 };
 
@@ -109,7 +109,7 @@ static __thread cru_current_test_t current
     __attribute__((tls_model("local-exec"))) = {0};
 
 /// Tests proceed through the stages in the order listed.
-enum cru_test_phase {
+enum test_phase {
     CRU_TEST_PHASE_PRESTART,
     CRU_TEST_PHASE_SETUP,
     CRU_TEST_PHASE_MAIN,
@@ -118,7 +118,7 @@ enum cru_test_phase {
     CRU_TEST_PHASE_STOPPED,
 };
 
-struct cru_test {
+struct test {
     const test_def_t *def;
     cru_slist_t *threads; ///< List of `pthread_t *`.
 
@@ -137,15 +137,15 @@ struct cru_test {
     cru_slist_t *cleanup_stacks;
 
     /// This remains zero until a thread promotes itself to become the result
-    /// thread. It remains set until cru_test_destroy().
+    /// thread. It remains set until test_destroy().
     pthread_t result_thread;
 
     /// This remains zero until the cleanup thread is created. It remains set
-    /// until cru_test_destroy().
+    /// until test_destroy().
     pthread_t cleanup_thread;
 
     /// Threads coordinate activity with the phase.
-    _Atomic enum cru_test_phase phase;
+    _Atomic enum test_phase phase;
 
     enum test_result result;
 
@@ -153,13 +153,13 @@ struct cru_test {
     /// CRU_TEST_PHASE_STOPPED.
     pthread_cond_t stop_cond;
 
-    /// Protects cru_test::stop_cond.
+    /// Protects test::stop_cond.
     pthread_mutex_t stop_mutex;
 
     /// \brief Options that control the test's behavior.
     ///
     /// These must be set, if at all, before the test starts.
-    struct cru_test_options {
+    struct test_options {
         /// Run the test in bootstrap mode.
         bool bootstrap;
 
@@ -168,7 +168,7 @@ struct cru_test {
         /// \see t_dump_image()
         bool no_dump;
 
-        /// Don't run the cleanup commands in cru_test::cleanup_stacks.
+        /// Don't run the cleanup commands in test::cleanup_stacks.
         bool no_cleanup;
 
         /// Try and use SPIR-V shaders when available
@@ -213,13 +213,13 @@ struct cru_test {
 };
 
 struct user_thread_arg {
-    cru_test_t *test;
+    test_t *test;
     void (*start_func)(void *start_arg);
     void *start_arg;
 };
 
 static bool
-cru_test_create_thread(cru_test_t *t, void *(*start)(void *arg), void *arg,
+test_create_thread(test_t *t, void *(*start)(void *arg), void *arg,
                        pthread_t *out_thread);
 
 static void *cleanup_thread_start(void *arg);
@@ -254,13 +254,13 @@ test_result_to_string(test_result_t result)
 }
 
 bool
-cru_test_is_current(void)
+test_is_current(void)
 {
     return current.test != NULL;
 }
 
 static void
-cru_test_set_image_filename(cru_test_t *t)
+test_set_image_filename(test_t *t)
 {
     ASSERT_TEST_IN_PRESTART_PHASE(t);
 
@@ -304,7 +304,7 @@ t_load_image_file(void)
 }
 
 void
-cru_test_destroy(cru_test_t *t)
+test_destroy(test_t *t)
 {
     ASSERT_NOT_IN_TEST_THREAD;
 
@@ -326,12 +326,12 @@ cru_test_destroy(cru_test_t *t)
     free(t);
 }
 
-cru_test_t *
-cru_test_create(const test_def_t *def)
+test_t *
+test_create(const test_def_t *def)
 {
     ASSERT_NOT_IN_TEST_THREAD;
 
-    cru_test_t *t = NULL;
+    test_t *t = NULL;
     int err;
 
     t = xzalloc(sizeof(*t));
@@ -365,7 +365,7 @@ cru_test_create(const test_def_t *def)
         abort();
     }
 
-    cru_test_set_image_filename(t);
+    test_set_image_filename(t);
 
     return t;
 
@@ -376,7 +376,7 @@ fail:
 }
 
 bool
-cru_test_enable_bootstrap(cru_test_t *t,
+test_enable_bootstrap(test_t *t,
                           uint32_t image_width, uint32_t image_height)
 {
     ASSERT_NOT_IN_TEST_THREAD;
@@ -396,7 +396,7 @@ cru_test_enable_bootstrap(cru_test_t *t,
 }
 
 void
-cru_test_enable_dump(cru_test_t *t)
+test_enable_dump(test_t *t)
 {
     ASSERT_NOT_IN_TEST_THREAD;
     ASSERT_TEST_IN_PRESTART_PHASE(t);
@@ -405,7 +405,7 @@ cru_test_enable_dump(cru_test_t *t)
 }
 
 bool
-cru_test_disable_cleanup(cru_test_t *t)
+test_disable_cleanup(test_t *t)
 {
     ASSERT_NOT_IN_TEST_THREAD;
     ASSERT_TEST_IN_PRESTART_PHASE(t);
@@ -416,7 +416,7 @@ cru_test_disable_cleanup(cru_test_t *t)
 }
 
 void
-cru_test_enable_spir_v(cru_test_t *t)
+test_enable_spir_v(test_t *t)
 {
     ASSERT_NOT_IN_TEST_THREAD;
     ASSERT_TEST_IN_PRESTART_PHASE(t);
@@ -425,7 +425,7 @@ cru_test_enable_spir_v(cru_test_t *t)
 }
 
 void
-cru_test_disable_separate_cleanup_thread(cru_test_t *t)
+test_disable_separate_cleanup_thread(test_t *t)
 {
     ASSERT_NOT_IN_TEST_THREAD;
     ASSERT_TEST_IN_PRESTART_PHASE(t);
@@ -699,9 +699,9 @@ t_ref_image(void)
     return t->image;
 }
 
-/// Illegal to call before cru_test_wait().
+/// Illegal to call before test_wait().
 test_result_t
-cru_test_get_result(cru_test_t *t)
+test_get_result(test_t *t)
 {
     ASSERT_NOT_IN_TEST_THREAD;
     ASSERT_TEST_IN_STOPPED_PHASE(t);
@@ -720,7 +720,7 @@ t_check_cancelled(void)
 }
 
 static void
-result_thread_join_others(cru_test_t *t)
+result_thread_join_others(test_t *t)
 {
     ASSERT_IN_RESULT_THREAD(t);
 
@@ -736,7 +736,7 @@ result_thread_join_others(cru_test_t *t)
 }
 
 static void
-cru_test_stop(cru_test_t *t)
+test_stop(test_t *t)
 {
     assert(t->phase < CRU_TEST_PHASE_STOPPED);
     t->phase = CRU_TEST_PHASE_STOPPED;
@@ -744,7 +744,7 @@ cru_test_stop(cru_test_t *t)
 }
 
 static void cru_noreturn
-result_thread_enter_cleanup_phase(cru_test_t *t)
+result_thread_enter_cleanup_phase(test_t *t)
 {
     ASSERT_NOT_IN_TEST_THREAD;
     ASSERT_IN_RESULT_THREAD(t);
@@ -762,7 +762,7 @@ result_thread_enter_cleanup_phase(cru_test_t *t)
             cru_loge("%s: failed to start cleanup thread", t->def->name);
 
             t->result = TEST_RESULT_FAIL;
-            cru_test_stop(t);
+            test_stop(t);
 
             t_thread_exit();
         }
@@ -784,7 +784,7 @@ t_end(enum test_result result)
 
     if (atomic_exchange(&t->phase, CRU_TEST_PHASE_PENDING_CLEANUP)
         >= CRU_TEST_PHASE_PENDING_CLEANUP) {
-        // A previous call to cru_test_end already cancelled the test and set
+        // A previous call to test_end already cancelled the test and set
         // the test result.
         t_thread_exit();
     }
@@ -1208,7 +1208,7 @@ t_init_physical_dev_mem_props(void)
 }
 
 static void
-thread_bind_to_test(cru_test_t *t)
+thread_bind_to_test(test_t *t)
 {
     ASSERT_NOT_IN_TEST_THREAD;
 
@@ -1365,7 +1365,7 @@ static void *
 main_thread_start(void *arg)
 {
     ASSERT_NOT_IN_TEST_THREAD;
-    thread_bind_to_test((cru_test_t *) arg);
+    thread_bind_to_test((test_t *) arg);
     ASSERT_IN_TEST_THREAD;
 
     ASSERT_TEST_IN_SETUP_PHASE;
@@ -1456,7 +1456,7 @@ main_thread_start(void *arg)
     vkQueueWaitIdle(t->queue);
 
     // The framework must cancel the test when the test's start function
-    // returns. Otherwise, cru_test_wait() will deadlock waiting for test
+    // returns. Otherwise, test_wait() will deadlock waiting for test
     // cancellation unless the test created a subthread that cancels later.
     t_pass();
 }
@@ -1485,11 +1485,11 @@ user_thread_start(void *_arg)
 /// The cleanup thread runs after all other test thread's have exited
 /// and unwinds all the test's cleanup stacks.
 ///
-/// \see cru_test::cleanup_stacks
+/// \see test::cleanup_stacks
 static void *
 cleanup_thread_start(void *arg)
 {
-    cru_test_t *t = arg;
+    test_t *t = arg;
     cru_cleanup_stack_t *cleanup = NULL;
 
     ASSERT_IN_CLEANUP_THREAD(t);
@@ -1501,13 +1501,13 @@ cleanup_thread_start(void *arg)
         cru_cleanup_release(cleanup);
     }
 
-    cru_test_stop(t);
+    test_stop(t);
 
     return NULL;
 }
 
 static bool
-cru_test_create_thread(cru_test_t *t, void *(*start)(void *arg), void *arg,
+test_create_thread(test_t *t, void *(*start)(void *arg), void *arg,
                        pthread_t *out_thread)
 {
     pthread_t *thread = NULL;
@@ -1534,7 +1534,7 @@ fail:
 }
 
 void
-cru_test_start(cru_test_t *t)
+test_start(test_t *t)
 {
     ASSERT_NOT_IN_TEST_THREAD;
     ASSERT_TEST_IN_PRESTART_PHASE(t);
@@ -1547,7 +1547,7 @@ cru_test_start(cru_test_t *t)
         return;
     }
 
-    if (!cru_test_create_thread(t, main_thread_start, t, NULL)) {
+    if (!test_create_thread(t, main_thread_start, t, NULL)) {
         t->phase = CRU_TEST_PHASE_STOPPED;
         t->result = TEST_RESULT_FAIL;
         return;
@@ -1573,7 +1573,7 @@ t_create_thread(void (*start)(void *arg), void *arg)
     test_arg->start_func = start;
     test_arg->start_arg = arg;
 
-    if (!cru_test_create_thread(t, user_thread_start, test_arg, NULL)) {
+    if (!test_create_thread(t, user_thread_start, test_arg, NULL)) {
         t_fail_silent();
     }
 }
@@ -1586,7 +1586,7 @@ t_thread_exit(void)
 }
 
 void
-cru_test_wait(cru_test_t *t)
+test_wait(test_t *t)
 {
     ASSERT_NOT_IN_TEST_THREAD;
 

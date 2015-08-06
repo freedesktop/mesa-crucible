@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "framework/test/cru_test.h"
+#include "framework/test/test.h"
 #include "util/cru_log.h"
 
 static pthread_mutex_t cru_log_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -92,7 +92,7 @@ cru_log_tag_v(const char *tag, const char *format, va_list va)
         printf("crucible: %s: ", tag);
     }
 
-    if (cru_test_is_current()) {
+    if (test_is_current()) {
         printf("%s: ", t_name);
     }
 

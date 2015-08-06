@@ -92,5 +92,5 @@ struct test_def {
                                                                             \
     static test_def_t                                                       \
     CRU_CAT(__test_def_, __COUNTER__)                                       \
-        __attribute__((__section__("cru_test_defs")))                       \
+        __attribute__((__section__("test_defs")))                       \
         __attribute__((__used__)) =

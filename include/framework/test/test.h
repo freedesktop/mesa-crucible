@@ -23,18 +23,18 @@
 
 #include "tapi/t.h"
 
-typedef struct cru_test cru_test_t;
+typedef struct test test_t;
 
 const char *test_result_to_string(test_result_t result);
 
-bool cru_test_is_current(void);
-cru_test_t *cru_test_create(const test_def_t *def);
-void cru_test_destroy(cru_test_t *test);
-void cru_test_enable_dump(cru_test_t *t);
-bool cru_test_enable_bootstrap(cru_test_t *test, uint32_t image_width, uint32_t image_height);
-bool cru_test_disable_cleanup(cru_test_t *test);
-void cru_test_disable_separate_cleanup_thread(cru_test_t *t);
-void cru_test_enable_spir_v(cru_test_t *t);
-void cru_test_start(cru_test_t *test);
-void cru_test_wait(cru_test_t *test);
-test_result_t cru_test_get_result(cru_test_t *test);
+bool test_is_current(void);
+test_t *test_create(const test_def_t *def);
+void test_destroy(test_t *test);
+void test_enable_dump(test_t *t);
+bool test_enable_bootstrap(test_t *test, uint32_t image_width, uint32_t image_height);
+bool test_disable_cleanup(test_t *test);
+void test_disable_separate_cleanup_thread(test_t *t);
+void test_enable_spir_v(test_t *t);
+void test_start(test_t *test);
+void test_wait(test_t *test);
+test_result_t test_get_result(test_t *test);

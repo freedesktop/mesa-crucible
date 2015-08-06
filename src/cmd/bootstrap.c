@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 
 #include "cmd.h"
-#include "framework/test/cru_test.h"
+#include "framework/test/test.h"
 #include "framework/test/test_def.h"
 
 enum {
@@ -108,7 +108,7 @@ static int
 start(const cru_command_t *cmd, int argc, char **argv)
 {
     const test_def_t *def = NULL;
-    cru_test_t *test = NULL;
+    test_t *test = NULL;
 
     parse_args(cmd, argc, argv);
     assert(opt_test_name);
@@ -119,7 +119,7 @@ start(const cru_command_t *cmd, int argc, char **argv)
         exit(1);
     }
 
-    test = cru_test_create(def);
+    test = test_create(def);
     if (!test) {
         cru_loge("%s: failed to initialize", def->name);
         exit(1);
@@ -138,12 +138,12 @@ start(const cru_command_t *cmd, int argc, char **argv)
         }
     }
 
-    if (!cru_test_enable_bootstrap(test, opt_image_width, opt_image_height))
+    if (!test_enable_bootstrap(test, opt_image_width, opt_image_height))
         exit(1);
 
-    cru_test_start(test);
-    cru_test_wait(test);
-    cru_test_destroy(test);
+    test_start(test);
+    test_wait(test);
+    test_destroy(test);
 
     return 0;
 }

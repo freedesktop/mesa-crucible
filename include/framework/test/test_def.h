@@ -29,25 +29,25 @@
 
 typedef struct test_def_vec test_def_vec_t;
 
-extern test_def_t __start_cru_test_defs, __stop_cru_test_defs;
+extern test_def_t __start_test_defs, __stop_test_defs;
 
 #define cru_foreach_test_def(def) \
-   for (def = &__start_cru_test_defs; \
-        def < &__stop_cru_test_defs; ++def)
+   for (def = &__start_test_defs; \
+        def < &__stop_test_defs; ++def)
 
 
 static inline uint64_t cru_pure
 test_def_get_id(const test_def_t *def)
 {
-    return def - &__start_cru_test_defs;
+    return def - &__start_test_defs;
 }
 
 static inline test_def_t * cru_pure
 test_def_from_id(uint64_t id)
 {
-    test_def_t *def = &__start_cru_test_defs + id;
+    test_def_t *def = &__start_test_defs + id;
 
-    if (def < &__stop_cru_test_defs) {
+    if (def < &__stop_test_defs) {
         return def;
     } else {
         return NULL;
@@ -63,7 +63,7 @@ test_def_match(const test_def_t *def, const char *glob)
 static inline uint32_t
 cru_num_defs(void)
 {
-    return &__stop_cru_test_defs - &__start_cru_test_defs;
+    return &__stop_test_defs - &__start_test_defs;
 }
 
 static inline const test_def_t *
