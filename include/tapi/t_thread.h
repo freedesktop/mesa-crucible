@@ -24,16 +24,11 @@
 
 #pragma once
 
-/// Create a new test thread.
-///
-/// \section Attributes
-///   - test cancellation point
-///
+/// \brief Create a new test thread.
 void t_create_thread(void (*start)(void *arg), void *arg);
 
-/// Cancel this test thread if another thread terminated the test.
+/// \brief Yield control to the test framework.
 ///
-/// \section Attributes
-///   - test cancellation point
-///
-void t_check_cancelled(void);
+/// This function will not return if the test result has already been set [for
+/// example, because some thread called t_end(), t_pass(), or t_fail()].
+void t_thread_yield(void);

@@ -267,7 +267,7 @@ result_thread_join_others(test_t *t)
 }
 
 void
-t_check_cancelled(void)
+t_thread_yield(void)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
@@ -338,7 +338,7 @@ thread_bind_to_test(test_t *t)
     ASSERT_IN_TEST_THREAD;
 
     // Die now if a different thread cancelled the test.
-    t_check_cancelled();
+    t_thread_yield();
 
     return;
 

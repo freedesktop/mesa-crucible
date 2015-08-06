@@ -85,7 +85,7 @@ __t_skipfv(const char *file, int line, const char *format, va_list va)
 
     // Check for cancellation because cancelled tests should produce no
     // messages.
-    t_check_cancelled();
+    t_thread_yield();
 
     string_t s = STRING_INIT;
     string_appendf(&s, "%s:%d", file, line);
@@ -134,7 +134,7 @@ __t_failfv(const char *file, int line, const char *format, va_list va)
 
     // Check for cancellation because cancelled tests should produce no
     // messages.
-    t_check_cancelled();
+    t_thread_yield();
 
     string_t s = STRING_INIT;
     string_appendf(&s, "%s:%d", file, line);
@@ -185,7 +185,7 @@ __t_assertfv(const char *file, int line, bool cond, const char *cond_string,
 
     // Check for cancellation because cancelled tests should produce no
     // messages.
-    t_check_cancelled();
+    t_thread_yield();
 
     if (cond)
         return;
@@ -209,7 +209,7 @@ t_compare_image(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    t_check_cancelled();
+    t_thread_yield();
 
     // Fail if the user accidentially tries to check the image in a non-image
     // test.
