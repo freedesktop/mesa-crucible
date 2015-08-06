@@ -19,22 +19,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
+/// \file
+/// \brief Test API: Misc stuff
+
 #pragma once
 
-#include "tapi/t.h"
+#include "util/vk_wrapper.h"
 
-typedef struct cru_test cru_test_t;
+typedef struct cru_format_info cru_format_info_t;
 
-const char *cru_test_result_to_string(cru_test_result_t result);
-
-bool cru_test_is_current(void);
-cru_test_t *cru_test_create(const cru_test_def_t *def);
-void cru_test_destroy(cru_test_t *test);
-void cru_test_enable_dump(cru_test_t *t);
-bool cru_test_enable_bootstrap(cru_test_t *test, uint32_t image_width, uint32_t image_height);
-bool cru_test_disable_cleanup(cru_test_t *test);
-void cru_test_disable_separate_cleanup_thread(cru_test_t *t);
-void cru_test_enable_spir_v(cru_test_t *t);
-void cru_test_start(cru_test_t *test);
-void cru_test_wait(cru_test_t *test);
-cru_test_result_t cru_test_get_result(cru_test_t *test);
+/// \brief Lookup info for VkFormat.
+///
+/// If Crucible does not have info for the given format, then the test fails.
+const cru_format_info_t *t_format_info(VkFormat format);

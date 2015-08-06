@@ -23,6 +23,7 @@
 
 #include <crucible/cru.h>
 #include <stdio.h>
+#include <unistd.h>
 
 /* This file implements a test that pokes at our internal allocators bo
  * allocating and destroying thousands of VkDynamicViewportState objects on

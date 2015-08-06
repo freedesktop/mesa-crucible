@@ -19,12 +19,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include "qonos/qonos.h"
-#include <crucible/cru_test.h>
 #include <assert.h>
 #include <string.h>
 
+#include "qonos/qonos.h"
 #include "qonos_pipeline-spirv.h"
+#include "tapi/t_cleanup.h"
+#include "tapi/t_result.h"
 
 VkPipeline
 qoCreateGraphicsPipeline(VkDevice device,
