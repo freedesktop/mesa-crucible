@@ -26,9 +26,9 @@
 #include <errno.h>
 #include <pthread.h>
 
-#include <crucible/cru_log.h>
-#include <crucible/cru_misc.h>
-#include <crucible/string.h>
+#include "util/cru_log.h"
+#include "util/misc.h"
+#include "util/string.h"
 
 static string_t cru_prefix_path_ = STRING_INIT;
 

@@ -24,17 +24,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <crucible/cru_format.h>
-#include <crucible/cru_image.h>
-#include <crucible/cru_log.h>
-#include <crucible/cru_misc.h>
-#include <crucible/cru_refcount.h>
-#include <crucible/cru_slist.h>
-#include <crucible/string.h>
-#include <crucible/xalloc.h>
-
 #include "framework/test/cru_test.h"
 #include "qonos/qonos.h"
+#include "util/cru_format.h"
+#include "util/cru_image.h"
+#include "util/cru_log.h"
+#include "util/cru_refcount.h"
+#include "util/cru_slist.h"
+#include "util/misc.h"
+#include "util/string.h"
+#include "util/xalloc.h"
 
 #define GET_CURRENT_TEST(__var) \
     ASSERT_IN_TEST_THREAD; \

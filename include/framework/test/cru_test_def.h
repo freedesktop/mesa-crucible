@@ -23,9 +23,9 @@
 
 #include <fnmatch.h>
 
-#include <crucible/cru_misc.h>
+#include "util/misc.h"
 #include <crucible/cru_test.h>
-#include <crucible/cru_vec.h>
+#include "util/cru_vec.h"
 
 typedef struct cru_test_def_vec cru_test_def_vec_t;
 

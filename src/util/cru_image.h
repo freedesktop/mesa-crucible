@@ -21,10 +21,10 @@
 
 #pragma once
 
-#include <crucible/cru_format.h>
-#include <crucible/cru_image.h>
-#include <crucible/cru_refcount.h>
-#include <crucible/string.h>
+#include "util/cru_format.h"
+#include "util/cru_image.h"
+#include "util/cru_refcount.h"
+#include "util/string.h"
 
 enum cru_image_type {
     CRU_IMAGE_TYPE_PIXELS,

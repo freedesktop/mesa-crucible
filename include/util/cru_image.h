@@ -50,8 +50,8 @@
 
 #include <stdbool.h>
 
-#include <crucible/cru_macros.h>
-#include <crucible/vk_wrapper.h>
+#include "util/macros.h"
+#include "util/vk_wrapper.h"
 
 #ifdef __cplusplus
 extern "C" {

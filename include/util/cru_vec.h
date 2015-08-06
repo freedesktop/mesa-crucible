@@ -24,7 +24,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include <crucible/cru_macros.h>
+#include "util/macros.h"
 
 typedef struct __cru_vec __cru_vec_t;
 typedef struct cru_void_vec cru_void_vec_t;

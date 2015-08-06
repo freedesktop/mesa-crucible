@@ -86,7 +86,7 @@
 
 #pragma once
 
-#include <crucible/vk_wrapper.h>
+#include "util/vk_wrapper.h"
 
 #ifdef __cplusplus
 extern "C" {

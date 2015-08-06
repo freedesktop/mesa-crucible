@@ -21,8 +21,8 @@
 
 #include <stdlib.h>
 
-#include <crucible/cru_misc.h>
-#include <crucible/xalloc.h>
+#include "util/misc.h"
+#include "util/xalloc.h"
 
 void *
 xmalloc(size_t size)

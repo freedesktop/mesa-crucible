@@ -38,7 +38,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#include <crucible/cru_log.h>
+#include "util/cru_log.h"
 
 #include "framework/runner/cru_runner.h"
 #include "framework/test/cru_test.h"

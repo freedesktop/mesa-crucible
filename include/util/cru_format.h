@@ -24,7 +24,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <crucible/vk_wrapper.h>
+#include "util/vk_wrapper.h"
 
 #ifdef __cplusplus
 extern "C" {

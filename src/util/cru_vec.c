@@ -26,10 +26,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <crucible/cru_vec.h>
-#include <crucible/cru_macros.h>
-#include <crucible/cru_misc.h>
-#include <crucible/xalloc.h>
+#include "util/cru_vec.h"
+#include "util/macros.h"
+#include "util/misc.h"
+#include "util/xalloc.h"
 
 #define CRU_VEC_INIT_CAPACITY 16
 

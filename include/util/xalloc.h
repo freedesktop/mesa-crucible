@@ -24,7 +24,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include <crucible/cru_macros.h>
+#include "util/macros.h"
 
 #ifdef __cplusplus
 extern "C" {

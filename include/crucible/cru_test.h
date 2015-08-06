@@ -54,8 +54,8 @@ extern "C" {
 #include <stddef.h>
 #include <unistd.h>
 
-#include <crucible/cru_cleanup.h>
-#include <crucible/cru_macros.h>
+#include "util/cru_cleanup.h"
+#include "util/macros.h"
 
 typedef struct cru_format_info cru_format_info_t;
 typedef struct cru_test_def cru_test_def_t;

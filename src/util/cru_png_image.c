@@ -26,8 +26,8 @@
 
 #include <libpng16/png.h>
 
-#include <crucible/cru_log.h>
-#include <crucible/xalloc.h>
+#include "util/cru_log.h"
+#include "util/xalloc.h"
 
 #include "cru_image.h"
 

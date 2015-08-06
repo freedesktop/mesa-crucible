@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <crucible/xalloc.h>
+#include "util/xalloc.h"
 
 #include "cru_image.h"
 

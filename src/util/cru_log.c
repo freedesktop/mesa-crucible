@@ -24,9 +24,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <crucible/cru_log.h>
-
 #include "framework/test/cru_test.h"
+#include "util/cru_log.h"
 
 static pthread_mutex_t cru_log_mutex = PTHREAD_MUTEX_INITIALIZER;
 static bool align_tags = false;

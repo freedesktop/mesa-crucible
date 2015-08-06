@@ -19,7 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include <crucible/cru_format.h>
+#include "util/cru_format.h"
 
 #define FMT(__vk_token) .format = __vk_token, .name = #__vk_token
 

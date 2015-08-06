@@ -19,8 +19,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include <crucible/cru_misc.h>
-#include <crucible/cru_vec.h>
+#include "util/misc.h"
+#include "util/cru_vec.h"
 
 #include "cmd.h"
 #include "framework/runner/cru_runner.h"

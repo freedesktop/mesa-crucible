@@ -24,7 +24,7 @@
 #include <stdatomic.h>
 #include <stdbool.h>
 
-#include <crucible/xalloc.h>
+#include "util/xalloc.h"
 
 #ifdef __cplusplus
 extern "C" {

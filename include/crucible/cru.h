@@ -21,15 +21,15 @@
 
 #pragma once
 
-#include <crucible/cru_cleanup.h>
-#include <crucible/cru_format.h>
-#include <crucible/cru_image.h>
-#include <crucible/cru_log.h>
-#include <crucible/cru_macros.h>
-#include <crucible/cru_misc.h>
-#include <crucible/cru_refcount.h>
-#include <crucible/cru_slist.h>
 #include <crucible/cru_test.h>
 #include "qonos/qonos.h"
-#include <crucible/string.h>
-#include <crucible/xalloc.h>
+#include "util/cru_cleanup.h"
+#include "util/cru_format.h"
+#include "util/cru_image.h"
+#include "util/cru_log.h"
+#include "util/macros.h"
+#include "util/misc.h"
+#include "util/cru_refcount.h"
+#include "util/cru_slist.h"
+#include "util/string.h"
+#include "util/xalloc.h"

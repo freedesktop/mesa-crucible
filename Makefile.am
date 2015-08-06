@@ -53,16 +53,6 @@ bin_crucible_SOURCES = \
 	src/cmd/main.c \
 	src/cmd/run.c \
 	src/cmd/version.c \
-	src/crucible/cru_cleanup.c \
-	src/crucible/cru_format.c \
-	src/crucible/cru_image.c \
-	src/crucible/cru_log.c \
-	src/crucible/cru_misc.c \
-	src/crucible/cru_pixel_image.c \
-	src/crucible/cru_png_image.c \
-	src/crucible/cru_vec.c \
-	src/crucible/string.c \
-	src/crucible/xalloc.c \
 	src/framework/runner/cru_runner.c \
 	src/framework/test/cru_test.c \
 	src/qonos/qonos.c \
@@ -81,7 +71,18 @@ bin_crucible_SOURCES = \
 	src/tests/func/interleaved-cmd-buffers.c \
 	src/tests/func/miptree/miptree.c \
 	src/tests/stress/alloc-multithread.c \
-	src/tests/stress/lots-of-surface-state.c
+	src/tests/stress/lots-of-surface-state.c \
+	src/util/cru_cleanup.c \
+	src/util/cru_format.c \
+	src/util/cru_image.c \
+	src/util/cru_log.c \
+	src/util/cru_misc.c \
+	src/util/cru_pixel_image.c \
+	src/util/cru_png_image.c \
+	src/util/cru_vec.c \
+	src/util/string.c \
+	src/util/xalloc.c \
+	$(NULL)
 
 BUILT_SOURCES = \
 	src/qonos/qonos_pipeline-spirv.h \

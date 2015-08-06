@@ -25,12 +25,12 @@
 
 #include <pthread.h>
 
-#include <crucible/cru_cleanup.h>
-#include <crucible/cru_image.h>
-#include <crucible/cru_log.h>
-#include <crucible/cru_refcount.h>
-#include <crucible/cru_vec.h>
-#include <crucible/xalloc.h>
+#include "util/cru_cleanup.h"
+#include "util/cru_image.h"
+#include "util/cru_log.h"
+#include "util/cru_refcount.h"
+#include "util/cru_vec.h"
+#include "util/xalloc.h"
 
 struct cru_cleanup_stack {
     /// \brief Stack of commands

@@ -26,8 +26,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include <crucible/string.h>
-#include <crucible/cru_misc.h>
+#include "util/string.h"
+#include "util/misc.h"
 
 #include "cmd.h"
 

@@ -23,7 +23,7 @@
 
 #include <stdbool.h>
 
-#include <crucible/cru_vec.h>
+#include "util/cru_vec.h"
 
 enum cru_test_isolation {
     /// The runner will start each test in a separate process.
