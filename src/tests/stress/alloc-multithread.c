@@ -91,7 +91,7 @@ test_alloc_multithread(void)
     sleep(1);
 }
 
-cru_define_test {
+test_define {
     .name = "stress.alloc-multithread",
     .start = test_alloc_multithread,
     .no_image = true,

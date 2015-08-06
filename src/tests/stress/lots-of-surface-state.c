@@ -286,7 +286,7 @@ test_lots_of_surface_state_vs(void)
     test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_VERTEX);
 }
 
-cru_define_test {
+test_define {
     .name = "stress.lots-of-surface-state.vs",
     .start = test_lots_of_surface_state_vs,
     .image_filename = "32x32-green.ref.png",
@@ -330,7 +330,7 @@ test_lots_of_surface_state_fs(void)
     test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_FRAGMENT);
 }
 
-cru_define_test {
+test_define {
     .name = "stress.lots-of-surface-state.fs",
     .start = test_lots_of_surface_state_fs,
     .image_filename = "32x32-green.ref.png",

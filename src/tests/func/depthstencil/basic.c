@@ -180,7 +180,7 @@ test(void)
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
 }
 
-cru_define_test {
+test_define {
     .name = "func.depthstencil.basic-depth.clear-0.0.op-less",
     .start = test,
     .depthstencil_format = VK_FORMAT_D24_UNORM,
@@ -190,7 +190,7 @@ cru_define_test {
     },
 };
 
-cru_define_test {
+test_define {
     .name = "func.depthstencil.basic-depth.clear-0.0.op-greater",
     .start = test,
     .depthstencil_format = VK_FORMAT_D24_UNORM,
@@ -200,7 +200,7 @@ cru_define_test {
     },
 };
 
-cru_define_test {
+test_define {
     .name = "func.depthstencil.basic-depth.clear-0.5.op-greater-equal",
     .start = test,
     .depthstencil_format = VK_FORMAT_D24_UNORM,
@@ -210,7 +210,7 @@ cru_define_test {
     },
 };
 
-cru_define_test {
+test_define {
     .name = "func.depthstencil.basic-depth.clear-1.0.op-greater",
     .start = test,
     .depthstencil_format = VK_FORMAT_D24_UNORM,

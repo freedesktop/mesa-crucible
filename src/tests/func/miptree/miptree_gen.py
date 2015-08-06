@@ -94,7 +94,7 @@ def all_params_iter():
         yield p
 
 template = dedent("""
-    cru_define_test {{
+    test_define {{
         .name = "func.miptree"
                 ".{format[0]}"
                 ".aspect-{aspect}"

@@ -27,9 +27,9 @@
 #include "util/cru_vec.h"
 #include "tapi/t_def.h"
 
-typedef struct cru_test_def_vec cru_test_def_vec_t;
+typedef struct test_def_vec test_def_vec_t;
 
-extern cru_test_def_t __start_cru_test_defs, __stop_cru_test_defs;
+extern test_def_t __start_cru_test_defs, __stop_cru_test_defs;
 
 #define cru_foreach_test_def(def) \
    for (def = &__start_cru_test_defs; \
@@ -37,15 +37,15 @@ extern cru_test_def_t __start_cru_test_defs, __stop_cru_test_defs;
 
 
 static inline uint64_t cru_pure
-cru_test_def_get_id(const cru_test_def_t *def)
+test_def_get_id(const test_def_t *def)
 {
     return def - &__start_cru_test_defs;
 }
 
-static inline cru_test_def_t * cru_pure
-cru_test_def_from_id(uint64_t id)
+static inline test_def_t * cru_pure
+test_def_from_id(uint64_t id)
 {
-    cru_test_def_t *def = &__start_cru_test_defs + id;
+    test_def_t *def = &__start_cru_test_defs + id;
 
     if (def < &__stop_cru_test_defs) {
         return def;
@@ -55,7 +55,7 @@ cru_test_def_from_id(uint64_t id)
 }
 
 static inline bool
-cru_test_def_match(const cru_test_def_t *def, const char *glob)
+test_def_match(const test_def_t *def, const char *glob)
 {
     return fnmatch(glob, def->name, 0) == 0;
 }
@@ -66,10 +66,10 @@ cru_num_defs(void)
     return &__stop_cru_test_defs - &__start_cru_test_defs;
 }
 
-static inline const cru_test_def_t *
+static inline const test_def_t *
 cru_find_def(const char *name)
 {
-    const cru_test_def_t *def;
+    const test_def_t *def;
 
     cru_foreach_test_def(def) {
         if (cru_streq(def->name, name)) {

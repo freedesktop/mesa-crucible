@@ -27,7 +27,7 @@ test_assert(void)
     t_assert(2 + 2 == 5);
 }
 
-cru_define_test {
+test_define {
     .name = "example.messages.assert",
     .start = test_assert,
     .no_image = true,
@@ -42,7 +42,7 @@ test_assertf(void)
     }
 }
 
-cru_define_test {
+test_define {
     .name = "example.messages.assertf",
     .start = test_assertf,
     .no_image = true,
@@ -54,7 +54,7 @@ test_skipf(void)
     t_skipf("i skipped on %s", __DATE__);
 }
 
-cru_define_test {
+test_define {
     .name = "example.messages.skipf",
     .start = test_skipf,
     .no_image = true,
@@ -66,7 +66,7 @@ test_failf(void)
     t_failf("i failed on %s", __DATE__);
 }
 
-cru_define_test {
+test_define {
     .name = "example.messages.failf",
     .start = test_failf,
     .no_image = true,

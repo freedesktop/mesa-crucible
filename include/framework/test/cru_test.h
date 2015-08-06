@@ -28,7 +28,7 @@ typedef struct cru_test cru_test_t;
 const char *test_result_to_string(test_result_t result);
 
 bool cru_test_is_current(void);
-cru_test_t *cru_test_create(const cru_test_def_t *def);
+cru_test_t *cru_test_create(const test_def_t *def);
 void cru_test_destroy(cru_test_t *test);
 void cru_test_enable_dump(cru_test_t *t);
 bool cru_test_enable_bootstrap(cru_test_t *test, uint32_t image_width, uint32_t image_height);

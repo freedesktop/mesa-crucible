@@ -27,13 +27,13 @@
 #include "util/macros.h"
 #include "util/vk_wrapper.h"
 
-typedef struct cru_test_def cru_test_def_t;
+typedef struct test_def test_def_t;
 
 /// \brief A test definition.
 ///
 /// All public members are const. This prevents a test from modifying its
 /// definition while running.
-struct cru_test_def {
+struct test_def {
     /// The test name must be a valid filename with no path separator.
     const char *const name;
 
@@ -70,7 +70,7 @@ struct cru_test_def {
     /// The test runner walks twice over the global list of test definitions.
     /// In the first pass, it enables each test that it plans to run.  In the
     /// second pass, it runs the enabled tests.
-    struct cru_test_def_priv {
+    struct test_def_priv {
         bool enable;
     } priv;
 } __attribute__((aligned(32)));
@@ -83,13 +83,14 @@ struct cru_test_def {
 ///       ...
 ///    }
 ///
-///    cru_define_test {
+///    test_define {
 ///       .name = "draw-a-triangle",
 ///       .start = draw_a_triangle,
 ///    }
 ///
-#define cru_define_test \
-    static cru_test_def_t \
-    CRU_CAT(__cru_test_def_, __COUNTER__) \
-        __attribute__((__section__("cru_test_defs"))) \
+#define test_define                                                         \
+                                                                            \
+    static test_def_t                                                       \
+    CRU_CAT(__test_def_, __COUNTER__)                                       \
+        __attribute__((__section__("cru_test_defs")))                       \
         __attribute__((__used__)) =

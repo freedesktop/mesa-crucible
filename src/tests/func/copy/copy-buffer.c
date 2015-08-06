@@ -108,7 +108,7 @@ test_large_copy(void)
     }
 }
 
-cru_define_test {
+test_define {
     .name = "func.copy.copy-buffer.large",
     .start = test_large_copy,
     .no_image = true,

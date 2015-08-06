@@ -160,7 +160,7 @@ test_small_secondaries(void)
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
 }
 
-cru_define_test {
+test_define {
     .name = "func.cmd-buffer.small-secondaries",
     .start = test_small_secondaries,
     .image_filename = "32x32-green.ref.png",
@@ -198,7 +198,7 @@ test_large_secondary(void)
     do_test_large_secondary(0);
 }
 
-cru_define_test {
+test_define {
     .name = "func.cmd-buffer.large-secondary",
     .start = test_large_secondary,
     .image_filename = "32x32-green.ref.png",
@@ -210,7 +210,7 @@ test_large_secondary_no_simultaneous(void)
     do_test_large_secondary(VK_CMD_BUFFER_OPTIMIZE_NO_SIMULTANEOUS_USE_BIT);
 }
 
-cru_define_test {
+test_define {
     .name = "func.cmd-buffer.large-secondary-no-simultaneous",
     .start = test_large_secondary_no_simultaneous,
     .image_filename = "32x32-green.ref.png",

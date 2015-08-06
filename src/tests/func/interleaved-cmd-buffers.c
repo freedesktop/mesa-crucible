@@ -182,13 +182,13 @@ test_end1_end2_submit1_submit2(void)
     compare_images(&src, &dest1, &dest2);
 }
 
-cru_define_test {
+test_define {
     .name = "func.interleaved-cmd-buffers.end1-submit1-end2-submit2",
     .image_filename = "func.interleaved-cmd-buffers.ref.png",
     .start = test_end1_submit1_end2_submit2,
 };
 
-cru_define_test {
+test_define {
     .name = "func.interleaved-cmd-buffers.end1-end2-submit1-submit2",
     .image_filename = "func.interleaved-cmd-buffers.ref.png",
     .start = test_end1_end2_submit1_submit2,

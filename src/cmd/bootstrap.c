@@ -21,7 +21,7 @@
 
 #include "cmd.h"
 #include "framework/test/cru_test.h"
-#include "framework/test/cru_test_def.h"
+#include "framework/test/test_def.h"
 
 enum {
     OPT_HELP = 'h',
@@ -107,7 +107,7 @@ done_getopt:
 static int
 start(const cru_command_t *cmd, int argc, char **argv)
 {
-    const cru_test_def_t *def = NULL;
+    const test_def_t *def = NULL;
     cru_test_t *test = NULL;
 
     parse_args(cmd, argc, argv);

@@ -82,7 +82,7 @@ test_timestamp(void)
         t_pass();
 }
 
-cru_define_test {
+test_define {
     .name = "func.query.timestamp",
     .start = test_timestamp,
     .no_image = true,

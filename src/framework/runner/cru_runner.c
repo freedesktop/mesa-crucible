@@ -43,7 +43,7 @@
 
 #include "framework/runner/cru_runner.h"
 #include "framework/test/cru_test.h"
-#include "framework/test/cru_test_def.h"
+#include "framework/test/test_def.h"
 
 #ifdef NDEBUG
 #   define ASSERT_MASTER_NOT_RUNNING ((void) 0)
@@ -91,11 +91,11 @@ struct cru_slave {
 };
 
 struct cru_dispatch_packet {
-    const cru_test_def_t *test_def;
+    const test_def_t *test_def;
 };
 
 struct cru_result_packet {
-    const cru_test_def_t *test_def;
+    const test_def_t *test_def;
     test_result_t result;
 };
 
@@ -236,7 +236,7 @@ cru_pipe_atomic_read_n(const cru_pipe_t *p, void *data, size_t n)
 
 /// Return false if the pipe is empty or has errors.
 static void
-master_report_result(const cru_test_def_t *def, test_result_t result)
+master_report_result(const test_def_t *def, test_result_t result)
 {
     ASSERT_IN_MASTER_PROCESS;
 
@@ -253,7 +253,7 @@ master_report_result(const cru_test_def_t *def, test_result_t result)
 
 /// Return false on failure.
 static bool
-master_send_dispatch(cru_slave_t *slave, const cru_test_def_t *def)
+master_send_dispatch(cru_slave_t *slave, const test_def_t *def)
 {
     ASSERT_IN_MASTER_PROCESS;
 
@@ -288,7 +288,7 @@ cleanup:
 }
 
 /// Return NULL if the pipe is empty or has errors.
-static const cru_test_def_t *
+static const test_def_t *
 slave_recv_dispatch(const cru_slave_t *slave)
 {
     ASSERT_IN_SLAVE_PROCESS;
@@ -321,7 +321,7 @@ master_recv_result(cru_slave_t *slave)
 /// Return false on failure.
 static bool
 slave_send_result(const cru_slave_t *slave,
-                  const cru_test_def_t *def, test_result_t result)
+                  const test_def_t *def, test_result_t result)
 {
     ASSERT_IN_SLAVE_PROCESS;
 
@@ -334,7 +334,7 @@ slave_send_result(const cru_slave_t *slave,
 }
 
 static test_result_t
-run_test_def(const cru_test_def_t *def)
+run_test_def(const test_def_t *def)
 {
     cru_test_t *test;
     test_result_t result;
@@ -370,7 +370,7 @@ slave_loop(const cru_slave_t *slave)
 {
     ASSERT_IN_SLAVE_PROCESS;
 
-    const cru_test_def_t *def;
+    const test_def_t *def;
 
     while (true) {
         test_result_t result;
@@ -500,7 +500,7 @@ master_loop_with_forking(void)
 {
     ASSERT_IN_MASTER_PROCESS;
 
-    const cru_test_def_t *def;
+    const test_def_t *def;
     cru_slave_t *slave = &master.slaves[0];
 
     // Dispatch each test to the current slave process. Interleave the
@@ -576,7 +576,7 @@ master_loop_no_forking(void)
 {
     ASSERT_IN_MASTER_PROCESS;
 
-    const cru_test_def_t *def;
+    const test_def_t *def;
 
     cru_foreach_test_def(def) {
         test_result_t result;
@@ -654,7 +654,7 @@ cru_runner_run_tests(void)
 }
 
 static inline void
-enable_test_def(cru_test_def_t *def)
+enable_test_def(test_def_t *def)
 {
     ASSERT_MASTER_NOT_RUNNING;
 
@@ -669,10 +669,10 @@ cru_runner_enable_all_nonexample_tests(void)
 {
     ASSERT_MASTER_NOT_RUNNING;
 
-    cru_test_def_t *def;
+    test_def_t *def;
 
     cru_foreach_test_def(def) {
-        if (!cru_test_def_match(def, "example.*")) {
+        if (!test_def_match(def, "example.*")) {
             enable_test_def(def);
         }
     }
@@ -683,12 +683,12 @@ cru_runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
 {
     ASSERT_MASTER_NOT_RUNNING;
 
-    cru_test_def_t *def;
+    test_def_t *def;
     char **glob;
 
     cru_foreach_test_def(def) {
         cru_vec_foreach(glob, testname_globs) {
-            if (cru_test_def_match(def, *glob)) {
+            if (test_def_match(def, *glob)) {
                 enable_test_def(def);
             }
         }

@@ -21,7 +21,7 @@
 
 #include "cmd.h"
 #include "framework/test/cru_test.h"
-#include "framework/test/cru_test_def.h"
+#include "framework/test/test_def.h"
 
 static const char *shortopts = "h";
 
@@ -67,12 +67,12 @@ done_getopt:
 static int
 start(const cru_command_t *cmd, int argc, char **argv)
 {
-    const cru_test_def_t *def;
+    const test_def_t *def;
 
     parse_args(cmd, argc, argv);
 
     cru_foreach_test_def(def) {
-        if (!cru_test_def_match(def, "example.*")) {
+        if (!test_def_match(def, "example.*")) {
             printf("%s\n", def->name);
         }
     }

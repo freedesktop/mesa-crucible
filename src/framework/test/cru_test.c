@@ -119,7 +119,7 @@ enum cru_test_phase {
 };
 
 struct cru_test {
-    const cru_test_def_t *def;
+    const test_def_t *def;
     cru_slist_t *threads; ///< List of `pthread_t *`.
 
     /// \brief List of cleanup stacks, one for each test thread.
@@ -265,7 +265,7 @@ cru_test_set_image_filename(cru_test_t *t)
     ASSERT_TEST_IN_PRESTART_PHASE(t);
 
     // Always define the reference image's filename, even when
-    // cru_test_def_t::no_image is set. This will be useful for tests that
+    // test_def_t::no_image is set. This will be useful for tests that
     // generate their reference images at runtime and wish to dump them to
     // disk.
     assert(t->ref_image_filename.len == 0);
@@ -327,7 +327,7 @@ cru_test_destroy(cru_test_t *t)
 }
 
 cru_test_t *
-cru_test_create(const cru_test_def_t *def)
+cru_test_create(const test_def_t *def)
 {
     ASSERT_NOT_IN_TEST_THREAD;
 

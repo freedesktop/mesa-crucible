@@ -27,7 +27,7 @@ test_pass(void)
     t_pass();
 }
 
-cru_define_test {
+test_define {
     .name = "example.basic.pass",
     .start = test_pass,
     .no_image = true,
@@ -39,7 +39,7 @@ test_fail(void)
     t_fail();
 }
 
-cru_define_test {
+test_define {
     .name = "example.basic.fail",
     .start = test_fail,
     .no_image = true,
@@ -51,7 +51,7 @@ test_skip(void)
     t_skip();
 }
 
-cru_define_test {
+test_define {
     .name = "example.basic.skip",
     .start = test_skip,
     .no_image = true,

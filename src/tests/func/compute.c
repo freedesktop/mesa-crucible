@@ -146,7 +146,7 @@ test(void)
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
 }
 
-cru_define_test {
+test_define {
     .name = "func.compute",
     .start = test,
     .no_image = true,

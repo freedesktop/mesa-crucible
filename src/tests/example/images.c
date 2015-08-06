@@ -40,7 +40,7 @@ test_map_ref_image(void)
     t_pass();
 }
 
-cru_define_test {
+test_define {
     .name = "example.image.map-ref-image",
     .start = test_map_ref_image,
 };
@@ -68,7 +68,7 @@ test_copy_ref_image(void)
     t_pass();
 }
 
-cru_define_test {
+test_define {
     .name = "example.image.copy-ref-image",
     .start = test_copy_ref_image,
 };
@@ -102,7 +102,7 @@ test_dump_seq_images(void)
     t_pass();
 }
 
-cru_define_test {
+test_define {
     .name = "example.image.dump-seq-images",
     .start = test_dump_seq_images,
     .no_image = true,
