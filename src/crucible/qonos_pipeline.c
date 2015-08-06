@@ -144,7 +144,7 @@ qoCreateGraphicsPipeline(VkDevice device,
         VkShader vs = extra->vertexShader;
 
         if (!vs.handle) {
-            vs = qoCreateShaderGLSL(t_device, VERTEX,
+            vs = qoCreateShaderGLSL(device, VERTEX,
                 layout(location = 0) in vec4 a_position;
                 layout(location = 1) in vec4 a_color;
                 out vec4 v_color;
@@ -169,7 +169,7 @@ qoCreateGraphicsPipeline(VkDevice device,
         VkShader fs = extra->fragmentShader;
 
         if (!fs.handle) {
-            fs = qoCreateShaderGLSL(t_device, FRAGMENT,
+            fs = qoCreateShaderGLSL(device, FRAGMENT,
                 out vec4 f_color;
                 in vec4 v_color;
                 void main()
@@ -193,7 +193,7 @@ qoCreateGraphicsPipeline(VkDevice device,
 
     t_assert(result == VK_SUCCESS);
     t_assert(pipeline.handle);
-    t_cleanup_push_vk_pipeline(t_device, pipeline);
+    t_cleanup_push_vk_pipeline(device, pipeline);
 
     return pipeline;
 }
