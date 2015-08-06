@@ -234,7 +234,7 @@ test_start(test_t *t)
         return;
     }
 
-    if (!test_create_thread(t, main_thread_start, t, NULL)) {
+    if (!test_thread_create(t, main_thread_start, t, NULL)) {
         t->phase = CRU_TEST_PHASE_STOPPED;
         t->result = TEST_RESULT_FAIL;
         return;

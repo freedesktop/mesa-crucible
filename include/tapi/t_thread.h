@@ -25,7 +25,7 @@
 #pragma once
 
 /// \brief Create a new test thread.
-void t_create_thread(void (*start)(void *arg), void *arg);
+void t_thread_create(void (*start)(void *arg), void *arg);
 
 /// \brief Yield control to the test framework.
 ///

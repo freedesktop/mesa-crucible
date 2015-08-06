@@ -519,7 +519,7 @@ cleanup_thread_start(void *arg)
 }
 
 bool
-test_create_thread(test_t *t, void *(*start)(void *arg), void *arg,
+test_thread_create(test_t *t, void *(*start)(void *arg), void *arg,
                    pthread_t *out_thread)
 {
     pthread_t *thread = NULL;
@@ -550,7 +550,7 @@ fail:
 /// TODO: Document join behavior. Users can't join test threads. Test runner
 /// joins them.
 void
-t_create_thread(void (*start)(void *arg), void *arg)
+t_thread_create(void (*start)(void *arg), void *arg)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
@@ -564,7 +564,7 @@ t_create_thread(void (*start)(void *arg), void *arg)
     test_arg->start_func = start;
     test_arg->start_arg = arg;
 
-    if (!test_create_thread(t, user_thread_start, test_arg, NULL)) {
+    if (!test_thread_create(t, user_thread_start, test_arg, NULL)) {
         t_fail_silent();
     }
 }

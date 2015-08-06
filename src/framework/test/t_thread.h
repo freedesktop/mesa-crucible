@@ -24,7 +24,7 @@
 #include "util/macros.h"
 
 void t_thread_exit(void) cru_noreturn;
-bool test_create_thread(test_t *t, void *(*start)(void *arg), void *arg, pthread_t *out_thread);
+bool test_thread_create(test_t *t, void *(*start)(void *arg), void *arg, pthread_t *out_thread);
 void *main_thread_start(void *arg);
 void result_thread_join_others(test_t *t);
 void result_thread_enter_cleanup_phase(test_t *t) cru_noreturn;
