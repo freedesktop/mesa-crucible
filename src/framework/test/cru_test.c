@@ -147,7 +147,7 @@ struct cru_test {
     /// Threads coordinate activity with the phase.
     _Atomic enum cru_test_phase phase;
 
-    enum cru_test_result result;
+    enum test_result result;
 
     /// The test broadcasts this condition when it enters
     /// CRU_TEST_PHASE_STOPPED.
@@ -239,14 +239,14 @@ join_thread(pthread_t thread)
 }
 
 const char *
-cru_test_result_to_string(cru_test_result_t result)
+test_result_to_string(test_result_t result)
 {
     switch (result) {
-    case CRU_TEST_RESULT_PASS:
+    case TEST_RESULT_PASS:
         return "pass";
-    case CRU_TEST_RESULT_SKIP:
+    case TEST_RESULT_SKIP:
         return "skip";
-    case CRU_TEST_RESULT_FAIL:
+    case TEST_RESULT_FAIL:
         return "fail";
     }
 
@@ -337,7 +337,7 @@ cru_test_create(const cru_test_def_t *def)
     t = xzalloc(sizeof(*t));
     t->def = def;
     t->phase = CRU_TEST_PHASE_PRESTART;
-    t->result = CRU_TEST_RESULT_PASS;
+    t->result = TEST_RESULT_PASS;
     t->ref_image_filename = STRING_INIT;
     t->opt.no_dump = true;
     t->opt.no_cleanup = false;
@@ -371,7 +371,7 @@ cru_test_create(const cru_test_def_t *def)
 
 fail:
     t->result = CRU_TEST_PHASE_STOPPED;
-    t->result = CRU_TEST_RESULT_FAIL;
+    t->result = TEST_RESULT_FAIL;
     return t;
 }
 
@@ -700,7 +700,7 @@ t_ref_image(void)
 }
 
 /// Illegal to call before cru_test_wait().
-cru_test_result_t
+test_result_t
 cru_test_get_result(cru_test_t *t)
 {
     ASSERT_NOT_IN_TEST_THREAD;
@@ -761,7 +761,7 @@ result_thread_enter_cleanup_phase(cru_test_t *t)
         if (err) {
             cru_loge("%s: failed to start cleanup thread", t->def->name);
 
-            t->result = CRU_TEST_RESULT_FAIL;
+            t->result = TEST_RESULT_FAIL;
             cru_test_stop(t);
 
             t_thread_exit();
@@ -777,7 +777,7 @@ result_thread_enter_cleanup_phase(cru_test_t *t)
 }
 
 void cru_noreturn
-t_end(enum cru_test_result result)
+t_end(enum test_result result)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
@@ -965,7 +965,7 @@ void cru_noreturn
 t_pass(void)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
-    t_end(CRU_TEST_RESULT_PASS);
+    t_end(TEST_RESULT_PASS);
 }
 
 void cru_noreturn
@@ -1014,7 +1014,7 @@ void cru_noreturn
 __t_skip_silent(void)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
-    t_end(CRU_TEST_RESULT_SKIP);
+    t_end(TEST_RESULT_SKIP);
 }
 
 void cru_noreturn
@@ -1063,7 +1063,7 @@ void cru_noreturn
 __t_fail_silent(void)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
-    t_end(CRU_TEST_RESULT_FAIL);
+    t_end(TEST_RESULT_FAIL);
 }
 
 void
@@ -1109,7 +1109,7 @@ __t_assertfv(const char *file, int line, bool cond, const char *cond_string,
         string_finish(&s);
     }
 
-    t_end(CRU_TEST_RESULT_FAIL);
+    t_end(TEST_RESULT_FAIL);
 }
 
 /// Find the best VkMemoryType whose properties contain each flag in
@@ -1543,13 +1543,13 @@ cru_test_start(cru_test_t *t)
 
     if (t->def->skip) {
         t->phase = CRU_TEST_PHASE_STOPPED;
-        t->result = CRU_TEST_RESULT_SKIP;
+        t->result = TEST_RESULT_SKIP;
         return;
     }
 
     if (!cru_test_create_thread(t, main_thread_start, t, NULL)) {
         t->phase = CRU_TEST_PHASE_STOPPED;
-        t->result = CRU_TEST_RESULT_FAIL;
+        t->result = TEST_RESULT_FAIL;
         return;
     }
 }
@@ -1647,8 +1647,8 @@ t_cleanup_pop_all(void)
 }
 
 void
-cru_test_result_merge(cru_test_result_t *accum,
-                      cru_test_result_t new_result)
+test_result_merge(test_result_t *accum,
+                      test_result_t new_result)
 {
     *accum = MAX(*accum, new_result);
 }

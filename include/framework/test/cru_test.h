@@ -25,7 +25,7 @@
 
 typedef struct cru_test cru_test_t;
 
-const char *cru_test_result_to_string(cru_test_result_t result);
+const char *test_result_to_string(test_result_t result);
 
 bool cru_test_is_current(void);
 cru_test_t *cru_test_create(const cru_test_def_t *def);
@@ -37,4 +37,4 @@ void cru_test_disable_separate_cleanup_thread(cru_test_t *t);
 void cru_test_enable_spir_v(cru_test_t *t);
 void cru_test_start(cru_test_t *test);
 void cru_test_wait(cru_test_t *test);
-cru_test_result_t cru_test_get_result(cru_test_t *test);
+test_result_t cru_test_get_result(cru_test_t *test);

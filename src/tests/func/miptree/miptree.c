@@ -906,7 +906,7 @@ miptree_download(const miptree_t *mt)
 static void cru_noreturn
 miptree_compare_images(const miptree_t *mt)
 {
-    cru_test_result_t result = CRU_TEST_RESULT_PASS;
+    test_result_t result = TEST_RESULT_PASS;
 
     vkQueueWaitIdle(t_queue);
 
@@ -922,7 +922,7 @@ miptree_compare_images(const miptree_t *mt)
 
         if (!cru_image_compare(slice->src_cru_image, slice->dest_cru_image)) {
             cru_loge("image incorrect at level %u, array slice %u", l, a);
-            result = CRU_TEST_RESULT_FAIL;
+            result = TEST_RESULT_FAIL;
         }
     }
 

@@ -32,19 +32,19 @@
 
 #include "util/macros.h"
 
-typedef enum cru_test_result cru_test_result_t;
+typedef enum test_result test_result_t;
 
-enum cru_test_result {
-    CRU_TEST_RESULT_PASS,
-    CRU_TEST_RESULT_SKIP,
-    CRU_TEST_RESULT_FAIL,
+enum test_result {
+    TEST_RESULT_PASS,
+    TEST_RESULT_SKIP,
+    TEST_RESULT_FAIL,
 };
 
 void
-cru_test_result_merge(cru_test_result_t *accum,
-                      cru_test_result_t new_result);
+test_result_merge(test_result_t *accum,
+                      test_result_t new_result);
 
-void t_end(cru_test_result_t result) cru_noreturn;
+void t_end(test_result_t result) cru_noreturn;
 
 void t_pass(void) cru_noreturn;
 
