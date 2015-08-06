@@ -21,8 +21,8 @@
  * IN THE SOFTWARE.
  */
 
-#include <crucible/cru.h>
 #include <stdio.h>
+#include "tapi/t.h"
 
 #include "lots-of-surface-state-spirv.h"
 

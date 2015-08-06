@@ -48,7 +48,11 @@
 /// TODO: Test non-square, non-power-of-two image sizes.
 
 #include <math.h>
-#include <crucible/cru.h>
+
+#include "util/cru_format.h"
+#include "util/misc.h"
+#include "util/string.h"
+#include "tapi/t.h"
 
 #include "miptree-spirv.h"
 

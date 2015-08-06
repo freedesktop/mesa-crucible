@@ -19,9 +19,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include <crucible/cru.h>
 #include <poll.h>
 #include <stdio.h>
+#include "tapi/t.h"
 
 static uint64_t
 get_timestamp(void)

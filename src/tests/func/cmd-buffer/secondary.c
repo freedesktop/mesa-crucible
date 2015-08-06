@@ -21,7 +21,7 @@
  * IN THE SOFTWARE.
  */
 
-#include <crucible/cru.h>
+#include "tapi/t.h"
 
 static VkBuffer
 make_vbo(void)
