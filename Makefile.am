@@ -76,7 +76,7 @@ bin_crucible_SOURCES = \
 	src/util/cru_format.c \
 	src/util/cru_image.c \
 	src/util/cru_log.c \
-	src/util/cru_misc.c \
+	src/util/misc.c \
 	src/util/cru_pixel_image.c \
 	src/util/cru_png_image.c \
 	src/util/cru_vec.c \
