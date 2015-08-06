@@ -20,10 +20,7 @@
 // IN THE SOFTWARE.
 
 /// \file
-/// \brief Test API for setting the result and possibly ending the test.
-///
-///   - The framework automatically calls t_compare_image() when the
-///     test's start function returns, unless it's a no-image test.
+/// \brief Test API for selecting the test's result.
 
 #pragma once
 
@@ -40,9 +37,7 @@ enum test_result {
     TEST_RESULT_FAIL,
 };
 
-void
-test_result_merge(test_result_t *accum,
-                      test_result_t new_result);
+void test_result_merge(test_result_t *accum, test_result_t new_result);
 
 void t_end(test_result_t result) cru_noreturn;
 
