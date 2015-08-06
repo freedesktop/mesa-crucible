@@ -50,6 +50,8 @@ extern "C" {
 #define __CRU_CAT(x, y) x##y
 #define CRU_CAT(x, y) __CRU_CAT(x, y)
 
+#define ARRAY_LENGTH(a) (sizeof(a) / sizeof((a)[0]))
+
 #define GLSL(version, src) ("#version " #version "\n" #src)
 
 #ifdef __cplusplus

@@ -36,8 +36,6 @@ extern "C" {
 typedef struct string string_t;
 typedef int cru_err_t;
 
-#define ARRAY_LENGTH(a) (sizeof(a) / sizeof((a)[0]))
-
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
