@@ -87,7 +87,7 @@ static void
 test_alloc_multithread(void)
 {
     for (unsigned i = 0; i < NUM_THREADS; i++)
-        t_thread_create(do_test_alloc_multithread, (void *)(uintptr_t)i);
+        t_thread_start(do_test_alloc_multithread, (void *)(uintptr_t)i);
     sleep(1);
 }
 

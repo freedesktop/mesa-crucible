@@ -57,13 +57,6 @@ void t_pass(void) cru_noreturn;
 #define t_assertf(cond, format, ...) __t_assertf(__FILE__, __LINE__, (cond), #cond, format, ##__VA_ARGS__)
 #define t_assertfv(cond, format, va) __t_assertfv(__FILE__, __LINE__, (cond), #cond, format, va)
 
-/// Compare the test's rendered image against its reference image, ending the
-/// test.
-///
-/// \see t_color_image
-/// \see t_ref_image
-void t_compare_image(void) cru_noreturn;
-
 void __t_skip(const char *file, int line) cru_noreturn;
 void __t_skipf(const char *file, int line, const char *format, ...) cru_noreturn cru_printflike(3, 4);
 void __t_skipfv(const char *file, int line, const char *format, va_list va) cru_noreturn;

@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "tapi/t_thread.h"
 #include "util/macros.h"
 
-bool test_thread_create(test_t *t, void (*start)(void *arg), void *arg);
+void t_enter_next_phase(void) cru_noreturn;

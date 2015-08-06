@@ -75,13 +75,13 @@ test_destroy(test_t *t)
     if (!t)
         return;
 
-    assert(t->phase == CRU_TEST_PHASE_PRESTART ||
-           t->phase == CRU_TEST_PHASE_STOPPED);
+    assert(t->phase == TEST_PHASE_PRESTART ||
+           t->phase == TEST_PHASE_STOPPED);
 
     // This test must own no running threads:
     //   - In the "prestart" phase, no test threads have been created yet.
-    //   - In the "stopped" phase, all test threads have been joined.
-    assert(t->threads == NULL);
+    //   - In the "stopped" phase, all test threads have exited.
+    assert(t->num_threads == 0);
 
     pthread_mutex_destroy(&t->stop_mutex);
     pthread_cond_destroy(&t->stop_cond);
@@ -99,14 +99,12 @@ test_create(const test_def_t *def)
     int err;
 
     t = xzalloc(sizeof(*t));
+
     t->def = def;
-    t->phase = CRU_TEST_PHASE_PRESTART;
+    t->opt.no_dump = true;
+    t->phase = ATOMIC_VAR_INIT(TEST_PHASE_PRESTART);
     t->result = TEST_RESULT_PASS;
     t->ref.filename = STRING_INIT;
-    t->opt.no_dump = true;
-    t->opt.no_cleanup = false;
-    t->opt.use_spir_v = false;
-    t->opt.no_separate_cleanup_thread = false;
 
     if (t->def->samples > 0) {
         loge("%s: multisample tests not yet supported", t->def->name);
@@ -116,8 +114,7 @@ test_create(const test_def_t *def)
     err = pthread_mutex_init(&t->stop_mutex, NULL);
     if (err) {
         // Abort to avoid destroying an uninitialized mutex later.
-        loge("%s: failed to init mutex during test creation",
-                 t->def->name);
+        loge("%s: failed to init mutex during test creation", t->def->name);
         abort();
     }
 
@@ -125,7 +122,7 @@ test_create(const test_def_t *def)
     if (err) {
         // Abort to avoid destroying an uninitialized cond later.
         loge("%s: failed to init thread condition during test creation",
-                 t->def->name);
+             t->def->name);
         abort();
     }
 
@@ -134,8 +131,8 @@ test_create(const test_def_t *def)
     return t;
 
 fail:
-    t->result = CRU_TEST_PHASE_STOPPED;
     t->result = TEST_RESULT_FAIL;
+    t->phase = TEST_PHASE_STOPPED;
     return t;
 }
 
@@ -220,23 +217,33 @@ t_format_info(VkFormat format)
     return info;
 }
 
+static void
+t_thread_release_wrapper(void *ignore)
+{
+    t_thread_release();
+}
+
 void
 test_start(test_t *t)
 {
     ASSERT_NOT_IN_TEST_THREAD;
     ASSERT_TEST_IN_PRESTART_PHASE(t);
 
-    t->phase = CRU_TEST_PHASE_SETUP;
-
     if (t->def->skip) {
-        t->phase = CRU_TEST_PHASE_STOPPED;
         t->result = TEST_RESULT_SKIP;
+        t->phase = TEST_PHASE_STOPPED;
+        pthread_cond_broadcast(&t->stop_cond);
         return;
     }
 
-    if (!test_thread_create(t, main_thread_start, t, NULL)) {
-        t->phase = CRU_TEST_PHASE_STOPPED;
+    // Start the test's first thread in a failure mode [that is, in
+    // t_thread_release()] and force it to recover. Doing so provides
+    // persistent validation of that recovery path.
+    if (!test_thread_create(t, t_thread_release_wrapper, NULL)) {
+        loge("%s: failed to create test's start thread", t->def->name);
         t->result = TEST_RESULT_FAIL;
+        t->phase = TEST_PHASE_STOPPED;
+        pthread_cond_broadcast(&t->stop_cond);
         return;
     }
 }
@@ -254,17 +261,18 @@ test_wait(test_t *t)
         abort();
     }
 
-    while (t->phase < CRU_TEST_PHASE_STOPPED) {
+    while (t->phase < TEST_PHASE_STOPPED) {
         err = pthread_cond_wait(&t->stop_cond, &t->stop_mutex);
         if (err) {
             loge("%s: failed to wait on test's result condition",
-                     t->def->name);
+                  t->def->name);
             abort();
         }
     }
 
     pthread_mutex_unlock(&t->stop_mutex);
 }
+
 void
 test_result_merge(test_result_t *accum,
                       test_result_t new_result)

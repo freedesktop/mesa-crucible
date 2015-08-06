@@ -22,6 +22,7 @@
 #pragma once
 
 #include <pthread.h>
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,17 +39,19 @@
 #include "util/string.h"
 #include "util/xalloc.h"
 
+typedef enum test_phase test_phase_t;
 typedef struct cru_current_test cru_current_test_t;
-typedef struct user_thread_arg user_thread_arg_t;
+typedef struct test test_t;
+typedef struct test_thread_arg test_thread_arg_t;
 
 /// Tests proceed through the stages in the order listed.
 enum test_phase {
-    CRU_TEST_PHASE_PRESTART,
-    CRU_TEST_PHASE_SETUP,
-    CRU_TEST_PHASE_MAIN,
-    CRU_TEST_PHASE_PENDING_CLEANUP,
-    CRU_TEST_PHASE_CLEANUP,
-    CRU_TEST_PHASE_STOPPED,
+    TEST_PHASE_PRESTART,
+    TEST_PHASE_SETUP,
+    TEST_PHASE_MAIN,
+    TEST_PHASE_PRECLEANUP,
+    TEST_PHASE_CLEANUP,
+    TEST_PHASE_STOPPED,
 };
 
 struct cru_current_test {
@@ -56,7 +59,7 @@ struct cru_current_test {
     cru_cleanup_stack_t *cleanup;
 };
 
-struct user_thread_arg {
+struct test_thread_arg {
     test_t *test;
     void (*start_func)(void *start_arg);
     void *start_arg;
@@ -64,7 +67,8 @@ struct user_thread_arg {
 
 struct test {
     const test_def_t *def;
-    cru_slist_t *threads; ///< List of `pthread_t *`.
+
+    atomic_uint num_threads;
 
     /// \brief List of cleanup stacks, one for each test thread.
     ///
@@ -72,38 +76,31 @@ struct test {
     ///
     /// When each test thread is created, a new thread-local cleanup stack,
     /// \ref cru_current_test::cleanup, is assigned to it. During
-    /// CRU_TEST_PHASE_CLEANUP, all cleanup stacks are unwound.
+    /// TEST_PHASE_CLEANUP, all cleanup stacks are unwound.
     ///
-    /// CAUTION: During CRU_TEST_PHASE_CLEANUP the the test is, by intentional
+    /// CAUTION: During TEST_PHASE_CLEANUP the the test is, by intentional
     /// design, current in no thread.  As a consequence, during
-    /// CRU_TEST_PHASE_CLEANUP it is illegal to call functions whose names
+    /// TEST_PHASE_CLEANUP it is illegal to call functions whose names
     /// begins with "t_".
     cru_slist_t *cleanup_stacks;
 
-    /// This remains zero until a thread promotes itself to become the result
-    /// thread. It remains set until test_destroy().
-    pthread_t result_thread;
-
-    /// This remains zero until the cleanup thread is created. It remains set
-    /// until test_destroy().
-    pthread_t cleanup_thread;
-
     /// Threads coordinate activity with the phase.
-    _Atomic enum test_phase phase;
+    _Atomic test_phase_t phase;
 
-    enum test_result result;
+    test_result_t result;
+    atomic_bool result_is_final;
 
     /// The test broadcasts this condition when it enters
-    /// CRU_TEST_PHASE_STOPPED.
+    /// TEST_PHASE_STOPPED.
     pthread_cond_t stop_cond;
 
-    /// Protects test::stop_cond.
+    /// Protects cru_test::stop_cond.
     pthread_mutex_t stop_mutex;
 
     /// \brief Options that control the test's behavior.
     ///
     /// These must be set, if at all, before the test starts.
-    struct test_options {
+    struct cru_test_options {
         /// Run the test in bootstrap mode.
         bool bootstrap;
 
@@ -112,7 +109,7 @@ struct test {
         /// \see t_dump_image()
         bool no_dump;
 
-        /// Don't run the cleanup commands in test::cleanup_stacks.
+        /// Don't run the cleanup commands in cru_test::cleanup_stacks.
         bool no_cleanup;
 
         /// Try and use SPIR-V shaders when available
@@ -165,6 +162,8 @@ struct test {
     } vk;
 };
 
+void t_compare_image(void);
+
 extern __thread cru_current_test_t current
     __attribute__((tls_model("local-exec")));
 
@@ -187,45 +186,28 @@ extern __thread cru_current_test_t current
 #define ASSERT_TEST_IN_PRESTART_PHASE(t) \
     do { \
         ASSERT_NOT_IN_TEST_THREAD; \
-        assert(t->phase == CRU_TEST_PHASE_PRESTART); \
+        assert(t->phase == TEST_PHASE_PRESTART); \
     } while (0)
 
 #define ASSERT_TEST_IN_SETUP_PHASE \
     do { \
         GET_CURRENT_TEST(t); \
-        assert(t->phase == CRU_TEST_PHASE_SETUP); \
-    } while (0)
-
-#define ASSERT_TEST_IN_MAJOR_PHASE \
-    do { \
-        GET_CURRENT_TEST(t); \
-        assert(t->phase >= CRU_TEST_PHASE_SETUP); \
-        assert(t->phase <= CRU_TEST_PHASE_PENDING_CLEANUP); \
+        assert(t->phase == TEST_PHASE_SETUP); \
     } while (0)
 
 #define ASSERT_TEST_IN_CLEANUP_PHASE(t) \
     do { \
-        assert(t->phase == CRU_TEST_PHASE_CLEANUP); \
+        assert(t->phase == TEST_PHASE_CLEANUP); \
     } while(0)
 
 #define ASSERT_TEST_IN_STOPPED_PHASE(t) \
     do { \
-        assert(t->phase == CRU_TEST_PHASE_STOPPED); \
+        assert(t->phase == TEST_PHASE_STOPPED); \
     } while(0)
 
-#define ASSERT_IN_RESULT_THREAD(t) \
+#define ASSERT_TEST_IN_MAJOR_PHASE \
     do { \
-        ASSERT_NOT_IN_TEST_THREAD; \
-        assert((t)->phase == CRU_TEST_PHASE_PENDING_CLEANUP); \
-        assert(pthread_equal(pthread_self(), (t)->result_thread)); \
-        assert(!pthread_equal(pthread_self(), (t)->cleanup_thread)); \
-    } while (0)
-
-#define ASSERT_IN_CLEANUP_THREAD(t) \
-    do { \
-        ASSERT_NOT_IN_TEST_THREAD; \
-        assert((t)->phase == CRU_TEST_PHASE_CLEANUP); \
-        assert(pthread_equal(pthread_self(), (t)->cleanup_thread)); \
-        assert(pthread_equal(pthread_self(), (t)->result_thread) == \
-               t->opt.no_separate_cleanup_thread); \
+        GET_CURRENT_TEST(t); \
+        assert(t->phase >= TEST_PHASE_SETUP); \
+        assert(t->phase <= TEST_PHASE_CLEANUP); \
     } while (0)

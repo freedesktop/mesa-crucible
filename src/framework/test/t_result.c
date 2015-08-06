@@ -23,33 +23,16 @@
 #include "t_thread.h"
 
 void cru_noreturn
-t_end(enum test_result result)
+t_end(test_result_t result)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    if (atomic_exchange(&t->phase, CRU_TEST_PHASE_PENDING_CLEANUP)
-        >= CRU_TEST_PHASE_PENDING_CLEANUP) {
-        // A previous call to test_end already cancelled the test and set
-        // the test result.
-        t_thread_exit();
+    if (!atomic_exchange(&t->result_is_final, true)) {
+        test_result_merge(&t->result, result);
     }
 
-    // This thread wins! It now unbinds itself from the test and becomes the
-    // "result" thread.
-    ASSERT_IN_TEST_THREAD;
-    current = (cru_current_test_t) {0};
-    t->result = result;
-    t->result_thread = pthread_self();
-    t->phase = CRU_TEST_PHASE_PENDING_CLEANUP;
-    ASSERT_NOT_IN_TEST_THREAD;
-
-    result_thread_join_others(t);
-
-    // This thread, the "result" thread, is the test's sole remaining thread.
-    assert(cru_slist_length(t->threads) == 0);
-
-    result_thread_enter_cleanup_phase(t);
+    t_thread_release();
 }
 
 void cru_noreturn
@@ -203,6 +186,7 @@ __t_assertfv(const char *file, int line, bool cond, const char *cond_string,
     t_end(TEST_RESULT_FAIL);
 }
 
+/// Compare the test's rendered image against its reference image.
 void
 t_compare_image(void)
 {
@@ -286,6 +270,4 @@ t_compare_image(void)
 
         t_fail_silent();
     }
-
-    t_pass();
 }

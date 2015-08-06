@@ -24,11 +24,32 @@
 
 #pragma once
 
-/// \brief Create a new test thread.
-void t_thread_create(void (*start)(void *arg), void *arg);
-
-/// \brief Yield control to the test framework.
+/// \brief Start a new test thread.
 ///
-/// This function will not return if the test result has already been set [for
-/// example, because some thread called t_end(), t_pass(), or t_fail()].
+/// The new thread may be a newly created thread or may be an existing thread
+/// resused from the framework's thread pool.  When the thread returns from its
+/// start function, it automatically calls t_thread_release().
+void t_thread_start(void (*start)(void *arg), void *arg);
+
+/// \brief Release a test thread to the framework.
+///
+/// This call does not return.  On release, the calling thread may immediately
+/// exit or may return to the framework's thread pool.
+///
+/// This call is useful if a thread needs to "exit" early without selecting the
+/// test's result, possibly because it defers the result selection to
+/// a different thread.
+void t_thread_release(void) cru_noreturn;
+
+/// \brief Yield control to the framework.
+///
+/// Before returning, this call may perform a small action on behalf of the
+/// framework.  This call does not return if the framework has decided that the
+/// test has already completed (for example, because another thread called
+/// t_fail()), in which case this call is equivalent to t_thread_release().
 void t_thread_yield(void);
+
+/// \brief Reduce the test's thread count to 1.
+///
+/// This call returns only if the calling thread is the test's sole thread.
+void t_thread_sieve(void);
