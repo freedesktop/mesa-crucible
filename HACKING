@@ -6,7 +6,7 @@ Directory Layout
 
 - misc
   If you want Crucible to play nicely with bash, zsh, vim, emacs, or whatever,
-  then then look in misc/.
+  then look in misc/.
 
 - include
   Headers under include/ are public within the project. That is, they define
