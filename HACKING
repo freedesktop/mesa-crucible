@@ -1,8 +1,5 @@
 Directory Layout
 ================
-
-WARNING: IN FLUX!
-
 - data
   Data files for tests, such as reference images, vertex data, texture
   images, etc.
@@ -10,17 +7,6 @@ WARNING: IN FLUX!
 - misc
   If you want Crucible to play nicely with bash, zsh, vim, emacs, or whatever,
   then look in misc/.
-
-- include
-  Headers under include/ are public within the project. That is, they define
-  API that is available to the entire codebase.  This contrasts with headers
-  under src/, which are private to their containing directory.
-
-- src/crucible
-  Source for the test framework, but not the tests themselves. Consider this
-  directory Crucible's "standard library", intended to be used by tests.  This
-  includes the test runner (the crucible command), png and image tools, logging
-  code, and generally any common code shared among many tests.
 
 - src/tests
   Source for the tests themselves.
@@ -33,12 +19,34 @@ WARNING: IN FLUX!
 
 - src/tests/stress: Stress tests
 
+- include
+  Headers under include/ define each module's public API.  This contrasts with
+  headers under src/, which are private to their containing directory.
+
+- include/tapi
+  The test API. Functions that begin with 't_' may be called only inside
+  a running test thread.
+
+- include/qonos
+  Wrappers around the Vulkan API that make life easier for test authors.
+
+- include/util
+  Utilities that may be used by any module. They are safe to use inside or
+  outside running test threads. Consider this to be Crucible's "standard
+  library".
+
+- include/framework
+  Crucible's framework APIs are off-limits to test code ( (that is, by code
+  under src/tests/).
+
+
 
 Writing Tests
 =============
-Tests live in the 'src/tests' directory. The Crucible API available to tests is
-in 'include/crucible/cru.h'. (Headers in 'src/crucible' are private to
-Crucible's test framework and are not available to the tests themselves).
+Tests live in the 'src/tests' directory.
+
+Tests have access to the APIs in the 'include/' directory (except
+'include/framework/', which is reserved for Crucible's test framework).
 
 After writing a test, you will likely need to generate a reference image for
 it.  The command 'crucible bootstrap' can generate one for you.
