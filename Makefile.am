@@ -53,7 +53,7 @@ bin_crucible_SOURCES = \
 	src/cmd/main.c \
 	src/cmd/run.c \
 	src/cmd/version.c \
-	src/framework/runner/cru_runner.c \
+	src/framework/runner/runner.c \
 	src/framework/test/t_cleanup.c \
 	src/framework/test/t_data.c \
 	src/framework/test/t_dump.c \

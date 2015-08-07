@@ -23,7 +23,7 @@
 #include "util/cru_vec.h"
 
 #include "cmd.h"
-#include "framework/runner/cru_runner.h"
+#include "framework/runner/runner.h"
 
 static enum test_isolation opt_isolation = CRU_TEST_ISOLATION_PROCESS;
 static int opt_fork = 1;
@@ -125,20 +125,20 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
 {
     parse_args(cmd, argc, argv);
 
-    cru_runner_test_isolation = opt_isolation;
-    cru_runner_do_forking = opt_fork;
-    cru_runner_do_cleanup_phase = !opt_no_cleanup;
-    cru_runner_use_separate_cleanup_threads = opt_separate_cleanup_thread;
-    cru_runner_do_image_dumps = opt_dump;
-    cru_runner_use_spir_v = opt_use_spir_v;
+    runner_test_isolation = opt_isolation;
+    runner_do_forking = opt_fork;
+    runner_do_cleanup_phase = !opt_no_cleanup;
+    runner_use_separate_cleanup_threads = opt_separate_cleanup_thread;
+    runner_do_image_dumps = opt_dump;
+    runner_use_spir_v = opt_use_spir_v;
 
     if (test_patterns.len == 0) {
-        cru_runner_enable_all_nonexample_tests();
+        runner_enable_all_nonexample_tests();
     } else {
-        cru_runner_enable_matching_tests(&test_patterns);
+        runner_enable_matching_tests(&test_patterns);
     }
 
-    if (cru_runner_run_tests()) {
+    if (runner_run_tests()) {
         exit(EXIT_SUCCESS);
     } else {
         exit(EXIT_FAILURE);

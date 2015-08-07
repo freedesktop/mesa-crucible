@@ -33,16 +33,16 @@ enum test_isolation {
     CRU_TEST_ISOLATION_THREAD,
 };
 
-extern enum test_isolation cru_runner_test_isolation;
-extern bool cru_runner_do_forking;
-extern bool cru_runner_do_cleanup_phase;
-extern bool cru_runner_do_image_dumps;
-extern bool cru_runner_use_spir_v;
-extern bool cru_runner_use_separate_cleanup_threads;
+extern enum test_isolation runner_test_isolation;
+extern bool runner_do_forking;
+extern bool runner_do_cleanup_phase;
+extern bool runner_do_image_dumps;
+extern bool runner_use_spir_v;
+extern bool runner_use_separate_cleanup_threads;
 
-void cru_runner_enable_cleanup(bool b);
-void cru_runner_enable_image_dumps(bool b);
-void cru_runner_enable_spir_v(bool b);
-void cru_runner_enable_all_nonexample_tests(void);
-void cru_runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs);
-bool cru_runner_run_tests(void);
+void runner_enable_cleanup(bool b);
+void runner_enable_image_dumps(bool b);
+void runner_enable_spir_v(bool b);
+void runner_enable_all_nonexample_tests(void);
+void runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs);
+bool runner_run_tests(void);

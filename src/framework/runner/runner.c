@@ -41,7 +41,7 @@
 
 #include "util/log.h"
 
-#include "framework/runner/cru_runner.h"
+#include "framework/runner/runner.h"
 #include "framework/test/test.h"
 #include "framework/test/test_def.h"
 
@@ -111,7 +111,7 @@ struct cru_master {
     atomic_bool sigint_flag;
 
 #ifndef NDEBUG
-    /// This is set only for the duration of cru_runner_run_tests().
+    /// This is set only for the duration of runner_run_tests().
     pid_t pid;
 #endif
 
@@ -127,12 +127,12 @@ static struct cru_master master = {
 #endif
 };
 
-enum test_isolation cru_runner_test_isolation = CRU_TEST_ISOLATION_THREAD;
-bool cru_runner_do_forking = true;
-bool cru_runner_do_cleanup_phase = true;
-bool cru_runner_do_image_dumps = false;
-bool cru_runner_use_spir_v = false;
-bool cru_runner_use_separate_cleanup_threads = true;
+enum test_isolation runner_test_isolation = CRU_TEST_ISOLATION_THREAD;
+bool runner_do_forking = true;
+bool runner_do_cleanup_phase = true;
+bool runner_do_image_dumps = false;
+bool runner_use_spir_v = false;
+bool runner_use_separate_cleanup_threads = true;
 
 static void
 set_sigint_handler(sighandler_t handler)
@@ -345,16 +345,16 @@ run_test_def(const test_def_t *def)
     if (!test)
         return TEST_RESULT_FAIL;
 
-    if (cru_runner_do_image_dumps)
+    if (runner_do_image_dumps)
         test_enable_dump(test);
 
-    if (!cru_runner_do_cleanup_phase)
+    if (!runner_do_cleanup_phase)
         test_disable_cleanup(test);
 
-    if (cru_runner_use_spir_v)
+    if (runner_use_spir_v)
         test_enable_spir_v(test);
 
-    if (!cru_runner_use_separate_cleanup_threads)
+    if (!runner_use_separate_cleanup_threads)
         test_disable_separate_cleanup_thread(test);
 
     test_start(test);
@@ -553,7 +553,7 @@ master_loop_with_forking(void)
         }
 
 
-        switch (cru_runner_test_isolation) {
+        switch (runner_test_isolation) {
         case CRU_TEST_ISOLATION_PROCESS:
             master_send_dispatch(slave, NULL);
             master_cleanup_slave(slave);
@@ -600,7 +600,7 @@ master_loop(void)
 {
     ASSERT_IN_MASTER_PROCESS;
 
-    if (cru_runner_do_forking) {
+    if (runner_do_forking) {
         set_sigint_handler(master_handle_sigint);
         master_loop_with_forking();
         set_sigint_handler(SIG_DFL);
@@ -612,12 +612,12 @@ master_loop(void)
 
 /// Return true if and only all tests pass or skip.
 bool
-cru_runner_run_tests(void)
+runner_run_tests(void)
 {
     ASSERT_MASTER_NOT_RUNNING;
 
-    if (!cru_runner_do_forking
-        && cru_runner_test_isolation == CRU_TEST_ISOLATION_THREAD) {
+    if (!runner_do_forking
+        && runner_test_isolation == CRU_TEST_ISOLATION_THREAD) {
         loge("invalid options for test runner");
         return false;
     }
@@ -665,7 +665,7 @@ enable_test_def(test_def_t *def)
 }
 
 void
-cru_runner_enable_all_nonexample_tests(void)
+runner_enable_all_nonexample_tests(void)
 {
     ASSERT_MASTER_NOT_RUNNING;
 
@@ -679,7 +679,7 @@ cru_runner_enable_all_nonexample_tests(void)
 }
 
 void
-cru_runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
+runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
 {
     ASSERT_MASTER_NOT_RUNNING;
 
