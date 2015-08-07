@@ -38,9 +38,9 @@ enum runner_isolation_mode {
 
 struct runner_opts {
     runner_isolation_mode_t isolation_mode;
-    bool do_forking;
-    bool do_cleanup_phase;
-    bool do_image_dumps;
+    bool no_fork;
+    bool no_cleanup_phase;
+    bool no_image_dumps;
     bool use_spir_v;
     bool use_separate_cleanup_threads;
 };

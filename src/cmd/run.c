@@ -126,10 +126,10 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
     parse_args(cmd, argc, argv);
 
     runner_opts.isolation_mode = opt_isolation;
-    runner_opts.do_forking = opt_fork;
-    runner_opts.do_cleanup_phase = !opt_no_cleanup;
+    runner_opts.no_fork = !opt_fork;
+    runner_opts.no_cleanup_phase = opt_no_cleanup;
     runner_opts.use_separate_cleanup_threads = opt_separate_cleanup_thread;
-    runner_opts.do_image_dumps = opt_dump;
+    runner_opts.no_image_dumps = !opt_dump;
     runner_opts.use_spir_v = opt_use_spir_v;
 
     if (test_patterns.len == 0) {

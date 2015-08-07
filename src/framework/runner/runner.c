@@ -119,9 +119,9 @@ struct cru_master {
 
 runner_opts_t runner_opts = {
     .isolation_mode = RUNNER_ISOLATION_MODE_THREAD,
-    .do_forking = true,
-    .do_cleanup_phase = true,
-    .do_image_dumps = false,
+    .no_fork = false,
+    .no_cleanup_phase = false,
+    .no_image_dumps = true,
     .use_spir_v = false,
     .use_separate_cleanup_threads = true,
 };
@@ -347,10 +347,10 @@ run_test_def(const test_def_t *def)
     if (!test)
         return TEST_RESULT_FAIL;
 
-    if (runner_opts.do_image_dumps)
+    if (runner_opts.no_image_dumps)
         test_enable_dump(test);
 
-    if (!runner_opts.do_cleanup_phase)
+    if (runner_opts.no_cleanup_phase)
         test_disable_cleanup(test);
 
     if (runner_opts.use_spir_v)
@@ -602,12 +602,12 @@ master_loop(void)
 {
     ASSERT_IN_MASTER_PROCESS;
 
-    if (runner_opts.do_forking) {
+    if (runner_opts.no_fork) {
+        master_loop_no_forking();
+    } else {
         set_sigint_handler(master_handle_sigint);
         master_loop_with_forking();
         set_sigint_handler(SIG_DFL);
-    } else {
-        master_loop_no_forking();
     }
 }
 
@@ -618,7 +618,7 @@ runner_run_tests(void)
 {
     ASSERT_MASTER_NOT_RUNNING;
 
-    if (!runner_opts.do_forking
+    if (runner_opts.no_fork
         && runner_opts.isolation_mode == RUNNER_ISOLATION_MODE_THREAD) {
         loge("invalid options for test runner");
         return false;
