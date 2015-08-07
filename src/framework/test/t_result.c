@@ -22,7 +22,7 @@
 #include "test.h"
 #include "t_thread.h"
 
-void cru_noreturn
+noreturn void
 t_end(test_result_t result)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
@@ -35,21 +35,21 @@ t_end(test_result_t result)
     t_thread_release();
 }
 
-void cru_noreturn
+noreturn void
 t_pass(void)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
     t_end(TEST_RESULT_PASS);
 }
 
-void cru_noreturn
+noreturn void
 __t_skip(const char *file, int line)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
     __t_skipf(file, line, NULL);
 }
 
-void cru_noreturn
+void noreturn
 __t_skipf(const char *file, int line, const char *format, ...)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
@@ -61,7 +61,7 @@ __t_skipf(const char *file, int line, const char *format, ...)
     va_end(va);
 }
 
-void cru_noreturn
+noreturn void
 __t_skipfv(const char *file, int line, const char *format, va_list va)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
@@ -84,21 +84,21 @@ __t_skipfv(const char *file, int line, const char *format, va_list va)
     __t_skip_silent();
 }
 
-void cru_noreturn
+noreturn void
 __t_skip_silent(void)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
     t_end(TEST_RESULT_SKIP);
 }
 
-void cru_noreturn
+noreturn void
 __t_fail(const char *file, int line)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
     __t_failf(file, line, NULL);
 }
 
-void cru_noreturn
+noreturn void
 __t_failf(const char *file, int line, const char *format, ...)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
@@ -110,7 +110,7 @@ __t_failf(const char *file, int line, const char *format, ...)
     va_end(va);
 }
 
-void cru_noreturn
+noreturn void
 __t_failfv(const char *file, int line, const char *format, va_list va)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
@@ -133,7 +133,7 @@ __t_failfv(const char *file, int line, const char *format, va_list va)
     __t_fail_silent();
 }
 
-void cru_noreturn
+noreturn void
 __t_fail_silent(void)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;

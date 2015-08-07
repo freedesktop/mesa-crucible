@@ -23,6 +23,7 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stdnoreturn.h>
 
 #include "util/macros.h"
 
@@ -58,8 +59,8 @@ void log_align_tags(bool enable);
     log_internal_error_loc_v(__FILE__, __LINE__, (format), (va))
 
 void __log_finishme(const char *file, int line, const char *format, ...) cru_printflike(3, 4);
-void log_internal_error_loc(const char *file, int line, const char *format, ...) cru_noreturn cru_printflike(3, 4);
-void log_internal_error_loc_v(const char *file, int line, const char *format, va_list va) cru_noreturn;
+noreturn void log_internal_error_loc(const char *file, int line, const char *format, ...) cru_printflike(3, 4);
+noreturn void log_internal_error_loc_v(const char *file, int line, const char *format, va_list va);
 
 #ifdef __cplusplus
 }

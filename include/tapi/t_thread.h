@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <stdnoreturn.h>
+
 /// \brief Start a new test thread.
 ///
 /// The new thread may be a newly created thread or may be an existing thread
@@ -39,7 +41,7 @@ void t_thread_start(void (*start)(void *arg), void *arg);
 /// This call is useful if a thread needs to "exit" early without selecting the
 /// test's result, possibly because it defers the result selection to
 /// a different thread.
-void t_thread_release(void) cru_noreturn;
+noreturn void t_thread_release(void);
 
 /// \brief Yield control to the framework.
 ///

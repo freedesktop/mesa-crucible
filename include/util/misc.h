@@ -25,6 +25,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdnoreturn.h>
 #include <string.h>
 
 #include "util/macros.h"
@@ -47,7 +48,7 @@ typedef int cru_err_t;
 /// \brief Out-of-memory handler.
 ///
 /// Print an error message and exit.
-void cru_oom(void) cru_noreturn;
+noreturn void cru_oom(void);
 
 cru_err_t cru_getenv_bool(const char *name, bool default_, bool *result);
 

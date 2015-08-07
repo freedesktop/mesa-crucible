@@ -19,12 +19,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <stdnoreturn.h>
+
 #include <libgen.h>
-#include <errno.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #include "util/log.h"
 #include "util/misc.h"
@@ -32,7 +34,7 @@
 
 static string_t cru_prefix_path_ = STRING_INIT;
 
-void cru_noreturn
+noreturn void
 cru_oom(void)
 {
     fprintf(stderr, "crucible: out of memory\n");

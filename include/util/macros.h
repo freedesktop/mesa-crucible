@@ -30,7 +30,6 @@ extern "C" {
 #define CRU_VERSION_MAJOR 0
 #define CRU_VERSION_MINOR 1
 
-#define cru_noreturn __attribute__((__noreturn__))
 #define cru_constructor __attribute__((__constructor__))
 #define cru_printflike(a, b) __attribute__((__format__(__printf__, a, b)))
 #define cru_pure __attribute__((__pure__))

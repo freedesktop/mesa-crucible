@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <stdnoreturn.h>
+
 #include "util/macros.h"
 
-void t_enter_next_phase(void) cru_noreturn;
+noreturn void t_enter_next_phase(void);

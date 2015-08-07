@@ -24,7 +24,7 @@
 #include "t_phases.h"
 #include "t_thread.h"
 
-static void cru_noreturn
+static noreturn void
 t_enter_setup_phase(void)
 {
     GET_CURRENT_TEST(t);
@@ -39,7 +39,7 @@ t_enter_setup_phase(void)
     t_enter_next_phase();
 }
 
-static void cru_noreturn
+static noreturn void
 t_enter_main_phase(void)
 {
     GET_CURRENT_TEST(t);
@@ -75,7 +75,7 @@ t_enter_main_phase(void)
     t_thread_release();
 }
 
-static void cru_noreturn
+static noreturn void
 t_enter_precleanup_phase(void)
 {
     GET_CURRENT_TEST(t);
@@ -94,7 +94,7 @@ t_enter_precleanup_phase(void)
     t_enter_next_phase();
 }
 
-static void cru_noreturn
+static noreturn void
 t_unwind_cleanup_stacks(void *ignore)
 {
     GET_CURRENT_TEST(t);
@@ -112,7 +112,7 @@ t_unwind_cleanup_stacks(void *ignore)
     t_enter_next_phase();
 }
 
-static void cru_noreturn
+static noreturn void
 t_enter_cleanup_phase(void)
 {
     GET_CURRENT_TEST(t);
@@ -128,7 +128,7 @@ t_enter_cleanup_phase(void)
     }
 }
 
-static void cru_noreturn
+static noreturn void
 t_enter_stopped_phase(void)
 {
     GET_CURRENT_TEST(t);
@@ -156,7 +156,7 @@ t_enter_stopped_phase(void)
     pthread_exit(NULL);
 }
 
-void cru_noreturn
+noreturn void
 t_enter_next_phase(void)
 {
     GET_CURRENT_TEST(t);

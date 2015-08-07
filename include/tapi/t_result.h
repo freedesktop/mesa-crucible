@@ -26,6 +26,7 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stdnoreturn.h>
 
 #include "util/macros.h"
 
@@ -39,9 +40,9 @@ enum test_result {
 
 void test_result_merge(test_result_t *accum, test_result_t new_result);
 
-void t_end(test_result_t result) cru_noreturn;
+noreturn void t_end(test_result_t result);
 
-void t_pass(void) cru_noreturn;
+noreturn void t_pass(void);
 
 #define t_skip() __t_skip(__FILE__, __LINE__)
 #define t_skipf(format, ...) __t_skipf(__FILE__, __LINE__, format, ##__VA_ARGS__)
@@ -57,15 +58,15 @@ void t_pass(void) cru_noreturn;
 #define t_assertf(cond, format, ...) __t_assertf(__FILE__, __LINE__, (cond), #cond, format, ##__VA_ARGS__)
 #define t_assertfv(cond, format, va) __t_assertfv(__FILE__, __LINE__, (cond), #cond, format, va)
 
-void __t_skip(const char *file, int line) cru_noreturn;
-void __t_skipf(const char *file, int line, const char *format, ...) cru_noreturn cru_printflike(3, 4);
-void __t_skipfv(const char *file, int line, const char *format, va_list va) cru_noreturn;
-void __t_skip_silent(void) cru_noreturn;
+noreturn void __t_skip(const char *file, int line);
+noreturn void __t_skipf(const char *file, int line, const char *format, ...) cru_printflike(3, 4);
+noreturn void __t_skipfv(const char *file, int line, const char *format, va_list va);
+noreturn void __t_skip_silent(void);
 
-void __t_fail(const char *file, int line) cru_noreturn;
-void __t_failf(const char *file, int line, const char *format, ...) cru_noreturn cru_printflike(3, 4);
-void __t_failfv(const char *file, int line, const char *format, va_list va) cru_noreturn;
-void __t_fail_silent(void) cru_noreturn;
+noreturn void __t_fail(const char *file, int line);
+noreturn void __t_failf(const char *file, int line, const char *format, ...) cru_printflike(3, 4);
+noreturn void __t_failfv(const char *file, int line, const char *format, va_list va);
+noreturn void __t_fail_silent(void);
 
 void __t_assert(const char *file, int line, bool cond, const char *cond_string);
 void __t_assertf(const char *file, int line, bool cond, const char *cond_string, const char *format, ...) cru_printflike(5, 6);

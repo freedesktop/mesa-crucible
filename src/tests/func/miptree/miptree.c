@@ -48,6 +48,7 @@
 /// TODO: Test non-square, non-power-of-two image sizes.
 
 #include <math.h>
+#include <stdnoreturn.h>
 
 #include "util/cru_format.h"
 #include "util/misc.h"
@@ -903,7 +904,7 @@ miptree_download(const miptree_t *mt)
     }
 }
 
-static void cru_noreturn
+static noreturn void
 miptree_compare_images(const miptree_t *mt)
 {
     test_result_t result = TEST_RESULT_PASS;

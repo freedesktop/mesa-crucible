@@ -23,7 +23,7 @@
 #include "t_phases.h"
 #include "t_thread.h"
 
-static void * cru_noreturn
+static noreturn void *
 test_thread_start(void *arg)
 {
     ASSERT_NOT_IN_TEST_THREAD;
@@ -124,7 +124,7 @@ t_thread_start(void (*start)(void *arg), void *arg)
         t_failf("%s()", __func__);
 }
 
-void cru_noreturn
+noreturn void
 t_thread_release(void)
 {
     GET_CURRENT_TEST(t);
