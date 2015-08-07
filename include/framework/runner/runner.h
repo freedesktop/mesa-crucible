@@ -26,6 +26,7 @@
 #include "util/cru_vec.h"
 
 typedef enum runner_isolation_mode runner_isolation_mode_t;
+typedef struct runner_opts runner_opts_t;
 
 enum runner_isolation_mode {
     /// The runner will isolate each test in a separate process.
@@ -35,12 +36,16 @@ enum runner_isolation_mode {
     RUNNER_ISOLATION_MODE_THREAD,
 };
 
-extern runner_isolation_mode_t runner_isolation_mode;
-extern bool runner_do_forking;
-extern bool runner_do_cleanup_phase;
-extern bool runner_do_image_dumps;
-extern bool runner_use_spir_v;
-extern bool runner_use_separate_cleanup_threads;
+struct runner_opts {
+    runner_isolation_mode_t isolation_mode;
+    bool do_forking;
+    bool do_cleanup_phase;
+    bool do_image_dumps;
+    bool use_spir_v;
+    bool use_separate_cleanup_threads;
+};
+
+extern runner_opts_t runner_opts;
 
 void runner_enable_cleanup(bool b);
 void runner_enable_image_dumps(bool b);

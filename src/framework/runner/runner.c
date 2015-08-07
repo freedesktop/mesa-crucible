@@ -117,6 +117,15 @@ struct cru_master {
 
 };
 
+runner_opts_t runner_opts = {
+    .isolation_mode = RUNNER_ISOLATION_MODE_THREAD,
+    .do_forking = true,
+    .do_cleanup_phase = true,
+    .do_image_dumps = false,
+    .use_spir_v = false,
+    .use_separate_cleanup_threads = true,
+};
+
 static struct cru_master master = {
     .slaves = {
         { .pid = -1 },
@@ -126,13 +135,6 @@ static struct cru_master master = {
     .pid = 0,
 #endif
 };
-
-runner_isolation_mode_t runner_isolation_mode = RUNNER_ISOLATION_MODE_THREAD;
-bool runner_do_forking = true;
-bool runner_do_cleanup_phase = true;
-bool runner_do_image_dumps = false;
-bool runner_use_spir_v = false;
-bool runner_use_separate_cleanup_threads = true;
 
 static void
 set_sigint_handler(sighandler_t handler)
@@ -345,16 +347,16 @@ run_test_def(const test_def_t *def)
     if (!test)
         return TEST_RESULT_FAIL;
 
-    if (runner_do_image_dumps)
+    if (runner_opts.do_image_dumps)
         test_enable_dump(test);
 
-    if (!runner_do_cleanup_phase)
+    if (!runner_opts.do_cleanup_phase)
         test_disable_cleanup(test);
 
-    if (runner_use_spir_v)
+    if (runner_opts.use_spir_v)
         test_enable_spir_v(test);
 
-    if (!runner_use_separate_cleanup_threads)
+    if (!runner_opts.use_separate_cleanup_threads)
         test_disable_separate_cleanup_thread(test);
 
     test_start(test);
@@ -553,7 +555,7 @@ master_loop_with_forking(void)
         }
 
 
-        switch (runner_isolation_mode) {
+        switch (runner_opts.isolation_mode) {
         case RUNNER_ISOLATION_MODE_PROCESS:
             master_send_dispatch(slave, NULL);
             master_cleanup_slave(slave);
@@ -600,7 +602,7 @@ master_loop(void)
 {
     ASSERT_IN_MASTER_PROCESS;
 
-    if (runner_do_forking) {
+    if (runner_opts.do_forking) {
         set_sigint_handler(master_handle_sigint);
         master_loop_with_forking();
         set_sigint_handler(SIG_DFL);
@@ -616,8 +618,8 @@ runner_run_tests(void)
 {
     ASSERT_MASTER_NOT_RUNNING;
 
-    if (!runner_do_forking
-        && runner_isolation_mode == RUNNER_ISOLATION_MODE_THREAD) {
+    if (!runner_opts.do_forking
+        && runner_opts.isolation_mode == RUNNER_ISOLATION_MODE_THREAD) {
         loge("invalid options for test runner");
         return false;
     }
