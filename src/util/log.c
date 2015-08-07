@@ -41,6 +41,16 @@ log_tag(const char *tag, const char *format, ...)
 }
 
 void
+log_abort(const char *format, ...)
+{
+    va_list va;
+
+    va_start(va, format);
+    log_abort_v(format, va);
+    va_end(va);
+}
+
+void
 loge(const char *format, ...)
 {
     va_list va;
@@ -100,6 +110,13 @@ log_tag_v(const char *tag, const char *format, va_list va)
     printf("\n");
 
     pthread_mutex_unlock(&log_mutex);
+}
+
+void
+log_abort_v(const char *format, va_list va)
+{
+    log_tag_v("abort", format, va);
+    abort();
 }
 
 void

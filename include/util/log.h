@@ -32,12 +32,14 @@ extern "C" {
 #endif
 
 void log_tag(const char *tag, const char *format, ...) printflike(2, 3);
+void log_abort(const char *format, ...) printflike(1, 2);
 void loge(const char *format, ...) printflike(1, 2);
 void logw(const char *format, ...) printflike(1, 2);
 void logi(const char *format, ...) printflike(1, 2);
 void logd(const char *format, ...) printflike(1, 2);
 
 void log_tag_v(const char *tag, const char *format, va_list va);
+void log_abort_v(const char *format, va_list va);
 void loge_v(const char *format, va_list va);
 void logw_v(const char *format, va_list va);
 void logi_v(const char *format, va_list va);
