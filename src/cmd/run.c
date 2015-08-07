@@ -25,7 +25,7 @@
 #include "cmd.h"
 #include "framework/runner/runner.h"
 
-static enum test_isolation opt_isolation = CRU_TEST_ISOLATION_PROCESS;
+static runner_isolation_mode_t opt_isolation = RUNNER_ISOLATION_MODE_PROCESS;
 static int opt_fork = 1;
 static int opt_no_cleanup = 0;
 static int opt_dump = 0;
@@ -89,9 +89,9 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
             break;
         case 'I':
             if (cru_streq(optarg, "p") || cru_streq(optarg, "process")) {
-                opt_isolation = CRU_TEST_ISOLATION_PROCESS;
+                opt_isolation = RUNNER_ISOLATION_MODE_PROCESS;
             } else if (cru_streq(optarg, "t") || cru_streq(optarg, "thread")) {
-                opt_isolation = CRU_TEST_ISOLATION_THREAD;
+                opt_isolation = RUNNER_ISOLATION_MODE_THREAD;
             } else {
                 cru_usage_error(cmd, "invalid value '%s' for --isolation",
                                 argv[optind-1]);
@@ -125,7 +125,7 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
 {
     parse_args(cmd, argc, argv);
 
-    runner_test_isolation = opt_isolation;
+    runner_isolation_mode = opt_isolation;
     runner_do_forking = opt_fork;
     runner_do_cleanup_phase = !opt_no_cleanup;
     runner_use_separate_cleanup_threads = opt_separate_cleanup_thread;

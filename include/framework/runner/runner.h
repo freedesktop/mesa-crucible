@@ -25,15 +25,17 @@
 
 #include "util/cru_vec.h"
 
-enum test_isolation {
-    /// The runner will start each test in a separate process.
-    CRU_TEST_ISOLATION_PROCESS,
+typedef enum runner_isolation_mode runner_isolation_mode_t;
 
-    /// The runner will start each test in a separate thread.
-    CRU_TEST_ISOLATION_THREAD,
+enum runner_isolation_mode {
+    /// The runner will isolate each test in a separate process.
+    RUNNER_ISOLATION_MODE_PROCESS,
+
+    /// The runner will isolate each test in a separate thread.
+    RUNNER_ISOLATION_MODE_THREAD,
 };
 
-extern enum test_isolation runner_test_isolation;
+extern runner_isolation_mode_t runner_isolation_mode;
 extern bool runner_do_forking;
 extern bool runner_do_cleanup_phase;
 extern bool runner_do_image_dumps;

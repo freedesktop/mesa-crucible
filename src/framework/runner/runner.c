@@ -127,7 +127,7 @@ static struct cru_master master = {
 #endif
 };
 
-enum test_isolation runner_test_isolation = CRU_TEST_ISOLATION_THREAD;
+runner_isolation_mode_t runner_isolation_mode = RUNNER_ISOLATION_MODE_THREAD;
 bool runner_do_forking = true;
 bool runner_do_cleanup_phase = true;
 bool runner_do_image_dumps = false;
@@ -553,12 +553,12 @@ master_loop_with_forking(void)
         }
 
 
-        switch (runner_test_isolation) {
-        case CRU_TEST_ISOLATION_PROCESS:
+        switch (runner_isolation_mode) {
+        case RUNNER_ISOLATION_MODE_PROCESS:
             master_send_dispatch(slave, NULL);
             master_cleanup_slave(slave);
             break;
-        case CRU_TEST_ISOLATION_THREAD:
+        case RUNNER_ISOLATION_MODE_THREAD:
             master_drain_result_pipe(slave);
             break;
         }
@@ -617,7 +617,7 @@ runner_run_tests(void)
     ASSERT_MASTER_NOT_RUNNING;
 
     if (!runner_do_forking
-        && runner_test_isolation == CRU_TEST_ISOLATION_THREAD) {
+        && runner_isolation_mode == RUNNER_ISOLATION_MODE_THREAD) {
         loge("invalid options for test runner");
         return false;
     }
