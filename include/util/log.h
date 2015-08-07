@@ -31,11 +31,11 @@
 extern "C" {
 #endif
 
-void log_tag(const char *tag, const char *format, ...) cru_printflike(2, 3);
-void loge(const char *format, ...) cru_printflike(1, 2);
-void logw(const char *format, ...) cru_printflike(1, 2);
-void logi(const char *format, ...) cru_printflike(1, 2);
-void logd(const char *format, ...) cru_printflike(1, 2);
+void log_tag(const char *tag, const char *format, ...) printflike(2, 3);
+void loge(const char *format, ...) printflike(1, 2);
+void logw(const char *format, ...) printflike(1, 2);
+void logi(const char *format, ...) printflike(1, 2);
+void logd(const char *format, ...) printflike(1, 2);
 
 void log_tag_v(const char *tag, const char *format, va_list va);
 void loge_v(const char *format, va_list va);
@@ -58,8 +58,8 @@ void log_align_tags(bool enable);
 #define log_internal_error_v(format, va) \
     log_internal_error_loc_v(__FILE__, __LINE__, (format), (va))
 
-void __log_finishme(const char *file, int line, const char *format, ...) cru_printflike(3, 4);
-noreturn void log_internal_error_loc(const char *file, int line, const char *format, ...) cru_printflike(3, 4);
+void __log_finishme(const char *file, int line, const char *format, ...) printflike(3, 4);
+noreturn void log_internal_error_loc(const char *file, int line, const char *format, ...) printflike(3, 4);
 noreturn void log_internal_error_loc_v(const char *file, int line, const char *format, va_list va);
 
 #ifdef __cplusplus

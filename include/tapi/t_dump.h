@@ -50,8 +50,7 @@ void t_dump_seq_image(cru_image_t *image);
 ///
 /// The image's full filename is "{testname}.{format}".
 /// This function is a no-op if image dumping is disabled on the cmdline.
-void t_dump_image_f(cru_image_t *image, const char *format, ...)
-    cru_printflike(2, 3);
+void t_dump_image_f(cru_image_t *image, const char *format, ...) printflike(2, 3);
 
 /// \copydoc t_image_dump_f()
 void t_dump_image_fv(cru_image_t *image, const char *format, va_list va);

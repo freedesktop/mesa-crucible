@@ -59,15 +59,15 @@ noreturn void t_pass(void);
 #define t_assertfv(cond, format, va) __t_assertfv(__FILE__, __LINE__, (cond), #cond, format, va)
 
 noreturn void __t_skip(const char *file, int line);
-noreturn void __t_skipf(const char *file, int line, const char *format, ...) cru_printflike(3, 4);
+noreturn void __t_skipf(const char *file, int line, const char *format, ...) printflike(3, 4);
 noreturn void __t_skipfv(const char *file, int line, const char *format, va_list va);
 noreturn void __t_skip_silent(void);
 
 noreturn void __t_fail(const char *file, int line);
-noreturn void __t_failf(const char *file, int line, const char *format, ...) cru_printflike(3, 4);
+noreturn void __t_failf(const char *file, int line, const char *format, ...) printflike(3, 4);
 noreturn void __t_failfv(const char *file, int line, const char *format, va_list va);
 noreturn void __t_fail_silent(void);
 
 void __t_assert(const char *file, int line, bool cond, const char *cond_string);
-void __t_assertf(const char *file, int line, bool cond, const char *cond_string, const char *format, ...) cru_printflike(5, 6);
+void __t_assertf(const char *file, int line, bool cond, const char *cond_string, const char *format, ...) printflike(5, 6);
 void __t_assertfv(const char *file, int line, bool cond, const char *cond_string, const char *format, va_list va);

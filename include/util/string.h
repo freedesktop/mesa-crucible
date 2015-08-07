@@ -134,7 +134,7 @@ string_set_len(string_t *s, size_t len)
 }
 
 void string_finish(string_t *s);
-string_t *string_new(void) cru_malloclike;
+malloclike string_t *string_new(void);
 void string_free(string_t *s);
 void string_make_long(string_t *s);
 void string_truncate(string_t *s, size_t len);
@@ -157,9 +157,9 @@ bool string_endswith(const string_t *s, const string_t *tail);
 bool string_endswith_cstr(const string_t *s, const char *tail);
 int64_t string_rfind_char(const string_t *s, char c);
 void string_rstrip_char(string_t *s, char c);
-void string_printf(string_t *s, const char *format, ...) cru_printflike(2, 3);
+void string_printf(string_t *s, const char *format, ...) printflike(2, 3);
 void string_vprintf(string_t *s, const char *format, va_list va);
-void string_appendf(string_t *s, const char *format, ...) cru_printflike(2, 3);
+void string_appendf(string_t *s, const char *format, ...) printflike(2, 3);
 void string_vappendf(string_t *s, const char *format, va_list va);
 
 bool path_is_abs(const string_t *path);

@@ -45,7 +45,7 @@ cru_find_command(const char *name)
     return NULL;
 }
 
-noreturn void cru_printflike(2, 3)
+noreturn void printflike(2, 3)
 cru_usage_error(const cru_command_t *cmd, const char *format, ...)
 {
     va_list va;

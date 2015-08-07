@@ -38,7 +38,7 @@ xmallocn(size_t n, size_t size)
 {
     size_t total_size;
 
-    if (!cru_unlikely(cru_mul_size_checked(&total_size, n, size)))
+    if (!unlikely(cru_mul_size_checked(&total_size, n, size)))
         cru_oom();
 
     return xmalloc(total_size);
@@ -58,7 +58,7 @@ xreallocn(void *mem, size_t n, size_t size)
 {
     size_t total_size;
 
-    if (!cru_unlikely(cru_mul_size_checked(&total_size, n, size)))
+    if (!unlikely(cru_mul_size_checked(&total_size, n, size)))
         cru_oom();
 
     return xrealloc(mem, total_size);
@@ -78,7 +78,7 @@ xzallocn(size_t n, size_t size)
 {
     size_t total_size;
 
-    if (!cru_unlikely(cru_mul_size_checked(&total_size, n, size)))
+    if (!unlikely(cru_mul_size_checked(&total_size, n, size)))
         cru_oom();
 
     return xzalloc(total_size);

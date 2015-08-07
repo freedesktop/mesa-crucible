@@ -147,7 +147,7 @@ __t_assert(const char *file, int line, bool cond, const char *cond_string)
     __t_assertf(file, line, cond, cond_string, NULL);
 }
 
-void cru_printflike(5, 6)
+void printflike(5, 6)
 __t_assertf(const char *file, int line, bool cond, const char *cond_string,
             const char *format, ...)
 {

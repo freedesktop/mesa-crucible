@@ -47,7 +47,7 @@ t_dump_seq_image(cru_image_t *image)
     cru_image_write_file(image, string_data(&filename));
 }
 
-void cru_printflike(2, 3)
+void printflike(2, 3)
 t_dump_image_f(cru_image_t *image, const char *format, ...)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;

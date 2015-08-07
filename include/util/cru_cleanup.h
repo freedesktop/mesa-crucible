@@ -71,7 +71,7 @@ enum cru_cleanup_cmd {
     CRU_CLEANUP_CMD_VK_SHADER_MODULE,
 };
 
-cru_cleanup_stack_t* cru_cleanup_create(void) cru_malloclike;
+malloclike cru_cleanup_stack_t* cru_cleanup_create(void);
 void cru_cleanup_reference(cru_cleanup_stack_t *c);
 void cru_cleanup_release(cru_cleanup_stack_t *c);
 void cru_cleanup_push_command(cru_cleanup_stack_t *c, enum cru_cleanup_cmd cmd, ...);

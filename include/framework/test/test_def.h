@@ -36,13 +36,13 @@ extern test_def_t __start_test_defs, __stop_test_defs;
         def < &__stop_test_defs; ++def)
 
 
-static inline uint64_t cru_pure
+static pure inline uint64_t
 test_def_get_id(const test_def_t *def)
 {
     return def - &__start_test_defs;
 }
 
-static inline test_def_t * cru_pure
+static pure inline test_def_t *
 test_def_from_id(uint64_t id)
 {
     test_def_t *def = &__start_test_defs + id;

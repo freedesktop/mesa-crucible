@@ -39,7 +39,7 @@ string_finish(string_t *s)
     }
 }
 
-string_t * cru_malloclike
+malloclike string_t *
 string_new(void)
 {
     string_t *s = xmalloc(sizeof(*s));
@@ -134,7 +134,7 @@ string_grow_to_len(string_t *s, size_t len)
     }
 
     while (new_cap < len + 1) {
-        if (cru_unlikely(new_cap > SIZE_MAX / 2)) {
+        if (unlikely(new_cap > SIZE_MAX / 2)) {
             cru_oom();
         }
         new_cap *= 2;
@@ -308,7 +308,7 @@ string_rstrip_char(string_t *s, char c)
 }
 
 /// Like sprintf, but resized the string as needed.
-void cru_printflike(2, 3)
+void printflike(2, 3)
 string_printf(string_t *s, const char *format, ...)
 {
     va_list va;
@@ -326,7 +326,7 @@ string_vprintf(string_t *s, const char *format, va_list va)
 }
 
 /// Like string_printf(), but appends to rather than replaces the string.
-void cru_printflike(2, 3)
+void printflike(2, 3)
 string_appendf(string_t *s, const char *format, ...)
 {
     va_list va;
