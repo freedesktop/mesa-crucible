@@ -347,7 +347,7 @@ run_test_def(const test_def_t *def)
     if (!test)
         return TEST_RESULT_FAIL;
 
-    if (runner_opts.no_image_dumps)
+    if (!runner_opts.no_image_dumps)
         test_enable_dump(test);
 
     if (runner_opts.no_cleanup_phase)
