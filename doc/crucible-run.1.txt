@@ -10,7 +10,7 @@ SYNOPSIS
 --------
 [verse]
 *crucible run* [--fork|--no-fork] [--no-cleanup] [--dump|--no-dump]
-               [--[no-]separate-cleanup-threads]
+               [--jobs=<jobs> | -j <jobs>] [--[no-]separate-cleanup-threads]
                [--isolation=<method> | -I <method>]
                [<pattern>...]
 
@@ -37,6 +37,9 @@ OPTIONS
 
 --dump, --no-dump [default: disabled]::
     Dump (or disable dumping) test images into Crucible's data directory.
+
+-j <jobs>, --jobs=<jobs>::
+    Number of tests to run simultaneously. Similar to GNU Make's -j option.
 
 -I <method>, --isolation=<method> [default: method=process]::
     Select the method the runner uses to isolate tests. The runner will start

@@ -19,42 +19,61 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#pragma once
+#include "runner.h"
+#include "slave.h"
 
-#include <stdbool.h>
-#include <stdint.h>
+static cru_pipe_t *dispatch_pipe;
+static cru_pipe_t *result_pipe;
 
-#include "util/cru_vec.h"
+/// Return NULL if the pipe is empty or has errors.
+static const test_def_t *
+slave_recv_test(void)
+{
+    dispatch_packet_t pk;
 
-typedef enum runner_isolation_mode runner_isolation_mode_t;
-typedef struct runner_opts runner_opts_t;
+    if (!cru_pipe_atomic_read(dispatch_pipe, &pk))
+        return false;
 
-enum runner_isolation_mode {
-    /// The runner will isolate each test in a separate process.
-    RUNNER_ISOLATION_MODE_PROCESS,
+    return pk.test_def;
+}
 
-    /// The runner will isolate each test in a separate thread.
-    RUNNER_ISOLATION_MODE_THREAD,
-};
+/// Return false on failure.
+static bool
+slave_send_result(const test_def_t *def, test_result_t result)
+{
+    const result_packet_t pk = {
+        .test_def = def,
+        .result = result,
+    };
 
-struct runner_opts {
-    /// Number of tests to run simultaneously. Similar to GNU Make's -j
-    /// option.
-    uint32_t jobs;
+    return cru_pipe_atomic_write(result_pipe, &pk);
+}
 
-    runner_isolation_mode_t isolation_mode;
-    bool no_fork;
-    bool no_cleanup_phase;
-    bool no_image_dumps;
-    bool use_spir_v;
-    bool use_separate_cleanup_threads;
-};
+static void
+slave_loop(void)
+{
+    const test_def_t *def;
 
-extern runner_opts_t runner_opts;
+    for (;;) {
+        test_result_t result;
 
-void runner_enable_cleanup(bool b);
-void runner_enable_image_dumps(bool b);
-void runner_enable_spir_v(bool b);
-void runner_enable_all_nonexample_tests(void);
-void runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs);
-bool runner_run_tests(void);
+        def = slave_recv_test();
+        if (!def)
+            return;
+
+        result = run_test_def(def);
+        slave_send_result(def, result);
+    }
+}
+
+void
+slave_run(cru_pipe_t *_dispatch_pipe, cru_pipe_t *_result_pipe)
+{
+    assert(!dispatch_pipe);
+    assert(!result_pipe);
+
+    dispatch_pipe = _dispatch_pipe;
+    result_pipe = _result_pipe;
+
+    slave_loop();
+}

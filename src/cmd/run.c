@@ -19,6 +19,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
+#include <stdlib.h>
+#include <unistd.h>
+
 #include "util/misc.h"
 #include "util/cru_vec.h"
 
@@ -26,6 +29,7 @@
 #include "framework/runner/runner.h"
 
 static runner_isolation_mode_t opt_isolation = RUNNER_ISOLATION_MODE_PROCESS;
+static int opt_jobs = 0;
 static int opt_fork = 1;
 static int opt_no_cleanup = 0;
 static int opt_dump = 0;
@@ -44,10 +48,11 @@ static int opt_separate_cleanup_thread = 1;
 //    above) of optstring is a colon (':'),  then getopt() returns ':' instead
 //    of '?' to indicate a missing option argument.
 //
-static const char *shortopts = "+:hI:";
+static const char *shortopts = "+:hj:I:";
 
 static const struct option longopts[] = {
     {"help",          no_argument,       NULL,           'h'},
+    {"jobs",          required_argument, NULL,           'j'},
     {"isolation",     required_argument, NULL,           'I'},
     {"fork",          no_argument,       &opt_fork,       true},
     {"no-fork",       no_argument,       &opt_fork,       false},
@@ -63,6 +68,27 @@ static const struct option longopts[] = {
 };
 
 static cru_cstr_vec_t test_patterns = CRU_VEC_INIT;
+
+static bool
+parse_i32(const char *str, int32_t *i32)
+{
+    char *endptr;
+    long l;
+
+    if (str[0] == 0)
+        return false;
+
+    l = strtol(str, &endptr, 10);
+    if (endptr[0] != 0) {
+        // Entire string was not parsed.
+        return false;
+    } else if (l < INT32_MIN || l > INT32_MAX) {
+        return false;
+    }
+
+    *i32 = l;
+    return true;
+}
 
 static void
 parse_args(const cru_command_t *cmd, int argc, char **argv)
@@ -86,6 +112,14 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
         case 'h':
             cru_command_page_help(cmd);
             exit(0);
+            break;
+        case 'j':
+            if (!parse_i32(optarg, &opt_jobs)) {
+                cru_usage_error(cmd, "invalid value for --jobs");
+            }
+            if (opt_jobs <= 0) {
+                cru_usage_error(cmd, "--jobs must be positive");
+            }
             break;
         case 'I':
             if (cru_streq(optarg, "p") || cru_streq(optarg, "process")) {
@@ -120,12 +154,26 @@ done_getopt:
     }
 }
 
+static uint32_t
+get_jobs(void)
+{
+    if (opt_jobs == 0) {
+        opt_jobs = sysconf(_SC_NPROCESSORS_ONLN);
+        if (opt_jobs == -1)
+            return 1;
+    }
+
+    return opt_jobs;
+}
+
+
 static int
 cmd_start(const cru_command_t *cmd, int argc, char **argv)
 {
     parse_args(cmd, argc, argv);
 
     runner_opts.isolation_mode = opt_isolation;
+    runner_opts.jobs = get_jobs();
     runner_opts.no_fork = !opt_fork;
     runner_opts.no_cleanup_phase = opt_no_cleanup;
     runner_opts.use_separate_cleanup_threads = opt_separate_cleanup_thread;

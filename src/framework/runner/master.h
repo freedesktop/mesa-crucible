@@ -24,37 +24,4 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "util/cru_vec.h"
-
-typedef enum runner_isolation_mode runner_isolation_mode_t;
-typedef struct runner_opts runner_opts_t;
-
-enum runner_isolation_mode {
-    /// The runner will isolate each test in a separate process.
-    RUNNER_ISOLATION_MODE_PROCESS,
-
-    /// The runner will isolate each test in a separate thread.
-    RUNNER_ISOLATION_MODE_THREAD,
-};
-
-struct runner_opts {
-    /// Number of tests to run simultaneously. Similar to GNU Make's -j
-    /// option.
-    uint32_t jobs;
-
-    runner_isolation_mode_t isolation_mode;
-    bool no_fork;
-    bool no_cleanup_phase;
-    bool no_image_dumps;
-    bool use_spir_v;
-    bool use_separate_cleanup_threads;
-};
-
-extern runner_opts_t runner_opts;
-
-void runner_enable_cleanup(bool b);
-void runner_enable_image_dumps(bool b);
-void runner_enable_spir_v(bool b);
-void runner_enable_all_nonexample_tests(void);
-void runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs);
-bool runner_run_tests(void);
+bool master_run(uint32_t num_tests);

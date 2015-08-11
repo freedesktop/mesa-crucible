@@ -22,39 +22,44 @@
 #pragma once
 
 #include <stdbool.h>
-#include <stdint.h>
 
-#include "util/cru_vec.h"
+#include "framework/runner/runner.h"
+#include "framework/test/test.h"
+#include "framework/test/test_def.h"
 
-typedef enum runner_isolation_mode runner_isolation_mode_t;
-typedef struct runner_opts runner_opts_t;
+typedef union cru_pipe cru_pipe_t;
+typedef struct dispatch_packet dispatch_packet_t;
+typedef struct result_packet result_packet_t;
 
-enum runner_isolation_mode {
-    /// The runner will isolate each test in a separate process.
-    RUNNER_ISOLATION_MODE_PROCESS,
+union cru_pipe {
+    int fd[2];
 
-    /// The runner will isolate each test in a separate thread.
-    RUNNER_ISOLATION_MODE_THREAD,
+    struct {
+        int read_fd;
+        int write_fd;
+    };
 };
 
-struct runner_opts {
-    /// Number of tests to run simultaneously. Similar to GNU Make's -j
-    /// option.
-    uint32_t jobs;
-
-    runner_isolation_mode_t isolation_mode;
-    bool no_fork;
-    bool no_cleanup_phase;
-    bool no_image_dumps;
-    bool use_spir_v;
-    bool use_separate_cleanup_threads;
+struct dispatch_packet {
+    const test_def_t *test_def;
 };
 
-extern runner_opts_t runner_opts;
+struct result_packet {
+    const test_def_t *test_def;
+    test_result_t result;
+};
 
-void runner_enable_cleanup(bool b);
-void runner_enable_image_dumps(bool b);
-void runner_enable_spir_v(bool b);
-void runner_enable_all_nonexample_tests(void);
-void runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs);
-bool runner_run_tests(void);
+bool cru_pipe_init(cru_pipe_t *p);
+void cru_pipe_finish(cru_pipe_t *p);
+bool cru_pipe_become_reader(cru_pipe_t *p);
+bool cru_pipe_become_writer(cru_pipe_t *p);
+bool cru_pipe_atomic_write_n(const cru_pipe_t *p, const void *data, size_t n);
+bool cru_pipe_atomic_read_n(const cru_pipe_t *p, void *data, size_t n);
+
+#define cru_pipe_atomic_write(p, data) \
+    cru_pipe_atomic_write_n((p), (data), sizeof(*(data)))
+
+#define cru_pipe_atomic_read(p, data) \
+    cru_pipe_atomic_read_n((p), (data), sizeof(*(data)))
+
+test_result_t run_test_def(const test_def_t *def);
