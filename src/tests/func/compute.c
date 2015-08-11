@@ -107,7 +107,7 @@ test(void)
         .borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK);
 
     vkUpdateDescriptorSets(t_device,
-        2, /* writeCount */
+        /*writeCount*/ 2,
         (VkWriteDescriptorSet[]) {
             {
                 .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,

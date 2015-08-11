@@ -1,44 +1,41 @@
-/*
- * Copyright 2015 Intel Corporation
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice (including the next
- * paragraph) shall be included in all copies or substantial portions of the
- * Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- */
+// Copyright 2015 Intel Corporation
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice (including the next
+// paragraph) shall be included in all copies or substantial portions of the
+// Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+// IN THE SOFTWARE.
 
 #include <stdio.h>
 #include "tapi/t.h"
 
 #include "lots-of-surface-state-spirv.h"
 
-/* This file implements a test that pokes a particular aspect of the Intel
- * open-source vulkan driver.  In particular, the Intel hardware has a
- * maximum 16 bits in which to store the binding table offsets so all
- * binding tables must be placed in the first 64K relative to the surface
- * state base address.  This test creates a single command buffer that uses
- * more than 64K worth of binding tablees while consuming a very small
- * amount of actual batch buffer space.
- */
+// This file implements a test that pokes a particular aspect of the Intel
+// open-source vulkan driver.  In particular, the Intel hardware has a
+// maximum 16 bits in which to store the binding table offsets so all
+// binding tables must be placed in the first 64K relative to the surface
+// state base address.  This test creates a single command buffer that uses
+// more than 64K worth of binding tablees while consuming a very small
+// amount of actual batch buffer space.
 
 static void
 test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
 {
-    /* Create the descriptor set layout. */
+    //  Create the descriptor set layout.
     VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
             .count = 1,
             .pBinding = (VkDescriptorSetLayoutBinding[]) {
@@ -117,7 +114,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
 
     qoBindBufferMemory(t_device, vbo, vbo_mem, /*offset*/ 0);
 
-    /* Fill the VBO with 2D coordinates. One per pixel in a 32x32 image */
+    // Fill the VBO with 2D coordinates. One per pixel in a 32x32 image.
     for (int x = 0; x < 32; x++) {
         for (int y = 0; y < 32; y++) {
             vbo_map[2 * (y * 32 + x) + 0] = (x + 0.5) / 16.0 - 1.0;
@@ -127,10 +124,9 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
 
     srand(0);
 
-    /* Fill the first 1024 floats in the UBO with random numbers in the
-     * range [-1, 2].  Why that range?  Some are negative but it's centered
-     * around 0.5.  In other words, it seemed good at the time.
-     */
+    // Fill the first 1024 floats in the UBO with random numbers in the
+    // range [-1, 2].  Why that range?  Some are negative but it's centered
+    // around 0.5.  In other words, it seemed good at the time.
     for (int i = 0; i < 1024; i++) {
         ubo_map[i] = ((float)rand() / RAND_MAX) * 3 - 1;
     }
@@ -191,7 +187,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
         desc_info[i] = (VkDescriptorInfo) { .bufferView = ubo_view };
 
     vkUpdateDescriptorSets(t_device,
-        1, /* writeCount */
+        /*writeCount*/ 1,
         (VkWriteDescriptorSet[]) {
             {
                 .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
@@ -207,10 +203,9 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
     for (int i = 0; i < 1024; i++) {
         uint32_t offsets[12];
 
-        /* Compute the offsets and the extra data value.  These are
-         * computed so that the sum of the first 6 UBO entries will be zero
-         * and the sum of the second 6 will be one.
-         */
+        // Compute the offsets and the extra data value.  These are
+        // computed so that the sum of the first 6 UBO entries will be zero
+        // and the sum of the second 6 will be one.
         float sum = 0;
         for (int j = 0; j < 5; j++) {
             int idx = rand() % 1024;
@@ -218,7 +213,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
             sum += ubo_map[idx];
         }
 
-        /* The first batch should sum to zero */
+        // The first batch should sum to zero.
         ubo_map[1024 + i * 2 + 0] = 0 - sum;
         offsets[5] = (1024 + i * 2 + 0) * sizeof(float);
 
@@ -229,7 +224,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
             sum += ubo_map[idx];
         }
 
-        /* The second batch should sum to one */
+        // The second batch should sum to one.
         ubo_map[1024 + i * 2 + 1] = 1 - sum;
         offsets[11] = (1024 + i * 2 + 1) * sizeof(float);
 
@@ -303,7 +298,7 @@ test_lots_of_surface_state_fs(void)
         }
     );
 
-    /* The fragment shader takes 12 UBOs */
+    // The fragment shader takes 12 UBOs.
     VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
         out vec4 f_color;
         layout(set = 0, binding =  0) uniform block0  { float f; } u0;

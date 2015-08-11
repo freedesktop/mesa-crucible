@@ -160,7 +160,7 @@ test(void)
     memcpy(map + vertex_offset, vertex_data, sizeof(vertex_data));
 
     vkUpdateDescriptorSets(t_device,
-        1, /* writeCount */
+        /*writeCount*/ 1,
         (VkWriteDescriptorSet[]) {
             {
                 .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,

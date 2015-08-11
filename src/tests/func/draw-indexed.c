@@ -151,13 +151,13 @@ test(void)
                            (VkBuffer[]) { buffer, buffer },
                            (VkDeviceSize[]) { 0, sizeof(vertex_data.vertices) });
 
-    /* Tests uint16 index type */
+    // Tests uint16 index type
     uint16_t index_data16[] = { 50, 101, 102, 103, 104, 105, 106, 107 };
     memcpy(map + 1024, index_data16, sizeof(index_data16));
     vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024, VK_INDEX_TYPE_UINT16);
 
-    /* Tests instanced, index rendering with negative base vertex and non-zero
-     * start index. */
+    // Tests instanced, index rendering with negative base vertex and non-zero
+    // start index.
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
     vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 0, 2);
 
@@ -165,11 +165,11 @@ test(void)
     memcpy(map + 1024 + 64, index_data16_restart, sizeof(index_data16_restart));
     vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024 + 64, VK_INDEX_TYPE_UINT16);
 
-    /* Tests restart index */
+    // Tests restart index
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, restart_pipeline);
     vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 2, 1);
 
-    /* Tests uint32 index type */
+    // Tests uint32 index type
     uint32_t index_data32[] = { 50, 101, 102, 103, ~0, 105, 106, 107 };
     memcpy(map + 1024 + 128, index_data32, sizeof(index_data32));
     vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024 + 128, VK_INDEX_TYPE_UINT32);
