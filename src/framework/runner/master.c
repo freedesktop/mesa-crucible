@@ -136,6 +136,7 @@ static void master_kill_all_slaves(void);
 
 static void master_init_epoll(void);
 static void master_finish_epoll(void);
+static bool master_epoll_add_slave_pipe(slave_pipe_t *pipe, int rw);
 
 static void master_handle_epoll_event(const struct epoll_event *event);
 static void master_handle_pipe_event(const struct epoll_event *event);
@@ -376,7 +377,6 @@ static slave_t *
 master_get_new_slave(void)
 {
     slave_t *slave;
-    int err;
 
     if (master.goto_next_phase)
         return NULL;
@@ -423,17 +423,8 @@ master_get_new_slave(void)
     if (!slave_pipe_become_reader(&slave->result_pipe))
         goto fail;
 
-    err = epoll_ctl(master.epoll_fd, EPOLL_CTL_ADD, slave->result_pipe.read_fd,
-                    &(struct epoll_event) {
-                        .events = EPOLLIN,
-                        .data = {
-                            .ptr = &slave->result_pipe,
-                        },
-                    });
-    if (err == -1) {
-        loge("runner failed to add slave process's pipe to epoll fd");
+    if (!master_epoll_add_slave_pipe(&slave->result_pipe, 0))
         goto fail;
-    }
 
     ++master.num_slaves;
 
@@ -643,6 +634,26 @@ master_finish_epoll(void)
     sigemptyset(&sigset);
     sigaddset(&sigset, SIGCHLD);
     sigprocmask(SIG_UNBLOCK, &sigset, NULL);
+}
+
+static bool
+master_epoll_add_slave_pipe(slave_pipe_t *pipe, int rw)
+{
+    int err;
+
+    assert(rw == 0 || rw == 1);
+
+    err = epoll_ctl(master.epoll_fd, EPOLL_CTL_ADD, pipe->fd[rw],
+                    &(struct epoll_event) {
+                        .events = EPOLLIN,
+                        .data = { .ptr = pipe },
+                    });
+    if (err == -1) {
+        loge("runner failed to add a slave pipe to epoll fd");
+        return false;
+    }
+
+    return true;
 }
 
 static void
