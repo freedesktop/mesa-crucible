@@ -316,7 +316,7 @@ miptree_create(void)
     qoBindBufferMemory(t_device, dest_buffer, dest_buffer_mem, /*offset*/ 0);
 
     miptree_t *mt = xzalloc(sizeof(*mt) + num_slices * sizeof(mt->slices[0]));
-    t_cleanup_push_callback(free, mt);
+    t_cleanup_push_free(mt);
 
     mt->image = image;
     mt->src_buffer = src_buffer;

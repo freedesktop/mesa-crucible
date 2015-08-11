@@ -52,7 +52,7 @@ test_copy_ref_image(void)
     const uint32_t height = t_height;
 
     uint32_t *copy_pixels = xmalloc(4 * width * height);
-    t_cleanup_push(free, copy_pixels);
+    t_cleanup_push_free(copy_pixels);
 
     cru_image_t *copy_image = cru_image_from_pixels(copy_pixels,
                                                     VK_FORMAT_R8G8B8A8_UNORM,
@@ -80,6 +80,8 @@ test_dump_seq_images(void)
     const uint32_t height = 16;
 
     void *pixels = xmalloc(4 * width * height);
+    t_cleanup_push_free(pixels);
+
     cru_image_t *img = cru_image_from_pixels(pixels, VK_FORMAT_R8G8B8A8_UNORM,
                                              width, height);
     t_cleanup_push(img);
