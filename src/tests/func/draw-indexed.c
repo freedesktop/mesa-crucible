@@ -23,6 +23,15 @@
 
 #include "draw-indexed-spirv.h"
 
+struct params {
+    const void *index_data;
+    size_t index_data_size;
+    bool use_restart;
+    uint32_t start_instance;
+    uint32_t num_instances;
+    VkIndexType index_type;
+};
+
 static void
 test(void)
 {
@@ -151,36 +160,74 @@ test(void)
                            (VkBuffer[]) { buffer, buffer },
                            (VkDeviceSize[]) { 0, sizeof(vertex_data.vertices) });
 
-    // Tests uint16 index type
-    uint16_t index_data16[] = { 50, 101, 102, 103, 104, 105, 106, 107 };
-    memcpy(map + 1024, index_data16, sizeof(index_data16));
-    vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024, VK_INDEX_TYPE_UINT16);
+    const struct params *params = t_user_data;
+    memcpy(map + 1024, params->index_data, params->index_data_size);
+    vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024, params->index_type);
+
+    if (params->use_restart)
+        vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, restart_pipeline);
+    else
+        vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
     // Tests instanced, index rendering with negative base vertex and non-zero
     // start index.
-    vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-    vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 0, 2);
 
-    uint16_t index_data16_restart[] = { 50, 101, 102, 103, ~0, 105, 106, 107 };
-    memcpy(map + 1024 + 64, index_data16_restart, sizeof(index_data16_restart));
-    vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024 + 64, VK_INDEX_TYPE_UINT16);
+    const uint32_t first_index = 1;
+    const uint32_t vertex_count = 7;
+    const int32_t vertex_offset = -1;
 
-    // Tests restart index
-    vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, restart_pipeline);
-    vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 2, 1);
-
-    // Tests uint32 index type
-    uint32_t index_data32[] = { 50, 101, 102, 103, ~0, 105, 106, 107 };
-    memcpy(map + 1024 + 128, index_data32, sizeof(index_data32));
-    vkCmdBindIndexBuffer(t_cmd_buffer, buffer, 1024 + 128, VK_INDEX_TYPE_UINT32);
-    vkCmdDrawIndexed(t_cmd_buffer, 1, 7, -1, 3, 1);
+    vkCmdDrawIndexed(t_cmd_buffer, first_index, vertex_count, vertex_offset,
+                     params->start_instance, params->num_instances);
 
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
 }
 
+// Tests uint16 index type
+static const uint16_t index_data16[] = { 50, 101, 102, 103, 104, 105, 106, 107 };
+
 test_define {
-    .name = "func.draw-indexed",
-    .start = test
+    .name = "func.draw-index16",
+    .start = test,
+    .user_data = &(struct params) {
+        .index_data = index_data16,
+        .index_data_size = sizeof(index_data16),
+        .use_restart = false,
+        .start_instance = 0,
+        .num_instances = 2,
+        .index_type = VK_INDEX_TYPE_UINT16
+    }
+};
+
+// Tests restart index
+static const uint16_t index_data16_restart[] = { 50, 101, 102, 103, ~0, 105, 106, 107 };
+
+test_define {
+    .name = "func.draw-index16-restart",
+    .start = test,
+    .user_data = &(struct params) {
+        .index_data = index_data16_restart,
+        .index_data_size = sizeof(index_data16_restart),
+        .use_restart = true,
+        .start_instance = 2,
+        .num_instances = 1,
+        .index_type = VK_INDEX_TYPE_UINT16
+    }
+};
+
+// Tests uint32 index type
+static const uint32_t index_data32_restart[] = { 50, 101, 102, 103, ~0, 105, 106, 107 };
+
+test_define {
+    .name = "func.draw-index32-restart",
+    .start = test,
+    .user_data = &(struct params) {
+        .index_data = index_data32_restart,
+        .index_data_size = sizeof(index_data32_restart),
+        .use_restart = true,
+        .start_instance = 3,
+        .num_instances = 1,
+        .index_type = VK_INDEX_TYPE_UINT32
+    }
 };
