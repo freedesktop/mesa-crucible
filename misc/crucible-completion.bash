@@ -24,6 +24,7 @@ __crucible_run()
       --separate-cleanup-threads
       --no-separate-cleanup-threads
       -I --isolation
+      -j --jobs
       --dump
       --no-dump
       --no-cleanup
