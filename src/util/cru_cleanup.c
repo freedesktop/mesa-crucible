@@ -60,6 +60,10 @@ struct cmd_callback {
     void *data;
 };
 
+struct cmd_free {
+    void *data;
+};
+
 struct cmd_cru_cleanup_stack {
     cru_cleanup_stack_t *cleanup;
 };
@@ -273,6 +277,11 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
         case CRU_CLEANUP_CMD_CALLBACK: {
             CMD_CREATE(struct cmd_callback);
             CMD_SET(func);
+            CMD_SET(data);
+            break;
+        }
+        case CRU_CLEANUP_CMD_FREE: {
+            CMD_CREATE(struct cmd_free);
             CMD_SET(data);
             break;
         }
@@ -504,6 +513,11 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
         case CRU_CLEANUP_CMD_CALLBACK: {
             CMD_GET(struct cmd_callback);
             cmd->func(cmd->data);
+            break;
+        }
+        case CRU_CLEANUP_CMD_FREE: {
+            CMD_GET(struct cmd_free);
+            free(cmd->data);
             break;
         }
 

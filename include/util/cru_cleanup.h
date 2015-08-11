@@ -37,6 +37,7 @@ typedef void (*cru_cleanup_callback_func_t)(void *data);
 
 enum cru_cleanup_cmd {
     CRU_CLEANUP_CMD_CALLBACK,
+    CRU_CLEANUP_CMD_FREE,
     CRU_CLEANUP_CMD_CRU_CLEANUP_STACK,
     CRU_CLEANUP_CMD_CRU_IMAGE,
     CRU_CLEANUP_CMD_VK_ATTACHMENT_VIEW,
@@ -93,6 +94,7 @@ void cru_cleanup_push(cru_cleanup_stack_t *t, T obj, ...);
 #endif
 
 static inline void cru_cleanup_push_callback(cru_cleanup_stack_t *c, cru_cleanup_callback_func_t func, void *data)                          { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_CALLBACK,                         func, data); }
+static inline void cru_cleanup_push_free(cru_cleanup_stack_t *c, void *data)                                                                { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_FREE,                             data); }
 static inline void cru_cleanup_push_cru_cleanup_stack(cru_cleanup_stack_t *c, cru_cleanup_stack_t *x)                                       { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_CRU_CLEANUP_STACK,                x); }
 static inline void cru_cleanup_push_cru_image(cru_cleanup_stack_t *c, cru_image_t *x)                                                       { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_CRU_IMAGE,                        x); }
 
