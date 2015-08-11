@@ -19,11 +19,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
+#include <limits.h>
+
+#include <fcntl.h>
+#include <unistd.h>
+
 #include "runner.h"
 #include "slave.h"
 
-static cru_pipe_t *dispatch_pipe;
-static cru_pipe_t *result_pipe;
+static int dispatch_fd;
+static int result_fd;
 
 /// Return NULL if the pipe is empty or has errors.
 static const test_def_t *
@@ -31,13 +36,15 @@ slave_recv_test(void)
 {
     dispatch_packet_t pk;
 
-    if (!cru_pipe_atomic_read(dispatch_pipe, &pk))
+    static_assert(sizeof(pk) <= PIPE_BUF, "dispatch packets will not be read "
+                  "and written atomically");
+
+    if (read(dispatch_fd, &pk, sizeof(pk)) != sizeof(pk))
         return false;
 
     return pk.test_def;
 }
 
-/// Return false on failure.
 static bool
 slave_send_result(const test_def_t *def, test_result_t result)
 {
@@ -46,7 +53,10 @@ slave_send_result(const test_def_t *def, test_result_t result)
         .result = result,
     };
 
-    return cru_pipe_atomic_write(result_pipe, &pk);
+    static_assert(sizeof(pk) <= PIPE_BUF, "result packets will not be read "
+                  "and written atomically");
+
+    return write(result_fd, &pk, sizeof(pk)) == sizeof(pk);
 }
 
 static void
@@ -67,13 +77,13 @@ slave_loop(void)
 }
 
 void
-slave_run(cru_pipe_t *_dispatch_pipe, cru_pipe_t *_result_pipe)
+slave_run(int _dispatch_fd, int _result_fd)
 {
-    assert(!dispatch_pipe);
-    assert(!result_pipe);
+    assert(_dispatch_fd >= 0);
+    assert(_result_fd >= 0);
 
-    dispatch_pipe = _dispatch_pipe;
-    result_pipe = _result_pipe;
+    dispatch_fd = _dispatch_fd;
+    result_fd = _result_fd;
 
     slave_loop();
 }

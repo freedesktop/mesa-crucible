@@ -23,4 +23,4 @@
 
 #include "runner.h"
 
-void slave_run(cru_pipe_t *dispatch_pipe, cru_pipe_t *result_pipe);
+void slave_run(int dispatch_fd, int result_fd);

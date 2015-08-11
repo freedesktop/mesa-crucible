@@ -31,10 +31,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
-
-#include <fcntl.h>
-#include <unistd.h>
 
 #include "util/log.h"
 
@@ -56,87 +52,6 @@ runner_opts_t runner_opts = {
     .use_spir_v = false,
     .use_separate_cleanup_threads = true,
 };
-
-bool
-cru_pipe_init(cru_pipe_t *p)
-{
-    int err;
-
-    err = pipe2(p->fd, O_CLOEXEC);
-    if (err) {
-        loge("failed to create pipe");
-        return false;
-    }
-
-    return true;
-}
-
-void
-cru_pipe_finish(cru_pipe_t *p)
-{
-    for (int i = 0; i < 2; ++i) {
-        if (p->fd[i] != -1) {
-            close(p->fd[i]);
-        }
-    }
-}
-
-bool
-cru_pipe_become_reader(cru_pipe_t *p)
-{
-    int err;
-
-    assert(p->read_fd != -1);
-    assert(p->write_fd != -1);
-
-    err = close(p->write_fd);
-    if (err == -1) {
-        loge("runner failed to close pipe's write fd");
-        return false;
-    }
-
-    p->write_fd = -1;
-
-    return true;
-}
-
-bool
-cru_pipe_become_writer(cru_pipe_t *p)
-{
-    int err;
-
-    assert(p->read_fd != -1);
-    assert(p->write_fd != -1);
-
-    err = close(p->read_fd);
-    if (err == -1) {
-        loge("runner failed to close pipe's read fd");
-        return false;
-    }
-
-    p->read_fd = -1;
-
-    return true;
-}
-
-bool
-cru_pipe_atomic_write_n(const cru_pipe_t *p, const void *data, size_t n)
-{
-    // POSIX.1-2001 says that writes of less than PIPE_BUF bytes are atomic.
-    // We assume that, if all writes to a pipe are atomic, then all reads will
-    // be atomic also.
-    assert(n < PIPE_BUF);
-
-    return write(p->write_fd, data, n) == n;
-}
-
-bool
-cru_pipe_atomic_read_n(const cru_pipe_t *p, void *data, size_t n)
-{
-    assert(n < PIPE_BUF);
-
-    return read(p->read_fd, data, n) == n;
-}
 
 test_result_t
 run_test_def(const test_def_t *def)

@@ -27,18 +27,8 @@
 #include "framework/test/test.h"
 #include "framework/test/test_def.h"
 
-typedef union cru_pipe cru_pipe_t;
 typedef struct dispatch_packet dispatch_packet_t;
 typedef struct result_packet result_packet_t;
-
-union cru_pipe {
-    int fd[2];
-
-    struct {
-        int read_fd;
-        int write_fd;
-    };
-};
 
 struct dispatch_packet {
     const test_def_t *test_def;
@@ -48,18 +38,5 @@ struct result_packet {
     const test_def_t *test_def;
     test_result_t result;
 };
-
-bool cru_pipe_init(cru_pipe_t *p);
-void cru_pipe_finish(cru_pipe_t *p);
-bool cru_pipe_become_reader(cru_pipe_t *p);
-bool cru_pipe_become_writer(cru_pipe_t *p);
-bool cru_pipe_atomic_write_n(const cru_pipe_t *p, const void *data, size_t n);
-bool cru_pipe_atomic_read_n(const cru_pipe_t *p, void *data, size_t n);
-
-#define cru_pipe_atomic_write(p, data) \
-    cru_pipe_atomic_write_n((p), (data), sizeof(*(data)))
-
-#define cru_pipe_atomic_read(p, data) \
-    cru_pipe_atomic_read_n((p), (data), sizeof(*(data)))
 
 test_result_t run_test_def(const test_def_t *def);

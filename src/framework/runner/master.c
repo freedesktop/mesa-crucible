@@ -22,12 +22,14 @@
 /// \file
 /// \brief The runner's master process
 
+#include <limits.h>
 #include <signal.h>
 #include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
+#include <fcntl.h>
 #include <unistd.h>
 #include <sys/epoll.h>
 #include <sys/signalfd.h>
@@ -43,6 +45,21 @@
 #include "slave.h"
 
 typedef struct slave slave_t;
+typedef struct slave_pipe slave_pipe_t;
+
+struct slave_pipe {
+    union {
+        int fd[2];
+
+        struct {
+            int read_fd;
+            int write_fd;
+        };
+    };
+
+    /// A reference to the pipe's containing slave. Used by epoll handlers.
+    slave_t *slave;
+};
 
 /// \brief A slave process's proxy in the master process.
 ///
@@ -59,8 +76,8 @@ struct slave {
         const test_def_t *data[256];
     } tests;
 
-    cru_pipe_t dispatch_pipe;
-    cru_pipe_t result_pipe;
+    slave_pipe_t dispatch_pipe;
+    slave_pipe_t result_pipe;
 
     /// Number of tests dispatched to the slave over its lifetime.
     uint32_t lifetime_test_count;
@@ -134,7 +151,12 @@ static void slave_rm_test(slave_t *slave, const test_def_t *def);
 
 static bool slave_start_test(slave_t *slave, const test_def_t *def);
 static void slave_send_sentinel(slave_t *slave);
-static void slave_drain_pipe(slave_t *slave);
+static void slave_drain_result_pipe(slave_t *slave);
+
+static bool slave_pipe_init(slave_t *slave, slave_pipe_t *pipe);
+static void slave_pipe_finish(slave_pipe_t *pipe);
+static bool slave_pipe_become_reader(slave_pipe_t *pipe);
+static bool slave_pipe_become_writer(slave_pipe_t *pipe);
 
 static slave_t *find_slave_by_pid(pid_t pid);
 
@@ -366,10 +388,10 @@ master_get_new_slave(void)
     assert(!slave->pid);
     *slave = (slave_t) {0};
 
-    if (!cru_pipe_init(&slave->dispatch_pipe))
+    if (!slave_pipe_init(slave, &slave->dispatch_pipe))
         goto fail;
 
-    if (!cru_pipe_init(&slave->result_pipe))
+    if (!slave_pipe_init(slave, &slave->result_pipe))
         goto fail;
 
     slave->pid = fork();
@@ -384,28 +406,28 @@ master_get_new_slave(void)
         set_sigint_handler(SIG_DFL);
         master_finish_epoll();
 
-        if (!cru_pipe_become_reader(&slave->dispatch_pipe))
+        if (!slave_pipe_become_reader(&slave->dispatch_pipe))
             exit(EXIT_FAILURE);
 
-        if (!cru_pipe_become_writer(&slave->result_pipe))
+        if (!slave_pipe_become_writer(&slave->result_pipe))
             exit(EXIT_FAILURE);
 
-        slave_run(&slave->dispatch_pipe, &slave->result_pipe);
+        slave_run(slave->dispatch_pipe.read_fd, slave->result_pipe.write_fd);
 
         exit(EXIT_SUCCESS);
     }
 
-    if (!cru_pipe_become_writer(&slave->dispatch_pipe))
+    if (!slave_pipe_become_writer(&slave->dispatch_pipe))
         goto fail;
 
-    if (!cru_pipe_become_reader(&slave->result_pipe))
+    if (!slave_pipe_become_reader(&slave->result_pipe))
         goto fail;
 
     err = epoll_ctl(master.epoll_fd, EPOLL_CTL_ADD, slave->result_pipe.read_fd,
                     &(struct epoll_event) {
                         .events = EPOLLIN,
                         .data = {
-                            .ptr = slave,
+                            .ptr = &slave->result_pipe,
                         },
                     });
     if (err == -1) {
@@ -434,7 +456,7 @@ master_cleanup_dead_slave(slave_t *slave)
     assert(slave->pid);
     assert(slave->is_dead);
 
-    slave_drain_pipe(slave);
+    slave_drain_result_pipe(slave);
 
     // Any remaining tests owned by this slave are lost. They no longer count
     // towards any dispatch limits.
@@ -449,8 +471,8 @@ master_cleanup_dead_slave(slave_t *slave)
         abort();
     }
 
-    cru_pipe_finish(&slave->dispatch_pipe);
-    cru_pipe_finish(&slave->result_pipe);
+    slave_pipe_finish(&slave->dispatch_pipe);
+    slave_pipe_finish(&slave->result_pipe);
 
     slave->pid = 0;
     --master.num_slaves;
@@ -531,7 +553,9 @@ master_send_packet(slave_t *slave, const dispatch_packet_t *pk)
         abort();
     }
 
-    if (!cru_pipe_atomic_write(&slave->dispatch_pipe, pk))
+    static_assert(sizeof(*pk) <= PIPE_BUF, "dispatch packets will not be read "
+                  "and written atomically");
+    if (write(slave->dispatch_pipe.write_fd, pk, sizeof(*pk)) != sizeof(*pk))
         goto cleanup;
 
     result = true;
@@ -634,12 +658,12 @@ master_handle_epoll_event(const struct epoll_event *event)
 static void
 master_handle_pipe_event(const struct epoll_event *event)
 {
-    slave_t *slave;
+    slave_pipe_t *pipe;
 
     assert(event->data.ptr != &master.signal_fd);
 
-    slave = event->data.ptr;
-    slave_drain_pipe(slave);
+    pipe = event->data.ptr;
+    slave_drain_result_pipe(pipe->slave);
 }
 
 static void
@@ -834,12 +858,15 @@ slave_send_sentinel(slave_t *slave)
 }
 
 static void
-slave_drain_pipe(slave_t *slave)
+slave_drain_result_pipe(slave_t *slave)
 {
     for (;;) {
         result_packet_t pk;
 
-        if (!cru_pipe_atomic_read(&slave->result_pipe, &pk))
+        static_assert(sizeof(pk) <= PIPE_BUF, "result packets will not be "
+                      "read and written atomically");
+
+        if (read(slave->result_pipe.read_fd, &pk, sizeof(pk)) != sizeof(pk))
             return;
 
         slave_rm_test(slave, pk.test_def);
@@ -859,4 +886,68 @@ find_slave_by_pid(pid_t pid)
     }
 
     return NULL;
+}
+
+static bool
+slave_pipe_init(slave_t *slave, slave_pipe_t *pipe)
+{
+    int err;
+
+    err = pipe2(pipe->fd, O_CLOEXEC);
+    if (err) {
+        loge("failed to create pipe");
+        return false;
+    }
+
+    pipe->slave = slave;
+
+    return true;
+}
+
+static void
+slave_pipe_finish(slave_pipe_t *pipe)
+{
+    for (int i = 0; i < 2; ++i) {
+        if (pipe->fd[i] != -1) {
+            close(pipe->fd[i]);
+        }
+    }
+}
+
+static bool
+slave_pipe_become_reader(slave_pipe_t *pipe)
+{
+    int err;
+
+    assert(pipe->read_fd != -1);
+    assert(pipe->write_fd != -1);
+
+    err = close(pipe->write_fd);
+    if (err == -1) {
+        loge("runner failed to close pipe's write fd");
+        return false;
+    }
+
+    pipe->write_fd = -1;
+
+    return true;
+}
+
+static bool
+slave_pipe_become_writer(slave_pipe_t *pipe)
+{
+    int err;
+
+    assert(pipe->read_fd != -1);
+    assert(pipe->write_fd != -1);
+
+    err = close(pipe->read_fd);
+    if (err == -1) {
+        loge("runner failed to close pipe's read fd");
+        return false;
+    }
+
+    pipe->read_fd = -1;
+
+    return true;
 }
