@@ -33,7 +33,11 @@ AC_ARG_WITH([mesa],
                     [Path to mesa repo for headers and libraries])])
 if test "x$with_mesa" != x; then
     MESA_CPPFLAGS=-I$with_mesa/include
-    MESA_LDFLAGS="-L$with_mesa/lib -R$with_mesa/lib"
+    if test -d "$with_mesa/lib64"; then
+        MESA_LDFLAGS="-L$with_mesa/lib64 -R$with_mesa/lib64"
+    else
+        MESA_LDFLAGS="-L$with_mesa/lib -R$with_mesa/lib"
+    fi
 fi
 
 AC_SUBST([MESA_CPPFLAGS])
