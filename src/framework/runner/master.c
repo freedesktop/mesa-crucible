@@ -79,6 +79,12 @@ struct slave {
     slave_pipe_t dispatch_pipe;
     slave_pipe_t result_pipe;
 
+    /// Each slave process's stdout and stderr are connected to a pipe in the
+    /// master process. This prevents concurrently running slaves from
+    /// corrupting the master's stdout and stderr with interleaved output.
+    slave_pipe_t stdout_pipe;
+    slave_pipe_t stderr_pipe;
+
     /// Number of tests dispatched to the slave over its lifetime.
     uint32_t lifetime_test_count;
 
@@ -158,6 +164,7 @@ static bool slave_pipe_init(slave_t *slave, slave_pipe_t *pipe);
 static void slave_pipe_finish(slave_pipe_t *pipe);
 static bool slave_pipe_become_reader(slave_pipe_t *pipe);
 static bool slave_pipe_become_writer(slave_pipe_t *pipe);
+static void slave_pipe_drain_to_fd(slave_pipe_t *pipe, int fd);
 
 static slave_t *find_slave_by_pid(pid_t pid);
 
@@ -390,8 +397,11 @@ master_get_new_slave(void)
 
     if (!slave_pipe_init(slave, &slave->dispatch_pipe))
         goto fail;
-
     if (!slave_pipe_init(slave, &slave->result_pipe))
+        goto fail;
+    if (!slave_pipe_init(slave, &slave->stdout_pipe))
+        goto fail;
+    if (!slave_pipe_init(slave, &slave->stderr_pipe))
         goto fail;
 
     slave->pid = fork();
@@ -403,12 +413,23 @@ master_get_new_slave(void)
     }
 
     if (slave->pid == 0) {
+        // Before the slave duplicates stdout and stderr, write only to the
+        // debug log. This avoids corrupting the master's stdout and stderr
+        // with interleaved output during concurrent test runs.
+        if (!(dup2(slave->stdout_pipe.write_fd, STDOUT_FILENO) != -1 &&
+              dup2(slave->stderr_pipe.write_fd, STDERR_FILENO) != -1)) {
+            logd("runner failed to dup slave's stdout and stderr");
+            exit(EXIT_FAILURE);
+        }
+
+        slave_pipe_finish(&slave->stdout_pipe);
+        slave_pipe_finish(&slave->stderr_pipe);
+
         set_sigint_handler(SIG_DFL);
         master_finish_epoll();
 
         if (!slave_pipe_become_reader(&slave->dispatch_pipe))
             exit(EXIT_FAILURE);
-
         if (!slave_pipe_become_writer(&slave->result_pipe))
             exit(EXIT_FAILURE);
 
@@ -419,11 +440,23 @@ master_get_new_slave(void)
 
     if (!slave_pipe_become_writer(&slave->dispatch_pipe))
         goto fail;
-
     if (!slave_pipe_become_reader(&slave->result_pipe))
+        goto fail;
+    if (!slave_pipe_become_reader(&slave->stdout_pipe))
+        goto fail;
+    if (!slave_pipe_become_reader(&slave->stderr_pipe))
+        goto fail;
+
+    if (fcntl(slave->stdout_pipe.read_fd, F_SETFL, O_NONBLOCK) == -1)
+        goto fail;
+    if (fcntl(slave->stderr_pipe.read_fd, F_SETFL, O_NONBLOCK) == -1)
         goto fail;
 
     if (!master_epoll_add_slave_pipe(&slave->result_pipe, 0))
+        goto fail;
+    if (!master_epoll_add_slave_pipe(&slave->stdout_pipe, 0))
+        goto fail;
+    if (!master_epoll_add_slave_pipe(&slave->stderr_pipe, 0))
         goto fail;
 
     ++master.num_slaves;
@@ -448,6 +481,8 @@ master_cleanup_dead_slave(slave_t *slave)
     assert(slave->is_dead);
 
     slave_drain_result_pipe(slave);
+    slave_pipe_drain_to_fd(&slave->stdout_pipe, STDOUT_FILENO);
+    slave_pipe_drain_to_fd(&slave->stderr_pipe, STDERR_FILENO);
 
     // Any remaining tests owned by this slave are lost. They no longer count
     // towards any dispatch limits.
@@ -464,6 +499,8 @@ master_cleanup_dead_slave(slave_t *slave)
 
     slave_pipe_finish(&slave->dispatch_pipe);
     slave_pipe_finish(&slave->result_pipe);
+    slave_pipe_finish(&slave->stdout_pipe);
+    slave_pipe_finish(&slave->stderr_pipe);
 
     slave->pid = 0;
     --master.num_slaves;
@@ -669,12 +706,24 @@ master_handle_epoll_event(const struct epoll_event *event)
 static void
 master_handle_pipe_event(const struct epoll_event *event)
 {
-    slave_pipe_t *pipe;
+    slave_pipe_t *pipe = event->data.ptr;
 
     assert(event->data.ptr != &master.signal_fd);
 
-    pipe = event->data.ptr;
-    slave_drain_result_pipe(pipe->slave);
+    switch ((void*) pipe - (void*) pipe->slave) {
+    case offsetof(slave_t, result_pipe):
+        slave_drain_result_pipe(pipe->slave);
+        break;
+    case offsetof(slave_t, stdout_pipe):
+        slave_pipe_drain_to_fd(pipe, STDOUT_FILENO);
+        break;
+    case offsetof(slave_t, stderr_pipe):
+        slave_pipe_drain_to_fd(pipe, STDERR_FILENO);
+        break;
+    default:
+        log_internal_error("invalid slave pipe in epoll event");
+        break;
+    }
 }
 
 static void
@@ -961,4 +1010,36 @@ slave_pipe_become_writer(slave_pipe_t *pipe)
     pipe->read_fd = -1;
 
     return true;
+}
+
+static void
+slave_pipe_drain_to_fd(slave_pipe_t *pipe, int fd)
+{
+    char buf[4096];
+
+    for (;;) {
+        ssize_t nread = 0;
+        ssize_t nwrite = 0;
+
+        if (master.goto_next_phase)
+            return;
+
+        nread = read(pipe->read_fd, buf, sizeof(buf));
+        if (nread <= 0)
+            return;
+
+        while (nread > 0) {
+            if (master.goto_next_phase)
+                return;
+
+            nwrite = write(fd, buf, nread);
+            if (nwrite < 0) {
+                // Even on write errors, we must continue to drain the slave's
+                // pipe. Otherwise the slave may block on a full pipe.
+                continue;
+            }
+
+            nread -= nwrite;
+        }
+    }
 }
