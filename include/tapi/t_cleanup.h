@@ -53,6 +53,7 @@ void t_cleanup_push(T obj, ...);
 #endif
 
 static inline void t_cleanup_push_callback(void (*func)(void* data), void *data)                                    { t_cleanup_push_command(CRU_CLEANUP_CMD_CALLBACK, func, data); }
+static inline void t_cleanup_push_free(void *data)                                                                  { t_cleanup_push_command(CRU_CLEANUP_CMD_FREE, data); }
 static inline void t_cleanup_push_cru_cleanup_stack(cru_cleanup_stack_t *x)                                         { t_cleanup_push_command(CRU_CLEANUP_CMD_CRU_CLEANUP_STACK, x); }
 static inline void t_cleanup_push_cru_image(cru_image_t *x)                                                         { t_cleanup_push_command(CRU_CLEANUP_CMD_CRU_IMAGE, x); }
 
