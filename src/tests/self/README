@@ -1,0 +1,15 @@
+tldr; The tests are run by `make check`. Do not run them with crucible-run.
+
+This directory contains self-tests for Crucible. That is, these tests check the
+correctness of Crucible itself.
+
+The crucible-run command excludes self-tests by default. To run them, you must
+provide a matching glob pattern.  For example, to run all self-tests, execute
+`crucible run 'self.*'`. However, as explained below, the test results will be
+inconclusive.
+
+Some self-tests produce output that require external verification, for example,
+by a script.  The result of such a test, when run with crucible-run, is
+inconclusive without also running its verification script. To run all
+self-tests automatically along with their verification scripts, run `make
+check`.

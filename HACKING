@@ -19,6 +19,8 @@ Directory Layout
 
 - src/tests/stress: Stress tests
 
+- src/tests/self: Self-tests for Crucible. Used by `make check`.
+
 - include
   Headers under include/ define each module's public API.  This contrasts with
   headers under src/, which are private to their containing directory.
