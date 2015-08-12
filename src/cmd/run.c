@@ -181,7 +181,7 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
     runner_opts.use_spir_v = opt_use_spir_v;
 
     if (test_patterns.len == 0) {
-        runner_enable_all_nonexample_tests();
+        runner_enable_all_normal_tests();
     } else {
         runner_enable_matching_tests(&test_patterns);
     }

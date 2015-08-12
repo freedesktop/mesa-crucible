@@ -119,12 +119,13 @@ enable_test_def(test_def_t *def)
 }
 
 void
-runner_enable_all_nonexample_tests(void)
+runner_enable_all_normal_tests(void)
 {
     test_def_t *def;
 
     cru_foreach_test_def(def) {
-        if (!test_def_match(def, "example.*")) {
+        if (!test_def_match(def, "example.*") &&
+            !test_def_match(def, "self.*")) {
             enable_test_def(def);
         }
     }
