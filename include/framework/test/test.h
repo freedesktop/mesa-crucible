@@ -24,17 +24,35 @@
 #include "tapi/t.h"
 
 typedef struct test test_t;
+typedef struct test_create_info test_create_info_t;
+
+struct test_create_info {
+    const test_def_t *def;
+
+    bool enable_dump;
+    bool enable_cleanup_phase;
+    bool enable_separate_cleanup_thread;
+    bool enable_spir_v;
+    bool enable_bootstrap;
+
+    uint32_t bootstrap_image_width;
+    uint32_t bootstrap_image_height;
+};
+
+#ifdef DOXYGEN
+test_t *test_create(const test_create_info_t *va_args info);
+#else
+#define test_create(...) \
+    test_create_s(&(test_create_info_t) { 0, ##__VA_ARGS__ })
+#endif
 
 const char *test_result_to_string(test_result_t result);
 
-bool test_is_current(void);
-test_t *test_create(const test_def_t *def);
+/// Like test_create(), but with explicit info structure.
+test_t *test_create_s(const test_create_info_t *info);
 void test_destroy(test_t *test);
-void test_enable_dump(test_t *t);
-bool test_enable_bootstrap(test_t *test, uint32_t image_width, uint32_t image_height);
-bool test_disable_cleanup(test_t *test);
-void test_disable_separate_cleanup_thread(test_t *t);
-void test_enable_spir_v(test_t *t);
+bool test_is_current(void);
+
 void test_start(test_t *test);
 void test_wait(test_t *test);
 test_result_t test_get_result(test_t *test);

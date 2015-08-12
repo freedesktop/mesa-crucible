@@ -112,7 +112,7 @@ test_destroy(test_t *t)
 }
 
 test_t *
-test_create(const test_def_t *def)
+test_create_s(const test_create_info_t *info)
 {
     ASSERT_NOT_IN_TEST_THREAD;
 
@@ -121,11 +121,34 @@ test_create(const test_def_t *def)
 
     t = xzalloc(sizeof(*t));
 
-    t->def = def;
-    t->opt.no_dump = true;
     t->phase = ATOMIC_VAR_INIT(TEST_PHASE_PRESTART);
     t->result = TEST_RESULT_PASS;
     t->ref.filename = STRING_INIT;
+
+    t->def = info->def;
+    t->opt.no_dump = !info->enable_dump;
+    t->opt.no_cleanup = !info->enable_cleanup_phase;
+    t->opt.no_separate_cleanup_thread = !info->enable_separate_cleanup_thread;
+    t->opt.use_spir_v = info->enable_spir_v;
+    t->opt.bootstrap = info->enable_bootstrap;
+
+    if (info->enable_bootstrap) {
+        if (info->enable_cleanup_phase) {
+            loge("%s: enable_bootstrap and enable_cleanup_phase are mutually "
+                 "exclusive", __func__);
+            goto fail;
+        }
+
+        if (!info->def->no_image &&
+            (info->bootstrap_image_width == 0 ||
+             info->bootstrap_image_height == 0)) {
+            loge("%s: bootstrap image must have non-zero size", t->def->name);
+            goto fail;
+        }
+
+        t->ref.width = info->bootstrap_image_width;
+        t->ref.width = info->bootstrap_image_width;
+    }
 
     if (t->def->samples > 0) {
         loge("%s: multisample tests not yet supported", t->def->name);
@@ -155,64 +178,6 @@ fail:
     t->result = TEST_RESULT_FAIL;
     t->phase = TEST_PHASE_STOPPED;
     return t;
-}
-
-bool
-test_enable_bootstrap(test_t *t,
-                          uint32_t image_width, uint32_t image_height)
-{
-    ASSERT_NOT_IN_TEST_THREAD;
-    ASSERT_TEST_IN_PRESTART_PHASE(t);
-
-    if (!t->def->no_image && (image_width == 0 || image_height == 0)) {
-        loge("%s: bootstrap image must have non-zero size", t->def->name);
-        return false;
-    }
-
-    t->opt.bootstrap = true;
-    t->opt.no_cleanup = true;
-    t->ref.width = image_width;
-    t->ref.height = image_height;
-
-    return true;
-}
-
-void
-test_enable_dump(test_t *t)
-{
-    ASSERT_NOT_IN_TEST_THREAD;
-    ASSERT_TEST_IN_PRESTART_PHASE(t);
-
-    t->opt.no_dump = false;
-}
-
-bool
-test_disable_cleanup(test_t *t)
-{
-    ASSERT_NOT_IN_TEST_THREAD;
-    ASSERT_TEST_IN_PRESTART_PHASE(t);
-
-    t->opt.no_cleanup = true;
-
-    return true;
-}
-
-void
-test_enable_spir_v(test_t *t)
-{
-    ASSERT_NOT_IN_TEST_THREAD;
-    ASSERT_TEST_IN_PRESTART_PHASE(t);
-
-    t->opt.use_spir_v = true;
-}
-
-void
-test_disable_separate_cleanup_thread(test_t *t)
-{
-    ASSERT_NOT_IN_TEST_THREAD;
-    ASSERT_TEST_IN_PRESTART_PHASE(t);
-
-    t->opt.no_separate_cleanup_thread = true;
 }
 
 /// Illegal to call before test_wait().

@@ -119,12 +119,6 @@ start(const cru_command_t *cmd, int argc, char **argv)
         exit(1);
     }
 
-    test = test_create(def);
-    if (!test) {
-        loge("%s: failed to initialize", def->name);
-        exit(1);
-    }
-
     if (!def->no_image) {
         if (opt_image_width == 0) {
             loge("%s: test has image, --width must be non-zero",
@@ -138,8 +132,15 @@ start(const cru_command_t *cmd, int argc, char **argv)
         }
     }
 
-    if (!test_enable_bootstrap(test, opt_image_width, opt_image_height))
+    test = test_create(.def = def,
+                       .enable_bootstrap = true,
+                       .enable_cleanup_phase = false,
+                       .bootstrap_image_width = opt_image_width,
+                       .bootstrap_image_height = opt_image_height);
+    if (!test) {
+        loge("%s: failed to initialize", def->name);
         exit(1);
+    }
 
     test_start(test);
     test_wait(test);

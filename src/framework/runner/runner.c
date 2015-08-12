@@ -61,21 +61,14 @@ run_test_def(const test_def_t *def)
 
     assert(def->priv.enable);
 
-    test = test_create(def);
+    test = test_create(.def = def,
+                       .enable_dump = !runner_opts.no_image_dumps,
+                       .enable_cleanup_phase = !runner_opts.no_cleanup_phase,
+                       .enable_spir_v = runner_opts.use_spir_v,
+                       .enable_separate_cleanup_thread =
+                            runner_opts.use_separate_cleanup_threads);
     if (!test)
         return TEST_RESULT_FAIL;
-
-    if (!runner_opts.no_image_dumps)
-        test_enable_dump(test);
-
-    if (runner_opts.no_cleanup_phase)
-        test_disable_cleanup(test);
-
-    if (runner_opts.use_spir_v)
-        test_enable_spir_v(test);
-
-    if (!runner_opts.use_separate_cleanup_threads)
-        test_disable_separate_cleanup_thread(test);
 
     test_start(test);
     test_wait(test);
