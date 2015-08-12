@@ -447,6 +447,8 @@ master_get_new_slave(void)
     if (!slave_pipe_become_reader(&slave->stderr_pipe))
         goto fail;
 
+    if (fcntl(slave->result_pipe.read_fd, F_SETFL, O_NONBLOCK) == -1)
+        goto fail;
     if (fcntl(slave->stdout_pipe.read_fd, F_SETFL, O_NONBLOCK) == -1)
         goto fail;
     if (fcntl(slave->stderr_pipe.read_fd, F_SETFL, O_NONBLOCK) == -1)
@@ -926,6 +928,8 @@ slave_drain_result_pipe(slave_t *slave)
         static_assert(sizeof(pk) <= PIPE_BUF, "result packets will not be "
                       "read and written atomically");
 
+        // To avoid deadlock between master and slave, this read must be
+        // non-blocking.
         if (read(slave->result_pipe.read_fd, &pk, sizeof(pk)) != sizeof(pk))
             return;
 
