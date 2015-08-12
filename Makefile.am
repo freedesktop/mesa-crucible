@@ -185,4 +185,8 @@ data/pink-leaves-%.png: \
 	    --convert-tool="$(IMAGEMAGICK_CONVERT)" \
 	    $< $@
 
+.PHONY: check
+check: all
+	@
+
 CLEANFILES = $(man1_MANS) $(BUILT_SOURCES) $(built_data_files)
