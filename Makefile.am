@@ -19,6 +19,8 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+export CRUCIBLE_TOP := $(srcdir)
+
 CPPFLAGS = \
    $(MESA_CPPFLAGS) \
    -D_DEFAULT_SOURCE \
@@ -81,6 +83,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/miptree/miptree.c \
 	src/tests/stress/alloc-multithread.c \
 	src/tests/stress/lots-of-surface-state.c \
+	src/tests/self/concurrent-output.c \
 	src/util/cru_cleanup.c \
 	src/util/cru_format.c \
 	src/util/cru_image.c \
@@ -187,6 +190,6 @@ data/pink-leaves-%.png: \
 
 .PHONY: check
 check: all
-	@
+	bash $(srcdir)/src/tests/self/concurrent-output.bash
 
 CLEANFILES = $(man1_MANS) $(BUILT_SOURCES) $(built_data_files)

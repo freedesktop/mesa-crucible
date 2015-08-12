@@ -43,3 +43,7 @@ install-sh
 libtool
 ltmain.sh
 missing
+
+# self test output
+/src/tests/self/*.stdout
+/src/tests/self/*.stderr
