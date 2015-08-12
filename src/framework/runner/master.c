@@ -860,11 +860,11 @@ slave_rm_test(slave_t *slave, const test_def_t *def)
     assert(slave->tests.len >= 1);
     assert(master.cur_dispatched_tests >= 1);
 
-    memmove(slave->tests.data + i, slave->tests.data + i + 1,
-            slave->tests.len);
-
     --slave->tests.len;
     --master.cur_dispatched_tests;
+
+    memmove(slave->tests.data + i, slave->tests.data + i + 1,
+            slave->tests.len);
 }
 
 static bool
