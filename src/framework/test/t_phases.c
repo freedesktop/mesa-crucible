@@ -143,16 +143,13 @@ t_enter_stopped_phase(void)
     // To avoid race conditions with test_wait(), the test's thread count must
     // be zero before the test transitions to TEST_PHASE_STOPPED;
     t->num_threads = 0;
-    t->phase = TEST_PHASE_STOPPED;
+    test_broadcast_stop(t);
 
     // The test's thread count is now invalid: the test still owns a running
     // thread (this one!) despite its thread count being zero. We must take
     // extra care to avoid all code paths that modify the thread count or
     // expect it to be non-zero. That's easily accomplished by exiting the
     // thread.
-    //
-    // But first, we need to inform the test runner that the test is now stopped.
-    pthread_cond_broadcast(&t->stop_cond);
     pthread_exit(NULL);
 }
 

@@ -162,6 +162,7 @@ struct test {
     } vk;
 };
 
+void test_broadcast_stop(test_t *t);
 void t_compare_image(void);
 
 extern __thread cru_current_test_t current

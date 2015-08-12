@@ -46,6 +46,27 @@ test_is_current(void)
     return current.test != NULL;
 }
 
+void
+test_broadcast_stop(test_t *t)
+{
+    int err;
+
+    err = pthread_mutex_lock(&t->stop_mutex);
+    if (err)
+        log_abort("%s: failed to lock mutex", __func__);
+
+    assert(t->num_threads == 0);
+    assert(t->phase < TEST_PHASE_STOPPED);
+
+    t->phase = TEST_PHASE_STOPPED;
+
+    err = pthread_mutex_unlock(&t->stop_mutex);
+    if (err)
+        log_abort("%s: failed to lock mutex", __func__);
+
+    pthread_cond_broadcast(&t->stop_cond);
+}
+
 static void
 test_set_image_filename(test_t *t)
 {
@@ -231,8 +252,7 @@ test_start(test_t *t)
 
     if (t->def->skip) {
         t->result = TEST_RESULT_SKIP;
-        t->phase = TEST_PHASE_STOPPED;
-        pthread_cond_broadcast(&t->stop_cond);
+        test_broadcast_stop(t);
         return;
     }
 
@@ -242,8 +262,7 @@ test_start(test_t *t)
     if (!test_thread_create(t, t_thread_release_wrapper, NULL)) {
         loge("%s: failed to create test's start thread", t->def->name);
         t->result = TEST_RESULT_FAIL;
-        t->phase = TEST_PHASE_STOPPED;
-        pthread_cond_broadcast(&t->stop_cond);
+        test_broadcast_stop(t);
         return;
     }
 }
@@ -262,6 +281,8 @@ test_wait(test_t *t)
     }
 
     while (t->phase < TEST_PHASE_STOPPED) {
+        // AVOID DEADLOCK! When a test thread transitions to
+        // TEST_PHASE_STOPPED, it must be holding the test::stop_mutex lock.
         err = pthread_cond_wait(&t->stop_cond, &t->stop_mutex);
         if (err) {
             loge("%s: failed to wait on test's result condition",
