@@ -45,6 +45,13 @@ static uint32_t runner_num_tests;
 static bool runner_is_init = false;
 runner_opts_t runner_opts = {0};
 
+#define ASSERT_RUNNER_IS_INIT \
+    do { \
+        if (!runner_is_init) { \
+            log_internal_error("%s: runner is not initialized", __func__); \
+        } \
+    } while (0)
+
 bool
 runner_init(runner_opts_t *opts)
 {
@@ -79,6 +86,8 @@ runner_init(runner_opts_t *opts)
 test_result_t
 run_test_def(const test_def_t *def)
 {
+    ASSERT_RUNNER_IS_INIT;
+
     test_t *test;
     test_result_t result;
 
@@ -105,12 +114,16 @@ run_test_def(const test_def_t *def)
 bool
 runner_run_tests(void)
 {
+    ASSERT_RUNNER_IS_INIT;
+
     return master_run(runner_num_tests);
 }
 
 static inline void
 enable_test_def(test_def_t *def)
 {
+    ASSERT_RUNNER_IS_INIT;
+
     if (!def->priv.enable)
         ++runner_num_tests;
 
@@ -120,6 +133,8 @@ enable_test_def(test_def_t *def)
 void
 runner_enable_all_normal_tests(void)
 {
+    ASSERT_RUNNER_IS_INIT;
+
     test_def_t *def;
 
     cru_foreach_test_def(def) {
@@ -133,6 +148,8 @@ runner_enable_all_normal_tests(void)
 void
 runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
 {
+    ASSERT_RUNNER_IS_INIT;
+
     test_def_t *def;
     char **glob;
 
