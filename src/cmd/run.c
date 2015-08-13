@@ -182,9 +182,11 @@ get_num_jobs(void)
 static int
 cmd_start(const cru_command_t *cmd, int argc, char **argv)
 {
+    bool ok;
+
     parse_args(cmd, argc, argv);
 
-    runner_init(&(runner_opts_t) {
+    ok = runner_init(&(runner_opts_t) {
         .jobs = get_num_jobs(),
         .isolation_mode = opt_isolation,
         .no_fork = !opt_fork,
@@ -193,6 +195,11 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
         .no_image_dumps = !opt_dump,
         .use_spir_v = opt_use_spir_v,
     });
+
+    if (!ok) {
+        loge("failed to initialize the test runner");
+        exit(EXIT_FAILURE);
+    }
 
     if (test_patterns.len == 0) {
         runner_enable_all_normal_tests();
