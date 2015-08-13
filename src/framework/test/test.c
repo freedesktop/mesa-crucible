@@ -147,7 +147,7 @@ test_create_s(const test_create_info_t *info)
         }
 
         t->ref.width = info->bootstrap_image_width;
-        t->ref.width = info->bootstrap_image_width;
+        t->ref.height = info->bootstrap_image_height;
     }
 
     if (t->def->samples > 0) {
