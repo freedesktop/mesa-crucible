@@ -43,7 +43,13 @@ install-sh
 libtool
 ltmain.sh
 missing
+test-driver
+test-suite.log
 
-# self test output
+# autotools test-driver output
+/src/tests/self/concurrent-output.bash.log
+/src/tests/self/concurrent-output.bash.trs
+
+# self-tests output
 /src/tests/self/*.stdout
 /src/tests/self/*.stderr
