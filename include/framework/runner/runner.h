@@ -52,9 +52,6 @@ struct runner_opts {
 
 extern runner_opts_t runner_opts;
 
-void runner_enable_cleanup(bool b);
-void runner_enable_image_dumps(bool b);
-void runner_enable_spir_v(bool b);
 void runner_enable_all_normal_tests(void);
 void runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs);
 bool runner_run_tests(void);
