@@ -42,16 +42,39 @@
 #include "runner.h"
 
 static uint32_t runner_num_tests;
+static bool runner_is_init = false;
+runner_opts_t runner_opts = {0};
 
-runner_opts_t runner_opts = {
-    .jobs = 1,
-    .isolation_mode = RUNNER_ISOLATION_MODE_THREAD,
-    .no_fork = false,
-    .no_cleanup_phase = false,
-    .no_image_dumps = true,
-    .use_spir_v = false,
-    .use_separate_cleanup_threads = true,
-};
+bool
+runner_init(runner_opts_t *opts)
+{
+    if (runner_is_init) {
+        log_internal_error("cannot initialize runner twice");
+        return false;
+    }
+
+    if (opts->no_fork
+        && opts->isolation_mode == RUNNER_ISOLATION_MODE_THREAD) {
+        log_finishme("support no_fork with RUNNER_ISOLATION_MODE_THREAD");
+        return false;
+    }
+
+    if (opts->jobs > 1
+        && opts->isolation_mode == RUNNER_ISOLATION_MODE_THREAD) {
+        log_finishme("support jobs > 1 with RUNNER_ISOLATION_MODE_THREAD");
+        return false;
+    }
+
+    if (opts->jobs > 1 && opts->no_fork) {
+        log_finishme("support jobs > 1 with no_fork");
+        return false;
+    }
+
+    runner_opts = *opts;
+    runner_is_init = true;
+
+    return true;
+}
 
 test_result_t
 run_test_def(const test_def_t *def)
@@ -82,23 +105,6 @@ run_test_def(const test_def_t *def)
 bool
 runner_run_tests(void)
 {
-    if (runner_opts.no_fork &&
-            runner_opts.isolation_mode == RUNNER_ISOLATION_MODE_THREAD) {
-        log_finishme("support no_fork with RUNNER_ISOLATION_MODE_THREAD");
-        return false;
-    }
-
-    if (runner_opts.jobs > 1 &&
-            runner_opts.isolation_mode == RUNNER_ISOLATION_MODE_THREAD) {
-        log_finishme("support jobs > 1 with RUNNER_ISOLATION_MODE_THREAD");
-        return false;
-    }
-
-    if (runner_opts.jobs > 1 && runner_opts.no_fork) {
-        log_finishme("support jobs > 1 with no_fork");
-        return false;
-    }
-
     return master_run(runner_num_tests);
 }
 

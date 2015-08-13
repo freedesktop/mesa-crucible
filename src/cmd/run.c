@@ -155,9 +155,14 @@ done_getopt:
 }
 
 static uint32_t
-get_default_jobs(void)
+get_num_jobs(void)
 {
     int jobs = 1;
+
+    if (opt_jobs > 0) {
+        // Number of jobs was explicitly set on the cmdline.
+        return opt_jobs;
+    }
 
     switch (opt_isolation) {
     case RUNNER_ISOLATION_MODE_PROCESS:
@@ -179,16 +184,15 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
 {
     parse_args(cmd, argc, argv);
 
-    runner_opts.isolation_mode = opt_isolation;
-    runner_opts.no_fork = !opt_fork;
-    runner_opts.no_cleanup_phase = opt_no_cleanup;
-    runner_opts.use_separate_cleanup_threads = opt_separate_cleanup_thread;
-    runner_opts.no_image_dumps = !opt_dump;
-    runner_opts.use_spir_v = opt_use_spir_v;
-
-    runner_opts.jobs = opt_jobs;
-    if (runner_opts.jobs == 0)
-        runner_opts.jobs = get_default_jobs();
+    runner_init(&(runner_opts_t) {
+        .jobs = get_num_jobs(),
+        .isolation_mode = opt_isolation,
+        .no_fork = !opt_fork,
+        .no_cleanup_phase = opt_no_cleanup,
+        .use_separate_cleanup_threads = opt_separate_cleanup_thread,
+        .no_image_dumps = !opt_dump,
+        .use_spir_v = opt_use_spir_v,
+    });
 
     if (test_patterns.len == 0) {
         runner_enable_all_normal_tests();

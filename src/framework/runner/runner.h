@@ -39,4 +39,6 @@ struct result_packet {
     test_result_t result;
 };
 
+extern runner_opts_t runner_opts;
+
 test_result_t run_test_def(const test_def_t *def);
