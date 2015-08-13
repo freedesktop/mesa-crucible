@@ -500,190 +500,193 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
 
     header = cru_vec_pop(&c->commands, sizeof(*header));
 
-    if (noop) {
-        loge("%s: noop=true is broken", __func__);
-        abort();
-    }
-
     #define CMD_GET(T) \
         T *cmd = cru_vec_pop(&c->commands, sizeof(*cmd))
+
+    // If this pop is a no-op, then don't do the command.
+    #define CMD_DO(func_call) \
+        do { \
+            if (!noop) { \
+                func_call; \
+            } \
+        } while (0)
 
     switch (header->cmd_type) {
         // Misc objects
         case CRU_CLEANUP_CMD_CALLBACK: {
             CMD_GET(struct cmd_callback);
-            cmd->func(cmd->data);
+            CMD_DO(cmd->func(cmd->data));
             break;
         }
         case CRU_CLEANUP_CMD_FREE: {
             CMD_GET(struct cmd_free);
-            free(cmd->data);
+            CMD_DO(free(cmd->data));
             break;
         }
 
         // Crucible objects
         case CRU_CLEANUP_CMD_CRU_CLEANUP_STACK: {
             CMD_GET(struct cmd_cru_cleanup_stack);
-            cru_cleanup_release(cmd->cleanup);
+            CMD_DO(cru_cleanup_release(cmd->cleanup));
             break;
         }
         case CRU_CLEANUP_CMD_CRU_IMAGE: {
             CMD_GET(struct cmd_cru_image);
-            cru_image_release(cmd->image);
+            CMD_DO(cru_image_release(cmd->image));
             break;
         }
 
         // Dispatchable Vulkan objects
         case CRU_CLEANUP_CMD_VK_DEVICE: {
             CMD_GET(struct cmd_vk_device);
-            vkDestroyDevice(cmd->dev);
+            CMD_DO(vkDestroyDevice(cmd->dev));
             break;
         }
         case CRU_CLEANUP_CMD_VK_INSTANCE: {
             CMD_GET(struct cmd_vk_instance);
-            vkDestroyInstance(cmd->instance);
+            CMD_DO(vkDestroyInstance(cmd->instance));
             break;
         }
 
         // Non-dispatchable Vulkan objects
         case CRU_CLEANUP_CMD_VK_ATTACHMENT_VIEW: {
             CMD_GET(struct cmd_vk_attachment_view);
-            vkDestroyAttachmentView(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyAttachmentView(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_BUFFER: {
             CMD_GET(struct cmd_vk_buffer);
-            vkDestroyBuffer(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyBuffer(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_BUFFER_VIEW: {
             CMD_GET(struct cmd_vk_buffer_view);
-            vkDestroyBufferView(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyBufferView(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_CMD_BUFFER: {
             CMD_GET(struct cmd_vk_cmd_buffer);
-            vkDestroyCommandBuffer(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyCommandBuffer(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_CMD_POOL: {
             CMD_GET(struct cmd_vk_cmd_pool);
-            vkDestroyCommandPool(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyCommandPool(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_DESCRIPTOR_POOL: {
             CMD_GET(struct cmd_vk_descriptor_pool);
-            vkDestroyDescriptorPool(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyDescriptorPool(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET: {
             CMD_GET(struct cmd_vk_descriptor_set);
-            vkFreeDescriptorSets(cmd->dev, cmd->pool, 1, &cmd->set);
+            CMD_DO(vkFreeDescriptorSets(cmd->dev, cmd->pool, 1, &cmd->set));
             break;
         }
         case CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET_LAYOUT: {
             CMD_GET(struct cmd_vk_descriptor_set_layout);
-            vkDestroyDescriptorSetLayout(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyDescriptorSetLayout(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_DEVICE_MEMORY: {
             CMD_GET(struct cmd_vk_device_memory);
-            vkFreeMemory(cmd->dev, cmd->x);
+            CMD_DO(vkFreeMemory(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_DEVICE_MEMORY_MAP: {
             CMD_GET(struct cmd_vk_device_memory);
-            vkUnmapMemory(cmd->dev, cmd->x);
+            CMD_DO(vkUnmapMemory(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_DYNAMIC_COLOR_BLEND_STATE: {
             CMD_GET(struct cmd_vk_dynamic_color_blend_state);
-            vkDestroyDynamicColorBlendState(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyDynamicColorBlendState(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_DYNAMIC_DEPTH_STENCIL_STATE: {
             CMD_GET(struct cmd_vk_dynamic_depth_stencil_state);
-            vkDestroyDynamicDepthStencilState(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyDynamicDepthStencilState(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_DYNAMIC_RASTER_STATE: {
             CMD_GET(struct cmd_vk_dynamic_raster_state);
-            vkDestroyDynamicRasterState(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyDynamicRasterState(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_DYNAMIC_VIEWPORT_STATE: {
             CMD_GET(struct cmd_vk_dynamic_viewport_state);
-            vkDestroyDynamicViewportState(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyDynamicViewportState(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_EVENT: {
             CMD_GET(struct cmd_vk_event);
-            vkDestroyEvent(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyEvent(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_FENCE: {
             CMD_GET(struct cmd_vk_fence);
-            vkDestroyFence(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyFence(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_FRAMEBUFFER: {
             CMD_GET(struct cmd_vk_framebuffer);
-            vkDestroyFramebuffer(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyFramebuffer(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_IMAGE: {
             CMD_GET(struct cmd_vk_image);
-            vkDestroyImage(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyImage(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_IMAGE_VIEW: {
             CMD_GET(struct cmd_vk_image_view);
-            vkDestroyImageView(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyImageView(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_PIPELINE: {
             CMD_GET(struct cmd_vk_pipeline);
-            vkDestroyPipeline(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyPipeline(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_PIPELINE_CACHE: {
             CMD_GET(struct cmd_vk_pipeline_cache);
-            vkDestroyPipelineCache(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyPipelineCache(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_PIPELINE_LAYOUT: {
             CMD_GET(struct cmd_vk_pipeline_layout);
-            vkDestroyPipelineLayout(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyPipelineLayout(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_QUERY_POOL: {
             CMD_GET(struct cmd_vk_query_pool);
-            vkDestroyQueryPool(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyQueryPool(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_RENDER_PASS: {
             CMD_GET(struct cmd_vk_render_pass);
-            vkDestroyRenderPass(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyRenderPass(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_SAMPLER: {
             CMD_GET(struct cmd_vk_sampler);
-            vkDestroySampler(cmd->dev, cmd->x);
+            CMD_DO(vkDestroySampler(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_SEMAPHORE: {
             CMD_GET(struct cmd_vk_semaphore);
-            vkDestroySemaphore(cmd->dev, cmd->x);
+            CMD_DO(vkDestroySemaphore(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_SHADER: {
             CMD_GET(struct cmd_vk_shader);
-            vkDestroyShader(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyShader(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_SHADER_MODULE: {
             CMD_GET(struct cmd_vk_shader_module);
-            vkDestroyShaderModule(cmd->dev, cmd->x);
+            CMD_DO(vkDestroyShaderModule(cmd->dev, cmd->x));
             break;
         }
     }
@@ -691,6 +694,7 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
     return true;
 
     #undef CMD_GET
+    #undef CMD_DO
 }
 
 void
