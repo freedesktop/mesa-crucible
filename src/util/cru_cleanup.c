@@ -505,7 +505,7 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
         abort();
     }
 
-   #define CMD_GET(T) \
+    #define CMD_GET(T) \
         T *cmd = cru_vec_pop(&c->commands, sizeof(*cmd))
 
     switch (header->cmd_type) {
@@ -690,7 +690,7 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
 
     return true;
 
-   #undef CMD_GET
+    #undef CMD_GET
 }
 
 void
