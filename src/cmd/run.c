@@ -30,7 +30,7 @@
 
 static runner_isolation_mode_t opt_isolation = RUNNER_ISOLATION_MODE_PROCESS;
 static int opt_jobs = 0;
-static int opt_fork = 1;
+static int opt_fork = -1; // -1 => unset on cmdline
 static int opt_no_cleanup = 0;
 static int opt_dump = 0;
 static int opt_use_spir_v = 0;
@@ -154,6 +154,12 @@ done_getopt:
     }
 }
 
+static bool
+one_test(void)
+{
+    return test_patterns.len == 1 && !strstr(test_patterns.data[0], "*");
+}
+
 static uint32_t
 get_num_jobs(void)
 {
@@ -163,6 +169,9 @@ get_num_jobs(void)
         // Number of jobs was explicitly set on the cmdline.
         return opt_jobs;
     }
+
+    if (one_test())
+        return 1;
 
     switch (opt_isolation) {
     case RUNNER_ISOLATION_MODE_PROCESS:
@@ -179,6 +188,23 @@ get_num_jobs(void)
     return jobs;
 }
 
+static bool
+get_fork_mode(void)
+{
+    if (opt_fork != -1) {
+        // The cmdline explicitly selected a fork mode.
+        return opt_fork;
+    }
+
+    if (one_test()) {
+        // When the user selects exactly one test, we assume he wants to debug
+        // it. Debugging is easier if Crucible doesn't fork.
+        return false;
+    }
+
+    return true;
+}
+
 static int
 cmd_start(const cru_command_t *cmd, int argc, char **argv)
 {
@@ -189,7 +215,7 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
     ok = runner_init(&(runner_opts_t) {
         .jobs = get_num_jobs(),
         .isolation_mode = opt_isolation,
-        .no_fork = !opt_fork,
+        .no_fork = !get_fork_mode(),
         .no_cleanup_phase = opt_no_cleanup,
         .use_separate_cleanup_threads = opt_separate_cleanup_thread,
         .no_image_dumps = !opt_dump,
