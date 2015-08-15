@@ -160,6 +160,8 @@ t_thread_yield(void)
         // releasing itself to the framework.
         t_thread_release();
     }
+
+    pthread_yield();
 }
 
 void
