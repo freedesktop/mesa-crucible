@@ -28,6 +28,8 @@
 #include "cmd.h"
 #include "framework/runner/runner.h"
 
+static bool get_fork_mode(void);
+
 static runner_isolation_mode_t opt_isolation = RUNNER_ISOLATION_MODE_PROCESS;
 static int opt_jobs = 0;
 static int opt_fork = -1; // -1 => unset on cmdline
@@ -172,6 +174,12 @@ get_num_jobs(void)
 
     if (one_test())
         return 1;
+
+    if (!get_fork_mode()) {
+        // (2015-08-18) The runner does not yet support multiple jobs when
+        // forking is disabled.
+        return 1;
+    }
 
     switch (opt_isolation) {
     case RUNNER_ISOLATION_MODE_PROCESS:
