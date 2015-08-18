@@ -192,22 +192,12 @@ copy_unorm8_to_uint8(
     void *src, uint32_t src_x, uint32_t src_y, uint32_t src_stride,
     void *dest, uint32_t dest_x, uint32_t dest_y, uint32_t dest_stride)
 {
-    const uint32_t src_cpp = 1;
-    const uint32_t dest_cpp = 1;
+    const uint32_t cpp = 1;
 
     for (uint32_t y = 0; y < height; ++y) {
-        void *src_row = src + ((src_y + y) * src_stride +
-                               src_x * src_cpp);
-
-        void *dest_row = dest + ((dest_y + y) * dest_stride +
-                                 dest_x * dest_cpp);
-
-        for (uint32_t x = 0; x < width; ++x) {
-            void *src_pix = src_row + (x * src_cpp);
-            void *dest_pix = dest_row + (x * dest_cpp);
-
-            memcpy(dest_pix, src_pix, width);
-        }
+        void *src_row = src + ((src_y + y) * src_stride + src_x * cpp);
+        void *dest_row = dest + ((dest_y + y) * dest_stride + dest_x * cpp);
+        memcpy(dest_row, src_row, width * cpp);
     }
 
     return true;
