@@ -136,11 +136,9 @@ static void
 t_setup_attachment(VkDevice dev,
                    VkFormat format,
                    VkImageUsageFlags image_usage_flags,
-                   VkImageAspect image_aspect,
                    uint32_t width, uint32_t height,
                    VkImage *out_image,
-                   VkAttachmentView *out_attachment_view,
-                   VkImageView *out_image_view)
+                   VkAttachmentView *out_attachment_view)
 {
     GET_CURRENT_TEST(t);
     ASSERT_TEST_IN_SETUP_PHASE;
@@ -148,7 +146,6 @@ t_setup_attachment(VkDevice dev,
     if (format == VK_FORMAT_UNDEFINED) {
         *out_image = QO_NULL_IMAGE;
         *out_attachment_view = QO_NULL_ATTACHMENT_VIEW;
-        *out_image_view = QO_NULL_IMAGE_VIEW;
         return;
     }
 
@@ -172,18 +169,6 @@ t_setup_attachment(VkDevice dev,
     *out_attachment_view = qoCreateAttachmentView(dev,
         .image = *out_image,
         .format = format);
-
-    *out_image_view = qoCreateImageView(dev,
-        .image = *out_image,
-        .viewType = VK_IMAGE_VIEW_TYPE_2D,
-        .format = format,
-        .subresourceRange = {
-            .aspect = image_aspect,
-            .baseMipLevel = 0,
-            .mipLevels = 1,
-            .baseArraySlice = 0,
-            .arraySize = 1,
-        });
 }
 
 static void
@@ -200,11 +185,9 @@ t_setup_framebuffer(void)
 
     t_setup_attachment(t->vk.device, VK_FORMAT_R8G8B8A8_UNORM,
                        VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-                       VK_IMAGE_ASPECT_COLOR,
                        t->ref.width, t->ref.height,
                        &t->vk.color_image,
-                       &t->vk.color_attachment_view,
-                       &t->vk.color_texture_view);
+                       &t->vk.color_attachment_view);
 
     bind_info[att_count++] = (VkAttachmentBindInfo) {
         .view = t->vk.color_attachment_view,
@@ -214,11 +197,9 @@ t_setup_framebuffer(void)
     if (t->def->depthstencil_format != VK_FORMAT_UNDEFINED) {
         t_setup_attachment(t->vk.device, t->def->depthstencil_format,
                            VK_IMAGE_USAGE_DEPTH_STENCIL_BIT,
-                           VK_IMAGE_ASPECT_DEPTH,
                            t->ref.width, t->ref.height,
                            &t->vk.ds_image,
-                           &t->vk.ds_attachment_view,
-                           &t->vk.depth_image_view);
+                           &t->vk.ds_attachment_view);
 
         bind_info[att_count++] = (VkAttachmentBindInfo) {
             .view = t->vk.ds_attachment_view,
@@ -231,6 +212,46 @@ t_setup_framebuffer(void)
         .height = t->ref.height,
         .attachmentCount = att_count,
         .pAttachments = bind_info);
+}
+
+static void
+t_setup_image_views(void)
+{
+    ASSERT_TEST_IN_SETUP_PHASE;
+    GET_CURRENT_TEST(t);
+
+    if (t->vk.color_image.handle) {
+        t->vk.color_texture_view = qoCreateImageView(t->vk.device,
+            .image = t->vk.color_image,
+            .viewType = VK_IMAGE_VIEW_TYPE_2D,
+            .format = VK_FORMAT_R8G8B8A8_UNORM,
+            .subresourceRange = {
+                .aspect = VK_IMAGE_ASPECT_COLOR,
+                .baseMipLevel = 0,
+                .mipLevels = 1,
+                .baseArraySlice = 0,
+                .arraySize = 1,
+            });
+    }
+
+    if (t->vk.ds_image.handle) {
+        const cru_format_info_t *finfo =
+            t_format_info(t->def->depthstencil_format);
+
+        if (finfo->depth_format) {
+            t->vk.depth_image_view = qoCreateImageView(t->vk.device,
+                .image = t->vk.ds_image,
+                .viewType = VK_IMAGE_VIEW_TYPE_2D,
+                .format = finfo->depth_format,
+                .subresourceRange = {
+                    .aspect = VK_IMAGE_ASPECT_DEPTH,
+                    .baseMipLevel = 0,
+                    .mipLevels = 1,
+                    .baseArraySlice = 0,
+                    .arraySize = 1,
+                });
+        }
+    }
 }
 
 void
@@ -268,6 +289,7 @@ t_setup_vulkan(void)
     t_cleanup_push_vk_device(t->vk.device);
 
     t_setup_framebuffer();
+    t_setup_image_views();
 
     vkGetDeviceQueue(t->vk.device, 0, 0, &t->vk.queue);
 
