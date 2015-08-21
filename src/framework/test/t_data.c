@@ -168,7 +168,7 @@ __t_color_image_view(void)
 
     t_assert(!t->def->no_image);
 
-    return &t->vk.color_texture_view;
+    return &t->vk.color_image_view;
 }
 
 const VkImage *

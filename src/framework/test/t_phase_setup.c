@@ -221,7 +221,7 @@ t_setup_image_views(void)
     GET_CURRENT_TEST(t);
 
     if (t->vk.color_image.handle) {
-        t->vk.color_texture_view = qoCreateImageView(t->vk.device,
+        t->vk.color_image_view = qoCreateImageView(t->vk.device,
             .image = t->vk.color_image,
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
             .format = VK_FORMAT_R8G8B8A8_UNORM,

@@ -151,7 +151,7 @@ struct test {
 
         VkImage color_image;
         VkAttachmentView color_attachment_view;
-        VkImageView color_texture_view;
+        VkImageView color_image_view;
 
         VkImage ds_image;
         VkAttachmentView ds_attachment_view;
