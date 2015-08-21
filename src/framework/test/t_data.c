@@ -207,6 +207,18 @@ __t_depth_image_view(void)
     return &t->vk.depth_image_view;
 }
 
+const VkImageView *
+__t_stencil_image_view(void)
+{
+    ASSERT_TEST_IN_MAJOR_PHASE;
+    GET_CURRENT_TEST(t);
+
+    t_assert(!t->def->no_image);
+    t_assert(t->vk.stencil_image_view.handle);
+
+    return &t->vk.stencil_image_view;
+}
+
 const VkFramebuffer *
 __t_framebuffer(void)
 {

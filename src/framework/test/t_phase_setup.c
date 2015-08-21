@@ -251,6 +251,20 @@ t_setup_image_views(void)
                     .arraySize = 1,
                 });
         }
+
+        if (finfo->stencil_format) {
+            t->vk.stencil_image_view = qoCreateImageView(t->vk.device,
+                .image = t->vk.ds_image,
+                .viewType = VK_IMAGE_VIEW_TYPE_2D,
+                .format = finfo->stencil_format,
+                .subresourceRange = {
+                    .aspect = VK_IMAGE_ASPECT_STENCIL,
+                    .baseMipLevel = 0,
+                    .mipLevels = 1,
+                    .baseArraySlice = 0,
+                    .arraySize = 1,
+                });
+        }
     }
 }
 
