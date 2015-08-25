@@ -108,8 +108,8 @@ struct mipslice {
     uint32_t width;
     uint32_t height;
 
-    VkImageView texture_view;
-    VkAttachmentView color_view;
+    VkImageView image_view;
+    VkAttachmentView attachment_view;
 
     uint32_t buffer_offset;
 
@@ -336,14 +336,14 @@ miptree_create(void)
         const uint32_t level_height = cru_minify(height, l);
 
         for (uint32_t a = 0; a < array_length; ++a) {
-            VkAttachmentView color_view = qoCreateAttachmentView(
+            VkAttachmentView att_view = qoCreateAttachmentView(
                 t_device,
                 .image = image,
                 .format = format,
                 .mipLevel = l,
                 .baseArraySlice = a);
 
-            VkImageView texture_view = qoCreateImageView(t_device,
+            VkImageView image_view = qoCreateImageView(t_device,
                 .image = image,
                 .viewType = VK_IMAGE_VIEW_TYPE_2D,
                 .format = format,
@@ -413,8 +413,8 @@ miptree_create(void)
                                   level_width, level_height);
 
             mt->slices[a * levels + l] = (mipslice_t) {
-                .texture_view = texture_view,
-                .color_view = color_view,
+                .image_view = image_view,
+                .attachment_view = att_view,
 
                 .level = l,
                 .array_slice = a,
@@ -591,11 +591,11 @@ miptree_download_copy_to_linear_image(const miptree_t *mt)
 }
 
 static void
-copy_images_with_draw(const cru_format_info_t *format_info,
-                      VkImageView *tex_views,
-                      VkAttachmentView *color_views,
-                      VkExtent2D *extents,
-                      uint32_t count)
+copy_color_images_with_draw(const cru_format_info_t *format_info,
+                            VkExtent2D extents[],
+                            VkImageView image_views[],
+                            VkAttachmentView attachment_views[],
+                            uint32_t count)
 {
     static const uint32_t num_vertices = 4;
     static const uint32_t num_position_components = 2;
@@ -725,7 +725,7 @@ copy_images_with_draw(const cru_format_info_t *format_info,
             .attachmentCount = 1,
             .pAttachments = (VkAttachmentBindInfo[]) {
                 {
-                    .view = color_views[i],
+                    .view = attachment_views[i],
                     .layout = VK_IMAGE_LAYOUT_GENERAL,
                 },
             },
@@ -767,7 +767,7 @@ copy_images_with_draw(const cru_format_info_t *format_info,
                     .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
                     .pDescriptors = (VkDescriptorInfo[]) {
                         {
-                            .imageView = tex_views[i],
+                            .imageView = image_views[i],
                             .imageLayout = VK_IMAGE_LAYOUT_GENERAL,
                         },
                     },
@@ -806,8 +806,8 @@ miptree_upload_copy_with_draw(const miptree_t *mt)
 {
     const test_params_t *params = t_user_data;
 
-    VkImageView tex_views[mt->num_slices];
-    VkAttachmentView color_views[mt->num_slices];
+    VkImageView image_views[mt->num_slices];
+    VkAttachmentView att_views[mt->num_slices];
     VkExtent2D extents[mt->num_slices];
 
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
@@ -816,9 +816,9 @@ miptree_upload_copy_with_draw(const miptree_t *mt)
         extents[i].width = slice->width;
         extents[i].height = slice->height;
 
-        color_views[i] = slice->color_view;
+        att_views[i] = slice->attachment_view;
 
-        tex_views[i] = qoCreateImageView(t_device,
+        image_views[i] = qoCreateImageView(t_device,
             .image = slice->src_vk_image,
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
             .format = mt->format_info->format,
@@ -837,15 +837,15 @@ miptree_upload_copy_with_draw(const miptree_t *mt)
             });
     }
 
-    copy_images_with_draw(mt->format_info, tex_views, color_views, extents,
-                            mt->num_slices);
+    copy_color_images_with_draw(mt->format_info, extents, image_views,
+                                att_views, mt->num_slices);
 }
 
 static void
 miptree_download_copy_with_draw(const miptree_t *mt)
 {
-    VkImageView tex_views[mt->num_slices];
-    VkAttachmentView color_views[mt->num_slices];
+    VkImageView image_views[mt->num_slices];
+    VkAttachmentView att_views[mt->num_slices];
     VkExtent2D extents[mt->num_slices];
 
     for (uint32_t i = 0; i < mt->num_slices; ++i) {
@@ -854,9 +854,9 @@ miptree_download_copy_with_draw(const miptree_t *mt)
         extents[i].width = slice->width;
         extents[i].height = slice->height;
 
-        tex_views[i] = slice->texture_view;
+        image_views[i] = slice->image_view;
 
-        color_views[i] = qoCreateAttachmentView(t_device,
+        att_views[i] = qoCreateAttachmentView(t_device,
             .image = slice->dest_vk_image,
             .format = mt->format_info->format,
             .mipLevel = 0,
@@ -864,8 +864,8 @@ miptree_download_copy_with_draw(const miptree_t *mt)
             .arraySize = 1);
     }
 
-    copy_images_with_draw(mt->format_info, tex_views, color_views, extents,
-                            mt->num_slices);
+    copy_color_images_with_draw(mt->format_info, extents, image_views,
+                                att_views, mt->num_slices);
 }
 
 static void
