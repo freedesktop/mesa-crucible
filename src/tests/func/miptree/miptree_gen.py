@@ -40,12 +40,12 @@ color_params_iter = (
     for upload_method in (
         'copy-from-buffer',
         'copy-from-linear-image',
-        'render',
+        'copy-with-draw',
     )
     for download_method in (
         'copy-to-buffer',
         'copy-to-linear-image',
-        'render',
+        'copy-with-draw',
     )
 )
 

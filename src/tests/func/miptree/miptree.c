@@ -64,13 +64,13 @@ typedef struct mipslice mipslice_t;
 enum miptree_upload_method {
     MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
     MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
-    MIPTREE_UPLOAD_METHOD_RENDER,
+    MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW,
 };
 
 enum miptree_download_method {
     MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
     MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
-    MIPTREE_DOWNLOAD_METHOD_RENDER,
+    MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
 };
 
 struct test_params {
@@ -591,11 +591,11 @@ miptree_download_copy_to_linear_image(const miptree_t *mt)
 }
 
 static void
-render_textures(const cru_format_info_t *format_info,
-                VkImageView *tex_views,
-                VkAttachmentView *color_views,
-                VkExtent2D *extents,
-                uint32_t count)
+copy_images_with_draw(const cru_format_info_t *format_info,
+                      VkImageView *tex_views,
+                      VkAttachmentView *color_views,
+                      VkExtent2D *extents,
+                      uint32_t count)
 {
     static const uint32_t num_vertices = 4;
     static const uint32_t num_position_components = 2;
@@ -802,7 +802,7 @@ render_textures(const cru_format_info_t *format_info,
 }
 
 static void
-miptree_upload_render(const miptree_t *mt)
+miptree_upload_copy_with_draw(const miptree_t *mt)
 {
     const test_params_t *params = t_user_data;
 
@@ -837,12 +837,12 @@ miptree_upload_render(const miptree_t *mt)
             });
     }
 
-    render_textures(mt->format_info, tex_views, color_views, extents,
-                    mt->num_slices);
+    copy_images_with_draw(mt->format_info, tex_views, color_views, extents,
+                            mt->num_slices);
 }
 
 static void
-miptree_download_render(const miptree_t *mt)
+miptree_download_copy_with_draw(const miptree_t *mt)
 {
     VkImageView tex_views[mt->num_slices];
     VkAttachmentView color_views[mt->num_slices];
@@ -864,8 +864,8 @@ miptree_download_render(const miptree_t *mt)
             .arraySize = 1);
     }
 
-    render_textures(mt->format_info, tex_views, color_views, extents,
-                    mt->num_slices);
+    copy_images_with_draw(mt->format_info, tex_views, color_views, extents,
+                            mt->num_slices);
 }
 
 static void
@@ -880,8 +880,8 @@ miptree_upload(const miptree_t *mt)
     case MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE:
         miptree_upload_copy_from_linear_image(mt);
         break;
-    case MIPTREE_UPLOAD_METHOD_RENDER:
-        miptree_upload_render(mt);
+    case MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW:
+        miptree_upload_copy_with_draw(mt);
         break;
     }
 }
@@ -898,8 +898,8 @@ miptree_download(const miptree_t *mt)
     case MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE:
         miptree_download_copy_to_linear_image(mt);
         break;
-    case MIPTREE_DOWNLOAD_METHOD_RENDER:
-        miptree_download_render(mt);
+    case MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW:
+        miptree_download_copy_with_draw(mt);
         break;
     }
 }
