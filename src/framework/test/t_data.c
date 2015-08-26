@@ -172,7 +172,7 @@ __t_color_image_view(void)
 }
 
 const VkImage *
-__t_ds_image(void)
+__t_depthstencil_image(void)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
@@ -184,7 +184,7 @@ __t_ds_image(void)
 }
 
 const VkAttachmentView *
-__t_ds_attachment_view(void)
+__t_depthstencil_attachment_view(void)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);

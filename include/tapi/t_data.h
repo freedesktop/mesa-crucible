@@ -69,8 +69,8 @@ typedef struct cru_image cru_image_t;
 #define t_color_image (*__t_color_image())
 #define t_color_attachment_view (*__t_color_attachment_view())
 #define t_color_image_view (*__t_color_image_view())
-#define t_ds_image (*__t_ds_image())
-#define t_ds_attachment_view (*__t_ds_attachment_view())
+#define t_depthstencil_image (*__t_depthstencil_image())
+#define t_depthstencil_attachment_view (*__t_depthstencil_attachment_view())
 #define t_depth_image_view (*__t_depth_image_view())
 #define t_stencil_image_view (*__t_stencil_image_view())
 #define t_framebuffer (*__t_framebuffer())
@@ -98,8 +98,8 @@ const VkDynamicDepthStencilState *__t_dynamic_ds_state(void);
 const VkImage *__t_color_image(void);
 const VkAttachmentView *__t_color_attachment_view(void);
 const VkImageView *__t_color_image_view(void);
-const VkImage *__t_ds_image(void);
-const VkAttachmentView *__t_ds_attachment_view(void);
+const VkImage *__t_depthstencil_image(void);
+const VkAttachmentView *__t_depthstencil_attachment_view(void);
 const VkImageView *__t_depth_image_view(void);
 const VkImageView *__t_stencil_image_view(void);
 const VkFramebuffer *__t_framebuffer(void);
