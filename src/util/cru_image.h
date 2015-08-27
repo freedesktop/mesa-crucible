@@ -30,6 +30,7 @@ enum cru_image_type {
     CRU_IMAGE_TYPE_PIXELS,
     CRU_IMAGE_TYPE_PNG,
     CRU_IMAGE_TYPE_TEXTURE,
+    CRU_IMAGE_TYPE_VULKAN,
 };
 
 struct cru_image {

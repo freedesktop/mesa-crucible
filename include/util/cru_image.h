@@ -71,6 +71,24 @@ uint32_t cru_image_get_height(cru_image_t *image);
 VkFormat cru_image_get_format(cru_image_t *image);
 malloclike cru_image_t *cru_image_from_pixels(void *restrict pixels, VkFormat format, uint32_t width, uint32_t height);
 malloclike cru_image_t *cru_image_load_file(const char *filename);
+
+/// \brief Create a Crucible image from a Vulkan image.
+///
+/// If writing a test, consider using t_new_cru_image_from_vk_image(), which
+/// has a simpler interface.
+///
+/// If Crucible submits any Vulkan commands on the \a image, then it will do
+/// so using the provided VkQueue. Crucible may allocate temporary
+/// VkDeviceMemory using the provided VkMemoryType index, which must be
+/// host-visible.
+///
+malloclike cru_image_t *
+cru_image_from_vk_image(VkDevice dev, VkQueue queue, VkImage image,
+                        VkFormat format, VkImageAspect aspect,
+                        uint32_t level0_width, uint32_t level0_height,
+                        uint32_t miplevel, uint32_t array_slice,
+                        uint32_t tmp_mem_type_index);
+
 bool cru_image_write_file(cru_image_t *image, const char *filename);
 bool cru_image_copy(cru_image_t *dest, cru_image_t *src);
 bool cru_image_compare(cru_image_t *a, cru_image_t *b);
