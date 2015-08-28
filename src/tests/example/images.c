@@ -54,10 +54,8 @@ test_copy_ref_image(void)
     uint32_t *copy_pixels = xmalloc(4 * width * height);
     t_cleanup_push_free(copy_pixels);
 
-    cru_image_t *copy_image = cru_image_from_pixels(copy_pixels,
-                                                    VK_FORMAT_R8G8B8A8_UNORM,
-                                                    width, height);
-    t_cleanup_push(copy_image);
+    cru_image_t *copy_image = t_new_cru_image_from_pixels(
+            copy_pixels, VK_FORMAT_R8G8B8A8_UNORM, width, height);
     cru_image_copy(copy_image, t_ref_image());
     t_dump_image_f(copy_image, "actual.png");
 
@@ -82,9 +80,8 @@ test_dump_seq_images(void)
     void *pixels = xmalloc(4 * width * height);
     t_cleanup_push_free(pixels);
 
-    cru_image_t *img = cru_image_from_pixels(pixels, VK_FORMAT_R8G8B8A8_UNORM,
-                                             width, height);
-    t_cleanup_push(img);
+    cru_image_t *img = t_new_cru_image_from_pixels(
+        pixels, VK_FORMAT_R8G8B8A8_UNORM, width, height);
 
     // Dump a red, green, then blue image.
     for (int i = 0; i < 3; ++i) {

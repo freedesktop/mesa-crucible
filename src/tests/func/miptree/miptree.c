@@ -393,16 +393,15 @@ miptree_create(void)
             t_assert(level_width == cru_image_get_width(templ_image));
             t_assert(level_height == cru_image_get_height(templ_image));
 
-            src_image = cru_image_from_pixels(src_pixels, format,
-                                              level_width, level_height);
-            t_cleanup_push(src_image);
+            src_image = t_new_cru_image_from_pixels(src_pixels,
+                    format, level_width, level_height);
             t_assert(cru_image_copy(src_image, templ_image));
             mipslice_perturb_pixels(src_pixels, format_info,
                                     level_width, level_height,
                                     l, levels, a, array_length);
 
-            dest_image = cru_image_from_pixels(dest_pixels, format,
-                                               level_width, level_height);
+            dest_image = t_new_cru_image_from_pixels(dest_pixels,
+                    format, level_width, level_height);
             t_cleanup_push(dest_image);
             fill_rect_with_canary(dest_pixels, format_info,
                                   level_width, level_height);

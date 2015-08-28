@@ -108,10 +108,8 @@ setup_dest(struct dest *dest)
 
     qoBindBufferMemory(t_device, buffer, mem, 0);
 
-    cru_image_t *cru_image = cru_image_from_pixels(map, VK_FORMAT_R8G8B8A8_UNORM,
-                                                   t_width, t_height);
-    t_assert(cru_image);
-    t_cleanup_push(cru_image);
+    cru_image_t *cru_image = t_new_cru_image_from_pixels(map,
+            VK_FORMAT_R8G8B8A8_UNORM, t_width, t_height);
 
     dest->cmd = cmd;
     dest->buffer = buffer;
