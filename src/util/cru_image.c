@@ -401,9 +401,16 @@ cru_image_compare_rect(cru_image_t *a, uint32_t a_x, uint32_t a_y,
     if (a == b)
         return true;
 
-    if (a->format_info != b->format_info) {
+    if (a->format_info != b->format_info &&
+
+        !((a->format_info->format == VK_FORMAT_S8_UINT &&
+           b->format_info->format == VK_FORMAT_R8_UNORM) ||
+
+          (a->format_info->format == VK_FORMAT_R8_UNORM &&
+           b->format_info->format == VK_FORMAT_S8_UINT))) {
+
         // Maybe one day we'll want to support more formats.
-        loge("%s: image formats differ", __func__);
+        loge("%s: image formats are incompatible", __func__);
         goto cleanup;
     }
 
