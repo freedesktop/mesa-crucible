@@ -55,3 +55,18 @@ t_new_cru_image_from_vk_image(VkDevice dev, VkQueue queue, VkImage image,
 
     return cimg;
 }
+
+malloclike cru_image_t *
+t_new_cru_image_from_pixels(void *restrict pixels, VkFormat format,
+                            uint32_t width, uint32_t height)
+{
+    t_thread_yield();
+
+    cru_image_t *cimg = cru_image_from_pixels(pixels, format, width, height);
+    if (!cimg)
+        t_failf("%s: failed to create image", __func__);
+
+    t_cleanup_push_cru_image(cimg);
+
+    return cimg;
+}

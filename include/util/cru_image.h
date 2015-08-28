@@ -69,7 +69,14 @@ void cru_image_release(cru_image_t *image);
 uint32_t cru_image_get_width(cru_image_t *image);
 uint32_t cru_image_get_height(cru_image_t *image);
 VkFormat cru_image_get_format(cru_image_t *image);
-malloclike cru_image_t *cru_image_from_pixels(void *restrict pixels, VkFormat format, uint32_t width, uint32_t height);
+
+/// \brief Create a Crucible image from an array of pixels.
+///
+/// If writing a test, consider using t_new_cru_image_from_pixels(), which has
+/// a simpler interface.
+malloclike cru_image_t *
+cru_image_from_pixels(void *restrict pixels, VkFormat format,
+                      uint32_t width, uint32_t height);
 
 
 /// \brief Create a Crucible image from a file.

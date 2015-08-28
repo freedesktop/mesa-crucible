@@ -53,3 +53,14 @@ t_new_cru_image_from_vk_image(VkDevice dev, VkQueue queue, VkImage image,
                               VkFormat format, VkImageAspect aspect,
                               uint32_t level0_width, uint32_t level0_height,
                               uint32_t miplevel, uint32_t array_slice);
+
+/// \brief Create a Crucible image from an array of pixels.
+///
+/// This is a wrapper around cru_image_from_pixels(). On success, the new image
+/// is pushed onto the test thread's cleanup stack.  On failure, the test
+/// fails.
+///
+/// \see cru_image_from_from_pixels()
+malloclike cru_image_t *
+t_new_cru_image_from_pixels(void *restrict pixels, VkFormat format,
+                            uint32_t width, uint32_t height);
