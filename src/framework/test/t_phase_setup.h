@@ -22,4 +22,4 @@
 #pragma once
 
 void t_setup_vulkan(void);
-void t_setup_ref_image(void);
+void t_setup_ref_images(void);

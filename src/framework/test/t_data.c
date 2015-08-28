@@ -298,3 +298,15 @@ t_ref_image(void)
 
     return t->ref.image;
 }
+
+cru_image_t *
+t_ref_stencil_image(void)
+{
+    ASSERT_TEST_IN_MAJOR_PHASE;
+    GET_CURRENT_TEST(t);
+
+    t_assert(t->def->ref_stencil_filename);
+    t_assert(!t->def->no_image);
+
+    return t->ref.stencil_image;
+}

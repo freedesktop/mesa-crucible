@@ -32,7 +32,7 @@ t_enter_setup_phase(void)
     t->phase = TEST_PHASE_SETUP;
 
     if (!t->opt.bootstrap && !t->def->no_image) {
-        t_setup_ref_image();
+        t_setup_ref_images();
     }
 
     t_setup_vulkan();

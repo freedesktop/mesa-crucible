@@ -47,6 +47,17 @@ struct test_def {
     /// the default filename "{test_name}.ref.png" is used.
     const char *const image_filename;
 
+    /// \brief Filename of the test's reference stencil image.
+    ///
+    /// The filename is relative to Crucible's data directory. If the filename
+    /// is NULL, then the test has no reference stencil image. If the filename
+    /// is "DEFAULT", then the default filename "{test_name}.ref-stencil.png"
+    /// is used.
+    ///
+    /// If test_def::ref_stencil_filename is set, then
+    /// test_def::depthstencil_format must also be set.
+    const char *const ref_stencil_filename;
+
     void (*const start)(void);
     const uint32_t samples;
     const bool no_image;

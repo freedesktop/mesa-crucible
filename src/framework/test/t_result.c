@@ -186,14 +186,11 @@ __t_assertfv(const char *file, int line, bool cond, const char *cond_string,
     t_end(TEST_RESULT_FAIL);
 }
 
-/// Compare the test's rendered image against its reference image.
-void
-t_compare_image(void)
+static bool
+t_compare_color_image(void)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
-
-    t_thread_yield();
 
     // Fail if the user accidentially tries to check the image in a non-image
     // test.
@@ -211,7 +208,7 @@ t_compare_image(void)
         assert(!t->ref.image);
         t_assert(cru_image_write_file(actual_image,
                                       string_data(&t->ref.filename)));
-        t_pass();
+        return true;
     }
 
     assert(t->ref.image);
@@ -221,7 +218,6 @@ t_compare_image(void)
 
         // Dump the actual image for inspection.
         //
-        // FINISHME: Add a cmdline flag to toggle image dumping.
         // FINISHME: Dump the image diff too.
         string_t actual_path = STRING_INIT;
         string_copy(&actual_path, cru_prefix_path());
@@ -230,6 +226,76 @@ t_compare_image(void)
         string_append_cstr(&actual_path, ".actual.png");
         cru_image_write_file(actual_image, string_data(&actual_path));
 
+        return false;
+    }
+
+    return true;
+}
+
+static bool
+t_compare_stencil_image(void)
+{
+    ASSERT_TEST_IN_MAJOR_PHASE;
+    GET_CURRENT_TEST(t);
+
+    // Fail if the user accidentially tries to check the image in a non-image
+    // test.
+    t_assert(!t->def->no_image);
+
+    assert(t->ref.width > 0);
+    assert(t->ref.height > 0);
+
+    const cru_format_info_t *finfo = t_format_info(t->def->depthstencil_format);
+
+    cru_image_t *actual_image = t_new_cru_image_from_vk_image(t->vk.device,
+            t->vk.queue, t->vk.ds_image, finfo->stencil_format,
+            VK_IMAGE_ASPECT_STENCIL, t->ref.width, t->ref.height,
+            /*miplevel*/ 0, /*array_slice*/ 0);
+
+    if (t->opt.bootstrap) {
+        assert(!t->ref.stencil_image);
+        t_assert(cru_image_write_file(actual_image,
+                                      string_data(&t->ref.stencil_filename)));
+        return true;
+    }
+
+    assert(t->ref.stencil_image);
+
+    if (!cru_image_compare(actual_image, t->ref.stencil_image)) {
+        loge("actual and reference stencil images differ");
+
+        // Dump the actual image for inspection.
+        //
+        // FINISHME: Dump the image diff too.
+        string_t actual_path = STRING_INIT;
+        string_copy(&actual_path, cru_prefix_path());
+        path_append_cstr(&actual_path, "data");
+        path_append_cstr(&actual_path, t_name);
+        string_append_cstr(&actual_path, ".actual-stencil.png");
+        cru_image_write_file(actual_image, string_data(&actual_path));
+
+        return false;
+    }
+
+    return true;
+}
+
+/// Compare the test's rendered image against its reference image.
+void
+t_compare_image(void)
+{
+    ASSERT_TEST_IN_MAJOR_PHASE;
+
+    t_thread_yield();
+
+    bool ok = true;
+
+    ok &= t_compare_color_image();
+    ok &= t_compare_stencil_image();
+
+    if (!ok) {
+        // Fail silently because the aspect-specific comparison functions have
+        // already logged the errors.
         t_fail_silent();
     }
 }

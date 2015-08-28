@@ -79,6 +79,7 @@ typedef struct cru_image cru_image_t;
 #define t_height (*__t_height())
 #define t_use_spir_v (*__t_use_spir_v())
 cru_image_t *t_ref_image(void);
+cru_image_t *t_ref_stencil_image(void);
 
 const char *__t_name(void);
 const void *__t_user_data(void);

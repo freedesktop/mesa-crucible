@@ -348,7 +348,7 @@ t_setup_vulkan(void)
 }
 
 void
-t_setup_ref_image(void)
+t_setup_ref_images(void)
 {
     ASSERT_TEST_IN_SETUP_PHASE;
     GET_CURRENT_TEST(t);
@@ -366,4 +366,14 @@ t_setup_ref_image(void)
 
     t_assert(t->ref.width > 0);
     t_assert(t->ref.height > 0);
+
+    if (t->def->ref_stencil_filename) {
+        assert(t->ref.stencil_filename.len > 0);
+
+        t->ref.stencil_image = t_new_cru_image_from_filename(
+            string_data(&t->ref.stencil_filename));
+
+        t_assert(t->ref.width == cru_image_get_width(t->ref.stencil_image));
+        t_assert(t->ref.height == cru_image_get_height(t->ref.stencil_image));
+    }
 }

@@ -68,23 +68,36 @@ test_broadcast_stop(test_t *t)
 }
 
 static void
-test_set_image_filename(test_t *t)
+test_set_ref_filenames(test_t *t)
 {
     ASSERT_TEST_IN_PRESTART_PHASE(t);
 
-    // Always define the reference image's filename, even when
-    // test_def_t::no_image is set. This will be useful for tests that
-    // generate their reference images at runtime and wish to dump them to
-    // disk.
     assert(t->ref.filename.len == 0);
+    assert(t->ref.stencil_filename.len == 0);
 
     if (t->def->image_filename) {
         // Test uses a custom filename.
         string_copy_cstr(&t->ref.filename, t->def->image_filename);
     } else {
         // Test uses the default filename.
+        //
+        // Always define the reference image's filename, even when
+        // test_def_t::no_image is set. This will be useful for tests that
+        // generate their reference images at runtime and wish to dump them to
+        // disk.
         string_copy_cstr(&t->ref.filename, t->def->name);
         string_append_cstr(&t->ref.filename, ".ref.png");
+    }
+
+    if (!t->def->ref_stencil_filename) {
+        // Test does not have a reference stencil image
+    } else if (cru_streq(t->def->ref_stencil_filename, "DEFAULT")) {
+        string_copy_cstr(&t->ref.stencil_filename, t->def->name);
+        string_append_cstr(&t->ref.stencil_filename, ".ref-stencil.png");
+    } else {
+        // Test uses a custom filename.
+        string_copy_cstr(&t->ref.stencil_filename,
+                         t->def->ref_stencil_filename);
     }
 }
 
@@ -107,6 +120,7 @@ test_destroy(test_t *t)
     pthread_mutex_destroy(&t->stop_mutex);
     pthread_cond_destroy(&t->stop_cond);
     string_finish(&t->ref.filename);
+    string_finish(&t->ref.stencil_filename);
 
     free(t);
 }
@@ -124,6 +138,7 @@ test_create_s(const test_create_info_t *info)
     t->phase = ATOMIC_VAR_INIT(TEST_PHASE_PRESTART);
     t->result = TEST_RESULT_PASS;
     t->ref.filename = STRING_INIT;
+    t->ref.stencil_filename = STRING_INIT;
 
     t->def = info->def;
     t->opt.no_dump = !info->enable_dump;
@@ -173,7 +188,7 @@ test_create_s(const test_create_info_t *info)
         abort();
     }
 
-    test_set_image_filename(t);
+    test_set_ref_filenames(t);
 
     return t;
 

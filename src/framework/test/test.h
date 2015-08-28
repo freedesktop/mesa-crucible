@@ -126,10 +126,14 @@ struct test {
 
     /// Reference image
     struct {
-        string_t filename;
-        cru_image_t *image;
         uint32_t width;
         uint32_t height;
+
+        string_t filename;
+        cru_image_t *image;
+
+        string_t stencil_filename;
+        cru_image_t *stencil_image;
     } ref;
 
     /// Vulkan data
