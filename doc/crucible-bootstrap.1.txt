@@ -13,4 +13,4 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-TODO
+When running a test in bootstrap mode, image dumps are automatically enabled.

@@ -139,6 +139,9 @@ test_create_s(const test_create_info_t *info)
             goto fail;
         }
 
+        // Force-enable image dumps when in bootstrap mode.
+        t->opt.no_dump = false;
+
         if (!info->def->no_image &&
             (info->bootstrap_image_width == 0 ||
              info->bootstrap_image_height == 0)) {
