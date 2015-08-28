@@ -49,6 +49,7 @@ noinst_PROGRAMS = \
 bin_crucible_SOURCES = \
 	src/cmd/cmd.c \
 	src/cmd/bootstrap.c \
+	src/cmd/dump-image.c \
 	src/cmd/help.c \
 	src/cmd/ls_example_tests.c \
 	src/cmd/ls_tests.c \
@@ -121,6 +122,7 @@ bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread -lpng16
 
 man1_MANS = \
     doc/crucible-bootstrap.1 \
+    doc/crucible-dump-image.1 \
     doc/crucible-help.1 \
     doc/crucible-ls-example-tests.1 \
     doc/crucible-ls-tests.1 \

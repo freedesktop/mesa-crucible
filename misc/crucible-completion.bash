@@ -1,8 +1,13 @@
-__crucible_commands="bootstrap test help ls-tests ls-example-tests run version"
+__crucible_commands="bootstrap dump-image test help ls-tests ls-example-tests run version"
 
 __crucible_bootstrap()
 {
    COMPREPLY=($(compgen -W "--help --width --height $($1 ls-tests)" -- ${COMP_WORDS[COMP_CWORD]}))
+}
+
+__crucible_dump_image()
+{
+   COMPREPLY=($(compgen -o filenames -A file -W "--help" -- ${COMP_WORDS[COMP_CWORD]}))
 }
 
 __crucible_help()
@@ -59,6 +64,7 @@ __crucible()
 
     case "$command" in
 	bootstrap) __crucible_bootstrap $1 ;;
+	dump-image) __crucible_dump_image $1 ;;
 	help) __crucible_help ;;
 	ls-tests) __crucible_ls_tests $1 ;;
 	run) __crucible_run $1 ;;

@@ -1,0 +1,29 @@
+crucible-dump-image(1)
+======================
+:doctype: manpage
+
+NAME
+----
+crucible-dump-image - dump image file to text
+
+SYNOPSIS
+--------
+[verse]
+*crucible dump-image* <filename>
+
+DESCRIPTION
+-----------
+Dump the image file to an ASCII table that displays each pixel's bytes.
+
+
+EXAMPLES
+--------
+
+Dumping a 4x4 blue image:
+----
+$ crucible dump-image blue-4x4.png
+0x00| 0000ffff 0000ffff 0000ffff 0000ffff
+0x01| 0000ffff 0000ffff 0000ffff 0000ffff
+0x02| 0000ffff 0000ffff 0000ffff 0000ffff
+0x03| 0000ffff 0000ffff 0000ffff 0000ffff
+----
