@@ -404,6 +404,12 @@ master_get_new_slave(void)
     if (!slave_pipe_init(slave, &slave->stderr_pipe))
         goto fail;
 
+    // Flush standard out and error before forking.  Otherwise, both the
+    // child and parent processes will have the same queue and, when that
+    // gets flushed, we'll end up with duplicate data in the output.
+    fflush(stdout);
+    fflush(stderr);
+
     slave->pid = fork();
 
     if (slave->pid == -1) {
