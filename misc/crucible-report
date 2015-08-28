@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+
+usage = """\
+NAME
+  crucible-report - a script for generating reports from crucible runs
+
+SYNOPSIS
+  crucible-report log1 log2"""
+
+import re
+import sys
+from textwrap import dedent
+
+cru_re = re.compile(r'^crucible:\s+(\w*)\s*:\s+(\S*)\s*$')
+
+def parse_results(fname):
+    results = {}
+    with open(fname) as f:
+        for line in f.readlines():
+            match = cru_re.match(line)
+            if not match:
+                continue
+
+            name = match.group(2)
+            status = match.group(1)
+
+            # We don't want info mesages
+            if status not in ('start', 'pass', 'fail', 'skip'):
+                continue
+
+            # XXX: We really shouldn't have to do this.  If we had to do
+            # this then some test is getting run multiple times and that's
+            # bad.
+            if name in results and results[name] != 'start':
+                continue;
+
+            results[name] = status;
+
+    # Go through and mark lost tests
+    for name in results:
+        if results[name] == 'start':
+            results[name] = 'lost'
+
+    return results
+
+def score_status(status):
+    if status == 'lost':
+        return -2
+    elif status == 'fail':
+        return -1
+    elif status == 'skip':
+        return 0
+    elif status == 'pass':
+        return 1
+    else:
+        assert False
+
+if len(sys.argv) < 3:
+    print(usage)
+    sys.exit(3)
+
+status1 = parse_results(sys.argv[1])
+status2 = parse_results(sys.argv[2])
+
+# The report is only valid if both runs have the same set of tests.
+assert status1.keys() == status2.keys()
+
+num_tests = len(status1.keys())
+fixed = 0
+regressions = 0
+
+for name in status1.keys():
+    if status1[name] == status2[name]:
+        continue
+
+    if score_status(status1[name]) < score_status(status2[name]):
+        fixed += 1
+    else:
+        regressions += 1
+
+    print(' {0:>5s} -> {1:<5s} : {2}'.format(status1[name], status2[name], name))
+
+print('================================')
+print('  fixed:      {0}'.format(fixed))
+print('  regressed:  {0}'.format(regressions))
+print('  unchanged:  {0}'.format(num_tests - fixed - regressions))
+print('  total:      {0}'.format(num_tests))
