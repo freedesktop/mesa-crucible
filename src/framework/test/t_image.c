@@ -24,6 +24,20 @@
 #include "util/cru_image.h"
 
 malloclike cru_image_t *
+t_new_cru_image_from_filename(const char *filename)
+{
+    t_thread_yield();
+
+    cru_image_t *cimg = cru_image_load_file(filename);
+    if (!cimg)
+        t_failf("%s: failed to create image", __func__);
+
+    t_cleanup_push_cru_image(cimg);
+
+    return cimg;
+}
+
+malloclike cru_image_t *
 t_new_cru_image_from_vk_image(VkDevice dev, VkQueue queue, VkImage image,
                               VkFormat format, VkImageAspect aspect,
                               uint32_t level0_width, uint32_t level0_height,

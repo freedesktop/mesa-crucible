@@ -29,6 +29,17 @@
 
 typedef struct cru_image cru_image_t;
 
+/// \brief Create a Crucible image from a file.
+///
+/// This is a wrapper around cru_image_load_file(). On success, the new
+/// image is pushed onto the test thread's cleanup stack.  On failure, the test
+/// fails.
+///
+/// \see cru_image_from_filename()
+///
+malloclike cru_image_t *
+t_new_cru_image_from_filename(const char *filename);
+
 /// \brief Create a Crucible image from a Vulkan image.
 ///
 /// This is a wrapper around cru_image_from_vk_image(). On success, the new

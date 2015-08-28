@@ -54,5 +54,5 @@ After writing a test, you will likely need to generate a reference image for
 it.  The command 'crucible bootstrap' can generate one for you.
 
 All images in the 'data' directory are available to tests. You can load an
-image with `cru_image_load_file(filename)`, where filename is relative to the
-'data' directory.
+image with `t_new_cru_image_from_filename(filename)`, where filename is
+relative to the 'data' directory.

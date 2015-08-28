@@ -70,7 +70,17 @@ uint32_t cru_image_get_width(cru_image_t *image);
 uint32_t cru_image_get_height(cru_image_t *image);
 VkFormat cru_image_get_format(cru_image_t *image);
 malloclike cru_image_t *cru_image_from_pixels(void *restrict pixels, VkFormat format, uint32_t width, uint32_t height);
-malloclike cru_image_t *cru_image_load_file(const char *filename);
+
+
+/// \brief Create a Crucible image from a file.
+///
+/// If writing a test, consider using t_new_cru_image_from_filename(), which
+/// has a simpler interface.
+///
+/// Relative filenames are relative to Crucible's data directory. The resultant
+/// Crucible image is read-only.
+malloclike cru_image_t *
+cru_image_load_file(const char *filename);
 
 /// \brief Create a Crucible image from a Vulkan image.
 ///
