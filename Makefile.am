@@ -61,6 +61,7 @@ bin_crucible_SOURCES = \
 	src/framework/test/t_cleanup.c \
 	src/framework/test/t_data.c \
 	src/framework/test/t_dump.c \
+	src/framework/test/t_image.c \
 	src/framework/test/t_phases.c \
 	src/framework/test/t_phase_setup.c \
 	src/framework/test/t_result.c \

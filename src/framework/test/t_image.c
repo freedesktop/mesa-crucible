@@ -19,31 +19,25 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-/// \file
-/// \brief Test API
-///
-/// FINISHME(chadv): Document how tests work, the different test phases, and how
-/// some of the more mysterious APIs should be used.
-///
-/// NOTES:
-///   - Functions prefixed with 't_' operate on the thread-local test context
-///     and are reentrant.
+#include "tapi/t.h"
+#include "tapi/t_thread.h"
+#include "util/cru_image.h"
 
-#pragma once
+malloclike cru_image_t *
+t_new_cru_image_from_vk_image(VkDevice dev, VkQueue queue, VkImage image,
+                              VkFormat format, VkImageAspect aspect,
+                              uint32_t level0_width, uint32_t level0_height,
+                              uint32_t miplevel, uint32_t array_slice)
+{
+    t_thread_yield();
 
-#include <stdlib.h>
-#include <string.h>
+    cru_image_t *cimg = cru_image_from_vk_image(t_device, queue, image,
+            format, aspect, level0_width, level0_height, miplevel,
+            array_slice, t_mem_type_index_for_mmap);
+    if (!cimg)
+        t_failf("%s: failed to create image", __func__);
 
-#include "qonos/qonos.h"
-#include "util/log.h"
-#include "util/macros.h"
-#include "util/xalloc.h"
+    t_cleanup_push_cru_image(cimg);
 
-#include "t_cleanup.h"
-#include "t_data.h"
-#include "t_def.h"
-#include "t_dump.h"
-#include "t_image.h"
-#include "t_misc.h"
-#include "t_result.h"
-#include "t_thread.h"
+    return cimg;
+}

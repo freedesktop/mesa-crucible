@@ -20,30 +20,25 @@
 // IN THE SOFTWARE.
 
 /// \file
-/// \brief Test API
-///
-/// FINISHME(chadv): Document how tests work, the different test phases, and how
-/// some of the more mysterious APIs should be used.
-///
-/// NOTES:
-///   - Functions prefixed with 't_' operate on the thread-local test context
-///     and are reentrant.
+/// \brief Test API: Helpers for Crucible images
 
 #pragma once
 
-#include <stdlib.h>
-#include <string.h>
-
-#include "qonos/qonos.h"
-#include "util/log.h"
 #include "util/macros.h"
-#include "util/xalloc.h"
+#include "util/vk_wrapper.h"
 
-#include "t_cleanup.h"
-#include "t_data.h"
-#include "t_def.h"
-#include "t_dump.h"
-#include "t_image.h"
-#include "t_misc.h"
-#include "t_result.h"
-#include "t_thread.h"
+typedef struct cru_image cru_image_t;
+
+/// \brief Create a Crucible image from a Vulkan image.
+///
+/// This is a wrapper around cru_image_from_vk_image(). On success, the new
+/// image is pushed onto the test thread's cleanup stack.  On failure, the test
+/// fails.
+///
+/// \see cru_image_from_vk_image()
+///
+malloclike cru_image_t *
+t_new_cru_image_from_vk_image(VkDevice dev, VkQueue queue, VkImage image,
+                              VkFormat format, VkImageAspect aspect,
+                              uint32_t level0_width, uint32_t level0_height,
+                              uint32_t miplevel, uint32_t array_slice);
