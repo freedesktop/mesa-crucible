@@ -245,6 +245,9 @@ t_compare_stencil_image(void)
     assert(t->ref.width > 0);
     assert(t->ref.height > 0);
 
+    if (!t->def->ref_stencil_filename)
+        return true;
+
     const cru_format_info_t *finfo = t_format_info(t->def->depthstencil_format);
 
     cru_image_t *actual_image = t_new_cru_image_from_vk_image(t->vk.device,
