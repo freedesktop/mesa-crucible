@@ -243,7 +243,6 @@ mipslice_make_template_image(const struct cru_format_info *format_info,
                              uint32_t layer, uint32_t num_layers)
 {
     string_t filename;
-    cru_image_t *image;
 
     filename = miplevel_get_template_filename(format_info,
                                               image_width, image_height,
@@ -252,11 +251,7 @@ mipslice_make_template_image(const struct cru_format_info *format_info,
 
     // FIXME: Don't load the same file multiple times. It slows down the test
     // run.
-    image = cru_image_load_file(string_data(&filename));
-    t_assert(image);
-    t_cleanup_push(image);
-
-    return image;
+    return t_new_cru_image_from_filename(string_data(&filename));
 }
 
 static const miptree_t *

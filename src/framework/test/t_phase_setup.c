@@ -359,9 +359,7 @@ t_setup_ref_image(void)
     assert(!t->def->no_image);
     assert(t->ref.filename.len > 0);
 
-    t->ref.image = cru_image_load_file(string_data(&t->ref.filename));
-    t_assert(t->ref.image);
-    t_cleanup_push(t->ref.image);
+    t->ref.image = t_new_cru_image_from_filename(string_data(&t->ref.filename));
 
     t->ref.width = cru_image_get_width(t->ref.image);
     t->ref.height = cru_image_get_height(t->ref.image);
