@@ -24,6 +24,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <unistd.h>
+
 #include "util/log.h"
 #include "util/misc.h"
 #include "util/string.h"
@@ -365,6 +367,25 @@ bool
 path_is_abs(const string_t *path)
 {
     return string_data(path)[0] == '/';
+}
+
+void
+path_to_abs(string_t *restrict dest, const string_t *restrict path)
+{
+    if (path_is_abs(path)) {
+        string_copy(dest, path);
+        return;
+    }
+
+    char buf[PATH_MAX];
+
+    if (getcwd(buf, PATH_MAX) == NULL) {
+        loge("getcwd failed");
+        abort();
+    }
+
+    path_append_cstr(dest, buf);
+    path_append(dest, path);
 }
 
 void

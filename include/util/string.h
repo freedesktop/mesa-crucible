@@ -163,7 +163,7 @@ void string_appendf(string_t *s, const char *format, ...) printflike(2, 3);
 void string_vappendf(string_t *s, const char *format, va_list va);
 
 bool path_is_abs(const string_t *path);
-void path_get_abs(string_t *dest, const string_t *path);
+void path_to_abs(string_t *restrict dest, const string_t *restrict path);
 void path_append(string_t *dest, const string_t *tail);
 void path_append_cstr(string_t *dest, const char *tail);
 void path_append_raw(string_t *dest, const char *tail, size_t len);
