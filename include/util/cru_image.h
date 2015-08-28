@@ -25,18 +25,6 @@
 /// \brief cru_image
 ///
 /// NOTES:
-///    - Filenames are relative the 'img' directory.
-///
-///    - Tests can load miptrees by a sequence of:
-///
-///         file_img = cru_image_from_filename(filename
-///         cru_image_copy(tex_image, file_img);
-///
-///    - Tests can probe render targets with:
-///
-///         file_img = cru_image_from_filename(filename
-///         cru_image_compare(tex_image, file_img);
-///
 ///    - Test authors can create new images with:
 ///
 ///         cru_image_write_file(tex_image, filename);
