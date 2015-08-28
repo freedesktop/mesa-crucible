@@ -148,7 +148,7 @@ cru_image_check_compatible(const char *func,
 }
 
 cru_image_t *
-cru_image_load_file(const char *_filename)
+cru_image_from_filename(const char *_filename)
 {
     string_t filename = STRING_INIT;
     cru_image_t *image = NULL;

@@ -28,7 +28,7 @@ t_new_cru_image_from_filename(const char *filename)
 {
     t_thread_yield();
 
-    cru_image_t *cimg = cru_image_load_file(filename);
+    cru_image_t *cimg = cru_image_from_filename(filename);
     if (!cimg)
         t_failf("%s: failed to create image", __func__);
 

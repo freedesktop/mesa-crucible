@@ -29,12 +29,12 @@
 ///
 ///    - Tests can load miptrees by a sequence of:
 ///
-///         file_img = cru_image_load_file(filename
+///         file_img = cru_image_from_filename(filename
 ///         cru_image_copy(tex_image, file_img);
 ///
 ///    - Tests can probe render targets with:
 ///
-///         file_img = cru_image_load_file(filename
+///         file_img = cru_image_from_filename(filename
 ///         cru_image_compare(tex_image, file_img);
 ///
 ///    - Test authors can create new images with:
@@ -43,7 +43,7 @@
 ///
 ///    - Images created by cru_image_from_pixels() are read-write.
 ///
-///    - Images created by cru_image_load_file() are read-only.
+///    - Images created by cru_image_from_filename() are read-only.
 ///
 ///    - Images hold no reference on their storage. For example, pixel images
 ///      do not own the backing pixel array.
@@ -80,7 +80,7 @@ malloclike cru_image_t *cru_image_from_pixels(void *restrict pixels, VkFormat fo
 /// Relative filenames are relative to Crucible's data directory. The resultant
 /// Crucible image is read-only.
 malloclike cru_image_t *
-cru_image_load_file(const char *filename);
+cru_image_from_filename(const char *filename);
 
 /// \brief Create a Crucible image from a Vulkan image.
 ///

@@ -31,7 +31,7 @@ typedef struct cru_image cru_image_t;
 
 /// \brief Create a Crucible image from a file.
 ///
-/// This is a wrapper around cru_image_load_file(). On success, the new
+/// This is a wrapper around cru_image_from_filename(). On success, the new
 /// image is pushed onto the test thread's cleanup stack.  On failure, the test
 /// fails.
 ///
