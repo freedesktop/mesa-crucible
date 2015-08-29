@@ -118,7 +118,7 @@ BUILT_SOURCES = \
 bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread -lpng16
 
 %-spirv.h: %.c misc/glsl_scraper.py
-	$(AM_V_GEN) $(PYTHON2) $(srcdir)/misc/glsl_scraper.py --with-glslang=$(GLSLANG) -o $@ $<
+	$(AM_V_GEN) $(PYTHON3) $(srcdir)/misc/glsl_scraper.py --with-glslang=$(GLSLANG) -o $@ $<
 
 %_gen.c: %_gen.py
 	$(AM_V_GEN) $(PYTHON3) $<

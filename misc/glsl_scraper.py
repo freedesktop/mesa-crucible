@@ -1,7 +1,7 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 import argparse
-import cStringIO
+import io
 import os
 import re
 import shutil
@@ -13,7 +13,7 @@ from textwrap import dedent
 
 class Shader:
     def __init__(self, stage):
-        self.stream = cStringIO.StringIO()
+        self.stream = io.StringIO()
         self.stage = stage
 
         if self.stage == 'VERTEX':
@@ -190,18 +190,18 @@ class Parser:
             self.current_shader.add_text(t)
 
     def handle_macro(self, macro):
-        t = self.token_iter.next()
+        t = next(self.token_iter)
         assert t == '('
 
         if macro == 'qoCreateShaderGLSL':
             # Throw away the device parameter
-            t = self.token_iter.next()
-            t = self.token_iter.next()
+            t = next(self.token_iter)
+            t = next(self.token_iter)
             assert t == ','
 
-        stage = self.token_iter.next().strip()
+        stage = next(self.token_iter).strip()
 
-        t = self.token_iter.next()
+        t = next(self.token_iter)
         assert t == ','
 
         self.current_shader = Shader(stage)
