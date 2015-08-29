@@ -40,7 +40,7 @@ class Shader:
         self.line = line
 
     def glsl_source(self):
-        return self.stream.getvalue()
+        return dedent(self.stream.getvalue())
 
     def compile(self):
         # We can assume if we got here that we have a temp directory and that
