@@ -35,7 +35,7 @@ static int opt_jobs = 0;
 static int opt_fork = -1; // -1 => unset on cmdline
 static int opt_no_cleanup = 0;
 static int opt_dump = 0;
-static int opt_use_spir_v = 0;
+static int opt_use_spir_v = 1;
 static int opt_separate_cleanup_thread = 1;
 
 // From man:getopt(3) :
@@ -62,6 +62,7 @@ static const struct option longopts[] = {
     {"dump",          no_argument,       &opt_dump,       true},
     {"no-dump",       no_argument,       &opt_dump,       false},
     {"use-spir-v",    no_argument,       &opt_use_spir_v, true},
+    {"no-spir-v",     no_argument,       &opt_use_spir_v, false},
 
     {"separate-cleanup-threads",    no_argument, &opt_separate_cleanup_thread, true},
     {"no-separate-cleanup-threads", no_argument, &opt_separate_cleanup_thread, false},

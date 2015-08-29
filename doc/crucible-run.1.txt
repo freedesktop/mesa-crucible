@@ -11,7 +11,7 @@ SYNOPSIS
 [verse]
 *crucible run* [--fork|--no-fork] [--no-cleanup] [--dump|--no-dump]
                [--jobs=<jobs> | -j <jobs>] [--[no-]separate-cleanup-threads]
-               [--isolation=<method> | -I <method>]
+               [--use-spir-v|--no-spir-v] [--isolation=<method> | -I <method>]
                [<pattern>...]
 
 DESCRIPTION
@@ -46,8 +46,8 @@ OPTIONS
     each test in a separate process if <method> is "p" or "process", and in
     a separate thread if <method> is "t" or "thread".
 
---use-spir-v::
-    Use SPIR-V shaders when available.
+--use-spir-v, --no-spir-v [default: enabled]::
+    Use (or don't use) SPIR-V shaders when available.
 
 --[no-]separate-cleanup-threads [default: enabled]::
     If enabled, then the test's "result" thread [1] will create a new thread
