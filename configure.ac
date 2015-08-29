@@ -61,11 +61,11 @@ if test "x$IMAGEMAGICK_CONVERT" = x; then
     AC_MSG_ERROR([failed to find ImageMagick convert])
 fi
 
-AC_ARG_VAR([GLSLANG], [path to glslang executable])
-AC_SUBST([GLSLANG])
-AC_CHECK_PROGS([GLSLANG], [glslang glslangValidator])
-if test "x$GLSLANG" = "x"; then
-    AC_MSG_ERROR([failed to find glslang or glslangValidator])
+AC_ARG_VAR([GLSLC], [path to glslc executable])
+AC_SUBST([GLSLC])
+AC_CHECK_PROGS([GLSLC], [glslc])
+if test "x$GLSLC" = "x"; then
+    AC_MSG_ERROR([failed to find glslc])
 fi
 
 AC_ARG_VAR([ASCIIDOC], [path to asciidoc executable])

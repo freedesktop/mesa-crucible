@@ -11,26 +11,14 @@ import sys
 import tempfile
 from textwrap import dedent
 
+class ShaderCompileError(RuntimeError):
+    def __init__(self):
+        super(ShaderCompileError, self).__init__('Compile error')
+
 class Shader:
     def __init__(self, stage):
         self.stream = io.StringIO()
         self.stage = stage
-
-        if self.stage == 'VERTEX':
-            self.ext = 'vert'
-        elif self.stage == 'TESS_CONTROL':
-            self.ext = 'tesc'
-        elif self.stage == 'TESS_EVALUATION':
-            self.ext = 'tese'
-        elif self.stage == 'GEOMETRY':
-            self.ext = 'geom'
-        elif self.stage == 'FRAGMENT':
-            self.ext = 'frag'
-        elif self.stage == 'COMPUTE':
-            self.ext = 'comp'
-        else:
-            assert False
-
         self.dwords = None
 
     def add_text(self, s):
@@ -42,29 +30,37 @@ class Shader:
     def glsl_source(self):
         return dedent(self.stream.getvalue())
 
-    def compile(self):
-        # We can assume if we got here that we have a temp directory and that
-        # we're currently living in it.
-        glsl_fname = 'shader{0}.{1}'.format(self.line, self.ext)
-        spirv_fname = self.ext + '.spv'
-
-        glsl_file = open(glsl_fname, 'w')
-        glsl_file.write('#version 430 core\n')
-        glsl_file.write(self.glsl_source())
-        glsl_file.close()
-
-        out = open('glslang.out', 'wb')
-        err = subprocess.call([glslang, '-H', '-V', glsl_fname], stdout=out)
-        out.close()
-        out = open('glslang.out', 'r')
-        if err != 0:
-            sys.stderr.write(out.read())
-            return False
+    def __run_glslc(self, extra_args=[]):
+        stage_flag = '-fshader-stage='
+        if self.stage == 'VERTEX':
+            stage_flag += 'vertex'
+        elif self.stage == 'TESS_CONTROL':
+            stage_flag += 'tesscontrol'
+        elif self.stage == 'TESS_EVALUATION':
+            stage_flag += 'tesseval'
+        elif self.stage == 'GEOMETRY':
+            stage_flag += 'geometry'
+        elif self.stage == 'FRAGMENT':
+            stage_flag += 'fragment'
+        elif self.stage == 'COMPUTE':
+            stage_flag += 'compute'
         else:
-            self.assembly = out.readlines()
+            assert False
 
-        out.close()
+        with subprocess.Popen([glslc] + extra_args +
+                              [stage_flag, '-std=430core', '-o', '-', '-'],
+                              stdout = subprocess.PIPE,
+                              stdin = subprocess.PIPE) as proc:
 
+            proc.stdin.write(self.glsl_source().encode('utf-8'))
+            out, err = proc.communicate(timeout=30)
+
+            if proc.returncode != 0:
+                raise ShaderCompileError()
+
+            return out
+
+    def compile(self):
         def dwords(f):
             while True:
                 dword_str = f.read(4)
@@ -73,14 +69,9 @@ class Shader:
                 assert len(dword_str) == 4
                 yield struct.unpack('I', dword_str)[0]
 
-        spirv_file = open(spirv_fname, 'rb')
-        self.dwords = list(dwords(spirv_file))
-        spirv_file.close()
-
-        os.remove(glsl_fname)
-        os.remove(spirv_fname)
-
-        return True
+        spirv = self.__run_glslc()
+        self.dwords = list(dwords(io.BytesIO(spirv)))
+        self.assembly = str(self.__run_glslc(['-S']), 'utf-8')
 
     def _dump_glsl_code(self, f, var_name):
         # First dump the GLSL source as strings
@@ -96,15 +87,8 @@ class Shader:
     def _dump_spirv_code(self, f, var_name):
         f.write('/* SPIR-V Assembly:\n')
         f.write(' *\n')
-        preamble = True
-        for line in self.assembly:
-            if preamble and line.startswith('// Module'):
-                preamble = False
-
-            if preamble:
-                continue
-
-            f.write(' * ' + line)
+        for line in self.assembly.splitlines():
+            f.write(' * ' + line + '\n')
         f.write(' */\n')
 
         f.write('static const uint32_t {0}[] = {{'.format(var_name))
@@ -242,10 +226,10 @@ def parse_args():
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('-o', '--outfile', default='-',
                         help='Output to the given file (default: stdout).')
-    p.add_argument('--with-glslang', metavar='PATH',
-                        default='glslangValidator',
-                        dest='glslang',
-                        help='Full path to the glslangValidator program.')
+    p.add_argument('--with-glslc', metavar='PATH',
+                        default='glslc',
+                        dest='glslc',
+                        help='Full path to the glslc shader compiler.')
     p.add_argument('--glsl-only', action='store_true')
     p.add_argument('infile', metavar='INFILE')
 
@@ -255,7 +239,7 @@ def parse_args():
 args = parse_args()
 infname = args.infile
 outfname = args.outfile
-glslang = args.glslang
+glslc = args.glslc
 glsl_only = args.glsl_only
 
 with open_file(infname, 'r') as infile:
@@ -263,28 +247,16 @@ with open_file(infname, 'r') as infile:
     parser.run()
 
 if not glsl_only:
-    # glslangValidator has an absolutely *insane* interface.  We pretty much
-    # have to run in a temporary directory.  Sad day.
-    current_dir = os.getcwd()
-    tmpdir = tempfile.mkdtemp('glsl_scraper')
-
-    try:
-        os.chdir(tmpdir)
-
-        for shader in parser.shaders:
-            success = shader.compile()
-
+    for shader in parser.shaders:
+        try:
+            shader.compile()
+        except ShaderCompileError:
             # If any compile fails, we set glsl_only and bail.  This way
             # the entire fill will either support SPIR-V or not.  If we did
             # it per-shader, then we could have problems with linking a
             # pipeline that's half GLSL and half SPIR-V.
-            if not success:
-                glsl_only = True
-                break
-
-        os.chdir(current_dir)
-    finally:
-        shutil.rmtree(tmpdir)
+            glsl_only = True
+            break
 
 with open_file(outfname, 'w') as outfile:
     outfile.write(dedent("""\
