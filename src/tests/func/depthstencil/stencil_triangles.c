@@ -53,12 +53,22 @@ clear_stencil_with_quad(void)
                 void main()
                 {
                     // Draw a full quad.
-                    switch (gl_VertexID) {
-                    case 0: gl_Position = vec4(-1, -1, 0, 1); break;
-                    case 1: gl_Position = vec4(+1, -1, 0, 1); break;
-                    case 2: gl_Position = vec4(+1, +1, 0, 1); break;
-                    case 3: gl_Position = vec4(-1, +1, 0, 1); break;
+                    if (gl_VertexID == 0) {
+                        gl_Position = vec4(-1, -1, 0, 1);
+                    } else if (gl_VertexID == 1) {
+                        gl_Position = vec4(+1, -1, 0, 1);
+                    } else if (gl_VertexID == 2) {
+                        gl_Position = vec4(+1, +1, 0, 1);
+                    } else if (gl_VertexID == 3) {
+                        gl_Position = vec4(-1, +1, 0, 1);
                     }
+                    // XXX: spirv_to_nir doesn't handle switch yet
+                    // switch (gl_VertexID) {
+                    // case 0: gl_Position = vec4(-1, -1, 0, 1); break;
+                    // case 1: gl_Position = vec4(+1, -1, 0, 1); break;
+                    // case 2: gl_Position = vec4(+1, +1, 0, 1); break;
+                    // case 3: gl_Position = vec4(-1, +1, 0, 1); break;
+                    // }
                 }
             ),
             .fragmentShader = qoCreateShaderGLSL(t_device, FRAGMENT,
@@ -150,21 +160,37 @@ draw_triangle(void)
                 // Draw 3 overlapping triangles.
                 void main()
                 {
-                    switch (gl_VertexID) {
-                    case 0: gl_Position = vec4(-0.6, -0.6, 0, 1); break;
-                    case 1: gl_Position = vec4(+0.6, -0.6, 0, 1); break;
-                    case 2: gl_Position = vec4( 0.0, +0.6, 0, 1); break;
+                    if (gl_VertexID == 0) {
+                        gl_Position = vec4(-0.6, -0.6, 0, 1);
+                    } else if (gl_VertexID == 1) {
+                        gl_Position = vec4(+0.6, -0.6, 0, 1);
+                    } else if (gl_VertexID == 2) {
+                        gl_Position = vec4( 0.0, +0.6, 0, 1);
                     }
+                    // XXX: spirv_to_nir doesn't handle switch yet
+                    // switch (gl_VertexID) {
+                    // case 0: gl_Position = vec4(-0.6, -0.6, 0, 1); break;
+                    // case 1: gl_Position = vec4(+0.6, -0.6, 0, 1); break;
+                    // case 2: gl_Position = vec4( 0.0, +0.6, 0, 1); break;
+                    // }
 
                     gl_Position.x += 0.2 * (gl_InstanceID - 1);
                     gl_Position.y += 0.2 * (gl_InstanceID - 1);
 
                     // blue, green, yellow
-                    switch (gl_InstanceID) {
-                    case 0: v_color = vec4(0.2,  0.2, 1.0, 1.0); break;
-                    case 1: v_color = vec4(0.2,  1.0, 0.2, 1.0); break;
-                    case 2: v_color = vec4(1.0,  1.0, 0.2, 1.0); break;
+                    if (gl_InstanceID == 0) {
+                        v_color = vec4(0.2,  0.2, 1.0, 1.0);
+                    } else if (gl_InstanceID == 1) {
+                        v_color = vec4(0.2,  1.0, 0.2, 1.0);
+                    } else if (gl_InstanceID == 2) {
+                        v_color = vec4(1.0,  1.0, 0.2, 1.0);
                     }
+                    // XXX: spirv_to_nir doesn't handle switch yet
+                    // switch (gl_InstanceID) {
+                    // case 0: v_color = vec4(0.2,  0.2, 1.0, 1.0); break;
+                    // case 1: v_color = vec4(0.2,  1.0, 0.2, 1.0); break;
+                    // case 2: v_color = vec4(1.0,  1.0, 0.2, 1.0); break;
+                    // }
                 }
             ),
             .fragmentShader = qoCreateShaderGLSL(t_device, FRAGMENT,
