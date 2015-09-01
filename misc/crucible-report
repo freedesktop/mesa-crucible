@@ -50,30 +50,45 @@ status_score = {
     'pass': 1,
 }
 
+status_color = {
+    'lost': 3, # Yellow
+    'fail': 1, # Red
+    'skip': 4, # Blue
+    'pass': 2, # Green
+}
+
+def colored_status(status):
+    color = status_color[status]
+    return '\x1b[' + str(90 + color) + 'm' + status + '\x1b[0m'
+
 if len(sys.argv) < 3:
     print(usage)
     sys.exit(3)
 
-status1 = parse_results(sys.argv[1])
-status2 = parse_results(sys.argv[2])
+run1 = parse_results(sys.argv[1])
+run2 = parse_results(sys.argv[2])
 
 # The report is only valid if both runs have the same set of tests.
-assert status1.keys() == status2.keys()
+assert run1.keys() == run2.keys()
 
-num_tests = len(status1.keys())
+num_tests = len(run1.keys())
 fixed = 0
 regressions = 0
 
-for name in status1.keys():
-    if status1[name] == status2[name]:
+for name in run1.keys():
+    status1 = run1[name]
+    status2 = run2[name]
+
+    if status1 == status2:
         continue
 
-    if status_score[status1[name]] < status_score[status2[name]]:
+    if status_score[status1] < status_score[status2]:
         fixed += 1
     else:
         regressions += 1
 
-    print(' {0:>5s} -> {1:<5s} : {2}'.format(status1[name], status2[name], name))
+    print(' {0:>5s} -> {1:<5s} : {2}'.format(colored_status(status1),
+                                             colored_status(status2), name))
 
 print('================================')
 print('  fixed:      {0}'.format(fixed))
