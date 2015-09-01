@@ -43,17 +43,12 @@ def parse_results(fname):
 
     return results
 
-def score_status(status):
-    if status == 'lost':
-        return -2
-    elif status == 'fail':
-        return -1
-    elif status == 'skip':
-        return 0
-    elif status == 'pass':
-        return 1
-    else:
-        assert False
+status_score = {
+    'lost': -2,
+    'fail': -1,
+    'skip': 0,
+    'pass': 1,
+}
 
 if len(sys.argv) < 3:
     print(usage)
@@ -73,7 +68,7 @@ for name in status1.keys():
     if status1[name] == status2[name]:
         continue
 
-    if score_status(status1[name]) < score_status(status2[name]):
+    if status_score[status1[name]] < status_score[status2[name]]:
         fixed += 1
     else:
         regressions += 1
