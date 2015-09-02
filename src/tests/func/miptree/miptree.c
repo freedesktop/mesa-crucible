@@ -143,6 +143,8 @@ fill_rect_with_canary(void *pixels,
             float *f = pixels + (sizeof(float) * i);
             f[0] = M_1_PI;
         }
+    } else if (format_info->format == VK_FORMAT_S8_UINT) {
+        memset(pixels, 0x19, width * height);
     } else {
         t_failf("unsupported cru_format_info");
     }
@@ -179,6 +181,19 @@ mipslice_perturb_pixels(void *pixels,
             float *f = pixels + (sizeof(float) * i);
             f[0] *= red_scale;
         }
+    } else if (format_info->format == VK_FORMAT_S8_UINT) {
+        for (uint32_t i = 0; i < width * height; ++i) {
+            // Stencil values have a small range, so it's dificult to guarantee
+            // uniqueness of each mipslice while also preserving the mipslice's
+            // resemblance to the original image. A good compromise is to
+            // invert the pixels of every odd mipslice and also apply a small
+            // shift to each pixel. The alternating inversion guarantees that
+            // adjacent mipslices are easily distinguishable, yet they still
+            // strongly resemble the original image.
+            bool odd = (level + layer) % 2;
+            uint8_t *u = pixels + i;
+            u[0] = CLAMP((1 - 2 * odd) * (u[0] - 3), 0, UINT8_MAX);
+        }
     } else {
         t_failf("unsupported cru_format_info");
      }
@@ -200,6 +215,7 @@ miplevel_get_template_filename(const cru_format_info_t *format_info,
         string_appendf(&filename, "mandrill");
         break;
     case VK_FORMAT_D32_SFLOAT:
+    case VK_FORMAT_S8_UINT:
         switch (layer) {
         case 0:
             string_appendf(&filename, "grass-grayscale");
