@@ -79,36 +79,19 @@ cru_pop_argv(int start, int count, int *argc, char **argv)
    *argc -= count;
 }
 
+/// Open the manpage "crucible-{suffix}({volume})" by exec'ing man.
 noreturn void
-cru_command_page_help(const cru_command_t *cmd)
+cru_open_crucible_manpage(int volume, const char *suffix)
 {
     int err;
 
-    // Build path to "{prefix}/doc/crucible-{command}.1".
-    string_t help_path = STRING_INIT;
-    path_append(&help_path, cru_prefix_path());
-    path_append_cstr(&help_path, "doc");
-    path_append_cstr(&help_path, "crucible-");
-    string_append_cstr(&help_path, cmd->name);
-    string_append_cstr(&help_path, ".1");
+    // Build path to "{prefix}/doc/crucible-{suffix}.{vol}".
+    string_t path = STRING_INIT;
+    path_append(&path, cru_prefix_path());
+    path_append_cstr(&path, "doc");
+    path_appendf(&path, "crucible-%s.%d", suffix, volume);
 
-    struct stat help_stat;
-    err = stat(string_data(&help_path), &help_stat);
-    if (err) {
-        int stat_errno = errno;
-        switch (stat_errno) {
-        case ENOENT:
-            loge("no help text for crucible-%s", cmd->name);
-            exit(1);
-        default:
-            loge("failed to read help text at %s",
-                     string_data(&help_path));
-            loge("%s", strerror(stat_errno));
-            exit(1);
-        }
-    }
-
-    char *man_args[] = {"man", "--local-file", string_data(&help_path), NULL};
+    char *man_args[] = {"man", "--local-file", string_data(&path), NULL};
 
     err = execvp(man_args[0], man_args);
     if (err) {
@@ -118,4 +101,10 @@ cru_command_page_help(const cru_command_t *cmd)
     }
 
     cru_unreachable;
+}
+
+noreturn void
+cru_command_page_help(const cru_command_t *cmd)
+{
+    cru_open_crucible_manpage(1, cmd->name);
 }

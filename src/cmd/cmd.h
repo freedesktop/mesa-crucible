@@ -45,6 +45,7 @@ const cru_command_t *cru_find_command(const char *name);
 void cru_pop_argv(int start, int count, int *argc, char **argv);
 noreturn void cru_usage_error(const cru_command_t *cmd, const char *format, ...) printflike(2, 3);
 noreturn void cru_command_page_help(const cru_command_t *cmd);
+noreturn void cru_open_crucible_manpage(int volume, const char *suffix);
 
 extern const cru_command_t __start_cru_commands, __stop_cru_commands;
 
