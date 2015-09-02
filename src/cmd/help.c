@@ -36,13 +36,18 @@ enum {
 };
 
 static int opt_flag;
-static const char *opt_command_name;
+static const char *opt_topic;
 
 static const char *shortopts = "";
 
 static const struct option longopts[] = {
     {"help", no_argument, &opt_flag, OPT_HELP},
     {0},
+};
+
+static const char *more_topics[] = {
+    "tutorial",
+    0,
 };
 
 static void
@@ -55,27 +60,21 @@ print_main_help(void)
         "  crucible - a testsuite for Vulkan\n"
         "\n"
         "SYNOPSIS\n"
-        "  crucible [--version] [--help] <command>\n"
+        "  crucible [--version] [--help] <topic>\n"
         "\n"
         "COMMANDS\n");
 
     cru_foreach_command(cmd) {
         printf("  %s\n", cmd->name);
     }
-}
 
-static void
-print_command_help(const char *cmd_name)
-{
-    const cru_command_t *cmd;
+    printf(
+        "\n"
+        "ADDITIONAL TOPICS\n");
 
-    cmd = cru_find_command(cmd_name);
-    if (!cmd) {
-        loge("failed to find command '%s'", cmd_name);
-        exit(1);
+    for (const char **t = more_topics; *t != NULL; ++t) {
+        printf("  %s\n", *t);
     }
-
-    cru_command_page_help(cmd);
 }
 
 static void
@@ -117,7 +116,7 @@ done_getopt:
     if (optind == argc)
         return;
 
-    opt_command_name = argv[optind++];
+    opt_topic = argv[optind++];
 
     if (optind < argc)
         cru_usage_error(cmd, "trailing arguments");
@@ -128,12 +127,26 @@ start(const cru_command_t *cmd, int argc, char **argv)
 {
     parse_args(cmd, argc, argv);
 
-    if (opt_command_name)
-        print_command_help(opt_command_name);
-    else
+    if (!opt_topic) {
         print_main_help();
+        return 0;
+    }
 
-    return 0;
+    const cru_command_t *target_cmd = cru_find_command(opt_topic);
+    if (target_cmd) {
+        cru_command_page_help(target_cmd);
+        return 0;
+    }
+
+    for (const char **t = more_topics; *t != NULL; ++t) {
+        if (cru_streq(*t, opt_topic)) {
+            cru_open_crucible_manpage(7, opt_topic);
+            return 0;
+        }
+    }
+
+    loge("failed to find topic '%s'", opt_topic);
+    return 1;
 }
 
 cru_define_command {
