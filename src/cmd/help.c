@@ -55,7 +55,7 @@ print_main_help(void)
         "  crucible - a testsuite for Vulkan\n"
         "\n"
         "SYNOPSIS\n"
-        "  crucible [--version] [--help] <command> [<args>]\n"
+        "  crucible [--version] [--help] <command>\n"
         "\n"
         "COMMANDS\n");
 
