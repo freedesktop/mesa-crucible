@@ -77,11 +77,19 @@ stencil_params_iter = (
     for array_length in (1, 2)
     for upload_method in (
         'copy-from-buffer',
-        'copy-from-linear-image',
+
+        # Intel doesn't support linear stencil images. If you want to enable
+        # testing linear stencil images, then you must first teach the test
+        # how to skip when the driver does not support the particular
+        # format/image/usage combination.
+        #
+        #'copy-from-linear-image',
     )
     for download_method in (
         'copy-to-buffer',
-        'copy-to-linear-image',
+
+        # Intel doesn't support linear stencil images. See above comment.
+        #'copy-to-linear-image',
     )
 )
 
