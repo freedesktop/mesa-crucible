@@ -56,3 +56,21 @@ it.  The command 'crucible bootstrap' can generate one for you.
 All images in the 'data' directory are available to tests. You can load an
 image with `t_new_cru_image_from_filename(filename)`, where filename is
 relative to the 'data' directory.
+
+
+
+Generated Files
+===============
+The names of generated source files should match the glob "*_gen.[ch]".
+
+Do not commit generated image files. They consume too much space in the git
+history.
+
+Do commit a generated source file if the diff of the generated file is
+substantially more reviewable and informative than the diff of the generator
+script. Often, small cryptic changes to a generator script will produce easily
+understood changes in its generated files. As a corollary, if a generated file
+is commited, then its generator script must produce deterministic output.
+
+Do not commit a generated source file if it doesn't satisfy the "reviewability"
+criterion above.

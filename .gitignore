@@ -8,8 +8,6 @@
 /doc/*.7
 
 # generated files
-*_gen.c
-*_gen.h
 *-spirv.h
 /data/grass-*.jpg
 /data/grass-*.png
