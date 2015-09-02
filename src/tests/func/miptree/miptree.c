@@ -148,8 +148,14 @@ fill_rect_with_canary(void *pixels,
     }
 }
 
-/// Ensure that each mipslice's image is unique, and that each pair of images
-/// is easily distinguishable visually.
+/// Ensure that each mipslice's pixels is unique, and that each pair of
+/// mipslices is easily distinguishable visually.
+///
+/// To aid the debugging of failing tests, the perturbed pixels of each
+/// mipslice must resemble the original image.  Perturb the mipslice too much,
+/// and it will resemble noise, making debugging failing tests difficult.
+/// Perturb too little, and it will resemble too closely adjacent mipslices,
+/// allowing the test to pass in the presence of driver bugs.
 static void
 mipslice_perturb_pixels(void *pixels,
                        const cru_format_info_t *format_info,
