@@ -68,16 +68,14 @@ if len(sys.argv) < 3:
 run1 = parse_results(sys.argv[1])
 run2 = parse_results(sys.argv[2])
 
-# The report is only valid if both runs have the same set of tests.
-assert run1.keys() == run2.keys()
-
 num_tests = len(run1.keys())
 fixed = 0
 regressions = 0
 
-for name in run1.keys():
-    status1 = run1[name]
-    status2 = run2[name]
+for name in set(run1.keys()) | set(run2.keys()):
+    # If a test wasn't run, consider it skipped.
+    status1 = run1.get(name, 'skip')
+    status2 = run2.get(name, 'skip')
 
     if status1 == status2:
         continue
