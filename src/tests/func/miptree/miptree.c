@@ -359,34 +359,52 @@ miptree_create(void)
             void *src_pixels = src_buffer_map + buffer_offset;
             void *dest_pixels = dest_buffer_map + buffer_offset;
 
-            VkImage src_vk_image = qoCreateImage(t_device,
-                .format = format,
-                .mipLevels = 1,
-                .arraySize = 1,
-                .extent = {
-                    .width = level_width,
-                    .height = level_height,
-                    .depth = 1,
-                },
-                .tiling = VK_IMAGE_TILING_LINEAR,
-                .usage = VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT);
+            VkImage src_vk_image;
+            VkImage dest_vk_image;
 
-            VkImage dest_vk_image = qoCreateImage(t_device,
-                .format = format,
-                .mipLevels = 1,
-                .arraySize = 1,
-                .extent = {
-                    .width = level_width,
-                    .height = level_height,
-                    .depth = 1,
-                },
-                .tiling = VK_IMAGE_TILING_LINEAR,
-                .usage = VK_IMAGE_USAGE_TRANSFER_DESTINATION_BIT);
+            switch (params->upload_method) {
+            case MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER:
+                src_vk_image = (VkImage) {0}; // unused
+                break;
+            case MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE:
+            case MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW:
+                src_vk_image = qoCreateImage(t_device,
+                    .format = format,
+                    .mipLevels = 1,
+                    .arraySize = 1,
+                    .extent = {
+                        .width = level_width,
+                        .height = level_height,
+                        .depth = 1,
+                    },
+                    .tiling = VK_IMAGE_TILING_LINEAR,
+                    .usage = VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT);
+                qoBindImageMemory(t_device, src_vk_image, src_buffer_mem,
+                                  buffer_offset);
+                break;
+            }
 
-            qoBindImageMemory(t_device, src_vk_image, src_buffer_mem,
-                              buffer_offset);
-            qoBindImageMemory(t_device, dest_vk_image, dest_buffer_mem,
-                              buffer_offset);
+            switch (params->download_method) {
+            case MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER:
+                dest_vk_image = (VkImage) {0}; // unused
+                break;
+            case MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE:
+            case MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW:
+                dest_vk_image = qoCreateImage(t_device,
+                    .format = format,
+                    .mipLevels = 1,
+                    .arraySize = 1,
+                    .extent = {
+                        .width = level_width,
+                        .height = level_height,
+                        .depth = 1,
+                    },
+                    .tiling = VK_IMAGE_TILING_LINEAR,
+                    .usage = VK_IMAGE_USAGE_TRANSFER_DESTINATION_BIT);
+                qoBindImageMemory(t_device, dest_vk_image, dest_buffer_mem,
+                                  buffer_offset);
+                break;
+            }
 
             cru_image_t *templ_image;
             cru_image_t *src_image;
