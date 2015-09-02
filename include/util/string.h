@@ -167,6 +167,8 @@ void path_to_abs(string_t *restrict dest, const string_t *restrict path);
 void path_append(string_t *dest, const string_t *tail);
 void path_append_cstr(string_t *dest, const char *tail);
 void path_append_raw(string_t *dest, const char *tail, size_t len);
+void path_appendf(string_t *dest, const char *format, ...) printflike(2, 3);
+void path_vappendf(string_t *dest, const char *format, va_list va);
 void path_dirname(string_t *path);
 
 #ifdef __cplusplus

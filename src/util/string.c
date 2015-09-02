@@ -415,6 +415,25 @@ path_append_raw(string_t *dest, const char *tail, size_t len)
     }
 }
 
+void printflike(2, 3)
+path_appendf(string_t *dest, const char *format, ...)
+{
+    va_list va;
+
+    va_start(va, format);
+    path_vappendf(dest, format, va);
+    va_end(va);
+}
+
+void
+path_vappendf(string_t *dest, const char *format, va_list va)
+{
+    string_t tmp = STRING_INIT;
+
+    string_vprintf(&tmp, format, va);
+    path_append(dest, &tmp);
+}
+
 /// Parse the dirname of path, in-place.
 ///
 ///
