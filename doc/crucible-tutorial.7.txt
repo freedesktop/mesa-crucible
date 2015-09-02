@@ -1,0 +1,123 @@
+crucible-tutorial(7)
+====================
+:doctype: manpage
+
+NAME
+----
+crucible-tutorial - a tutorial to using Crucible
+
+SYNOPSIS
+--------
+[verse]
+*crucible **
+
+
+PREREQUISITES
+-------------
+This tutorial assumes you already have successfully built Crucible in the
+source directory `CRU_SRC_DIR`.
+
+
+SETTING UP THE ENVIRONMENT
+--------------------------
+Crucible may be run from any directory without any special configuration.
+For example, you may run it when inside its source directory:
+
+----
+$ cd $CRU_SRC_DIR
+$ ./bin/crucible help
+----
+
+Or you can run it from any directory:
+
+----
+$ cd /anywhere
+$ $CRU_SRC_DIR/bin/crucible help
+----
+
+Though Crucible requires no special configuration, we recommend you add
+Crucible to your environment's PATH, like so:
+
+----
+$ PATH="$CRU_SRC_DIR/bin:$PATH"
+$ export PATH
+----
+
+If you use Bash, we recommend you enable Crucible's bash-completion:
+
+----
+$ source $CRU_SRC_DIR/misc/crucible-completion.bash
+----
+
+
+RUNNING TESTS
+-------------
+To list all tests:
+
+----
+$ crucible ls-tests
+----
+
+To run all tests:
+
+----
+$ crucible run
+----
+
+To run specific tests:
+
+----
+$ crucible run func.basic-clear
+$ crucible run func.basic-clear info.device-properties
+----
+
+The run command also supports glob patterns:
+
+----
+$ crucible run 'func.draw*indirect' 'func.miptree.*'
+----
+
+For more information, see *crucible-run(1)*.
+
+
+DEBUGGING FAILING TESTS
+-----------------------
+Crucible provides several features to assist in debugging failing tests.
+
+*Dumping Test Images*::
+The '--dump' option of *crucible-run* will force the test to dump diagnostic
+files (usually PNG files) to Crucible's data directory. These files will
+usually include the test's reference images (if the test uses reference
+images); the actual rendered images that the test compares against the
+reference images; and any other image the test author decided to dump for
+debugging assistance.  The filename of each dumped image begins with the
+testname. For example, to dump the images of hypothetical test
+'func.foo.r8g8b8a8-unorm', run the command:
++
+----
+$ crucible run --dump func.foo.r8g8b8a8-unorm
+----
++
+The hypothetical test may dump the following files:
++
+----
+func.foo.r8g8b8a8-unorm.ref.png
+func.foo.r8g8b8a8-unorm.actual.png
+----
+
+
+*Inspecting Dumped Test Images*::
+Often, the easiest way to inspect an image file is to use a graphical image
+viewer. Sometimes, you may need a more complex tool, such as GIMP or Photoshop.
+In extreme cases, you may be tempted to use a hex editor. For those extreme
+cases, Crucible provides a tool, *crucible-dump-image(1)*, that translates an
+image file to an ASCII grid of hex bytes.
+
+*Disable Forking*::
+By default, *crucible-run* employs multiple processes: one process for the test
+runner itself, and one or more processes for the actual tests. This process
+isolation may complicate debugging.  There are two ways to prevent
+*crucible-run* from forking:
+    - Use the option '--no-fork'.
+    - If exactly one test is passed to *crucible-run*, then Crucible assumes
+      you wish to debug that test and automatically disables forking.

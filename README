@@ -64,50 +64,6 @@ Supported Platforms
     - Other: Not yet tested.
 
 
-Building
-========
-Do the autotools dance:
-
-  $ autoreconf -vfi
-  $ ./configure
-  $ make
-
-The configure script will search for Vulkan headers and libraries in the usual
-system locations.  You can modify the search paths with environment variables
-CPATH and LIBRARY_PATH [see man:gcc(1)].  If you want to configure Crucible to
-use the headers and libraries contained in a Mesa source directory, then pass
---with-mesa=$MESA_DIR to the configure script.
-
-
-Running Tests
-=============
-If you alter your environment's PATH, then you can run the testsuite from any
-directory:
-
-  $ export PATH="$CRU_TOP/bin:$PATH"
-
-If you use Bash, we recommend you enable bash-completion:
-
-  $ source $CRU_TOP/misc/crucible-completion.bash
-
-To list all tests:
-
-  $ crucible ls-tests
-
-To run all tests:
-
-  $ crucible run
-
-To run specific tests:
-
-  $ crucible run func.basic-clear
-  $ crucible run func.basic-clear info.device-properties
-
-The run command also supports glob patterns:
-
-  $ crucible run 'func.draw*indirect' 'func.miptree.*'
-
-
 License
 =======
 Crucible is opensource software. See the LICENSE file for details.

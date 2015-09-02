@@ -127,6 +127,7 @@ man1_MANS = \
     doc/crucible-bootstrap.1 \
     doc/crucible-dump-image.1 \
     doc/crucible-help.1 \
+    doc/crucible-tutorial.7 \
     doc/crucible-ls-example-tests.1 \
     doc/crucible-ls-tests.1 \
     doc/crucible-run.1 \
@@ -137,6 +138,9 @@ man: $(man1_MANS)
 	@
 
 %.1: %.1.txt
+	$(AM_V_GEN)$(A2X) --format manpage $^
+
+%.7: %.7.txt
 	$(AM_V_GEN)$(A2X) --format manpage $^
 
 built_data_files = \
