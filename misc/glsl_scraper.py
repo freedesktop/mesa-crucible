@@ -12,8 +12,8 @@ import tempfile
 from textwrap import dedent
 
 class ShaderCompileError(RuntimeError):
-    def __init__(self):
-        super(ShaderCompileError, self).__init__('Compile error')
+    def __init__(self, *args):
+        super(ShaderCompileError, self).__init__(*args)
 
 class Shader:
     def __init__(self, stage):
@@ -50,13 +50,18 @@ class Shader:
         with subprocess.Popen([glslc] + extra_args +
                               [stage_flag, '-std=430core', '-o', '-', '-'],
                               stdout = subprocess.PIPE,
+                              stderr = subprocess.PIPE,
                               stdin = subprocess.PIPE) as proc:
 
             proc.stdin.write(self.glsl_source().encode('utf-8'))
             out, err = proc.communicate(timeout=30)
 
             if proc.returncode != 0:
-                raise ShaderCompileError()
+                # Unfortunately, glslang dumps errors to standard out.
+                # However, since we don't really want to count on that,
+                # we'll grab the output of both
+                message = out.decode('utf-8') + '\n' + err.decode('utf-8')
+                raise ShaderCompileError(message.strip())
 
             return out
 
