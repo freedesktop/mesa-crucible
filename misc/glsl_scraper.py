@@ -253,15 +253,7 @@ with open_file(infname, 'r') as infile:
 
 if not glsl_only:
     for shader in parser.shaders:
-        try:
-            shader.compile()
-        except ShaderCompileError:
-            # If any compile fails, we set glsl_only and bail.  This way
-            # the entire fill will either support SPIR-V or not.  If we did
-            # it per-shader, then we could have problems with linking a
-            # pipeline that's half GLSL and half SPIR-V.
-            glsl_only = True
-            break
+        shader.compile()
 
 with open_file(outfname, 'w') as outfile:
     outfile.write(dedent("""\
