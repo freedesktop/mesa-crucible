@@ -755,6 +755,9 @@ copy_color_images_with_draw(const cru_format_info_t *format_info,
     vkCmdBindDynamicRasterState(cmd, t_dynamic_rs_state);
     vkCmdBindDynamicColorBlendState(cmd, t_dynamic_cb_state);
     vkCmdBindDynamicDepthStencilState(cmd, t_dynamic_ds_state);
+    vkCmdBindVertexBuffers(cmd, /*startBinding*/ 0, /*bindingCount*/ 1,
+                           (VkBuffer[]) {vb},
+                           (VkDeviceSize[]) {0});
 
     for (uint32_t i = 0; i < count; ++i) {
         const uint32_t width = extents[i].width;
@@ -817,10 +820,6 @@ copy_color_images_with_draw(const cru_format_info_t *format_info,
                 .attachmentCount = 1,
                 .pAttachmentClearValues = NULL
             }, VK_RENDER_PASS_CONTENTS_INLINE);
-
-        vkCmdBindVertexBuffers(cmd, /*startBinding*/ 0, /*bindingCount*/ 1,
-                               (VkBuffer[]) {vb},
-                               (VkDeviceSize[]) {0});
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                                 pipeline_layout,
