@@ -156,7 +156,9 @@ cru_vec_push_memcpy(cru_vec_t *v, const elem_t *restrict elems,
 #define cru_vec_push_memcpy(v, elems, elem_count) \
 ({ \
     /* Statically assert that elems has the correct type. */ \
-    (void) sizeof(((v)->data = elems)); \
+    __typeof__(elems) __elem_tmp; \
+    (void) sizeof(__elem_tmp = (v)->data); \
+    \
     (__typeof__((v)->data)) __cru_vec_push_memcpy(&(v)->priv, \
                                                   (elems), (elem_count), \
                                                   cru_vec_elem_size(v)); \
@@ -224,6 +226,6 @@ void __cru_vec_clear(__cru_vec_t *v);
 void __cru_vec_grow_capacity(__cru_vec_t *v, size_t num_elems, size_t elem_size);
 void __cru_vec_grow_capacity_to(__cru_vec_t *v, size_t num_elems, size_t elem_size);
 void *__cru_vec_push(__cru_vec_t *v, size_t num_elems, size_t elem_size);
-void *__cru_vec_push_memcpy(__cru_vec_t *v, void *restrict elems, size_t n, size_t elem_size);
+void *__cru_vec_push_memcpy(__cru_vec_t *v, const void *restrict elems, size_t n, size_t elem_size);
 void *__cru_vec_pop(__cru_vec_t *v, size_t num_elems, size_t elem_size);
 void __cru_vec_copy(__cru_vec_t *restrict dest, const __cru_vec_t *restrict src, size_t elem_size);

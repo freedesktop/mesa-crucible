@@ -103,7 +103,7 @@ __cru_vec_push(__cru_vec_t *v, size_t num_elems, size_t elem_size)
 }
 
 void *
-__cru_vec_push_memcpy(__cru_vec_t *v, void *restrict elems,
+__cru_vec_push_memcpy(__cru_vec_t *v, const void *restrict elems,
                       size_t num_elems, size_t elem_size)
 {
     void *new_elems;
