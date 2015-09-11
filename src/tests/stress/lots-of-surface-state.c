@@ -33,14 +33,17 @@
 // amount of actual batch buffer space.
 
 static void
-test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
+test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
+                           bool use_dynamic_offsets)
 {
     //  Create the descriptor set layout.
     VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
             .count = 1,
             .pBinding = (VkDescriptorSetLayoutBinding[]) {
                 {
-                    .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
+                    .descriptorType = use_dynamic_offsets ?
+                                      VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC:
+                                      VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                     .arraySize = 12,
                     .stageFlags = (1 << ubo_stage),
                     .pImmutableSamplers = NULL,
@@ -171,34 +174,46 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
                            (VkBuffer[]) { vbo },
                            (VkDeviceSize[]) { 0 });
 
-    VkBufferView ubo_view = qoCreateBufferView(t_device,
-        .buffer = ubo,
-        .viewType = VK_BUFFER_VIEW_TYPE_RAW,
-        .format = VK_FORMAT_R32_SFLOAT,
-        .range = ubo_size);
+    VkDescriptorSet set[1024];
+    if (use_dynamic_offsets) {
+        // Allocate and set up a single descriptor set.  We'll just re-bind
+        // it with new dynamic offsets each time.
+        qoAllocDescriptorSets(t_device, QO_NULL_DESCRIPTOR_POOL,
+                              VK_DESCRIPTOR_SET_USAGE_STATIC,
+                              1, &set_layout, set);
 
-    VkDescriptorSet set;
-    qoAllocDescriptorSets(t_device, QO_NULL_DESCRIPTOR_POOL,
-                          VK_DESCRIPTOR_SET_USAGE_STATIC,
-                          1, &set_layout, &set);
+        VkBufferView ubo_view = qoCreateBufferView(t_device,
+            .buffer = ubo,
+            .viewType = VK_BUFFER_VIEW_TYPE_RAW,
+            .format = VK_FORMAT_R32_SFLOAT,
+            .range = ubo_size);
 
-    VkDescriptorInfo desc_info[12];
-    for (int i = 0; i < 12; i++)
-        desc_info[i] = (VkDescriptorInfo) { .bufferView = ubo_view };
+        VkDescriptorInfo desc_info[12];
+        for (int i = 0; i < 12; i++)
+            desc_info[i] = (VkDescriptorInfo) { .bufferView = ubo_view };
 
-    vkUpdateDescriptorSets(t_device,
-        /*writeCount*/ 1,
-        (VkWriteDescriptorSet[]) {
-            {
-                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .destSet = set,
-                .destBinding = 0,
-                .destArrayElement = 0,
-                .count = 12,
-                .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                .pDescriptors = desc_info,
-            },
-        }, 0, NULL);
+        vkUpdateDescriptorSets(t_device,
+            /*writeCount*/ 1,
+            (VkWriteDescriptorSet[]) {
+                {
+                    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                    .destSet = set[0],
+                    .destBinding = 0,
+                    .destArrayElement = 0,
+                    .count = 12,
+                    .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                    .pDescriptors = desc_info,
+                },
+            }, 0, NULL);
+    } else {
+        VkDescriptorSetLayout layouts[1024];
+        for (int i = 0; i < 1024; i++)
+            layouts[i] = set_layout;
+
+        qoAllocDescriptorSets(t_device, QO_NULL_DESCRIPTOR_POOL,
+                              VK_DESCRIPTOR_SET_USAGE_STATIC,
+                              1024, layouts, set);
+    }
 
     for (int i = 0; i < 1024; i++) {
         uint32_t offsets[12];
@@ -228,10 +243,41 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
         ubo_map[1024 + i * 2 + 1] = 1 - sum;
         offsets[11] = (1024 + i * 2 + 1) * sizeof(float);
 
-        vkCmdBindDescriptorSets(t_cmd_buffer,
-                                VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                pipeline_layout, 0, 1,
-                                &set, 12, offsets);
+        if (use_dynamic_offsets) {
+            vkCmdBindDescriptorSets(t_cmd_buffer,
+                                    VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                    pipeline_layout, 0, 1,
+                                    set, 12, offsets);
+        } else {
+            VkDescriptorInfo desc_info[12];
+            for (int j = 0; j < 12; j++) {
+                desc_info[j].bufferView = qoCreateBufferView(t_device,
+                    .buffer = ubo,
+                    .viewType = VK_BUFFER_VIEW_TYPE_RAW,
+                    .format = VK_FORMAT_R32_SFLOAT,
+                    .offset = offsets[j],
+                    .range = ubo_size);
+            }
+
+            vkUpdateDescriptorSets(t_device,
+                /*writeCount*/ 1,
+                (VkWriteDescriptorSet[]) {
+                    {
+                        .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                        .destSet = set[i],
+                        .destBinding = 0,
+                        .destArrayElement = 0,
+                        .count = 12,
+                        .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                        .pDescriptors = desc_info,
+                    },
+                }, 0, NULL);
+
+            vkCmdBindDescriptorSets(t_cmd_buffer,
+                                    VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                    pipeline_layout, 0, 1,
+                                    &set[i], 0, NULL);
+        }
 
         vkCmdDraw(t_cmd_buffer, i, 1, 0, 1);
     }
@@ -242,7 +288,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage)
 }
 
 static void
-test_lots_of_surface_state_vs(void)
+test_lots_of_surface_state_vs(bool use_dynamic_offsets)
 {
     VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
@@ -278,17 +324,36 @@ test_lots_of_surface_state_vs(void)
         }
     );
 
-    test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_VERTEX);
+    test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_VERTEX,
+                               use_dynamic_offsets);
+}
+
+static void
+test_lots_of_surface_state_vs_dynamic(void)
+{
+    test_lots_of_surface_state_vs(true);
 }
 
 test_define {
-    .name = "stress.lots-of-surface-state.vs",
-    .start = test_lots_of_surface_state_vs,
+    .name = "stress.lots-of-surface-state.vs.dynamic",
+    .start = test_lots_of_surface_state_vs_dynamic,
     .image_filename = "32x32-green.ref.png",
 };
 
 static void
-test_lots_of_surface_state_fs(void)
+test_lots_of_surface_state_vs_static(void)
+{
+    test_lots_of_surface_state_vs(false);
+}
+
+test_define {
+    .name = "stress.lots-of-surface-state.vs.static",
+    .start = test_lots_of_surface_state_vs_static,
+    .image_filename = "32x32-green.ref.png",
+};
+
+static void
+test_lots_of_surface_state_fs(bool use_dynamic_offsets)
 {
     VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
@@ -322,11 +387,30 @@ test_lots_of_surface_state_fs(void)
         }
     );
 
-    test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_FRAGMENT);
+    test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_FRAGMENT,
+                               use_dynamic_offsets);
+}
+
+static void
+test_lots_of_surface_state_fs_dynamic(void)
+{
+    test_lots_of_surface_state_fs(true);
 }
 
 test_define {
-    .name = "stress.lots-of-surface-state.fs",
-    .start = test_lots_of_surface_state_fs,
+    .name = "stress.lots-of-surface-state.fs.dynamic",
+    .start = test_lots_of_surface_state_fs_dynamic,
+    .image_filename = "32x32-green.ref.png",
+};
+
+static void
+test_lots_of_surface_state_fs_static(void)
+{
+    test_lots_of_surface_state_fs(false);
+}
+
+test_define {
+    .name = "stress.lots-of-surface-state.fs.static",
+    .start = test_lots_of_surface_state_fs_static,
     .image_filename = "32x32-green.ref.png",
 };
