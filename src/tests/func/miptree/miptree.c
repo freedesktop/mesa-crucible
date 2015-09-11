@@ -103,8 +103,6 @@ struct test_data {
 };
 
 struct miptree {
-    const cru_format_info_t *format_info;
-
     VkImage image;
 
     VkBuffer src_buffer;
@@ -355,7 +353,6 @@ miptree_create(void)
     mt->image = image;
     mt->src_buffer = src_buffer;
     mt->dest_buffer = dest_buffer;
-    mt->format_info = format_info;
     mt->width = width;
     mt->height = height;
     mt->levels = levels;
@@ -759,7 +756,7 @@ miptree_upload_copy_with_draw(const test_data_t *data)
         image_views[i] = qoCreateImageView(t_device,
             .image = slice->src_vk_image,
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
-            .format = mt->format_info->format,
+            .format = params->format,
             .channels = {
                 VK_CHANNEL_SWIZZLE_R,
                 VK_CHANNEL_SWIZZLE_G,
@@ -782,6 +779,8 @@ miptree_upload_copy_with_draw(const test_data_t *data)
 static void
 miptree_download_copy_with_draw(const test_data_t *data)
 {
+    const test_params_t *params = t_user_data;
+
     const miptree_t *mt = data->mt;
     VkImageView image_views[mt->num_slices];
     VkAttachmentView att_views[mt->num_slices];
@@ -797,7 +796,7 @@ miptree_download_copy_with_draw(const test_data_t *data)
 
         att_views[i] = qoCreateAttachmentView(t_device,
             .image = slice->dest_vk_image,
-            .format = mt->format_info->format,
+            .format = params->format,
             .mipLevel = 0,
             .baseArraySlice = 0,
             .arraySize = 1);
