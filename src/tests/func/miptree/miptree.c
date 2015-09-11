@@ -58,6 +58,8 @@
 #include "miptree-spirv.h"
 
 typedef struct test_params test_params_t;
+typedef struct test_data test_data_t;
+typedef struct test_draw_data test_draw_data_t;
 typedef struct miptree miptree_t;
 typedef struct mipslice mipslice_t;
 
@@ -83,6 +85,21 @@ struct test_params {
     uint32_t array_length;
     enum miptree_upload_method upload_method;
     enum miptree_download_method download_method;
+};
+
+struct test_data {
+    const miptree_t *mt;
+
+    /// Used only by upload/download methods that use vkCmdDraw*.
+    struct test_draw_data {
+        uint32_t num_vertices;
+        VkBuffer vertex_buffer;
+        VkDeviceSize vertex_buffer_offset;
+        VkRenderPass render_pass;
+        VkPipelineLayout pipeline_layout;
+        VkPipeline pipeline;
+        VkDescriptorSet desc_sets[1];
+    } draw;
 };
 
 struct miptree {
@@ -472,9 +489,10 @@ miptree_create(void)
 }
 
 static void
-miptree_upload_copy_from_buffer(const miptree_t *mt)
+miptree_upload_copy_from_buffer(const test_data_t *data)
 {
     const test_params_t *params = t_user_data;
+    const miptree_t *mt = data->mt;
 
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
@@ -506,9 +524,10 @@ miptree_upload_copy_from_buffer(const miptree_t *mt)
 }
 
 static void
-miptree_download_copy_to_buffer(const miptree_t *mt)
+miptree_download_copy_to_buffer(const test_data_t *data)
 {
     const test_params_t *params = t_user_data;
+    const miptree_t *mt = data->mt;
 
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
@@ -541,9 +560,10 @@ miptree_download_copy_to_buffer(const miptree_t *mt)
 
 
 static void
-miptree_upload_copy_from_linear_image(const miptree_t *mt)
+miptree_upload_copy_from_linear_image(const test_data_t *data)
 {
     const test_params_t *params = t_user_data;
+    const miptree_t *mt = data->mt;
 
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
@@ -583,9 +603,10 @@ miptree_upload_copy_from_linear_image(const miptree_t *mt)
 }
 
 static void
-miptree_download_copy_to_linear_image(const miptree_t *mt)
+miptree_download_copy_to_linear_image(const test_data_t *data)
 {
     const test_params_t *params = t_user_data;
+    const miptree_t *mt = data->mt;
 
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
@@ -625,29 +646,257 @@ miptree_download_copy_to_linear_image(const miptree_t *mt)
 }
 
 static void
-copy_color_images_with_draw(const cru_format_info_t *format_info,
+copy_color_images_with_draw(const test_data_t *data,
                             VkExtent2D extents[],
                             VkImageView image_views[],
                             VkAttachmentView attachment_views[],
                             uint32_t count)
 {
-    static const uint32_t num_vertices = 4;
-    static const uint32_t num_position_components = 2;
-    static const float position_data[] = {
+    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    qoBeginCommandBuffer(cmd);
+    vkCmdBindDynamicRasterState(cmd, t_dynamic_rs_state);
+    vkCmdBindDynamicColorBlendState(cmd, t_dynamic_cb_state);
+    vkCmdBindDynamicDepthStencilState(cmd, t_dynamic_ds_state);
+    vkCmdBindVertexBuffers(cmd, /*startBinding*/ 0, /*bindingCount*/ 1,
+                           (VkBuffer[]) { data->draw.vertex_buffer},
+                           (VkDeviceSize[]) { data->draw.vertex_buffer_offset });
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, data->draw.pipeline);
+
+    for (uint32_t i = 0; i < count; ++i) {
+        const uint32_t width = extents[i].width;
+        const uint32_t height = extents[i].height;
+
+        VkDynamicViewportState vp_state = qoCreateDynamicViewportState(t_device,
+            .viewportAndScissorCount = 1,
+            .pViewports = (VkViewport[]) {
+                {
+                    .originX = 0,
+                    .originY = 0,
+                    .width = width,
+                    .height = height,
+                    .minDepth = 0,
+                    .maxDepth = 1
+                },
+            },
+            .pScissors = (VkRect2D[]) {
+                { {0, 0 }, {width, height} },
+            });
+
+        vkCmdBindDynamicViewportState(cmd, vp_state);
+
+        VkFramebuffer fb = qoCreateFramebuffer(t_device,
+            .attachmentCount = 1,
+            .pAttachments = (VkAttachmentBindInfo[]) {
+                {
+                    .view = attachment_views[i],
+                    .layout = VK_IMAGE_LAYOUT_GENERAL,
+                },
+            },
+            .width = width,
+            .height = height,
+            .layers = 1);
+
+        vkUpdateDescriptorSets(t_device,
+            1, /* writeCount */
+            (VkWriteDescriptorSet[]) {
+                {
+                    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                    .destSet = data->draw.desc_sets[0],
+                    .destBinding = 0,
+                    .destArrayElement = 0,
+                    .count = 1,
+                    .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+                    .pDescriptors = (VkDescriptorInfo[]) {
+                        {
+                            .imageView = image_views[i],
+                            .imageLayout = VK_IMAGE_LAYOUT_GENERAL,
+                        },
+                    },
+                },
+            }, 0, NULL);
+
+        vkCmdBeginRenderPass(cmd,
+            &(VkRenderPassBeginInfo) {
+                .renderPass = data->draw.render_pass,
+                .framebuffer = fb,
+                .renderArea = { {0, 0}, {width, height} },
+                .attachmentCount = 1,
+                .pAttachmentClearValues = NULL
+            }, VK_RENDER_PASS_CONTENTS_INLINE);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                data->draw.pipeline_layout,
+                                /*firstSet*/ 0,
+                                ARRAY_LENGTH(data->draw.desc_sets),
+                                data->draw.desc_sets,
+                                /*dynamicOffsetCount*/ 0,
+                                /*dynamicOffsets*/ NULL);
+        vkCmdDraw(cmd, /*firstVertex*/ 0, data->draw.num_vertices,
+                  /*firstInstance*/ 0, /*instanceCount*/ 1);
+        vkCmdEndRenderPass(cmd);
+    }
+
+    qoEndCommandBuffer(cmd);
+    qoQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
+}
+
+static void
+miptree_upload_copy_with_draw(const test_data_t *data)
+{
+    const test_params_t *params = t_user_data;
+    const miptree_t *mt = data->mt;
+
+    VkImageView image_views[mt->num_slices];
+    VkAttachmentView att_views[mt->num_slices];
+    VkExtent2D extents[mt->num_slices];
+
+    for (uint32_t i = 0; i < mt->num_slices; ++i) {
+        const mipslice_t *slice = &mt->slices[i];
+
+        extents[i].width = slice->width;
+        extents[i].height = slice->height;
+
+        att_views[i] = slice->attachment_view;
+
+        image_views[i] = qoCreateImageView(t_device,
+            .image = slice->src_vk_image,
+            .viewType = VK_IMAGE_VIEW_TYPE_2D,
+            .format = mt->format_info->format,
+            .channels = {
+                VK_CHANNEL_SWIZZLE_R,
+                VK_CHANNEL_SWIZZLE_G,
+                VK_CHANNEL_SWIZZLE_B,
+                VK_CHANNEL_SWIZZLE_A,
+            },
+            .subresourceRange = {
+                .aspect = params->aspect,
+                .baseMipLevel = 0,
+                .mipLevels = 1,
+                .baseArraySlice = 0,
+                .arraySize = 1,
+            });
+    }
+
+    copy_color_images_with_draw(data, extents, image_views, att_views,
+                                mt->num_slices);
+}
+
+static void
+miptree_download_copy_with_draw(const test_data_t *data)
+{
+    const miptree_t *mt = data->mt;
+    VkImageView image_views[mt->num_slices];
+    VkAttachmentView att_views[mt->num_slices];
+    VkExtent2D extents[mt->num_slices];
+
+    for (uint32_t i = 0; i < mt->num_slices; ++i) {
+        const mipslice_t *slice = &mt->slices[i];
+
+        extents[i].width = slice->width;
+        extents[i].height = slice->height;
+
+        image_views[i] = slice->image_view;
+
+        att_views[i] = qoCreateAttachmentView(t_device,
+            .image = slice->dest_vk_image,
+            .format = mt->format_info->format,
+            .mipLevel = 0,
+            .baseArraySlice = 0,
+            .arraySize = 1);
+    }
+
+    copy_color_images_with_draw(data, extents, image_views, att_views,
+                                mt->num_slices);
+}
+
+static void
+miptree_upload(const test_data_t *data)
+{
+    const test_params_t *params = t_user_data;
+
+    switch (params->upload_method) {
+    case MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER:
+        miptree_upload_copy_from_buffer(data);
+        break;
+    case MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE:
+        miptree_upload_copy_from_linear_image(data);
+        break;
+    case MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW:
+        miptree_upload_copy_with_draw(data);
+        break;
+    }
+}
+
+static void
+miptree_download(const test_data_t *data)
+{
+    const test_params_t *params = t_user_data;
+
+    switch (params->download_method) {
+    case MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER:
+        miptree_download_copy_to_buffer(data);
+        break;
+    case MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE:
+        miptree_download_copy_to_linear_image(data);
+        break;
+    case MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW:
+        miptree_download_copy_with_draw(data);
+        break;
+    }
+}
+
+static noreturn void
+miptree_compare_images(const miptree_t *mt)
+{
+    test_result_t result = TEST_RESULT_PASS;
+
+    vkQueueWaitIdle(t_queue);
+
+    for (uint32_t i = 0; i < mt->num_slices; ++i) {
+        const mipslice_t *slice = &mt->slices[i];
+        const uint32_t l = slice->level;
+        const uint32_t a = slice->array_slice;
+
+        t_dump_image_f(slice->src_cru_image,
+                       "level%02u.array%02u.ref.png", l, a);
+        t_dump_image_f(slice->dest_cru_image,
+                       "level%02u.array%02u.actual.png", l, a);
+
+        if (!cru_image_compare(slice->src_cru_image, slice->dest_cru_image)) {
+            loge("image incorrect at level %u, array slice %u", l, a);
+            result = TEST_RESULT_FAIL;
+        }
+    }
+
+    t_end(result);
+}
+
+static void
+init_draw_data(test_draw_data_t *draw_data)
+{
+    const test_params_t *params = t_user_data;
+
+    if (!(params->upload_method == MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW ||
+          params->download_method == MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW)) {
+        return;
+    }
+
+    const float position_data[] = {
         -1, -1,
          1, -1,
          1,  1,
         -1,  1,
     };
-
-    const VkFormat format = format_info->format;
+    const uint32_t num_position_components = 2;
+    const uint32_t num_vertices =
+        ARRAY_LENGTH(position_data) / num_position_components;
+    const size_t vb_size = sizeof(position_data);
 
     VkRenderPass pass = qoCreateRenderPass(t_device,
         .attachmentCount = 1,
         .pAttachments = (VkAttachmentDescription[]) {
             {
                 QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
-                .format = format,
+                .format = params->format,
             },
         },
         .subpassCount = 1,
@@ -733,9 +982,9 @@ copy_color_images_with_draw(const cru_format_info_t *format_info,
             .subpass = 0,
         }});
 
-    size_t vb_size = sizeof(position_data);
     VkBuffer vb = qoCreateBuffer(t_device, .size = vb_size,
                                  .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+
     VkDeviceMemory vb_mem = qoAllocBufferMemory(t_device, vb,
         .memoryTypeIndex = t_mem_type_index_for_mmap);
 
@@ -744,235 +993,37 @@ copy_color_images_with_draw(const cru_format_info_t *format_info,
     memcpy(qoMapMemory(t_device, vb_mem, /*offset*/ 0, vb_size, /*flags*/ 0),
            position_data, sizeof(position_data));
 
-    VkDescriptorSet sets[1];
+    VkDescriptorSet desc_sets[1];
     qoAllocDescriptorSets(t_device, QO_NULL_DESCRIPTOR_POOL,
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           ARRAY_LENGTH(set_layouts),
-                          set_layouts, sets);
+                          set_layouts, desc_sets);
 
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
-    qoBeginCommandBuffer(cmd);
-    vkCmdBindDynamicRasterState(cmd, t_dynamic_rs_state);
-    vkCmdBindDynamicColorBlendState(cmd, t_dynamic_cb_state);
-    vkCmdBindDynamicDepthStencilState(cmd, t_dynamic_ds_state);
-    vkCmdBindVertexBuffers(cmd, /*startBinding*/ 0, /*bindingCount*/ 1,
-                           (VkBuffer[]) {vb},
-                           (VkDeviceSize[]) {0});
-
-    for (uint32_t i = 0; i < count; ++i) {
-        const uint32_t width = extents[i].width;
-        const uint32_t height = extents[i].height;
-
-        VkDynamicViewportState vp_state = qoCreateDynamicViewportState(t_device,
-            .viewportAndScissorCount = 1,
-            .pViewports = (VkViewport[]) {
-                {
-                    .originX = 0,
-                    .originY = 0,
-                    .width = width,
-                    .height = height,
-                    .minDepth = 0,
-                    .maxDepth = 1
-                },
-            },
-            .pScissors = (VkRect2D[]) {
-                { {0, 0 }, {width, height} },
-            });
-
-        vkCmdBindDynamicViewportState(cmd, vp_state);
-
-        VkFramebuffer fb = qoCreateFramebuffer(t_device,
-            .attachmentCount = 1,
-            .pAttachments = (VkAttachmentBindInfo[]) {
-                {
-                    .view = attachment_views[i],
-                    .layout = VK_IMAGE_LAYOUT_GENERAL,
-                },
-            },
-            .width = width,
-            .height = height,
-            .layers = 1);
-
-        vkUpdateDescriptorSets(t_device,
-            1, /* writeCount */
-            (VkWriteDescriptorSet[]) {
-                {
-                    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                    .destSet = sets[0],
-                    .destBinding = 0,
-                    .destArrayElement = 0,
-                    .count = 1,
-                    .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
-                    .pDescriptors = (VkDescriptorInfo[]) {
-                        {
-                            .imageView = image_views[i],
-                            .imageLayout = VK_IMAGE_LAYOUT_GENERAL,
-                        },
-                    },
-                },
-            }, 0, NULL);
-
-        vkCmdBeginRenderPass(cmd,
-            &(VkRenderPassBeginInfo) {
-                .renderPass = pass,
-                .framebuffer = fb,
-                .renderArea = { {0, 0}, {width, height} },
-                .attachmentCount = 1,
-                .pAttachmentClearValues = NULL
-            }, VK_RENDER_PASS_CONTENTS_INLINE);
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                pipeline_layout,
-                                /*firstSet*/ 0, ARRAY_LENGTH(sets), sets,
-                                /*dynamicOffsetCount*/ 0,
-                                /*dynamicOffsets*/ NULL);
-        vkCmdDraw(cmd, /*firstVertex*/ 0, num_vertices,
-                  /*firstInstance*/ 0, /*instanceCount*/ 1);
-        vkCmdEndRenderPass(cmd);
-    }
-
-    qoEndCommandBuffer(cmd);
-    qoQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
-}
-
-static void
-miptree_upload_copy_with_draw(const miptree_t *mt)
-{
-    const test_params_t *params = t_user_data;
-
-    VkImageView image_views[mt->num_slices];
-    VkAttachmentView att_views[mt->num_slices];
-    VkExtent2D extents[mt->num_slices];
-
-    for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        const mipslice_t *slice = &mt->slices[i];
-
-        extents[i].width = slice->width;
-        extents[i].height = slice->height;
-
-        att_views[i] = slice->attachment_view;
-
-        image_views[i] = qoCreateImageView(t_device,
-            .image = slice->src_vk_image,
-            .viewType = VK_IMAGE_VIEW_TYPE_2D,
-            .format = mt->format_info->format,
-            .channels = {
-                VK_CHANNEL_SWIZZLE_R,
-                VK_CHANNEL_SWIZZLE_G,
-                VK_CHANNEL_SWIZZLE_B,
-                VK_CHANNEL_SWIZZLE_A,
-            },
-            .subresourceRange = {
-                .aspect = params->aspect,
-                .baseMipLevel = 0,
-                .mipLevels = 1,
-                .baseArraySlice = 0,
-                .arraySize = 1,
-            });
-    }
-
-    copy_color_images_with_draw(mt->format_info, extents, image_views,
-                                att_views, mt->num_slices);
-}
-
-static void
-miptree_download_copy_with_draw(const miptree_t *mt)
-{
-    VkImageView image_views[mt->num_slices];
-    VkAttachmentView att_views[mt->num_slices];
-    VkExtent2D extents[mt->num_slices];
-
-    for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        const mipslice_t *slice = &mt->slices[i];
-
-        extents[i].width = slice->width;
-        extents[i].height = slice->height;
-
-        image_views[i] = slice->image_view;
-
-        att_views[i] = qoCreateAttachmentView(t_device,
-            .image = slice->dest_vk_image,
-            .format = mt->format_info->format,
-            .mipLevel = 0,
-            .baseArraySlice = 0,
-            .arraySize = 1);
-    }
-
-    copy_color_images_with_draw(mt->format_info, extents, image_views,
-                                att_views, mt->num_slices);
-}
-
-static void
-miptree_upload(const miptree_t *mt)
-{
-    const test_params_t *params = t_user_data;
-
-    switch (params->upload_method) {
-    case MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER:
-        miptree_upload_copy_from_buffer(mt);
-        break;
-    case MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE:
-        miptree_upload_copy_from_linear_image(mt);
-        break;
-    case MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW:
-        miptree_upload_copy_with_draw(mt);
-        break;
-    }
-}
-
-static void
-miptree_download(const miptree_t *mt)
-{
-    const test_params_t *params = t_user_data;
-
-    switch (params->download_method) {
-    case MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER:
-        miptree_download_copy_to_buffer(mt);
-        break;
-    case MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE:
-        miptree_download_copy_to_linear_image(mt);
-        break;
-    case MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW:
-        miptree_download_copy_with_draw(mt);
-        break;
-    }
-}
-
-static noreturn void
-miptree_compare_images(const miptree_t *mt)
-{
-    test_result_t result = TEST_RESULT_PASS;
-
-    vkQueueWaitIdle(t_queue);
-
-    for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        const mipslice_t *slice = &mt->slices[i];
-        const uint32_t l = slice->level;
-        const uint32_t a = slice->array_slice;
-
-        t_dump_image_f(slice->src_cru_image,
-                       "level%02u.array%02u.ref.png", l, a);
-        t_dump_image_f(slice->dest_cru_image,
-                       "level%02u.array%02u.actual.png", l, a);
-
-        if (!cru_image_compare(slice->src_cru_image, slice->dest_cru_image)) {
-            loge("image incorrect at level %u, array slice %u", l, a);
-            result = TEST_RESULT_FAIL;
-        }
-    }
-
-    t_end(result);
+    // Prevent dumb bugs by initializing the struct in one shot.
+    *draw_data = (test_draw_data_t) {
+        .vertex_buffer = vb,
+        .vertex_buffer_offset = 0,
+        .num_vertices = num_vertices,
+        .pipeline_layout = pipeline_layout,
+        .pipeline = pipeline,
+        .render_pass = pass,
+        .desc_sets = {
+            desc_sets[0],
+        },
+    };
 }
 
 static void
 test(void)
 {
-    const miptree_t *mt = NULL;
+    test_data_t data = {0};
 
-    mt = miptree_create();
-    miptree_upload(mt);
-    miptree_download(mt);
-    miptree_compare_images(mt);
+    data.mt = miptree_create();
+    init_draw_data(&data.draw);
+
+    miptree_upload(&data);
+    miptree_download(&data);
+    miptree_compare_images(data.mt);
 }
 
 #include "miptree_gen.c"
