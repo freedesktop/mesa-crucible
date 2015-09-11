@@ -738,12 +738,11 @@ copy_color_images_with_draw(const cru_format_info_t *format_info,
                                  .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
     VkDeviceMemory vb_mem = qoAllocBufferMemory(t_device, vb,
         .memoryTypeIndex = t_mem_type_index_for_mmap);
-    qoBindBufferMemory(t_device, vb, vb_mem, /*offset*/ 0);
-    void *vb_map = qoMapMemory(t_device, vb_mem, /*offset*/ 0,
-                               vb_size, /*flags*/ 0);
 
-    uint32_t vb_position_offset = 0;
-    memcpy(vb_map + vb_position_offset, position_data, sizeof(position_data));
+    qoBindBufferMemory(t_device, vb, vb_mem, /*offset*/ 0);
+
+    memcpy(qoMapMemory(t_device, vb_mem, /*offset*/ 0, vb_size, /*flags*/ 0),
+           position_data, sizeof(position_data));
 
     VkDescriptorSet sets[1];
     qoAllocDescriptorSets(t_device, QO_NULL_DESCRIPTOR_POOL,
@@ -821,7 +820,7 @@ copy_color_images_with_draw(const cru_format_info_t *format_info,
 
         vkCmdBindVertexBuffers(cmd, /*startBinding*/ 0, /*bindingCount*/ 1,
                                (VkBuffer[]) {vb},
-                               (VkDeviceSize[]) {vb_position_offset});
+                               (VkDeviceSize[]) {0});
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                                 pipeline_layout,
