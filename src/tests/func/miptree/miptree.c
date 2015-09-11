@@ -51,6 +51,7 @@
 #include <stdnoreturn.h>
 
 #include "util/cru_format.h"
+#include "util/cru_vec.h"
 #include "util/misc.h"
 #include "util/string.h"
 #include "tapi/t.h"
@@ -62,6 +63,7 @@ typedef struct test_data test_data_t;
 typedef struct test_draw_data test_draw_data_t;
 typedef struct miptree miptree_t;
 typedef struct mipslice mipslice_t;
+typedef struct mipslice_vec mipslice_vec_t;
 
 enum miptree_upload_method {
     MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
@@ -102,21 +104,6 @@ struct test_data {
     } draw;
 };
 
-struct miptree {
-    VkImage image;
-
-    VkBuffer src_buffer;
-    VkBuffer dest_buffer;
-
-    uint32_t width;
-    uint32_t height;
-    uint32_t levels;
-    uint32_t array_length;
-
-    mipslice_t *slices;
-    uint32_t num_slices;
-};
-
 struct mipslice {
     uint32_t level;
     uint32_t array_slice;
@@ -133,6 +120,22 @@ struct mipslice {
 
     cru_image_t *src_cru_image;
     cru_image_t *dest_cru_image;
+};
+
+CRU_VEC_DEFINE(struct mipslice_vec, struct mipslice);
+
+struct miptree {
+    VkImage image;
+
+    VkBuffer src_buffer;
+    VkBuffer dest_buffer;
+
+    uint32_t width;
+    uint32_t height;
+    uint32_t levels;
+    uint32_t array_length;
+
+    mipslice_vec_t mipslices;
 };
 
 // Fill the pixels with a canary color.
@@ -291,6 +294,16 @@ mipslice_make_template_image(const struct cru_format_info *format_info,
     return t_new_cru_image_from_filename(string_data(&filename));
 }
 
+static void
+miptree_destroy(miptree_t *mt)
+{
+    if (!mt)
+        return;
+
+    cru_vec_finish(&mt->mipslices);
+    free(mt);
+}
+
 static const miptree_t *
 miptree_create(void)
 {
@@ -306,7 +319,6 @@ miptree_create(void)
     const uint32_t width = params->width;
     const uint32_t height = params->height;
     const uint32_t array_length = params->array_length;
-    const uint32_t num_slices = levels * array_length;
     const size_t buffer_size = miptree_calc_buffer_size();
 
     // Create the image that will contain the real miptree.
@@ -347,8 +359,8 @@ miptree_create(void)
     qoBindBufferMemory(t_device, src_buffer, src_buffer_mem, /*offset*/ 0);
     qoBindBufferMemory(t_device, dest_buffer, dest_buffer_mem, /*offset*/ 0);
 
-    miptree_t *mt = xzalloc(sizeof(*mt) + num_slices * sizeof(mt->slices[0]));
-    t_cleanup_push_free(mt);
+    miptree_t *mt = xzalloc(sizeof(*mt));
+    t_cleanup_push_callback((cru_cleanup_callback_func_t) miptree_destroy, mt);
 
     mt->image = image;
     mt->src_buffer = src_buffer;
@@ -357,8 +369,7 @@ miptree_create(void)
     mt->height = height;
     mt->levels = levels;
     mt->array_length = array_length;
-    mt->slices = (void *) mt + sizeof(*mt);
-    mt->num_slices = num_slices;
+    cru_vec_init(&mt->mipslices);
 
     uint32_t buffer_offset = 0;
 
@@ -460,7 +471,7 @@ miptree_create(void)
             fill_rect_with_canary(dest_pixels, format_info,
                                   level_width, level_height);
 
-            mt->slices[a * levels + l] = (mipslice_t) {
+            const mipslice_t mipslice = {
                 .image_view = image_view,
                 .attachment_view = att_view,
 
@@ -478,6 +489,8 @@ miptree_create(void)
                 .dest_cru_image = dest_image,
             };
 
+            cru_vec_push_memcpy(&mt->mipslices, &mipslice, 1);
+
             buffer_offset += cpp * level_width * level_height;
         }
     }
@@ -490,13 +503,12 @@ miptree_upload_copy_from_buffer(const test_data_t *data)
 {
     const test_params_t *params = t_user_data;
     const miptree_t *mt = data->mt;
+    const mipslice_t *slice;
 
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
-    for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        const mipslice_t *slice = &mt->slices[i];
-
+    cru_vec_foreach(slice, &mt->mipslices) {
         VkBufferImageCopy copy = {
             .bufferOffset = slice->buffer_offset,
             .imageSubresource = {
@@ -525,13 +537,12 @@ miptree_download_copy_to_buffer(const test_data_t *data)
 {
     const test_params_t *params = t_user_data;
     const miptree_t *mt = data->mt;
+    const mipslice_t *slice;
 
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
-    for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        const mipslice_t *slice = &mt->slices[i];
-
+    cru_vec_foreach(slice, &mt->mipslices) {
         VkBufferImageCopy copy = {
             .bufferOffset = slice->buffer_offset,
             .imageSubresource = {
@@ -561,13 +572,12 @@ miptree_upload_copy_from_linear_image(const test_data_t *data)
 {
     const test_params_t *params = t_user_data;
     const miptree_t *mt = data->mt;
+    const mipslice_t *slice;
 
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
-    for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        const mipslice_t *slice = &mt->slices[i];
-
+    cru_vec_foreach(slice, &mt->mipslices) {
         VkImageCopy copy = {
             .srcSubresource = {
                 .aspect = params->aspect,
@@ -604,13 +614,12 @@ miptree_download_copy_to_linear_image(const test_data_t *data)
 {
     const test_params_t *params = t_user_data;
     const miptree_t *mt = data->mt;
+    const mipslice_t *slice;
 
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
-    for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        const mipslice_t *slice = &mt->slices[i];
-
+    cru_vec_foreach(slice, &mt->mipslices) {
         VkImageCopy copy = {
             .srcSubresource = {
                 .aspect = params->aspect,
@@ -739,14 +748,15 @@ static void
 miptree_upload_copy_with_draw(const test_data_t *data)
 {
     const test_params_t *params = t_user_data;
+
     const miptree_t *mt = data->mt;
+    const uint32_t num_views = mt->mipslices.len;
+    VkImageView image_views[num_views];
+    VkAttachmentView att_views[num_views];
+    VkExtent2D extents[num_views];
 
-    VkImageView image_views[mt->num_slices];
-    VkAttachmentView att_views[mt->num_slices];
-    VkExtent2D extents[mt->num_slices];
-
-    for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        const mipslice_t *slice = &mt->slices[i];
+    for (uint32_t i = 0; i < mt->mipslices.len; ++i) {
+        const mipslice_t *slice = &mt->mipslices.data[i];
 
         extents[i].width = slice->width;
         extents[i].height = slice->height;
@@ -773,7 +783,7 @@ miptree_upload_copy_with_draw(const test_data_t *data)
     }
 
     copy_color_images_with_draw(data, extents, image_views, att_views,
-                                mt->num_slices);
+                                num_views);
 }
 
 static void
@@ -782,13 +792,13 @@ miptree_download_copy_with_draw(const test_data_t *data)
     const test_params_t *params = t_user_data;
 
     const miptree_t *mt = data->mt;
-    VkImageView image_views[mt->num_slices];
-    VkAttachmentView att_views[mt->num_slices];
-    VkExtent2D extents[mt->num_slices];
+    const uint32_t num_views = mt->mipslices.len;
+    VkImageView image_views[num_views];
+    VkAttachmentView att_views[num_views];
+    VkExtent2D extents[num_views];
 
-    for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        const mipslice_t *slice = &mt->slices[i];
-
+    for (uint32_t i = 0; i < mt->mipslices.len; ++i) {
+        const mipslice_t *slice = &mt->mipslices.data[i];
         extents[i].width = slice->width;
         extents[i].height = slice->height;
 
@@ -803,7 +813,7 @@ miptree_download_copy_with_draw(const test_data_t *data)
     }
 
     copy_color_images_with_draw(data, extents, image_views, att_views,
-                                mt->num_slices);
+                                num_views);
 }
 
 static void
@@ -846,11 +856,11 @@ static noreturn void
 miptree_compare_images(const miptree_t *mt)
 {
     test_result_t result = TEST_RESULT_PASS;
+    const mipslice_t *slice;
 
     vkQueueWaitIdle(t_queue);
 
-    for (uint32_t i = 0; i < mt->num_slices; ++i) {
-        const mipslice_t *slice = &mt->slices[i];
+    cru_vec_foreach(slice, &mt->mipslices) {
         const uint32_t l = slice->level;
         const uint32_t a = slice->array_slice;
 
