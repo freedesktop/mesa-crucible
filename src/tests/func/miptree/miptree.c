@@ -642,6 +642,28 @@ copy_color_images_with_draw(const cru_format_info_t *format_info,
 
     const VkFormat format = format_info->format;
 
+    VkRenderPass pass = qoCreateRenderPass(t_device,
+        .attachmentCount = 1,
+        .pAttachments = (VkAttachmentDescription[]) {
+            {
+                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
+                .format = format,
+            },
+        },
+        .subpassCount = 1,
+        .pSubpasses = (VkSubpassDescription[]) {
+            {
+                QO_SUBPASS_DESCRIPTION_DEFAULTS,
+                .colorCount = 1,
+                .colorAttachments = (VkAttachmentReference[]) {
+                    {
+                        .attachment = 0,
+                        .layout = VK_IMAGE_LAYOUT_GENERAL,
+                    },
+                },
+            }
+        });
+
     VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
         layout(location = 0) in vec2 a_position;
 
@@ -707,6 +729,8 @@ copy_color_images_with_draw(const cru_format_info_t *format_info,
                     },
                 },
             },
+            .renderPass = pass,
+            .subpass = 0,
         }});
 
     size_t vb_size = sizeof(position_data);
@@ -766,28 +790,6 @@ copy_color_images_with_draw(const cru_format_info_t *format_info,
             .width = width,
             .height = height,
             .layers = 1);
-
-        VkRenderPass pass = qoCreateRenderPass(t_device,
-            .attachmentCount = 1,
-            .pAttachments = (VkAttachmentDescription[]) {
-                {
-                    QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
-                    .format = format,
-                },
-            },
-            .subpassCount = 1,
-            .pSubpasses = (VkSubpassDescription[]) {
-                {
-                    QO_SUBPASS_DESCRIPTION_DEFAULTS,
-                    .colorCount = 1,
-                    .colorAttachments = (VkAttachmentReference[]) {
-                        {
-                            .attachment = 0,
-                            .layout = VK_IMAGE_LAYOUT_GENERAL,
-                        },
-                    },
-                }
-            });
 
         vkUpdateDescriptorSets(t_device,
             1, /* writeCount */
