@@ -666,23 +666,22 @@ copy_color_images_with_draw(const test_data_t *data,
         const uint32_t width = extents[i].width;
         const uint32_t height = extents[i].height;
 
-        VkDynamicViewportState vp_state = qoCreateDynamicViewportState(t_device,
-            .viewportAndScissorCount = 1,
-            .pViewports = (VkViewport[]) {
-                {
-                    .originX = 0,
-                    .originY = 0,
-                    .width = width,
-                    .height = height,
-                    .minDepth = 0,
-                    .maxDepth = 1
+        vkCmdBindDynamicViewportState(cmd,
+            qoCreateDynamicViewportState(t_device,
+                .viewportAndScissorCount = 1,
+                .pViewports = (VkViewport[]) {
+                    {
+                        .originX = 0,
+                        .originY = 0,
+                        .width = width,
+                        .height = height,
+                        .minDepth = 0,
+                        .maxDepth = 1
+                    },
                 },
-            },
-            .pScissors = (VkRect2D[]) {
-                { {0, 0 }, {width, height} },
-            });
-
-        vkCmdBindDynamicViewportState(cmd, vp_state);
+                .pScissors = (VkRect2D[]) {
+                    { { 0, 0 }, { width, height } },
+                }));
 
         VkFramebuffer fb = qoCreateFramebuffer(t_device,
             .attachmentCount = 1,
