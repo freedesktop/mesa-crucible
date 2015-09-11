@@ -110,9 +110,6 @@ struct mipslice {
     uint32_t width;
     uint32_t height;
 
-    VkImageView image_view;
-    VkAttachmentView attachment_view;
-
     uint32_t buffer_offset;
 
     VkImage src_vk_image;
@@ -378,25 +375,6 @@ miptree_create(void)
         const uint32_t level_height = cru_minify(height, l);
 
         for (uint32_t a = 0; a < array_length; ++a) {
-            VkAttachmentView att_view = qoCreateAttachmentView(
-                t_device,
-                .image = image,
-                .format = format,
-                .mipLevel = l,
-                .baseArraySlice = a);
-
-            VkImageView image_view = qoCreateImageView(t_device,
-                .image = image,
-                .viewType = VK_IMAGE_VIEW_TYPE_2D,
-                .format = format,
-                .subresourceRange = {
-                    .aspect = params->aspect,
-                    .baseMipLevel = l,
-                    .mipLevels = 1,
-                    .baseArraySlice = a,
-                    .arraySize = 1,
-                });
-
             void *src_pixels = src_buffer_map + buffer_offset;
             void *dest_pixels = dest_buffer_map + buffer_offset;
 
@@ -472,9 +450,6 @@ miptree_create(void)
                                   level_width, level_height);
 
             const mipslice_t mipslice = {
-                .image_view = image_view,
-                .attachment_view = att_view,
-
                 .level = l,
                 .array_slice = a,
                 .width = level_width,
@@ -761,8 +736,6 @@ miptree_upload_copy_with_draw(const test_data_t *data)
         extents[i].width = slice->width;
         extents[i].height = slice->height;
 
-        att_views[i] = slice->attachment_view;
-
         image_views[i] = qoCreateImageView(t_device,
             .image = slice->src_vk_image,
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
@@ -780,6 +753,13 @@ miptree_upload_copy_with_draw(const test_data_t *data)
                 .baseArraySlice = 0,
                 .arraySize = 1,
             });
+
+        att_views[i] = qoCreateAttachmentView(
+            t_device,
+            .image = mt->image,
+            .format = params->format,
+            .mipLevel = slice->level,
+            .baseArraySlice = slice->array_slice);
     }
 
     copy_color_images_with_draw(data, extents, image_views, att_views,
@@ -802,7 +782,17 @@ miptree_download_copy_with_draw(const test_data_t *data)
         extents[i].width = slice->width;
         extents[i].height = slice->height;
 
-        image_views[i] = slice->image_view;
+        image_views[i] = qoCreateImageView(t_device,
+            .image = mt->image,
+            .viewType = VK_IMAGE_VIEW_TYPE_2D,
+            .format = params->format,
+            .subresourceRange = {
+                .aspect = params->aspect,
+                .baseMipLevel = slice->level,
+                .mipLevels = 1,
+                .baseArraySlice = slice->array_slice,
+                .arraySize = 1,
+            });
 
         att_views[i] = qoCreateAttachmentView(t_device,
             .image = slice->dest_vk_image,
