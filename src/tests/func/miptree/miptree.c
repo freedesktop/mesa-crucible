@@ -215,7 +215,7 @@ mipslice_perturb_pixels(void *pixels,
 }
 
 static string_t
-miplevel_get_template_filename(const cru_format_info_t *format_info,
+mipslice_get_template_filename(const cru_format_info_t *format_info,
                                uint32_t image_width, uint32_t image_height,
                                uint32_t level, uint32_t num_levels,
                                uint32_t layer, uint32_t num_layers)
@@ -286,7 +286,7 @@ mipslice_make_template_image(const struct cru_format_info *format_info,
 {
     string_t filename;
 
-    filename = miplevel_get_template_filename(format_info,
+    filename = mipslice_get_template_filename(format_info,
                                               image_width, image_height,
                                               level, num_levels,
                                               layer, num_layers);
