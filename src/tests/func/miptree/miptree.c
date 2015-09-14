@@ -194,6 +194,8 @@ mipslice_get_description(const mipslice_t *slice, string_t *desc)
     const test_params_t *params = t_user_data;
 
     switch (params->view_type) {
+    case VK_IMAGE_VIEW_TYPE_1D:
+    case VK_IMAGE_VIEW_TYPE_1D_ARRAY:
     case VK_IMAGE_VIEW_TYPE_2D:
     case VK_IMAGE_VIEW_TYPE_2D_ARRAY:
         if (params->array_length == 0) {
@@ -268,8 +270,9 @@ mipslice_get_template_filename(const cru_format_info_t *format_info,
                                uint32_t level, uint32_t num_levels,
                                uint32_t layer, uint32_t num_layers)
 {
-    string_t filename = STRING_INIT;
+    const test_params_t *params = t_user_data;
 
+    string_t filename = STRING_INIT;
     const uint32_t level_width = cru_minify(image_width, level);
     const uint32_t level_height = cru_minify(image_height, level);
 
@@ -301,7 +304,20 @@ mipslice_get_template_filename(const cru_format_info_t *format_info,
         break;
     }
 
-    string_appendf(&filename, "-%ux%u.png", level_width, level_height);
+    switch (params->view_type) {
+    case VK_IMAGE_VIEW_TYPE_1D:
+    case VK_IMAGE_VIEW_TYPE_1D_ARRAY:
+        // Reuse 2d image files for 1d images.
+        string_appendf(&filename, "-%ux%u.png", level_width, level_width);
+        break;
+    case VK_IMAGE_VIEW_TYPE_2D:
+    case VK_IMAGE_VIEW_TYPE_2D_ARRAY:
+    case VK_IMAGE_VIEW_TYPE_3D:
+        string_appendf(&filename, "-%ux%u.png", level_width, level_height);
+        break;
+    default:
+        t_failf("FINISHME: VkImageViewType %d", params->view_type);
+    }
 
     return filename;
 }
@@ -319,6 +335,8 @@ miptree_calc_buffer_size(void)
     const uint32_t depth = p->depth;
 
     switch (p->view_type) {
+        case VK_IMAGE_VIEW_TYPE_1D:
+        case VK_IMAGE_VIEW_TYPE_1D_ARRAY:
         case VK_IMAGE_VIEW_TYPE_2D:
         case VK_IMAGE_VIEW_TYPE_2D_ARRAY:
         case VK_IMAGE_VIEW_TYPE_3D:
@@ -345,16 +363,41 @@ mipslice_make_template_image(const struct cru_format_info *format_info,
                              uint32_t level, uint32_t num_levels,
                              uint32_t layer, uint32_t num_layers)
 {
-    string_t filename;
+    const test_params_t *params = t_user_data;
 
-    filename = mipslice_get_template_filename(format_info,
-                                              image_width, image_height,
-                                              level, num_levels,
-                                              layer, num_layers);
+    string_t filename = mipslice_get_template_filename(
+            format_info, image_width, image_height,
+            level, num_levels, layer, num_layers);
 
     // FIXME: Don't load the same file multiple times. It slows down the test
     // run.
-    return t_new_cru_image_from_filename(string_data(&filename));
+    cru_image_t *file_img =
+        t_new_cru_image_from_filename(string_data(&filename));
+
+    switch (params->view_type) {
+    case VK_IMAGE_VIEW_TYPE_1D:
+    case VK_IMAGE_VIEW_TYPE_1D_ARRAY: {
+        // Reuse 2d image files for 1d images.
+        void *pixels = cru_image_map(file_img, CRU_IMAGE_MAP_ACCESS_READ);
+        t_assert(pixels);
+
+        uint32_t level_width = cru_minify(image_width, level);
+        uint32_t stride = level_width * format_info->cpp;
+
+        t_assert(level_width == cru_image_get_width(file_img));
+        t_assert(layer < cru_image_get_height(file_img));
+
+        return t_new_cru_image_from_pixels(pixels + layer * stride,
+                                           cru_image_get_format(file_img),
+                                           level_width, /*height*/ 1);
+    }
+    case VK_IMAGE_VIEW_TYPE_2D:
+    case VK_IMAGE_VIEW_TYPE_2D_ARRAY:
+    case VK_IMAGE_VIEW_TYPE_3D:
+        return file_img;
+    default:
+        t_failf("FINISHME: VkImageViewType %d", params->view_type);
+    }
 }
 
 static void

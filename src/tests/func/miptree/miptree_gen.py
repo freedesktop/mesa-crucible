@@ -29,6 +29,30 @@ Format = namedtuple('Format', ('short_name', 'vk_name'))
 Params = namedtuple('Params', ('format', 'aspect', 'view', 'extent',
                     'levels', 'array_length', 'upload', 'download'))
 
+color_1d_params_iter = (
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    for format in (Format('r8g8b8a8-unorm', 'VK_FORMAT_R8G8B8A8_UNORM'),)
+    for aspect in ('color',)
+    for view in ('1d',)
+    for extent in (Extent3D(512, 1, 1),)
+    for levels in (1, 2)
+    for array_length in (1, 2)
+    for upload_method in (
+        'copy-from-buffer',
+        'copy-from-linear-image',
+
+        # Illegal to attach 1D image to a framebuffer.
+        #'copy-with-draw',
+    )
+    for download_method in (
+        'copy-to-buffer',
+        'copy-to-linear-image',
+
+        # FINISHME: The test cannot yet texture from 1D images.
+        #'copy-with-draw',
+    )
+)
+
 color_2d_params_iter = (
     Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
     for format in (Format('r8g8b8a8-unorm', 'VK_FORMAT_R8G8B8A8_UNORM'),)
@@ -70,7 +94,31 @@ color_3d_params_iter = (
         'copy-to-buffer',
         'copy-to-linear-image',
 
-        # FINISHME: The test cannot yet texture from 3D stencil images.
+        # FINISHME: The test cannot yet texture from 3D images.
+        #'copy-with-draw',
+    )
+)
+
+depth_1d_params_iter = (
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    for format in (Format('d32-sfloat', 'VK_FORMAT_D32_SFLOAT'),)
+    for aspect in ('depth',)
+    for view in ('1d',)
+    for extent in (Extent3D(1024, 1, 1),)
+    for levels in (1, 2)
+    for array_length in (1, 2)
+    for upload_method in (
+        'copy-from-buffer',
+        'copy-from-linear-image',
+
+        # Illegal to attach 1D image to a framebuffer.
+        #'copy-with-draw',
+    )
+    for download_method in (
+        'copy-to-buffer',
+        'copy-to-linear-image',
+
+        # FINISHME: The test cannot yet texture from 1D images.
         #'copy-with-draw',
     )
 )
@@ -115,6 +163,35 @@ depth_3d_params_iter = (
         'copy-to-linear-image',
 
         # FINISHME: The test cannot yet texture from 3D images.
+        #'copy-with-draw',
+    )
+)
+
+stencil_1d_params_iter = (
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    for format in (Format('s8-uint', 'VK_FORMAT_S8_UINT'),)
+    for aspect in ('stencil',)
+    for view in ('1d',)
+    for extent in (Extent3D(1024, 1, 1),)
+    for levels in (1, 2)
+    for array_length in (1, 2)
+    for upload_method in (
+        'copy-from-buffer',
+
+        # Intel doesn't support linear stencil images. If you want to enable
+        # testing linear stencil images, then you must first teach the test
+        # how to skip when the driver does not support the particular
+        # format/image/usage combination.
+        #
+        #'copy-from-linear-image',
+    )
+    for download_method in (
+        'copy-to-buffer',
+
+        # Intel doesn't support linear stencil images. See above comment.
+        #'copy-to-linear-image',
+
+        # FINISHME: The test cannot yet texture from 1D images.
         #'copy-with-draw',
     )
 )
@@ -171,13 +248,19 @@ stencil_3d_params_iter = (
 )
 
 def all_params_iter():
+    for p in color_1d_params_iter:
+        yield p
     for p in color_2d_params_iter:
         yield p
     for p in color_3d_params_iter:
         yield p
+    for p in depth_1d_params_iter:
+        yield p
     for p in depth_2d_params_iter:
         yield p
     for p in depth_3d_params_iter:
+        yield p
+    for p in stencil_1d_params_iter:
         yield p
     for p in stencil_2d_params_iter:
         yield p
@@ -241,7 +324,9 @@ def to_caps(s):
 def get_extent_str(params):
     e = params.extent
 
-    if params.view == '2d':
+    if params.view == '1d':
+        return '{}'.format(e.width)
+    elif params.view == '2d':
         return '{}x{}'.format(e.width, e.height)
     elif params.view == '3d':
         return '{}x{}x{}'.format(e.width, e.height, e.depth)
@@ -249,7 +334,7 @@ def get_extent_str(params):
         raise Exception('unhandled view in get_extent_str')
 
 def get_array_length_str(params):
-    if params.view == '2d':
+    if params.view in ('1d', '2d'):
         return '.array{:02}'.format(params.array_length)
     elif params.view == '3d':
         return ''
