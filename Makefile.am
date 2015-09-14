@@ -146,28 +146,48 @@ man: $(man1_MANS)
 built_data_files = \
 	data/grass-2048x1024.jpg \
 	data/grass-grayscale-2048x1024.png \
+	data/grass-grayscale-1024x1024.png \
 	data/grass-grayscale-1024x512.png \
+	data/grass-grayscale-512x512.png \
 	data/grass-grayscale-512x256.png \
+	data/grass-grayscale-256x256.png \
 	data/grass-grayscale-256x128.png \
+	data/grass-grayscale-128x128.png \
 	data/grass-grayscale-128x64.png \
+	data/grass-grayscale-64x64.png \
 	data/grass-grayscale-64x32.png \
+	data/grass-grayscale-32x32.png \
 	data/grass-grayscale-32x16.png \
+	data/grass-grayscale-16x16.png \
 	data/grass-grayscale-16x8.png \
+	data/grass-grayscale-8x8.png \
 	data/grass-grayscale-8x4.png \
+	data/grass-grayscale-4x4.png \
 	data/grass-grayscale-4x2.png \
+	data/grass-grayscale-2x2.png \
 	data/grass-grayscale-2x1.png \
 	data/grass-grayscale-1x1.png \
 	data/pink-leaves-2048x1024.jpg \
 	data/pink-leaves-grayscale-2048x1024.png \
+	data/pink-leaves-grayscale-1024x1024.png \
 	data/pink-leaves-grayscale-1024x512.png \
+	data/pink-leaves-grayscale-512x512.png \
 	data/pink-leaves-grayscale-512x256.png \
+	data/pink-leaves-grayscale-256x256.png \
 	data/pink-leaves-grayscale-256x128.png \
+	data/pink-leaves-grayscale-128x128.png \
 	data/pink-leaves-grayscale-128x64.png \
+	data/pink-leaves-grayscale-64x64.png \
 	data/pink-leaves-grayscale-64x32.png \
+	data/pink-leaves-grayscale-32x32.png \
 	data/pink-leaves-grayscale-32x16.png \
+	data/pink-leaves-grayscale-16x16.png \
 	data/pink-leaves-grayscale-16x8.png \
+	data/pink-leaves-grayscale-8x8.png \
 	data/pink-leaves-grayscale-8x4.png \
+	data/pink-leaves-grayscale-4x4.png \
 	data/pink-leaves-grayscale-4x2.png \
+	data/pink-leaves-grayscale-2x2.png \
 	data/pink-leaves-grayscale-2x1.png \
 	data/pink-leaves-grayscale-1x1.png \
 	$(NULL)
