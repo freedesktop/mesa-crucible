@@ -24,17 +24,17 @@
 from textwrap import dedent
 from collections import namedtuple
 
-Extent2D = namedtuple('Extent2D', ('width', 'height'))
+Extent3D = namedtuple('Extent3D', ('width', 'height', 'depth'))
 Format = namedtuple('Format', ('short_name', 'vk_name'))
 Params = namedtuple('Params', ('format', 'aspect', 'view', 'extent',
                     'levels', 'array_length', 'upload', 'download'))
 
-color_params_iter = (
+color_2d_params_iter = (
     Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
     for format in (Format('r8g8b8a8-unorm', 'VK_FORMAT_R8G8B8A8_UNORM'),)
     for aspect in ('color',)
     for view in ('2d',)
-    for extent in (Extent2D(512, 512),)
+    for extent in (Extent3D(512, 512, 1),)
     for levels in (1, 2)
     for array_length in (1, 2)
     for upload_method in (
@@ -49,12 +49,38 @@ color_params_iter = (
     )
 )
 
-depth_params_iter = (
+color_3d_params_iter = (
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    for format in (Format('r8g8b8a8-unorm', 'VK_FORMAT_R8G8B8A8_UNORM'),)
+    for aspect in ('color',)
+    for view in ('3d',)
+    for extent in (Extent3D(32, 32, 32),)
+    for levels in (1, 2)
+    for array_length in (1,)
+
+    for upload_method in (
+        'copy-from-buffer',
+        'copy-from-linear-image',
+
+        # Illegal to attach 3D image to a framebuffer.
+        #'copy-with-draw',
+    )
+
+    for download_method in (
+        'copy-to-buffer',
+        'copy-to-linear-image',
+
+        # FINISHME: The test cannot yet texture from 3D stencil images.
+        #'copy-with-draw',
+    )
+)
+
+depth_2d_params_iter = (
     Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
     for format in (Format('d32-sfloat', 'VK_FORMAT_D32_SFLOAT'),)
     for aspect in ('depth',)
     for view in ('2d',)
-    for extent in (Extent2D(1024, 512),)
+    for extent in (Extent3D(1024, 512, 1),)
     for levels in (1, 2)
     for array_length in (1, 2)
     for upload_method in (
@@ -67,12 +93,38 @@ depth_params_iter = (
     )
 )
 
-stencil_params_iter = (
+depth_3d_params_iter = (
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    for format in (Format('d32-sfloat', 'VK_FORMAT_D32_SFLOAT'),)
+    for aspect in ('depth',)
+    for view in ('3d',)
+    for extent in (Extent3D(1024, 512, 32),)
+    for levels in (1, 2)
+    for array_length in (1,)
+
+    for upload_method in (
+        'copy-from-buffer',
+        'copy-from-linear-image',
+
+        # Illegal to attach 3D image to a framebuffer.
+        #'copy-with-draw',
+    )
+
+    for download_method in (
+        'copy-to-buffer',
+        'copy-to-linear-image',
+
+        # FINISHME: The test cannot yet texture from 3D images.
+        #'copy-with-draw',
+    )
+)
+
+stencil_2d_params_iter = (
     Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
     for format in (Format('s8-uint', 'VK_FORMAT_S8_UINT'),)
     for aspect in ('stencil',)
     for view in ('2d',)
-    for extent in (Extent2D(1024, 512),)
+    for extent in (Extent3D(1024, 512, 1),)
     for levels in (1, 2)
     for array_length in (1, 2)
     for upload_method in (
@@ -93,12 +145,43 @@ stencil_params_iter = (
     )
 )
 
+stencil_3d_params_iter = (
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    for format in (Format('s8-uint', 'VK_FORMAT_S8_UINT'),)
+    for aspect in ('stencil',)
+    for view in ('3d',)
+    for extent in (Extent3D(1024, 512, 32),)
+    for levels in (1, 2)
+    for array_length in (1,)
+    for upload_method in (
+        'copy-from-buffer',
+
+        # Intel doesn't support linear stencil images. See above comment.
+        #'copy-from-linear-image',
+    )
+    for download_method in (
+        'copy-to-buffer',
+
+        # Intel doesn't support linear stencil images. See above comment.
+        #'copy-to-linear-image',
+
+        # FINISHME: The test cannot yet texture from 3D stencil images.
+        #'copy-with-draw',
+    )
+)
+
 def all_params_iter():
-    for p in color_params_iter:
+    for p in color_2d_params_iter:
         yield p
-    for p in depth_params_iter:
+    for p in color_3d_params_iter:
         yield p
-    for p in stencil_params_iter:
+    for p in depth_2d_params_iter:
+        yield p
+    for p in depth_3d_params_iter:
+        yield p
+    for p in stencil_2d_params_iter:
+        yield p
+    for p in stencil_3d_params_iter:
         yield p
 
 template = dedent("""
@@ -106,8 +189,8 @@ template = dedent("""
         .name = "func.miptree"
                 ".{format[0]}"
                 ".aspect-{aspect}"
-                ".extent-{extent.width}x{extent.height}"
-                ".view-{view}.levels{levels:02}.array{array_length:02}"
+                ".extent-{extent_str}"
+                ".view-{view}.levels{levels:02}{array_length_str}"
                 ".upload-{upload}.download-{download}",
         .start = test,
         .skip = {skip},
@@ -119,6 +202,7 @@ template = dedent("""
             .levels = {levels},
             .width = {extent.width},
             .height = {extent.height},
+            .depth = {extent.depth},
             .array_length = {array_length},
             .upload_method = MIPTREE_UPLOAD_METHOD_{upload_caps},
             .download_method = MIPTREE_DOWNLOAD_METHOD_{download_caps},
@@ -152,6 +236,24 @@ copyright = dedent("""\
 def to_caps(s):
     return s.upper().replace('-', '_')
 
+def get_extent_str(params):
+    e = params.extent
+
+    if params.view == '2d':
+        return '{}x{}'.format(e.width, e.height)
+    elif params.view == '3d':
+        return '{}x{}x{}'.format(e.width, e.height, e.depth)
+    else:
+        raise Exception('unhandled view in get_extent_str')
+
+def get_array_length_str(params):
+    if params.view == '2d':
+        return '.array{:02}'.format(params.array_length)
+    elif params.view == '3d':
+        return ''
+    else:
+        raise Exception('unhandled view in get_array_length_str')
+
 def main():
     out_filename = __file__.replace('.py', '.c')
 
@@ -164,8 +266,10 @@ def main():
                 aspect = p.aspect,
                 view = p.view,
                 extent = p.extent,
+                extent_str = get_extent_str(p),
                 levels = p.levels,
                 array_length = p.array_length,
+                array_length_str = get_array_length_str(p),
                 upload = p.upload,
                 download = p.download,
                 aspect_caps = to_caps(p.aspect),

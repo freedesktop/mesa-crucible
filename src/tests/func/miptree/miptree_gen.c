@@ -36,6 +36,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -59,6 +60,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -82,6 +84,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
@@ -105,6 +108,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -128,6 +132,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -151,6 +156,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
@@ -174,6 +180,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -197,6 +204,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -220,6 +228,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
@@ -243,6 +252,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -266,6 +276,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -289,6 +300,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
@@ -312,6 +324,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -335,6 +348,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -358,6 +372,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
@@ -381,6 +396,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -404,6 +420,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -427,6 +444,7 @@ test_define {
         .levels = 1,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
@@ -450,6 +468,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -473,6 +492,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -496,6 +516,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
@@ -519,6 +540,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -542,6 +564,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -565,6 +588,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
@@ -588,6 +612,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -611,6 +636,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -634,6 +660,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
@@ -657,6 +684,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -680,6 +708,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -703,6 +732,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
@@ -726,6 +756,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -749,6 +780,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -772,6 +804,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
@@ -795,6 +828,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -818,6 +852,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -841,6 +876,7 @@ test_define {
         .levels = 2,
         .width = 512,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
@@ -849,6 +885,198 @@ test_define {
 
 test_define {
     .name = "func.miptree"
+            ".r8g8b8a8-unorm"
+            ".aspect-color"
+            ".extent-32x32x32"
+            ".view-3d.levels01"
+            ".upload-copy-from-buffer.download-copy-to-buffer",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_R8G8B8A8_UNORM,
+        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 1,
+        .width = 32,
+        .height = 32,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".r8g8b8a8-unorm"
+            ".aspect-color"
+            ".extent-32x32x32"
+            ".view-3d.levels01"
+            ".upload-copy-from-buffer.download-copy-to-linear-image",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_R8G8B8A8_UNORM,
+        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 1,
+        .width = 32,
+        .height = 32,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".r8g8b8a8-unorm"
+            ".aspect-color"
+            ".extent-32x32x32"
+            ".view-3d.levels01"
+            ".upload-copy-from-linear-image.download-copy-to-buffer",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_R8G8B8A8_UNORM,
+        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 1,
+        .width = 32,
+        .height = 32,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".r8g8b8a8-unorm"
+            ".aspect-color"
+            ".extent-32x32x32"
+            ".view-3d.levels01"
+            ".upload-copy-from-linear-image.download-copy-to-linear-image",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_R8G8B8A8_UNORM,
+        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 1,
+        .width = 32,
+        .height = 32,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".r8g8b8a8-unorm"
+            ".aspect-color"
+            ".extent-32x32x32"
+            ".view-3d.levels02"
+            ".upload-copy-from-buffer.download-copy-to-buffer",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_R8G8B8A8_UNORM,
+        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 2,
+        .width = 32,
+        .height = 32,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".r8g8b8a8-unorm"
+            ".aspect-color"
+            ".extent-32x32x32"
+            ".view-3d.levels02"
+            ".upload-copy-from-buffer.download-copy-to-linear-image",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_R8G8B8A8_UNORM,
+        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 2,
+        .width = 32,
+        .height = 32,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".r8g8b8a8-unorm"
+            ".aspect-color"
+            ".extent-32x32x32"
+            ".view-3d.levels02"
+            ".upload-copy-from-linear-image.download-copy-to-buffer",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_R8G8B8A8_UNORM,
+        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 2,
+        .width = 32,
+        .height = 32,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".r8g8b8a8-unorm"
+            ".aspect-color"
+            ".extent-32x32x32"
+            ".view-3d.levels02"
+            ".upload-copy-from-linear-image.download-copy-to-linear-image",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_R8G8B8A8_UNORM,
+        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 2,
+        .width = 32,
+        .height = 32,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
             ".extent-1024x512"
@@ -864,6 +1092,7 @@ test_define {
         .levels = 1,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -887,6 +1116,7 @@ test_define {
         .levels = 1,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -910,6 +1140,7 @@ test_define {
         .levels = 1,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -933,6 +1164,7 @@ test_define {
         .levels = 1,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -956,6 +1188,7 @@ test_define {
         .levels = 1,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -979,6 +1212,7 @@ test_define {
         .levels = 1,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -1002,6 +1236,7 @@ test_define {
         .levels = 1,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -1025,6 +1260,7 @@ test_define {
         .levels = 1,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -1048,6 +1284,7 @@ test_define {
         .levels = 2,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -1071,6 +1308,7 @@ test_define {
         .levels = 2,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -1094,6 +1332,7 @@ test_define {
         .levels = 2,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -1117,6 +1356,7 @@ test_define {
         .levels = 2,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -1140,6 +1380,7 @@ test_define {
         .levels = 2,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -1163,6 +1404,7 @@ test_define {
         .levels = 2,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
@@ -1186,6 +1428,7 @@ test_define {
         .levels = 2,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -1209,7 +1452,200 @@ test_define {
         .levels = 2,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".extent-1024x512x32"
+            ".view-3d.levels01"
+            ".upload-copy-from-buffer.download-copy-to-buffer",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 1,
+        .width = 1024,
+        .height = 512,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".extent-1024x512x32"
+            ".view-3d.levels01"
+            ".upload-copy-from-buffer.download-copy-to-linear-image",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 1,
+        .width = 1024,
+        .height = 512,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".extent-1024x512x32"
+            ".view-3d.levels01"
+            ".upload-copy-from-linear-image.download-copy-to-buffer",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 1,
+        .width = 1024,
+        .height = 512,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".extent-1024x512x32"
+            ".view-3d.levels01"
+            ".upload-copy-from-linear-image.download-copy-to-linear-image",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 1,
+        .width = 1024,
+        .height = 512,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".extent-1024x512x32"
+            ".view-3d.levels02"
+            ".upload-copy-from-buffer.download-copy-to-buffer",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 2,
+        .width = 1024,
+        .height = 512,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".extent-1024x512x32"
+            ".view-3d.levels02"
+            ".upload-copy-from-buffer.download-copy-to-linear-image",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 2,
+        .width = 1024,
+        .height = 512,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".extent-1024x512x32"
+            ".view-3d.levels02"
+            ".upload-copy-from-linear-image.download-copy-to-buffer",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 2,
+        .width = 1024,
+        .height = 512,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".extent-1024x512x32"
+            ".view-3d.levels02"
+            ".upload-copy-from-linear-image.download-copy-to-linear-image",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 2,
+        .width = 1024,
+        .height = 512,
+        .depth = 32,
+        .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
     },
@@ -1232,6 +1668,7 @@ test_define {
         .levels = 1,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -1255,6 +1692,7 @@ test_define {
         .levels = 1,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -1278,6 +1716,7 @@ test_define {
         .levels = 2,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
@@ -1301,7 +1740,56 @@ test_define {
         .levels = 2,
         .width = 1024,
         .height = 512,
+        .depth = 1,
         .array_length = 2,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".s8-uint"
+            ".aspect-stencil"
+            ".extent-1024x512x32"
+            ".view-3d.levels01"
+            ".upload-copy-from-buffer.download-copy-to-buffer",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_S8_UINT,
+        .aspect = VK_IMAGE_ASPECT_STENCIL,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 1,
+        .width = 1024,
+        .height = 512,
+        .depth = 32,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".s8-uint"
+            ".aspect-stencil"
+            ".extent-1024x512x32"
+            ".view-3d.levels02"
+            ".upload-copy-from-buffer.download-copy-to-buffer",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_S8_UINT,
+        .aspect = VK_IMAGE_ASPECT_STENCIL,
+        .view_type = VK_IMAGE_VIEW_TYPE_3D,
+        .levels = 2,
+        .width = 1024,
+        .height = 512,
+        .depth = 32,
+        .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
     },

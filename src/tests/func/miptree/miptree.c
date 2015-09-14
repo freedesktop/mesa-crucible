@@ -84,6 +84,7 @@ struct test_params {
     uint32_t levels;
     uint32_t width;
     uint32_t height;
+    uint32_t depth;
     uint32_t array_length;
     enum miptree_upload_method upload_method;
     enum miptree_download_method download_method;
@@ -107,8 +108,11 @@ struct test_data {
 struct mipslice {
     uint32_t level;
     uint32_t array_slice;
+    uint32_t z_offset;
+
     uint32_t width;
     uint32_t height;
+    uint32_t depth;
 
     uint32_t buffer_offset;
 
@@ -134,6 +138,25 @@ struct miptree {
 
     mipslice_vec_t mipslices;
 };
+
+static const VkImageType
+image_type_from_image_view_type(VkImageViewType view_type)
+{
+    switch (view_type) {
+    case VK_IMAGE_VIEW_TYPE_1D:
+    case VK_IMAGE_VIEW_TYPE_1D_ARRAY:
+        return VK_IMAGE_TYPE_1D;
+    case VK_IMAGE_VIEW_TYPE_2D:
+    case VK_IMAGE_VIEW_TYPE_2D_ARRAY:
+    case VK_IMAGE_VIEW_TYPE_CUBE:
+    case VK_IMAGE_VIEW_TYPE_CUBE_ARRAY:
+        return VK_IMAGE_TYPE_2D;
+    case VK_IMAGE_VIEW_TYPE_3D:
+        return VK_IMAGE_TYPE_3D;
+    default:
+        t_failf("bad VkImageViewType %d", view_type);
+    }
+}
 
 // Fill the pixels with a canary color.
 static void
@@ -162,6 +185,31 @@ fill_rect_with_canary(void *pixels,
         memset(pixels, 0x19, width * height);
     } else {
         t_failf("unsupported cru_format_info");
+    }
+}
+
+static void
+mipslice_get_description(const mipslice_t *slice, string_t *desc)
+{
+    const test_params_t *params = t_user_data;
+
+    switch (params->view_type) {
+    case VK_IMAGE_VIEW_TYPE_2D:
+    case VK_IMAGE_VIEW_TYPE_2D_ARRAY:
+        if (params->array_length == 0) {
+            string_printf(desc, "level%02u", slice->level);
+        } else {
+            string_printf(desc, "level%02u.array%02u",
+                          slice->level, slice->array_slice);
+        }
+        break;
+    case VK_IMAGE_VIEW_TYPE_3D:
+        string_printf(desc, "level%02u.z%02u",
+                      slice->level, slice->z_offset);
+        break;
+    default:
+        t_failf("FINISHME: VkImageViewType %d", params->view_type);
+        break;
     }
 }
 
@@ -268,9 +316,22 @@ miptree_calc_buffer_size(void)
     const uint32_t cpp = 4;
     const uint32_t width = p->width;
     const uint32_t height = p->height;
+    const uint32_t depth = p->depth;
+
+    switch (p->view_type) {
+        case VK_IMAGE_VIEW_TYPE_2D:
+        case VK_IMAGE_VIEW_TYPE_2D_ARRAY:
+        case VK_IMAGE_VIEW_TYPE_3D:
+            break;
+        default:
+            t_failf("FINISHME: VkImageViewType %d", p->view_type);
+            break;
+    }
 
     for (uint32_t l = 0; l < p->levels; ++l) {
-        buffer_size += cpp * cru_minify(width, l) * cru_minify(height, l);
+        buffer_size += cpp * cru_minify(width, l) *
+                             cru_minify(height, l) *
+                             cru_minify(depth, l);
     }
 
     buffer_size *= p->array_length;
@@ -311,27 +372,26 @@ miptree_create(void)
 {
     const test_params_t *params = t_user_data;
 
-    /* FINISHME: 1D, 1D array, cube map, and 3D textures */
-    t_assert(params->view_type == VK_IMAGE_VIEW_TYPE_2D);
-
     const VkFormat format = params->format;
     const cru_format_info_t *format_info = t_format_info(format);
     const uint32_t cpp = format_info->cpp;
     const uint32_t levels = params->levels;
     const uint32_t width = params->width;
     const uint32_t height = params->height;
+    const uint32_t depth = params->depth;
     const uint32_t array_length = params->array_length;
     const size_t buffer_size = miptree_calc_buffer_size();
 
     // Create the image that will contain the real miptree.
     VkImage image = qoCreateImage(t_device,
+        .imageType = image_type_from_image_view_type(params->view_type),
         .format = format,
         .mipLevels = levels,
         .arraySize = array_length,
         .extent = {
             .width = width,
             .height = height,
-            .depth = 1,
+            .depth = depth,
         },
         .tiling = VK_IMAGE_TILING_OPTIMAL,
         .usage = VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT |
@@ -378,8 +438,14 @@ miptree_create(void)
     for (uint32_t l = 0; l < levels; ++l) {
         const uint32_t level_width = cru_minify(width, l);
         const uint32_t level_height = cru_minify(height, l);
+        const uint32_t level_depth = cru_minify(depth, l);
 
-        for (uint32_t a = 0; a < array_length; ++a) {
+        // 3D array textures are illegal.
+        t_assert(level_depth == 1 || array_length == 1);
+
+        const uint32_t num_layers = MAX(level_depth, array_length);
+
+        for (uint32_t layer = 0; layer < num_layers; ++layer) {
             void *src_pixels = src_buffer_map + buffer_offset;
             void *dest_pixels = dest_buffer_map + buffer_offset;
 
@@ -437,7 +503,7 @@ miptree_create(void)
             templ_image = mipslice_make_template_image(format_info,
                                                        width, height,
                                                        l, levels,
-                                                       a, array_length);
+                                                       layer, num_layers);
             t_assert(level_width == cru_image_get_width(templ_image));
             t_assert(level_height == cru_image_get_height(templ_image));
 
@@ -446,7 +512,8 @@ miptree_create(void)
             t_assert(cru_image_copy(src_image, templ_image));
             mipslice_perturb_pixels(src_pixels, format_info,
                                     level_width, level_height,
-                                    l, levels, a, array_length);
+                                    l, levels,
+                                    layer, num_layers);
 
             dest_image = t_new_cru_image_from_pixels(dest_pixels,
                     format, level_width, level_height);
@@ -454,11 +521,22 @@ miptree_create(void)
             fill_rect_with_canary(dest_pixels, format_info,
                                   level_width, level_height);
 
-            const mipslice_t mipslice = {
+            uint32_t z_offset = 0;
+            if (depth > 1)
+                z_offset = layer;
+
+            uint32_t array_slice = 0;
+            if (array_length > 1)
+                array_slice = layer;
+
+            mipslice_t mipslice = {
                 .level = l,
-                .array_slice = a,
+                .array_slice = array_slice,
+                .z_offset = z_offset,
+
                 .width = level_width,
                 .height = level_height,
+                .depth = level_depth,
 
                 .buffer_offset = buffer_offset,
 
@@ -496,7 +574,11 @@ miptree_upload_copy_from_buffer(const test_data_t *data)
                 .mipLevel = slice->level,
                 .arraySlice = slice->array_slice,
             },
-            .imageOffset = { .x = 0, .y = 0, .z = 0 },
+            .imageOffset = {
+                .x = 0,
+                .y = 0,
+                .z = slice->z_offset,
+            },
             .imageExtent = {
                 .width = slice->width,
                 .height = slice->height,
@@ -530,7 +612,11 @@ miptree_download_copy_to_buffer(const test_data_t *data)
                 .mipLevel = slice->level,
                 .arraySlice = slice->array_slice,
             },
-            .imageOffset = { .x = 0, .y = 0, .z = 0 },
+            .imageOffset = {
+                .x = 0,
+                .y = 0,
+                .z = slice->z_offset,
+            },
             .imageExtent = {
                 .width = slice->width,
                 .height = slice->height,
@@ -571,7 +657,11 @@ miptree_upload_copy_from_linear_image(const test_data_t *data)
                 .mipLevel = slice->level,
                 .arraySlice = slice->array_slice,
             },
-            .destOffset = { .x = 0, .y = 0, .z = 0 },
+            .destOffset = {
+                .x = 0,
+                .y = 0,
+                .z = slice->z_offset,
+            },
 
             .extent = {
                 .width = slice->width,
@@ -606,7 +696,11 @@ miptree_download_copy_to_linear_image(const test_data_t *data)
                 .mipLevel = slice->level,
                 .arraySlice = slice->array_slice,
             },
-            .srcOffset = { .x = 0, .y = 0, .z = 0 },
+            .srcOffset = {
+                .x = 0,
+                .y = 0,
+                .z = slice->z_offset,
+            },
 
             .destSubresource = {
                 .aspect = params->aspect,
@@ -782,6 +876,12 @@ miptree_download_copy_with_draw(const test_data_t *data)
     VkAttachmentView att_views[num_views];
     VkExtent2D extents[num_views];
 
+    if (params->view_type != VK_IMAGE_VIEW_TYPE_2D) {
+        // Different view types require pipelines with different sampler
+        // types.
+        t_failf("FINISHME: VkImageViewType %d", params->view_type);
+    }
+
     for (uint32_t i = 0; i < mt->mipslices.len; ++i) {
         const mipslice_t *slice = &mt->mipslices.data[i];
         extents[i].width = slice->width;
@@ -853,19 +953,23 @@ miptree_compare_images(const miptree_t *mt)
     test_result_t result = TEST_RESULT_PASS;
     const mipslice_t *slice;
 
+    string_t slice_desc = STRING_INIT;
+    string_t ref_filename = STRING_INIT;
+    string_t actual_filename = STRING_INIT;
+
     vkQueueWaitIdle(t_queue);
 
     cru_vec_foreach(slice, &mt->mipslices) {
-        const uint32_t l = slice->level;
-        const uint32_t a = slice->array_slice;
+        mipslice_get_description(slice, &slice_desc);
 
-        t_dump_image_f(slice->src_cru_image,
-                       "level%02u.array%02u.ref.png", l, a);
-        t_dump_image_f(slice->dest_cru_image,
-                       "level%02u.array%02u.actual.png", l, a);
+        string_printf(&ref_filename, "%s.ref.png", string_data(&slice_desc));
+        string_printf(&actual_filename, "%s.actual.png", string_data(&slice_desc));
+
+        t_dump_image_f(slice->src_cru_image, string_data(&ref_filename));
+        t_dump_image_f(slice->dest_cru_image, string_data(&actual_filename));
 
         if (!cru_image_compare(slice->src_cru_image, slice->dest_cru_image)) {
-            loge("image incorrect at level %u, array slice %u", l, a);
+            loge("image incorrect at %s", string_data(&slice_desc));
             result = TEST_RESULT_FAIL;
         }
     }
