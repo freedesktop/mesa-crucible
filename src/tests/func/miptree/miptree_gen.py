@@ -189,8 +189,10 @@ template = dedent("""
         .name = "func.miptree"
                 ".{format[0]}"
                 ".aspect-{aspect}"
+                ".view-{view}"
+                ".levels{levels:02}"
+                "{array_length_str}"
                 ".extent-{extent_str}"
-                ".view-{view}.levels{levels:02}{array_length_str}"
                 ".upload-{upload}.download-{download}",
         .start = test,
         .skip = {skip},

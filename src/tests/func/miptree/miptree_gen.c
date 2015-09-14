@@ -23,8 +23,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels01.array01"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -47,8 +49,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels01.array01"
             ".upload-copy-from-buffer.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -71,8 +75,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels01.array01"
             ".upload-copy-from-buffer.download-copy-with-draw",
     .start = test,
     .skip = false,
@@ -95,8 +101,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels01.array01"
             ".upload-copy-from-linear-image.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -119,8 +127,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels01.array01"
             ".upload-copy-from-linear-image.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -143,8 +153,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels01.array01"
             ".upload-copy-from-linear-image.download-copy-with-draw",
     .start = test,
     .skip = false,
@@ -167,8 +179,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels01.array01"
             ".upload-copy-with-draw.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -191,8 +205,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels01.array01"
             ".upload-copy-with-draw.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -215,8 +231,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels01.array01"
             ".upload-copy-with-draw.download-copy-with-draw",
     .start = test,
     .skip = false,
@@ -239,8 +257,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels01.array02"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -263,8 +283,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels01.array02"
             ".upload-copy-from-buffer.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -287,8 +309,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels01.array02"
             ".upload-copy-from-buffer.download-copy-with-draw",
     .start = test,
     .skip = false,
@@ -311,8 +335,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels01.array02"
             ".upload-copy-from-linear-image.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -335,8 +361,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels01.array02"
             ".upload-copy-from-linear-image.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -359,8 +387,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels01.array02"
             ".upload-copy-from-linear-image.download-copy-with-draw",
     .start = test,
     .skip = false,
@@ -383,8 +413,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels01.array02"
             ".upload-copy-with-draw.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -407,8 +439,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels01.array02"
             ".upload-copy-with-draw.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -431,8 +465,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels01"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels01.array02"
             ".upload-copy-with-draw.download-copy-with-draw",
     .start = test,
     .skip = false,
@@ -455,8 +491,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels02.array01"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -479,8 +517,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels02.array01"
             ".upload-copy-from-buffer.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -503,8 +543,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels02.array01"
             ".upload-copy-from-buffer.download-copy-with-draw",
     .start = test,
     .skip = false,
@@ -527,8 +569,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels02.array01"
             ".upload-copy-from-linear-image.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -551,8 +595,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels02.array01"
             ".upload-copy-from-linear-image.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -575,8 +621,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels02.array01"
             ".upload-copy-from-linear-image.download-copy-with-draw",
     .start = test,
     .skip = false,
@@ -599,8 +647,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels02.array01"
             ".upload-copy-with-draw.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -623,8 +673,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels02.array01"
             ".upload-copy-with-draw.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -647,8 +699,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array01"
             ".extent-512x512"
-            ".view-2d.levels02.array01"
             ".upload-copy-with-draw.download-copy-with-draw",
     .start = test,
     .skip = false,
@@ -671,8 +725,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels02.array02"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -695,8 +751,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels02.array02"
             ".upload-copy-from-buffer.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -719,8 +777,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels02.array02"
             ".upload-copy-from-buffer.download-copy-with-draw",
     .start = test,
     .skip = false,
@@ -743,8 +803,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels02.array02"
             ".upload-copy-from-linear-image.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -767,8 +829,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels02.array02"
             ".upload-copy-from-linear-image.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -791,8 +855,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels02.array02"
             ".upload-copy-from-linear-image.download-copy-with-draw",
     .start = test,
     .skip = false,
@@ -815,8 +881,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels02.array02"
             ".upload-copy-with-draw.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -839,8 +907,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels02.array02"
             ".upload-copy-with-draw.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -863,8 +933,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-2d"
+            ".levels02"
+            ".array02"
             ".extent-512x512"
-            ".view-2d.levels02.array02"
             ".upload-copy-with-draw.download-copy-with-draw",
     .start = test,
     .skip = false,
@@ -887,8 +959,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-3d"
+            ".levels01"
+            ""
             ".extent-32x32x32"
-            ".view-3d.levels01"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -911,8 +985,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-3d"
+            ".levels01"
+            ""
             ".extent-32x32x32"
-            ".view-3d.levels01"
             ".upload-copy-from-buffer.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -935,8 +1011,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-3d"
+            ".levels01"
+            ""
             ".extent-32x32x32"
-            ".view-3d.levels01"
             ".upload-copy-from-linear-image.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -959,8 +1037,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-3d"
+            ".levels01"
+            ""
             ".extent-32x32x32"
-            ".view-3d.levels01"
             ".upload-copy-from-linear-image.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -983,8 +1063,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-3d"
+            ".levels02"
+            ""
             ".extent-32x32x32"
-            ".view-3d.levels02"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1007,8 +1089,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-3d"
+            ".levels02"
+            ""
             ".extent-32x32x32"
-            ".view-3d.levels02"
             ".upload-copy-from-buffer.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -1031,8 +1115,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-3d"
+            ".levels02"
+            ""
             ".extent-32x32x32"
-            ".view-3d.levels02"
             ".upload-copy-from-linear-image.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1055,8 +1141,10 @@ test_define {
     .name = "func.miptree"
             ".r8g8b8a8-unorm"
             ".aspect-color"
+            ".view-3d"
+            ".levels02"
+            ""
             ".extent-32x32x32"
-            ".view-3d.levels02"
             ".upload-copy-from-linear-image.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -1079,8 +1167,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels01"
+            ".array01"
             ".extent-1024x512"
-            ".view-2d.levels01.array01"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1103,8 +1193,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels01"
+            ".array01"
             ".extent-1024x512"
-            ".view-2d.levels01.array01"
             ".upload-copy-from-buffer.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -1127,8 +1219,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels01"
+            ".array01"
             ".extent-1024x512"
-            ".view-2d.levels01.array01"
             ".upload-copy-from-linear-image.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1151,8 +1245,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels01"
+            ".array01"
             ".extent-1024x512"
-            ".view-2d.levels01.array01"
             ".upload-copy-from-linear-image.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -1175,8 +1271,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels01"
+            ".array02"
             ".extent-1024x512"
-            ".view-2d.levels01.array02"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1199,8 +1297,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels01"
+            ".array02"
             ".extent-1024x512"
-            ".view-2d.levels01.array02"
             ".upload-copy-from-buffer.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -1223,8 +1323,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels01"
+            ".array02"
             ".extent-1024x512"
-            ".view-2d.levels01.array02"
             ".upload-copy-from-linear-image.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1247,8 +1349,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels01"
+            ".array02"
             ".extent-1024x512"
-            ".view-2d.levels01.array02"
             ".upload-copy-from-linear-image.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -1271,8 +1375,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels02"
+            ".array01"
             ".extent-1024x512"
-            ".view-2d.levels02.array01"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1295,8 +1401,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels02"
+            ".array01"
             ".extent-1024x512"
-            ".view-2d.levels02.array01"
             ".upload-copy-from-buffer.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -1319,8 +1427,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels02"
+            ".array01"
             ".extent-1024x512"
-            ".view-2d.levels02.array01"
             ".upload-copy-from-linear-image.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1343,8 +1453,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels02"
+            ".array01"
             ".extent-1024x512"
-            ".view-2d.levels02.array01"
             ".upload-copy-from-linear-image.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -1367,8 +1479,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels02"
+            ".array02"
             ".extent-1024x512"
-            ".view-2d.levels02.array02"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1391,8 +1505,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels02"
+            ".array02"
             ".extent-1024x512"
-            ".view-2d.levels02.array02"
             ".upload-copy-from-buffer.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -1415,8 +1531,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels02"
+            ".array02"
             ".extent-1024x512"
-            ".view-2d.levels02.array02"
             ".upload-copy-from-linear-image.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1439,8 +1557,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-2d"
+            ".levels02"
+            ".array02"
             ".extent-1024x512"
-            ".view-2d.levels02.array02"
             ".upload-copy-from-linear-image.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -1463,8 +1583,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-3d"
+            ".levels01"
+            ""
             ".extent-1024x512x32"
-            ".view-3d.levels01"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1487,8 +1609,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-3d"
+            ".levels01"
+            ""
             ".extent-1024x512x32"
-            ".view-3d.levels01"
             ".upload-copy-from-buffer.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -1511,8 +1635,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-3d"
+            ".levels01"
+            ""
             ".extent-1024x512x32"
-            ".view-3d.levels01"
             ".upload-copy-from-linear-image.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1535,8 +1661,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-3d"
+            ".levels01"
+            ""
             ".extent-1024x512x32"
-            ".view-3d.levels01"
             ".upload-copy-from-linear-image.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -1559,8 +1687,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-3d"
+            ".levels02"
+            ""
             ".extent-1024x512x32"
-            ".view-3d.levels02"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1583,8 +1713,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-3d"
+            ".levels02"
+            ""
             ".extent-1024x512x32"
-            ".view-3d.levels02"
             ".upload-copy-from-buffer.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -1607,8 +1739,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-3d"
+            ".levels02"
+            ""
             ".extent-1024x512x32"
-            ".view-3d.levels02"
             ".upload-copy-from-linear-image.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1631,8 +1765,10 @@ test_define {
     .name = "func.miptree"
             ".d32-sfloat"
             ".aspect-depth"
+            ".view-3d"
+            ".levels02"
+            ""
             ".extent-1024x512x32"
-            ".view-3d.levels02"
             ".upload-copy-from-linear-image.download-copy-to-linear-image",
     .start = test,
     .skip = false,
@@ -1655,8 +1791,10 @@ test_define {
     .name = "func.miptree"
             ".s8-uint"
             ".aspect-stencil"
+            ".view-2d"
+            ".levels01"
+            ".array01"
             ".extent-1024x512"
-            ".view-2d.levels01.array01"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1679,8 +1817,10 @@ test_define {
     .name = "func.miptree"
             ".s8-uint"
             ".aspect-stencil"
+            ".view-2d"
+            ".levels01"
+            ".array02"
             ".extent-1024x512"
-            ".view-2d.levels01.array02"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1703,8 +1843,10 @@ test_define {
     .name = "func.miptree"
             ".s8-uint"
             ".aspect-stencil"
+            ".view-2d"
+            ".levels02"
+            ".array01"
             ".extent-1024x512"
-            ".view-2d.levels02.array01"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1727,8 +1869,10 @@ test_define {
     .name = "func.miptree"
             ".s8-uint"
             ".aspect-stencil"
+            ".view-2d"
+            ".levels02"
+            ".array02"
             ".extent-1024x512"
-            ".view-2d.levels02.array02"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1751,8 +1895,10 @@ test_define {
     .name = "func.miptree"
             ".s8-uint"
             ".aspect-stencil"
+            ".view-3d"
+            ".levels01"
+            ""
             ".extent-1024x512x32"
-            ".view-3d.levels01"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -1775,8 +1921,10 @@ test_define {
     .name = "func.miptree"
             ".s8-uint"
             ".aspect-stencil"
+            ".view-3d"
+            ".levels02"
+            ""
             ".extent-1024x512x32"
-            ".view-3d.levels02"
             ".upload-copy-from-buffer.download-copy-to-buffer",
     .start = test,
     .skip = false,
