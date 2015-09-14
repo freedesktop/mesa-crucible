@@ -225,22 +225,27 @@ miplevel_get_template_filename(const cru_format_info_t *format_info,
     const uint32_t level_width = cru_minify(image_width, level);
     const uint32_t level_height = cru_minify(image_height, level);
 
+    // The test attempts to make each pair of adjact mipslices visually
+    // distinct to (1) reduce the probability of the test falsely passing and
+    // to (2) aid the debugging of failing tests.  For most formats,
+    // mipslice_perturb_pixels() provides the visual distinction.
+    //
+    // However, for single-channel formats, the perturbation may not provide
+    // sufficient visual distinction. The perturbation acts on only one
+    // dimension (the single channel) but mipslices vary along two dimensions
+    // (level and layer).  To work around insufficient perturbation in the
+    // single-channel case, the test selects distint source images for each
+    // pair of adjacent mipslices.
     switch (format_info->format) {
     case VK_FORMAT_R8G8B8A8_UNORM:
         string_appendf(&filename, "mandrill");
         break;
     case VK_FORMAT_D32_SFLOAT:
     case VK_FORMAT_S8_UINT:
-        switch (layer) {
-        case 0:
+        if (layer % 2 == 0) {
             string_appendf(&filename, "grass-grayscale");
-            break;
-        case 1:
+        } else {
             string_appendf(&filename, "pink-leaves-grayscale");
-            break;
-        default:
-            t_failf("no image file exists for depth layer");
-            break;
         }
         break;
     default:
