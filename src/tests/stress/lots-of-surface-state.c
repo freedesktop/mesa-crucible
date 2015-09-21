@@ -292,7 +292,7 @@ test_lots_of_surface_state_vs(bool use_dynamic_offsets)
 {
     VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
-        out vec4 v_color;
+        layout(location = 0) out vec4 v_color;
         layout(set = 0, binding =  0) uniform block0  { float f; } u0;
         layout(set = 0, binding =  1) uniform block1  { float f; } u1;
         layout(set = 0, binding =  2) uniform block2  { float f; } u2;
@@ -316,8 +316,8 @@ test_lots_of_surface_state_vs(bool use_dynamic_offsets)
     );
 
     VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
-        in vec4 v_color;
-        out vec4 f_color;
+        layout(location = 0) in vec4 v_color;
+        layout(location = 0) out vec4 f_color;
         void main()
         {
             f_color = v_color;
@@ -365,7 +365,7 @@ test_lots_of_surface_state_fs(bool use_dynamic_offsets)
 
     // The fragment shader takes 12 UBOs.
     VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
-        out vec4 f_color;
+        layout(location = 0) out vec4 f_color;
         layout(set = 0, binding =  0) uniform block0  { float f; } u0;
         layout(set = 0, binding =  1) uniform block1  { float f; } u1;
         layout(set = 0, binding =  2) uniform block2  { float f; } u2;

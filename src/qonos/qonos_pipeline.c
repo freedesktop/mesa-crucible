@@ -148,7 +148,7 @@ qoCreateGraphicsPipeline(VkDevice device,
             vs = qoCreateShaderGLSL(device, VERTEX,
                 layout(location = 0) in vec4 a_position;
                 layout(location = 1) in vec4 a_color;
-                out vec4 v_color;
+                layout(location = 0) out vec4 v_color;
                 void main()
                 {
                     gl_Position = a_position;
@@ -171,8 +171,8 @@ qoCreateGraphicsPipeline(VkDevice device,
 
         if (!fs.handle) {
             fs = qoCreateShaderGLSL(device, FRAGMENT,
-                out vec4 f_color;
-                in vec4 v_color;
+                layout(location = 0) out vec4 f_color;
+                layout(location = 0) in vec4 v_color;
                 void main()
                 {
                     f_color = v_color;

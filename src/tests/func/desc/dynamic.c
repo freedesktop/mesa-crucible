@@ -33,7 +33,7 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
             vec4 color;
             vec4 offset;
         } u1;
-        flat out vec4 v_color;
+        layout(location = 0) flat out vec4 v_color;
         void main()
         {
             gl_Position = a_position + u1.offset;
@@ -42,8 +42,8 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
     );
 
     VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
-        out vec4 f_color;
-        flat in vec4 v_color;
+        layout(location = 0) out vec4 f_color;
+        layout(location = 0) flat in vec4 v_color;
         void main()
         {
             f_color = v_color;

@@ -1074,7 +1074,7 @@ init_draw_data(test_draw_data_t *draw_data)
 
     VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
         layout(set = 0, binding = 0) uniform sampler2D u_tex;
-        out vec4 f_color;
+        layout(location = 0) out vec4 f_color;
 
         void main()
         {

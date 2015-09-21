@@ -155,7 +155,7 @@ draw_triangle(void)
             QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS,
             .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN,
             .vertexShader = qoCreateShaderGLSL(t_device, VERTEX,
-                out vec4 v_color;
+                layout(location = 0) out vec4 v_color;
 
                 // Draw 3 overlapping triangles.
                 void main()
@@ -194,8 +194,8 @@ draw_triangle(void)
                 }
             ),
             .fragmentShader = qoCreateShaderGLSL(t_device, FRAGMENT,
-                in vec4 v_color;
-                out vec4 f_color;
+                layout(location = 0) in vec4 v_color;
+                layout(location = 0) out vec4 f_color;
 
                 void main()
                 {
