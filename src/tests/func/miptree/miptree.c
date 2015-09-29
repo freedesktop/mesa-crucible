@@ -560,7 +560,6 @@ miptree_create(void)
 
             dest_image = t_new_cru_image_from_pixels(dest_pixels,
                     format, level_width, level_height);
-            t_cleanup_push(dest_image);
             fill_rect_with_canary(dest_pixels, format_info,
                                   level_width, level_height);
 
