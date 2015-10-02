@@ -20,7 +20,3 @@ Do the typical autotools dance:
 The configure script will search for Vulkan headers and libraries in the usual
 system locations.  You can modify the search paths with environment variables
 CPATH and LIBRARY_PATH [see man:gcc(1)].
-
-If you are working with a Mesa driver and want to configure Crucible to use
-the uninstalled Vulkan headers and library in the Mesa source directory, then
-pass "--with-mesa=$MESA_SRC_DIR" to the configure script.
