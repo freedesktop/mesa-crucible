@@ -24,4 +24,3 @@
 #define VK_PROTOTYPES
 
 #include <vulkan/vulkan.h>
-#include <vulkan/vulkan_intel.h>
