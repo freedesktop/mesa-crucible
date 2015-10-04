@@ -144,7 +144,6 @@ test(void)
 
     VkBufferView buffer_view = qoCreateBufferView(t_device,
         .buffer = buffer,
-        .viewType = VK_BUFFER_VIEW_TYPE_RAW,
         .format = VK_FORMAT_R32G32B32A32_SFLOAT,
         .range = sizeof(color));
 

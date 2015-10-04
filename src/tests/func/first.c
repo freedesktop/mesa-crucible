@@ -179,7 +179,6 @@ test(void)
     for (int i = 0; i < ARRAY_LENGTH(buffer_view); ++i) {
         buffer_view[i] = qoCreateBufferView(t_device,
             .buffer = uniform_buffer,
-            .viewType = VK_BUFFER_VIEW_TYPE_RAW,
             .format = VK_FORMAT_R32G32B32A32_SFLOAT,
             .offset = 4 * sizeof(float) * i,
             .range = 64);

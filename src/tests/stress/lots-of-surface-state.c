@@ -184,7 +184,6 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
 
         VkBufferView ubo_view = qoCreateBufferView(t_device,
             .buffer = ubo,
-            .viewType = VK_BUFFER_VIEW_TYPE_RAW,
             .format = VK_FORMAT_R32_SFLOAT,
             .range = ubo_size);
 
@@ -253,7 +252,6 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
             for (int j = 0; j < 12; j++) {
                 desc_info[j].bufferView = qoCreateBufferView(t_device,
                     .buffer = ubo,
-                    .viewType = VK_BUFFER_VIEW_TYPE_RAW,
                     .format = VK_FORMAT_R32_SFLOAT,
                     .offset = offsets[j],
                     .range = ubo_size);
