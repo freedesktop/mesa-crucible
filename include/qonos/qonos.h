@@ -187,7 +187,7 @@ typedef struct QoShaderCreateInfo_ {
     .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO, \
     .depthTestEnable = false, \
     .depthWriteEnable = false, \
-    .depthBoundsEnable = false, \
+    .depthBoundsTestEnable = false, \
     .stencilTestEnable = false
 
 #define QO_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO_DEFAULTS \
