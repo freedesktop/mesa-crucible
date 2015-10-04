@@ -202,8 +202,8 @@ test(void)
             .renderPass = pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
-            .attachmentCount = 1,
-            .pAttachmentClearValues = (VkClearValue[]) {
+            .clearValueCount = 1,
+            .pClearValues = (VkClearValue[]) {
                 { .color = { .f32 = HEX_COLOR(0x161032) } },
             }
         }, VK_RENDER_PASS_CONTENTS_INLINE);

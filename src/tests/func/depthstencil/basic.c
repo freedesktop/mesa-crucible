@@ -159,8 +159,8 @@ test(void)
             .renderPass = pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
-            .attachmentCount = 2,
-            .pAttachmentClearValues = (VkClearValue[]) {
+            .clearValueCount = 2,
+            .pClearValues = (VkClearValue[]) {
                 { .color = { .f32 = { 0.2, 0.2, 0.2, 1.0 } } },
                 { .ds = { .depth = params->depth_clear_value } },
             }

@@ -99,8 +99,8 @@ create_and_begin_render_pass(void)
             .renderPass = pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
-            .attachmentCount = 1,
-            .pAttachmentClearValues = (VkClearValue[]) {
+            .clearValueCount = 1,
+            .pClearValues = (VkClearValue[]) {
                 { .color = { .f32 = { 1.0, 0.0, 0.0, 1.0 } } },
             }
         }, VK_RENDER_PASS_CONTENTS_SECONDARY_CMD_BUFFERS);

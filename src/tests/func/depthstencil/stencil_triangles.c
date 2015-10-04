@@ -267,8 +267,8 @@ draw_triangle(void)
             .renderPass = pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
-            .attachmentCount = 1,
-            .pAttachmentClearValues = (VkClearValue[]) {
+            .clearValueCount = 1,
+            .pClearValues = (VkClearValue[]) {
                 { .color = { .f32 = { 0.2, 0.2, 0.2, 1.0 } } },
             },
         },
