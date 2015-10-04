@@ -193,7 +193,7 @@ typedef struct QoShaderCreateInfo_ {
 #define QO_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO, \
     .rasterSamples = 1, \
-    .sampleMask = 0xffffffff
+    .pSampleMask = NULL
 
 #define QO_PIPELINE_COLOR_BLEND_ATTACHMENT_STATE_DEFAULTS \
     .blendEnable = false, \
