@@ -888,7 +888,7 @@ miptree_upload_copy_with_draw(const test_data_t *data)
                 VK_CHANNEL_SWIZZLE_A,
             },
             .subresourceRange = {
-                .aspect = params->aspect,
+                .aspectMask = 1 << params->aspect,
                 .baseMipLevel = 0,
                 .mipLevels = 1,
                 .baseArraySlice = 0,
@@ -934,7 +934,7 @@ miptree_download_copy_with_draw(const test_data_t *data)
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
             .format = params->format,
             .subresourceRange = {
-                .aspect = params->aspect,
+                .aspectMask = 1 << params->aspect,
                 .baseMipLevel = slice->level,
                 .mipLevels = 1,
                 .baseArraySlice = slice->array_slice,

@@ -226,7 +226,7 @@ t_setup_image_views(void)
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
             .format = VK_FORMAT_R8G8B8A8_UNORM,
             .subresourceRange = {
-                .aspect = VK_IMAGE_ASPECT_COLOR,
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
                 .baseMipLevel = 0,
                 .mipLevels = 1,
                 .baseArraySlice = 0,
@@ -244,7 +244,7 @@ t_setup_image_views(void)
                 .viewType = VK_IMAGE_VIEW_TYPE_2D,
                 .format = finfo->depth_format,
                 .subresourceRange = {
-                    .aspect = VK_IMAGE_ASPECT_DEPTH,
+                    .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
                     .baseMipLevel = 0,
                     .mipLevels = 1,
                     .baseArraySlice = 0,
@@ -258,7 +258,7 @@ t_setup_image_views(void)
                 .viewType = VK_IMAGE_VIEW_TYPE_2D,
                 .format = finfo->stencil_format,
                 .subresourceRange = {
-                    .aspect = VK_IMAGE_ASPECT_STENCIL,
+                    .aspectMask = VK_IMAGE_ASPECT_STENCIL_BIT,
                     .baseMipLevel = 0,
                     .mipLevels = 1,
                     .baseArraySlice = 0,

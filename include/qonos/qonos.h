@@ -286,7 +286,7 @@ typedef struct QoShaderCreateInfo_ {
         VK_CHANNEL_SWIZZLE_A, \
     }, \
     .subresourceRange = { \
-        .aspect = VK_IMAGE_ASPECT_COLOR, \
+        .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT, \
         .baseMipLevel = 0, \
         .mipLevels = 1, \
         .baseArraySlice = 0, \
