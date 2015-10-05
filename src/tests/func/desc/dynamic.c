@@ -121,8 +121,7 @@ test(void)
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           1, set_layout, set);
 
-    VkBuffer buffer = qoCreateBuffer(t_device, .size = 4096,
-                                     .usage = VK_BUFFER_USAGE_GENERAL);
+    VkBuffer buffer = qoCreateBuffer(t_device, .size = 4096);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
         .memoryTypeIndex = t_mem_type_index_for_mmap);

@@ -77,8 +77,7 @@ test(void)
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           1, &set_layout, &set);
 
-    VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024,
-                                     .usage = VK_BUFFER_USAGE_GENERAL);
+    VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
         .memoryTypeIndex = t_mem_type_index_for_device_access);

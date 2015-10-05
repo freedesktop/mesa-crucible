@@ -97,8 +97,7 @@ setup_dest(struct dest *dest)
 
     size_t buffer_size = 4 * t_width * t_height;
 
-    VkBuffer buffer = qoCreateBuffer(t_device, .size = buffer_size,
-                                     .usage = VK_BUFFER_USAGE_GENERAL);
+    VkBuffer buffer = qoCreateBuffer(t_device, .size = buffer_size);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
         .memoryTypeIndex = t_mem_type_index_for_mmap);

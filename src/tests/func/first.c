@@ -161,8 +161,7 @@ test(void)
     };
 
     VkBuffer uniform_buffer = qoCreateBuffer(t_device,
-        .size = sizeof(uniform_data),
-        .usage = VK_BUFFER_USAGE_GENERAL);
+        .size = sizeof(uniform_data));
 
     VkDeviceMemory uniform_mem = qoAllocBufferMemory(t_device, uniform_buffer,
         .memoryTypeIndex = t_mem_type_index_for_mmap);
