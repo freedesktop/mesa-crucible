@@ -272,7 +272,7 @@ typedef struct QoShaderCreateInfo_ {
     .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO, \
     .imageType = VK_IMAGE_TYPE_2D, \
     .tiling = VK_IMAGE_TILING_OPTIMAL, \
-    .usage = VK_IMAGE_USAGE_GENERAL, \
+    .usage = 0, \
     .mipLevels = 1, \
     .arraySize = 1, \
     .samples = 1

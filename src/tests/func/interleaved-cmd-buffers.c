@@ -63,7 +63,7 @@ setup_src(struct src *src)
            .depth = 1,
        },
        .tiling = VK_IMAGE_TILING_LINEAR,
-       .usage = VK_IMAGE_USAGE_GENERAL);
+       .usage = 0);
 
     VkMemoryRequirements mem_reqs =
        qoGetImageMemoryRequirements(t_device, image);
