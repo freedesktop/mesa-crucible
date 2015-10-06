@@ -1053,7 +1053,7 @@ init_draw_data(test_draw_data_t *draw_data)
             {
                 QO_SUBPASS_DESCRIPTION_DEFAULTS,
                 .colorCount = 1,
-                .colorAttachments = (VkAttachmentReference[]) {
+                .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,
                         .layout = VK_IMAGE_LAYOUT_GENERAL,

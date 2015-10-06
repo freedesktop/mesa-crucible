@@ -85,7 +85,7 @@ create_and_begin_render_pass(void)
             {
                 QO_SUBPASS_DESCRIPTION_DEFAULTS,
                 .colorCount = 1,
-                .colorAttachments = (VkAttachmentReference[]) {
+                .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,
                         .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,

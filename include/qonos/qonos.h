@@ -250,14 +250,14 @@ typedef struct QoShaderCreateInfo_ {
     .sType = VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION, \
     .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS, \
     .inputCount = 0, \
-    .inputAttachments = NULL, \
-    .resolveAttachments = NULL, \
+    .pInputAttachments = NULL, \
+    .pResolveAttachments = NULL, \
     .depthStencilAttachment = { \
         .attachment = VK_ATTACHMENT_UNUSED, \
         .layout = VK_IMAGE_LAYOUT_GENERAL, \
     }, \
     .preserveCount = 0, \
-    .preserveAttachments = NULL
+    .pPreserveAttachments = NULL
 
 #define QO_FRAMEBUFFER_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO, \
