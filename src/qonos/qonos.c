@@ -506,6 +506,7 @@ __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
             .module = module,
             .pName = "main",
             .flags = 0,
+            .stage = info->stage,
         }, &shader);
 
     t_assert(result == VK_SUCCESS);
