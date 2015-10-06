@@ -614,7 +614,8 @@ miptree_upload_copy_from_buffer(const test_data_t *data)
             .imageSubresource = {
                 .aspect = params->aspect,
                 .mipLevel = slice->level,
-                .arraySlice = slice->array_slice,
+                .arrayLayer = slice->array_slice,
+                .arraySize = 1,
             },
             .imageOffset = {
                 .x = 0,
@@ -652,7 +653,8 @@ miptree_download_copy_to_buffer(const test_data_t *data)
             .imageSubresource = {
                 .aspect = params->aspect,
                 .mipLevel = slice->level,
-                .arraySlice = slice->array_slice,
+                .arrayLayer = slice->array_slice,
+                .arraySize = 1,
             },
             .imageOffset = {
                 .x = 0,
@@ -690,14 +692,16 @@ miptree_upload_copy_from_linear_image(const test_data_t *data)
             .srcSubresource = {
                 .aspect = params->aspect,
                 .mipLevel = 0,
-                .arraySlice = 0,
+                .arrayLayer = 0,
+                .arraySize = 1,
             },
             .srcOffset = { .x = 0, .y = 0, .z = 0 },
 
             .destSubresource = {
                 .aspect = params->aspect,
                 .mipLevel = slice->level,
-                .arraySlice = slice->array_slice,
+                .arrayLayer = slice->array_slice,
+                .arraySize = 1,
             },
             .destOffset = {
                 .x = 0,
@@ -736,7 +740,8 @@ miptree_download_copy_to_linear_image(const test_data_t *data)
             .srcSubresource = {
                 .aspect = params->aspect,
                 .mipLevel = slice->level,
-                .arraySlice = slice->array_slice,
+                .arrayLayer = slice->array_slice,
+                .arraySize = 1,
             },
             .srcOffset = {
                 .x = 0,
@@ -747,7 +752,8 @@ miptree_download_copy_to_linear_image(const test_data_t *data)
             .destSubresource = {
                 .aspect = params->aspect,
                 .mipLevel = 0,
-                .arraySlice = 0,
+                .arrayLayer = 0,
+                .arraySize = 1,
             },
             .destOffset = { .x = 0, .y = 0, .z = 0 },
 

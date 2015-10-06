@@ -39,7 +39,8 @@ static const VkBufferImageCopy copy = {
     .imageSubresource = {
         .aspect = VK_IMAGE_ASPECT_COLOR,
         .mipLevel = 0,
-        .arraySlice = 0,
+        .arrayLayer = 0,
+        .arraySize = 1,
     },
     .imageOffset = { .x = 0, .y = 0, .z = 0 },
     .imageExtent = {
