@@ -162,7 +162,7 @@ test(void)
             .clearValueCount = 2,
             .pClearValues = (VkClearValue[]) {
                 { .color = { .f32 = { 0.2, 0.2, 0.2, 1.0 } } },
-                { .ds = { .depth = params->depth_clear_value } },
+                { .depthStencil = { .depth = params->depth_clear_value } },
             }
         }, VK_RENDER_PASS_CONTENTS_INLINE);
 
