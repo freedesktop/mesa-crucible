@@ -76,8 +76,7 @@ do_test_alloc_multithread(void *_id)
         }
 
         for (unsigned j = 0; j < chunk_size; j++) {
-            result = vkDestroyDynamicViewportState(device, states[j]);
-            t_assert(result == VK_SUCCESS);
+            vkDestroyDynamicViewportState(device, states[j]);
             t_thread_yield();
         }
     }
