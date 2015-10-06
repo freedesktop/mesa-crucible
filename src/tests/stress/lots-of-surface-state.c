@@ -164,7 +164,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
             .clearValueCount = 1,
             .pClearValues = (VkClearValue[]) {
-                { .color = { .f32 = { 1.0, 0.0, 0.0, 1.0 } } },
+                { .color = { .float32 = { 1.0, 0.0, 0.0, 1.0 } } },
             }
         }, VK_RENDER_PASS_CONTENTS_INLINE);
 

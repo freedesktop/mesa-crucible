@@ -203,7 +203,7 @@ test(void)
             .renderArea = { { 0, 0 }, { t_width, t_height } },
             .clearValueCount = 1,
             .pClearValues = (VkClearValue[]) {
-                { .color = { .f32 = HEX_COLOR(0x161032) } },
+                { .color = { .float32 = HEX_COLOR(0x161032) } },
             }
         }, VK_RENDER_PASS_CONTENTS_INLINE);
 
