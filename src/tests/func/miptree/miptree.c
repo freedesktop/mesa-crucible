@@ -897,7 +897,7 @@ miptree_upload_copy_with_draw(const test_data_t *data)
                 .aspectMask = 1 << params->aspect,
                 .baseMipLevel = 0,
                 .mipLevels = 1,
-                .baseArraySlice = 0,
+                .baseArrayLayer = 0,
                 .arraySize = 1,
             });
 
@@ -943,7 +943,7 @@ miptree_download_copy_with_draw(const test_data_t *data)
                 .aspectMask = 1 << params->aspect,
                 .baseMipLevel = slice->level,
                 .mipLevels = 1,
-                .baseArraySlice = slice->array_slice,
+                .baseArrayLayer = slice->array_slice,
                 .arraySize = 1,
             });
 

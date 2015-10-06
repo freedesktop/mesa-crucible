@@ -290,7 +290,7 @@ typedef struct QoShaderCreateInfo_ {
         .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT, \
         .baseMipLevel = 0, \
         .mipLevels = 1, \
-        .baseArraySlice = 0, \
+        .baseArrayLayer = 0, \
         .arraySize = 1, \
     }
 
