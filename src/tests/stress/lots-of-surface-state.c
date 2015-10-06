@@ -277,7 +277,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
                                     &set[i], 0, NULL);
         }
 
-        vkCmdDraw(t_cmd_buffer, i, 1, 0, 1);
+        vkCmdDraw(t_cmd_buffer, 1, 1, i, 0);
     }
 
     vkCmdEndRenderPass(t_cmd_buffer);

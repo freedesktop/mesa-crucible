@@ -139,8 +139,8 @@ clear_stencil_with_quad(void)
             .stencilFrontRef = params->clear_value.stencil,
             .stencilBackRef = params->clear_value.stencil));
     vkCmdDraw(t_cmd_buffer,
-              /*firstVertex*/ 0, /*vertexCount*/ 4,
-              /*firstInstance*/ 0, /*instanceCount*/ 1);
+              /*vertexCount*/ 4, /*instanceCount*/ 1,
+              /*firstVertex*/ 0, /*firstInstance*/ 0);
     vkCmdEndRenderPass(t_cmd_buffer);
 }
 
@@ -285,8 +285,8 @@ draw_triangle(void)
             .stencilFrontRef = params->stencil_ref,
             .stencilBackRef = params->stencil_ref));
     vkCmdDraw(t_cmd_buffer,
-              /*firstVertex*/ 0, /*vertexCount*/ 3,
-              /*firstInstance*/ 0, /*instanceCount*/ 3);
+              /*vertexCount*/ 3, /*instanceCount*/ 3,
+              /*firstVertex*/ 0, /*firstInstance*/ 0);
     vkCmdEndRenderPass(t_cmd_buffer);
 }
 

@@ -153,25 +153,25 @@ test_push_constants(void)
     /* Start off upper-left and red */
     push_vs_offset(-1.0, -1.0);
     push_fs_color(0, 4, (float[]) { 1.0, 0.0, 0.0, 1.0 });
-    vkCmdDraw(t_cmd_buffer, 0, 4, 0, 1);
+    vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     /* Upper-right */
     push_vs_offset(0.0, -1.0);
     /* Update just the green component to get yellow */
     push_fs_color(1, 1, (float[]) { 1.0 });
-    vkCmdDraw(t_cmd_buffer, 0, 4, 0, 1);
+    vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     /* Bottom-left */
     push_vs_offset(-1.0, 0.0);
     /* Update just the red component to get green */
     push_fs_color(0, 1, (float[]) { 0.0 });
-    vkCmdDraw(t_cmd_buffer, 0, 4, 0, 1);
+    vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     /* Bottom-right */
     push_vs_offset(0.0, 0.0);
     /* Update the green and blue components to get blue */
     push_fs_color(1, 2, (float[]) { 0.0, 1.0 });
-    vkCmdDraw(t_cmd_buffer, 0, 4, 0, 1);
+    vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);

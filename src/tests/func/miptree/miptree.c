@@ -851,8 +851,8 @@ copy_color_images_with_draw(const test_data_t *data,
                                 data->draw.desc_sets,
                                 /*dynamicOffsetCount*/ 0,
                                 /*dynamicOffsets*/ NULL);
-        vkCmdDraw(cmd, /*firstVertex*/ 0, data->draw.num_vertices,
-                  /*firstInstance*/ 0, /*instanceCount*/ 1);
+        vkCmdDraw(cmd, data->draw.num_vertices, /*instanceCount*/ 1,
+                  /*firstVertex*/ 0, /*firstInstance*/ 0);
         vkCmdEndRenderPass(cmd);
     }
 

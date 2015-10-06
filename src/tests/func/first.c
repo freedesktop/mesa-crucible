@@ -352,8 +352,8 @@ test(void)
                             VK_PIPELINE_BIND_POINT_GRAPHICS,
                             pipeline_layout, 1, 1,
                             &set[1], 0, NULL);
-    vkCmdDraw(t_cmd_buffer, /*firstVertex*/ 0, /*vertexCount*/ 3,
-              /*firstInstance*/ 0, /*instanceCount*/ 1);
+    vkCmdDraw(t_cmd_buffer, /*vertexCount*/ 3, /*instanceCount*/ 1,
+              /*firstVertex*/ 0, /*firstInstance*/ 0);
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);

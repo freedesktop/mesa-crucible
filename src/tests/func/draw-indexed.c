@@ -176,8 +176,8 @@ test(void)
     const uint32_t vertex_count = 7;
     const int32_t vertex_offset = -1;
 
-    vkCmdDrawIndexed(t_cmd_buffer, first_index, vertex_count, vertex_offset,
-                     params->start_instance, params->num_instances);
+    vkCmdDrawIndexed(t_cmd_buffer, vertex_count, params->num_instances,
+                     first_index, vertex_offset, params->start_instance);
 
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);

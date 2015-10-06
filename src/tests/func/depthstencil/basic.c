@@ -172,8 +172,8 @@ test(void)
 
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
-    vkCmdDraw(t_cmd_buffer, 0, 3, 0, 1);
-    vkCmdDraw(t_cmd_buffer, 3, 3, 1, 1);
+    vkCmdDraw(t_cmd_buffer, 3, 1, 0, 0);
+    vkCmdDraw(t_cmd_buffer, 3, 1, 3, 1);
 
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);

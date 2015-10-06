@@ -147,7 +147,7 @@ test_small_secondaries(void)
         vkCmdBindVertexBuffers(secondaries[i], 0, 2,
                                (VkBuffer[]) { vbo, vbo },
                                (VkDeviceSize[]) { (4 + i * 2) * sizeof(float), 0 });
-        vkCmdDraw(secondaries[i], 0, 1, 0, 1);
+        vkCmdDraw(secondaries[i], 1, 1, 0, 0);
         qoEndCommandBuffer(secondaries[i]);
     }
 
@@ -178,7 +178,7 @@ do_test_large_secondary(VkCmdBufferOptimizeFlags opt_flags)
         vkCmdBindVertexBuffers(secondary, 0, 2,
                                (VkBuffer[]) { vbo, vbo },
                                (VkDeviceSize[]) { (4 + i * 2) * sizeof(float), 0 });
-        vkCmdDraw(secondary, 0, 1, 0, 1);
+        vkCmdDraw(secondary, 1, 1, 0, 0);
     }
 
     qoEndCommandBuffer(secondary);
