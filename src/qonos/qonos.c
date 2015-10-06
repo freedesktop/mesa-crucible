@@ -244,13 +244,11 @@ qoAllocDescriptorSets(VkDevice dev, VkDescriptorPool descriptorPool,
                       VkDescriptorSet *sets)
 {
     VkResult result;
-    uint32_t out_count = 0;
 
     memset(sets, 0, count * sizeof(sets[0]));
     result = vkAllocDescriptorSets(dev, descriptorPool, usage, count, layouts,
-                                   sets, &out_count);
+                                   sets);
     t_assert(result == VK_SUCCESS);
-    t_assert(out_count == count);
 
     for (uint32_t i = 0; i < count; ++i) {
         t_assert(sets[i].handle);
