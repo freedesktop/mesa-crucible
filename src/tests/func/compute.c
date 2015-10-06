@@ -64,7 +64,7 @@ test(void)
         &(VkComputePipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
             .pNext = NULL,
-            .cs = {
+            .stage = {
                 .stage = VK_SHADER_STAGE_COMPUTE,
                 .shader = cs,
             },
