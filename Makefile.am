@@ -85,7 +85,6 @@ bin_crucible_SOURCES = \
 	src/tests/func/interleaved-cmd-buffers.c \
 	src/tests/func/miptree/miptree.c \
 	src/tests/func/push-constants/basic.c \
-	src/tests/stress/alloc-multithread.c \
 	src/tests/stress/lots-of-surface-state.c \
 	src/tests/self/concurrent-output.c \
 	src/util/cru_cleanup.c \

@@ -121,8 +121,7 @@ test(void)
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           1, set_layout, set);
 
-    VkBuffer buffer = qoCreateBuffer(t_device, .size = 4096,
-                                     .usage = VK_BUFFER_USAGE_GENERAL);
+    VkBuffer buffer = qoCreateBuffer(t_device, .size = 4096);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
         .memoryTypeIndex = t_mem_type_index_for_mmap);
@@ -144,7 +143,6 @@ test(void)
 
     VkBufferView buffer_view = qoCreateBufferView(t_device,
         .buffer = buffer,
-        .viewType = VK_BUFFER_VIEW_TYPE_RAW,
         .format = VK_FORMAT_R32G32B32A32_SFLOAT,
         .range = sizeof(color));
 
@@ -189,7 +187,7 @@ test(void)
             {
                 QO_SUBPASS_DESCRIPTION_DEFAULTS,
                 .colorCount = 1,
-                .colorAttachments = (VkAttachmentReference[]) {
+                .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,
                         .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -203,9 +201,9 @@ test(void)
             .renderPass = pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
-            .attachmentCount = 1,
-            .pAttachmentClearValues = (VkClearValue[]) {
-                { .color = { .f32 = HEX_COLOR(0x161032) } },
+            .clearValueCount = 1,
+            .pClearValues = (VkClearValue[]) {
+                { .color = { .float32 = HEX_COLOR(0x161032) } },
             }
         }, VK_RENDER_PASS_CONTENTS_INLINE);
 
@@ -219,21 +217,21 @@ test(void)
                             VK_PIPELINE_BIND_POINT_GRAPHICS,
                             pipeline_layout, 0, 1,
                             &set[0], 1, dynamic_offsets);
-    vkCmdDraw(t_cmd_buffer, 0, 4, 0, 1);
+    vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     dynamic_offsets[0] = 32;
     vkCmdBindDescriptorSets(t_cmd_buffer,
                             VK_PIPELINE_BIND_POINT_GRAPHICS,
                             pipeline_layout, 0, 1,
                             &set[0], 1, dynamic_offsets);
-    vkCmdDraw(t_cmd_buffer, 0, 4, 0, 1);
+    vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     dynamic_offsets[0] = 64;
     vkCmdBindDescriptorSets(t_cmd_buffer,
                             VK_PIPELINE_BIND_POINT_GRAPHICS,
                             pipeline_layout, 0, 1,
                             &set[0], 1, dynamic_offsets);
-    vkCmdDraw(t_cmd_buffer, 0, 4, 0, 1);
+    vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);

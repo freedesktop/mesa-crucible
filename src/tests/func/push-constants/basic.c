@@ -125,7 +125,7 @@ test_push_constants(void)
             {
                 QO_SUBPASS_DESCRIPTION_DEFAULTS,
                 .colorCount = 1,
-                .colorAttachments = (VkAttachmentReference[]) {
+                .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,
                         .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -139,9 +139,9 @@ test_push_constants(void)
             .renderPass = pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
-            .attachmentCount = 1,
-            .pAttachmentClearValues = (VkClearValue[]) {
-                { .color = { .f32 = { 0.0, 0.0, 0.0, 1.0 } } },
+            .clearValueCount = 1,
+            .pClearValues = (VkClearValue[]) {
+                { .color = { .float32 = { 0.0, 0.0, 0.0, 1.0 } } },
             }
         }, VK_RENDER_PASS_CONTENTS_INLINE);
 
@@ -153,25 +153,25 @@ test_push_constants(void)
     /* Start off upper-left and red */
     push_vs_offset(-1.0, -1.0);
     push_fs_color(0, 4, (float[]) { 1.0, 0.0, 0.0, 1.0 });
-    vkCmdDraw(t_cmd_buffer, 0, 4, 0, 1);
+    vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     /* Upper-right */
     push_vs_offset(0.0, -1.0);
     /* Update just the green component to get yellow */
     push_fs_color(1, 1, (float[]) { 1.0 });
-    vkCmdDraw(t_cmd_buffer, 0, 4, 0, 1);
+    vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     /* Bottom-left */
     push_vs_offset(-1.0, 0.0);
     /* Update just the red component to get green */
     push_fs_color(0, 1, (float[]) { 0.0 });
-    vkCmdDraw(t_cmd_buffer, 0, 4, 0, 1);
+    vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     /* Bottom-right */
     push_vs_offset(0.0, 0.0);
     /* Update the green and blue components to get blue */
     push_fs_color(1, 2, (float[]) { 0.0, 1.0 });
-    vkCmdDraw(t_cmd_buffer, 0, 4, 0, 1);
+    vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);

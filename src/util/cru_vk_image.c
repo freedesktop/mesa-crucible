@@ -151,7 +151,8 @@ copy(cru_vk_image_t *self, enum copy_direction dir)
         .imageSubresource = {
             .aspect = self->target.vk_aspect,
             .mipLevel = self->target.miplevel,
-            .arraySlice = self->target.array_slice,
+            .arrayLayer = self->target.array_slice,
+            .arraySize = 1,
         },
         .imageOffset = { .x = 0, .y = 0, .z = 0 },
         .imageExtent = {

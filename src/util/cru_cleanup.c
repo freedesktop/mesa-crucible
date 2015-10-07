@@ -82,11 +82,6 @@ struct cmd_cru_image {
     cru_image_t *image;
 };
 
-struct cmd_vk_attachment_view {
-    VkDevice dev;
-    VkAttachmentView x;
-};
-
 struct cmd_vk_buffer {
     VkDevice dev;
     VkBuffer x;
@@ -126,26 +121,6 @@ struct cmd_vk_descriptor_set_layout {
 struct cmd_vk_device_memory {
     VkDevice dev;
     VkDeviceMemory x;
-};
-
-struct cmd_vk_dynamic_color_blend_state {
-    VkDevice dev;
-    VkDynamicColorBlendState x;
-};
-
-struct cmd_vk_dynamic_depth_stencil_state {
-    VkDevice dev;
-    VkDynamicDepthStencilState x;
-};
-
-struct cmd_vk_dynamic_raster_state {
-    VkDevice dev;
-    VkDynamicRasterState x;
-};
-
-struct cmd_vk_dynamic_viewport_state {
-    VkDevice dev;
-    VkDynamicViewportState x;
 };
 
 struct cmd_vk_event {
@@ -311,12 +286,6 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
         }
 
         // Non-dispatchable Vulkan objects
-        case CRU_CLEANUP_CMD_VK_ATTACHMENT_VIEW: {
-            CMD_CREATE(struct cmd_vk_attachment_view);
-            CMD_SET(dev);
-            CMD_SET(x);
-            break;
-        }
         case CRU_CLEANUP_CMD_VK_BUFFER: {
             CMD_CREATE(struct cmd_vk_buffer);
             CMD_SET(dev);
@@ -368,30 +337,6 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
         }
         case CRU_CLEANUP_CMD_VK_DEVICE_MEMORY_MAP: {
             CMD_CREATE(struct cmd_vk_device_memory);
-            CMD_SET(dev);
-            CMD_SET(x);
-            break;
-        }
-        case CRU_CLEANUP_CMD_VK_DYNAMIC_COLOR_BLEND_STATE: {
-            CMD_CREATE(struct cmd_vk_dynamic_color_blend_state);
-            CMD_SET(dev);
-            CMD_SET(x);
-            break;
-        }
-        case CRU_CLEANUP_CMD_VK_DYNAMIC_DEPTH_STENCIL_STATE: {
-            CMD_CREATE(struct cmd_vk_dynamic_depth_stencil_state);
-            CMD_SET(dev);
-            CMD_SET(x);
-            break;
-        }
-        case CRU_CLEANUP_CMD_VK_DYNAMIC_RASTER_STATE: {
-            CMD_CREATE(struct cmd_vk_dynamic_raster_state);
-            CMD_SET(dev);
-            CMD_SET(x);
-            break;
-        }
-        case CRU_CLEANUP_CMD_VK_DYNAMIC_VIEWPORT_STATE: {
-            CMD_CREATE(struct cmd_vk_dynamic_viewport_state);
             CMD_SET(dev);
             CMD_SET(x);
             break;
@@ -549,11 +494,6 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
         }
 
         // Non-dispatchable Vulkan objects
-        case CRU_CLEANUP_CMD_VK_ATTACHMENT_VIEW: {
-            CMD_GET(struct cmd_vk_attachment_view);
-            CMD_DO(vkDestroyAttachmentView(cmd->dev, cmd->x));
-            break;
-        }
         case CRU_CLEANUP_CMD_VK_BUFFER: {
             CMD_GET(struct cmd_vk_buffer);
             CMD_DO(vkDestroyBuffer(cmd->dev, cmd->x));
@@ -597,26 +537,6 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
         case CRU_CLEANUP_CMD_VK_DEVICE_MEMORY_MAP: {
             CMD_GET(struct cmd_vk_device_memory);
             CMD_DO(vkUnmapMemory(cmd->dev, cmd->x));
-            break;
-        }
-        case CRU_CLEANUP_CMD_VK_DYNAMIC_COLOR_BLEND_STATE: {
-            CMD_GET(struct cmd_vk_dynamic_color_blend_state);
-            CMD_DO(vkDestroyDynamicColorBlendState(cmd->dev, cmd->x));
-            break;
-        }
-        case CRU_CLEANUP_CMD_VK_DYNAMIC_DEPTH_STENCIL_STATE: {
-            CMD_GET(struct cmd_vk_dynamic_depth_stencil_state);
-            CMD_DO(vkDestroyDynamicDepthStencilState(cmd->dev, cmd->x));
-            break;
-        }
-        case CRU_CLEANUP_CMD_VK_DYNAMIC_RASTER_STATE: {
-            CMD_GET(struct cmd_vk_dynamic_raster_state);
-            CMD_DO(vkDestroyDynamicRasterState(cmd->dev, cmd->x));
-            break;
-        }
-        case CRU_CLEANUP_CMD_VK_DYNAMIC_VIEWPORT_STATE: {
-            CMD_GET(struct cmd_vk_dynamic_viewport_state);
-            CMD_DO(vkDestroyDynamicViewportState(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_EVENT: {

@@ -161,8 +161,7 @@ test(void)
     };
 
     VkBuffer uniform_buffer = qoCreateBuffer(t_device,
-        .size = sizeof(uniform_data),
-        .usage = VK_BUFFER_USAGE_GENERAL);
+        .size = sizeof(uniform_data));
 
     VkDeviceMemory uniform_mem = qoAllocBufferMemory(t_device, uniform_buffer,
         .memoryTypeIndex = t_mem_type_index_for_mmap);
@@ -179,7 +178,6 @@ test(void)
     for (int i = 0; i < ARRAY_LENGTH(buffer_view); ++i) {
         buffer_view[i] = qoCreateBufferView(t_device,
             .buffer = uniform_buffer,
-            .viewType = VK_BUFFER_VIEW_TYPE_RAW,
             .format = VK_FORMAT_R32G32B32A32_SFLOAT,
             .offset = 4 * sizeof(float) * i,
             .range = 64);
@@ -245,9 +243,9 @@ test(void)
         .magFilter = VK_TEX_FILTER_LINEAR,
         .minFilter = VK_TEX_FILTER_LINEAR,
         .mipMode = VK_TEX_MIPMAP_MODE_NEAREST,
-        .addressU = VK_TEX_ADDRESS_CLAMP,
-        .addressV = VK_TEX_ADDRESS_CLAMP,
-        .addressW = VK_TEX_ADDRESS_CLAMP,
+        .addressModeU = VK_TEX_ADDRESS_MODE_CLAMP,
+        .addressModeV = VK_TEX_ADDRESS_MODE_CLAMP,
+        .addressModeW = VK_TEX_ADDRESS_MODE_CLAMP,
         .mipLodBias = 0,
         .maxAnisotropy = 0,
         .compareOp = VK_COMPARE_OP_GREATER,
@@ -322,7 +320,7 @@ test(void)
             {
                 QO_SUBPASS_DESCRIPTION_DEFAULTS,
                 .colorCount = 1,
-                .colorAttachments = (VkAttachmentReference[]) {
+                .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,
                         .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -336,9 +334,9 @@ test(void)
             .renderPass = pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
-            .attachmentCount = 1,
-            .pAttachmentClearValues = (VkClearValue[]) {
-                { .color = { .f32 = { 1.0, 0.0, 0.0, 1.0 } } },
+            .clearValueCount = 1,
+            .pClearValues = (VkClearValue[]) {
+                { .color = { .float32 = { 1.0, 0.0, 0.0, 1.0 } } },
             }
         }, VK_RENDER_PASS_CONTENTS_INLINE);
 
@@ -354,8 +352,8 @@ test(void)
                             VK_PIPELINE_BIND_POINT_GRAPHICS,
                             pipeline_layout, 1, 1,
                             &set[1], 0, NULL);
-    vkCmdDraw(t_cmd_buffer, /*firstVertex*/ 0, /*vertexCount*/ 3,
-              /*firstInstance*/ 0, /*instanceCount*/ 1);
+    vkCmdDraw(t_cmd_buffer, /*vertexCount*/ 3, /*instanceCount*/ 1,
+              /*firstVertex*/ 0, /*firstInstance*/ 0);
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);

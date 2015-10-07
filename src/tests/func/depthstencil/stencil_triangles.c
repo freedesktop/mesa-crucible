@@ -131,16 +131,21 @@ clear_stencil_with_quad(void)
                            /*startBinding*/ 0, /*bindingCount*/ 0,
                            NULL, NULL);
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-    vkCmdBindDynamicDepthStencilState(t_cmd_buffer,
-        qoCreateDynamicDepthStencilState(t_device,
-            QO_DYNAMIC_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS,
-            .stencilReadMask = 0xff,
-            .stencilWriteMask = 0xff,
-            .stencilFrontRef = params->clear_value.stencil,
-            .stencilBackRef = params->clear_value.stencil));
+    vkCmdSetStencilCompareMask(t_cmd_buffer,
+                               VK_STENCIL_FACE_FRONT_BIT |
+                               VK_STENCIL_FACE_BACK_BIT,
+                               0xff);
+    vkCmdSetStencilWriteMask(t_cmd_buffer,
+                             VK_STENCIL_FACE_FRONT_BIT |
+                             VK_STENCIL_FACE_BACK_BIT,
+                             0xff);
+    vkCmdSetStencilReference(t_cmd_buffer,
+                             VK_STENCIL_FACE_FRONT_BIT |
+                             VK_STENCIL_FACE_BACK_BIT,
+                             params->clear_value.stencil);
     vkCmdDraw(t_cmd_buffer,
-              /*firstVertex*/ 0, /*vertexCount*/ 4,
-              /*firstInstance*/ 0, /*instanceCount*/ 1);
+              /*vertexCount*/ 4, /*instanceCount*/ 1,
+              /*firstVertex*/ 0, /*firstInstance*/ 0);
     vkCmdEndRenderPass(t_cmd_buffer);
 }
 
@@ -249,7 +254,7 @@ draw_triangle(void)
             {
                 QO_SUBPASS_DESCRIPTION_DEFAULTS,
                 .colorCount = 1,
-                .colorAttachments = (VkAttachmentReference[]) {
+                .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,
                         .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -267,9 +272,9 @@ draw_triangle(void)
             .renderPass = pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
-            .attachmentCount = 1,
-            .pAttachmentClearValues = (VkClearValue[]) {
-                { .color = { .f32 = { 0.2, 0.2, 0.2, 1.0 } } },
+            .clearValueCount = 1,
+            .pClearValues = (VkClearValue[]) {
+                { .color = { .float32 = { 0.2, 0.2, 0.2, 1.0 } } },
             },
         },
         VK_RENDER_PASS_CONTENTS_INLINE);
@@ -277,16 +282,21 @@ draw_triangle(void)
                            /*startBinding*/ 0, /*bindingCount*/ 0,
                            NULL, NULL);
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-    vkCmdBindDynamicDepthStencilState(t_cmd_buffer,
-        qoCreateDynamicDepthStencilState(t_device,
-            QO_DYNAMIC_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS,
-            .stencilReadMask = 0xff,
-            .stencilWriteMask = 0xff,
-            .stencilFrontRef = params->stencil_ref,
-            .stencilBackRef = params->stencil_ref));
+    vkCmdSetStencilCompareMask(t_cmd_buffer,
+                               VK_STENCIL_FACE_FRONT_BIT |
+                               VK_STENCIL_FACE_BACK_BIT,
+                               0xff);
+    vkCmdSetStencilWriteMask(t_cmd_buffer,
+                             VK_STENCIL_FACE_FRONT_BIT |
+                             VK_STENCIL_FACE_BACK_BIT,
+                             0xff);
+    vkCmdSetStencilReference(t_cmd_buffer,
+                             VK_STENCIL_FACE_FRONT_BIT |
+                             VK_STENCIL_FACE_BACK_BIT,
+                             params->stencil_ref);
     vkCmdDraw(t_cmd_buffer,
-              /*firstVertex*/ 0, /*vertexCount*/ 3,
-              /*firstInstance*/ 0, /*instanceCount*/ 3);
+              /*vertexCount*/ 3, /*instanceCount*/ 3,
+              /*firstVertex*/ 0, /*firstInstance*/ 0);
     vkCmdEndRenderPass(t_cmd_buffer);
 }
 

@@ -28,8 +28,7 @@ get_timestamp(void)
 {
     size_t buffer_size = 1024;
 
-    VkBuffer buffer = qoCreateBuffer(t_device, .size = buffer_size,
-                                     .usage = VK_BUFFER_USAGE_GENERAL);
+    VkBuffer buffer = qoCreateBuffer(t_device, .size = buffer_size);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
         .memoryTypeIndex = t_mem_type_index_for_mmap);
@@ -68,12 +67,12 @@ test_timestamp(void)
     b = get_timestamp();
 
     VkResult result;
-    VkPhysicalDeviceLimits limits;
+    VkPhysicalDeviceProperties props;
 
-    result = vkGetPhysicalDeviceLimits(t_physical_dev, &limits);
+    result = vkGetPhysicalDeviceProperties(t_physical_dev, &props);
     t_assert(result == VK_SUCCESS);
 
-    freq = limits.timestampFrequency / 1000;
+    freq = props.limits.timestampFrequency / 1000;
     elapsed_ms = (b - a) / freq;
     printf("difference: %lu - %lu = %lu\n", b / freq, a / freq, elapsed_ms);
     if (elapsed_ms < 90 || elapsed_ms > 110)

@@ -102,42 +102,6 @@ __t_cmd_buffer(void)
     return &t->vk.cmd_buffer;
 }
 
-const VkDynamicViewportState *
-__t_dynamic_vp_state(void)
-{
-    ASSERT_TEST_IN_MAJOR_PHASE;
-    GET_CURRENT_TEST(t);
-
-    return &t->vk.dynamic_vp_state;
-}
-
-const VkDynamicRasterState *
-__t_dynamic_rs_state(void)
-{
-    ASSERT_TEST_IN_MAJOR_PHASE;
-    GET_CURRENT_TEST(t);
-
-    return &t->vk.dynamic_rs_state;
-}
-
-const VkDynamicColorBlendState *
-__t_dynamic_cb_state(void)
-{
-    ASSERT_TEST_IN_MAJOR_PHASE;
-    GET_CURRENT_TEST(t);
-
-    return &t->vk.dynamic_cb_state;
-}
-
-const VkDynamicDepthStencilState *
-__t_dynamic_ds_state(void)
-{
-    ASSERT_TEST_IN_MAJOR_PHASE;
-    GET_CURRENT_TEST(t);
-
-    return &t->vk.dynamic_ds_state;
-}
-
 const VkImage *
 __t_color_image(void)
 {
@@ -147,17 +111,6 @@ __t_color_image(void)
     t_assert(!t->def->no_image);
 
     return &t->vk.color_image;
-}
-
-const VkAttachmentView *
-__t_color_attachment_view(void)
-{
-    ASSERT_TEST_IN_MAJOR_PHASE;
-    GET_CURRENT_TEST(t);
-
-    t_assert(!t->def->no_image);
-
-    return &t->vk.color_attachment_view;
 }
 
 const VkImageView *
@@ -183,40 +136,16 @@ __t_depthstencil_image(void)
     return &t->vk.ds_image;
 }
 
-const VkAttachmentView *
-__t_depthstencil_attachment_view(void)
-{
-    ASSERT_TEST_IN_MAJOR_PHASE;
-    GET_CURRENT_TEST(t);
-
-    t_assert(!t->def->no_image);
-    t_assert(t->vk.ds_attachment_view.handle);
-
-    return &t->vk.ds_attachment_view;
-}
-
 const VkImageView *
-__t_depth_image_view(void)
+__t_depthstencil_image_view(void)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
     t_assert(!t->def->no_image);
-    t_assert(t->vk.depth_image_view.handle);
+    t_assert(t->vk.depthstencil_image_view.handle);
 
-    return &t->vk.depth_image_view;
-}
-
-const VkImageView *
-__t_stencil_image_view(void)
-{
-    ASSERT_TEST_IN_MAJOR_PHASE;
-    GET_CURRENT_TEST(t);
-
-    t_assert(!t->def->no_image);
-    t_assert(t->vk.stencil_image_view.handle);
-
-    return &t->vk.stencil_image_view;
+    return &t->vk.depthstencil_image_view;
 }
 
 const VkFramebuffer *

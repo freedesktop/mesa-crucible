@@ -148,19 +148,11 @@ struct test {
         VkCmdBuffer cmd_buffer;
         VkFramebuffer framebuffer;
 
-        VkDynamicViewportState dynamic_vp_state;
-        VkDynamicRasterState dynamic_rs_state;
-        VkDynamicColorBlendState dynamic_cb_state;
-        VkDynamicDepthStencilState dynamic_ds_state;
-
         VkImage color_image;
-        VkAttachmentView color_attachment_view;
         VkImageView color_image_view;
 
         VkImage ds_image;
-        VkAttachmentView ds_attachment_view;
-        VkImageView depth_image_view;
-        VkImageView stencil_image_view;
+        VkImageView depthstencil_image_view;
 
         uint32_t mem_type_index_for_mmap;
         uint32_t mem_type_index_for_device_access;

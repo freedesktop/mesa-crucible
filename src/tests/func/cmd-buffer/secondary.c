@@ -85,7 +85,7 @@ create_and_begin_render_pass(void)
             {
                 QO_SUBPASS_DESCRIPTION_DEFAULTS,
                 .colorCount = 1,
-                .colorAttachments = (VkAttachmentReference[]) {
+                .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,
                         .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -99,9 +99,9 @@ create_and_begin_render_pass(void)
             .renderPass = pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
-            .attachmentCount = 1,
-            .pAttachmentClearValues = (VkClearValue[]) {
-                { .color = { .f32 = { 1.0, 0.0, 0.0, 1.0 } } },
+            .clearValueCount = 1,
+            .pClearValues = (VkClearValue[]) {
+                { .color = { .float32 = { 1.0, 0.0, 0.0, 1.0 } } },
             }
         }, VK_RENDER_PASS_CONTENTS_SECONDARY_CMD_BUFFERS);
 
@@ -122,10 +122,6 @@ make_secondary_cmd_buffer(VkRenderPass pass, VkPipeline pipeline,
         .framebuffer = t_framebuffer);
 
     vkCmdBindPipeline(secondary, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-    vkCmdBindDynamicViewportState(secondary, t_dynamic_vp_state);
-    vkCmdBindDynamicRasterState(secondary, t_dynamic_rs_state);
-    vkCmdBindDynamicColorBlendState(secondary, t_dynamic_cb_state);
-    vkCmdBindDynamicDepthStencilState(secondary, t_dynamic_ds_state);
 
     return secondary;
 }
@@ -147,7 +143,7 @@ test_small_secondaries(void)
         vkCmdBindVertexBuffers(secondaries[i], 0, 2,
                                (VkBuffer[]) { vbo, vbo },
                                (VkDeviceSize[]) { (4 + i * 2) * sizeof(float), 0 });
-        vkCmdDraw(secondaries[i], 0, 1, 0, 1);
+        vkCmdDraw(secondaries[i], 1, 1, 0, 0);
         qoEndCommandBuffer(secondaries[i]);
     }
 
@@ -178,7 +174,7 @@ do_test_large_secondary(VkCmdBufferOptimizeFlags opt_flags)
         vkCmdBindVertexBuffers(secondary, 0, 2,
                                (VkBuffer[]) { vbo, vbo },
                                (VkDeviceSize[]) { (4 + i * 2) * sizeof(float), 0 });
-        vkCmdDraw(secondary, 0, 1, 0, 1);
+        vkCmdDraw(secondary, 1, 1, 0, 0);
     }
 
     qoEndCommandBuffer(secondary);

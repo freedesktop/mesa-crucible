@@ -73,7 +73,7 @@ test(void)
             {
                 QO_SUBPASS_DESCRIPTION_DEFAULTS,
                 .colorCount = 1,
-                .colorAttachments = (VkAttachmentReference[]) {
+                .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,
                         .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -150,9 +150,9 @@ test(void)
             .renderPass = pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
-            .attachmentCount = 1,
-            .pAttachmentClearValues = (VkClearValue[]) {
-                { .color = { .f32 = HEX_COLOR(0x522a27, 1.0) } },
+            .clearValueCount = 1,
+            .pClearValues = (VkClearValue[]) {
+                { .color = { .float32 = HEX_COLOR(0x522a27, 1.0) } },
             }
         }, VK_RENDER_PASS_CONTENTS_INLINE);
 
@@ -176,8 +176,8 @@ test(void)
     const uint32_t vertex_count = 7;
     const int32_t vertex_offset = -1;
 
-    vkCmdDrawIndexed(t_cmd_buffer, first_index, vertex_count, vertex_offset,
-                     params->start_instance, params->num_instances);
+    vkCmdDrawIndexed(t_cmd_buffer, vertex_count, params->num_instances,
+                     first_index, vertex_offset, params->start_instance);
 
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);

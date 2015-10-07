@@ -126,6 +126,8 @@ class Shader:
                 .pSpirv = {0}_spir_v_src,
             """.format(var_prefix)))
 
+        f.write("    .stage = VK_SHADER_STAGE_{0},\n".format(self.stage))
+
         f.write('};')
 
 token_exp = re.compile(r'(qoShaderCreateInfoGLSL|qoCreateShaderGLSL|\(|\)|,)')

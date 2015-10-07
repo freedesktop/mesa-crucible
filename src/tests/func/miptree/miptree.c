@@ -614,7 +614,8 @@ miptree_upload_copy_from_buffer(const test_data_t *data)
             .imageSubresource = {
                 .aspect = params->aspect,
                 .mipLevel = slice->level,
-                .arraySlice = slice->array_slice,
+                .arrayLayer = slice->array_slice,
+                .arraySize = 1,
             },
             .imageOffset = {
                 .x = 0,
@@ -652,7 +653,8 @@ miptree_download_copy_to_buffer(const test_data_t *data)
             .imageSubresource = {
                 .aspect = params->aspect,
                 .mipLevel = slice->level,
-                .arraySlice = slice->array_slice,
+                .arrayLayer = slice->array_slice,
+                .arraySize = 1,
             },
             .imageOffset = {
                 .x = 0,
@@ -690,14 +692,16 @@ miptree_upload_copy_from_linear_image(const test_data_t *data)
             .srcSubresource = {
                 .aspect = params->aspect,
                 .mipLevel = 0,
-                .arraySlice = 0,
+                .arrayLayer = 0,
+                .arraySize = 1,
             },
             .srcOffset = { .x = 0, .y = 0, .z = 0 },
 
             .destSubresource = {
                 .aspect = params->aspect,
                 .mipLevel = slice->level,
-                .arraySlice = slice->array_slice,
+                .arrayLayer = slice->array_slice,
+                .arraySize = 1,
             },
             .destOffset = {
                 .x = 0,
@@ -736,7 +740,8 @@ miptree_download_copy_to_linear_image(const test_data_t *data)
             .srcSubresource = {
                 .aspect = params->aspect,
                 .mipLevel = slice->level,
-                .arraySlice = slice->array_slice,
+                .arrayLayer = slice->array_slice,
+                .arraySize = 1,
             },
             .srcOffset = {
                 .x = 0,
@@ -747,7 +752,8 @@ miptree_download_copy_to_linear_image(const test_data_t *data)
             .destSubresource = {
                 .aspect = params->aspect,
                 .mipLevel = 0,
-                .arraySlice = 0,
+                .arrayLayer = 0,
+                .arraySize = 1,
             },
             .destOffset = { .x = 0, .y = 0, .z = 0 },
 
@@ -770,15 +776,12 @@ miptree_download_copy_to_linear_image(const test_data_t *data)
 static void
 copy_color_images_with_draw(const test_data_t *data,
                             VkExtent2D extents[],
-                            VkImageView image_views[],
-                            VkAttachmentView attachment_views[],
+                            VkImageView tex_views[],
+                            VkImageView attachment_views[],
                             uint32_t count)
 {
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
-    vkCmdBindDynamicRasterState(cmd, t_dynamic_rs_state);
-    vkCmdBindDynamicColorBlendState(cmd, t_dynamic_cb_state);
-    vkCmdBindDynamicDepthStencilState(cmd, t_dynamic_ds_state);
     vkCmdBindVertexBuffers(cmd, /*startBinding*/ 0, /*bindingCount*/ 1,
                            (VkBuffer[]) { data->draw.vertex_buffer},
                            (VkDeviceSize[]) { data->draw.vertex_buffer_offset });
@@ -788,30 +791,20 @@ copy_color_images_with_draw(const test_data_t *data,
         const uint32_t width = extents[i].width;
         const uint32_t height = extents[i].height;
 
-        vkCmdBindDynamicViewportState(cmd,
-            qoCreateDynamicViewportState(t_device,
-                .viewportAndScissorCount = 1,
-                .pViewports = (VkViewport[]) {
-                    {
-                        .originX = 0,
-                        .originY = 0,
-                        .width = width,
-                        .height = height,
-                        .minDepth = 0,
-                        .maxDepth = 1
-                    },
-                },
-                .pScissors = (VkRect2D[]) {
-                    { { 0, 0 }, { width, height } },
-                }));
+        vkCmdSetViewport(cmd, 1,
+            &(VkViewport) {
+                .originX = 0,
+                .originY = 0,
+                .width = width,
+                .height = height,
+                .minDepth = 0,
+                .maxDepth = 1
+            });
 
         VkFramebuffer fb = qoCreateFramebuffer(t_device,
             .attachmentCount = 1,
-            .pAttachments = (VkAttachmentBindInfo[]) {
-                {
-                    .view = attachment_views[i],
-                    .layout = VK_IMAGE_LAYOUT_GENERAL,
-                },
+            .pAttachments = (VkImageView[]) {
+                attachment_views[i],
             },
             .width = width,
             .height = height,
@@ -829,7 +822,7 @@ copy_color_images_with_draw(const test_data_t *data,
                     .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
                     .pDescriptors = (VkDescriptorInfo[]) {
                         {
-                            .imageView = image_views[i],
+                            .imageView = tex_views[i],
                             .imageLayout = VK_IMAGE_LAYOUT_GENERAL,
                         },
                     },
@@ -841,8 +834,8 @@ copy_color_images_with_draw(const test_data_t *data,
                 .renderPass = data->draw.render_pass,
                 .framebuffer = fb,
                 .renderArea = { {0, 0}, {width, height} },
-                .attachmentCount = 1,
-                .pAttachmentClearValues = NULL
+                .clearValueCount = 1,
+                .pClearValues = NULL
             }, VK_RENDER_PASS_CONTENTS_INLINE);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                                 data->draw.pipeline_layout,
@@ -851,8 +844,8 @@ copy_color_images_with_draw(const test_data_t *data,
                                 data->draw.desc_sets,
                                 /*dynamicOffsetCount*/ 0,
                                 /*dynamicOffsets*/ NULL);
-        vkCmdDraw(cmd, /*firstVertex*/ 0, data->draw.num_vertices,
-                  /*firstInstance*/ 0, /*instanceCount*/ 1);
+        vkCmdDraw(cmd, data->draw.num_vertices, /*instanceCount*/ 1,
+                  /*firstVertex*/ 0, /*firstInstance*/ 0);
         vkCmdEndRenderPass(cmd);
     }
 
@@ -867,8 +860,8 @@ miptree_upload_copy_with_draw(const test_data_t *data)
 
     const miptree_t *mt = data->mt;
     const uint32_t num_views = mt->mipslices.len;
-    VkImageView image_views[num_views];
-    VkAttachmentView att_views[num_views];
+    VkImageView tex_views[num_views];
+    VkImageView att_views[num_views];
     VkExtent2D extents[num_views];
 
     for (uint32_t i = 0; i < mt->mipslices.len; ++i) {
@@ -877,7 +870,7 @@ miptree_upload_copy_with_draw(const test_data_t *data)
         extents[i].width = slice->width;
         extents[i].height = slice->height;
 
-        image_views[i] = qoCreateImageView(t_device,
+        tex_views[i] = qoCreateImageView(t_device,
             .image = slice->src_vk_image,
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
             .format = params->format,
@@ -888,22 +881,33 @@ miptree_upload_copy_with_draw(const test_data_t *data)
                 VK_CHANNEL_SWIZZLE_A,
             },
             .subresourceRange = {
-                .aspect = params->aspect,
+                .aspectMask = 1 << params->aspect,
                 .baseMipLevel = 0,
                 .mipLevels = 1,
-                .baseArraySlice = 0,
+                .baseArrayLayer = 0,
                 .arraySize = 1,
             });
 
-        att_views[i] = qoCreateAttachmentView(
-            t_device,
+        att_views[i] = qoCreateImageView(t_device,
             .image = mt->image,
+            .viewType = VK_IMAGE_VIEW_TYPE_2D,
             .format = params->format,
-            .mipLevel = slice->level,
-            .baseArraySlice = slice->array_slice);
+            .channels = {
+                VK_CHANNEL_SWIZZLE_R,
+                VK_CHANNEL_SWIZZLE_G,
+                VK_CHANNEL_SWIZZLE_B,
+                VK_CHANNEL_SWIZZLE_A,
+            },
+            .subresourceRange = {
+                .aspectMask = 1 << params->aspect,
+                .baseMipLevel = slice->level,
+                .mipLevels = 1,
+                .baseArrayLayer = slice->array_slice,
+                .arraySize = 1,
+            });
     }
 
-    copy_color_images_with_draw(data, extents, image_views, att_views,
+    copy_color_images_with_draw(data, extents, tex_views, att_views,
                                 num_views);
 }
 
@@ -914,8 +918,8 @@ miptree_download_copy_with_draw(const test_data_t *data)
 
     const miptree_t *mt = data->mt;
     const uint32_t num_views = mt->mipslices.len;
-    VkImageView image_views[num_views];
-    VkAttachmentView att_views[num_views];
+    VkImageView tex_views[num_views];
+    VkImageView att_views[num_views];
     VkExtent2D extents[num_views];
 
     if (params->view_type != VK_IMAGE_VIEW_TYPE_2D) {
@@ -929,27 +933,31 @@ miptree_download_copy_with_draw(const test_data_t *data)
         extents[i].width = slice->width;
         extents[i].height = slice->height;
 
-        image_views[i] = qoCreateImageView(t_device,
+        tex_views[i] = qoCreateImageView(t_device,
             .image = mt->image,
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
             .format = params->format,
             .subresourceRange = {
-                .aspect = params->aspect,
+                .aspectMask = 1 << params->aspect,
                 .baseMipLevel = slice->level,
                 .mipLevels = 1,
-                .baseArraySlice = slice->array_slice,
+                .baseArrayLayer = slice->array_slice,
                 .arraySize = 1,
             });
 
-        att_views[i] = qoCreateAttachmentView(t_device,
+        att_views[i] = qoCreateImageView(t_device,
             .image = slice->dest_vk_image,
+            .viewType = params->view_type,
             .format = params->format,
-            .mipLevel = 0,
-            .baseArraySlice = 0,
-            .arraySize = 1);
+            .subresourceRange = {
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .baseMipLevel = 0,
+                .baseArrayLayer = 0,
+                .arraySize = 1,
+            });
     }
 
-    copy_color_images_with_draw(data, extents, image_views, att_views,
+    copy_color_images_with_draw(data, extents, tex_views, att_views,
                                 num_views);
 }
 
@@ -1053,7 +1061,7 @@ init_draw_data(test_draw_data_t *draw_data)
             {
                 QO_SUBPASS_DESCRIPTION_DEFAULTS,
                 .colorCount = 1,
-                .colorAttachments = (VkAttachmentReference[]) {
+                .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,
                         .layout = VK_IMAGE_LAYOUT_GENERAL,

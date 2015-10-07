@@ -64,7 +64,7 @@ test(void)
         &(VkComputePipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
             .pNext = NULL,
-            .cs = {
+            .stage = {
                 .stage = VK_SHADER_STAGE_COMPUTE,
                 .shader = cs,
             },
@@ -77,8 +77,7 @@ test(void)
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           1, &set_layout, &set);
 
-    VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024,
-                                     .usage = VK_BUFFER_USAGE_GENERAL);
+    VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
         .memoryTypeIndex = t_mem_type_index_for_device_access);
@@ -88,7 +87,6 @@ test(void)
     VkBufferView buffer_view;
     buffer_view = qoCreateBufferView(t_device,
         .buffer = buffer,
-        .viewType = VK_BUFFER_VIEW_TYPE_RAW,
         .format = VK_FORMAT_R32G32B32A32_SFLOAT,
         .offset = 0, .range = 64);
 
@@ -96,9 +94,9 @@ test(void)
         .magFilter = VK_TEX_FILTER_LINEAR,
         .minFilter = VK_TEX_FILTER_LINEAR,
         .mipMode = VK_TEX_MIPMAP_MODE_NEAREST,
-        .addressU = VK_TEX_ADDRESS_CLAMP,
-        .addressV = VK_TEX_ADDRESS_CLAMP,
-        .addressW = VK_TEX_ADDRESS_CLAMP,
+        .addressModeU = VK_TEX_ADDRESS_MODE_CLAMP,
+        .addressModeV = VK_TEX_ADDRESS_MODE_CLAMP,
+        .addressModeW = VK_TEX_ADDRESS_MODE_CLAMP,
         .mipLodBias = 0,
         .maxAnisotropy = 0,
         .compareOp = VK_COMPARE_OP_GREATER,

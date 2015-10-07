@@ -28,6 +28,18 @@ AC_PROG_CXX
 
 PKG_PROG_PKG_CONFIG()
 
+AC_ARG_WITH([mesa],
+    [AS_HELP_STRING([--with-mesa@<:@=PATH@:>@],
+                    [Path to mesa repo for headers and libraries])])
+if test "x$with_mesa" != x; then
+    MESA_CPPFLAGS=-I$with_mesa/include
+    if test -d "$with_mesa/lib64"; then
+        MESA_LDFLAGS="-L$with_mesa/lib64 -R$with_mesa/lib64"
+    else
+        MESA_LDFLAGS="-L$with_mesa/lib -R$with_mesa/lib"
+    fi
+fi
+
 AC_SUBST([MESA_CPPFLAGS])
 AC_SUBST([MESA_LDFLAGS])
 

@@ -244,13 +244,11 @@ qoAllocDescriptorSets(VkDevice dev, VkDescriptorPool descriptorPool,
                       VkDescriptorSet *sets)
 {
     VkResult result;
-    uint32_t out_count = 0;
 
     memset(sets, 0, count * sizeof(sets[0]));
     result = vkAllocDescriptorSets(dev, descriptorPool, usage, count, layouts,
-                                   sets, &out_count);
+                                   sets);
     t_assert(result == VK_SUCCESS);
-    t_assert(out_count == count);
 
     for (uint32_t i = 0; i < count; ++i) {
         t_assert(sets[i].handle);
@@ -288,70 +286,6 @@ __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info)
     t_cleanup_push_vk_buffer_view(dev, view);
 
     return view;
-}
-
-VkDynamicViewportState
-__qoCreateDynamicViewportState(VkDevice dev,
-                               const VkDynamicViewportStateCreateInfo *info)
-{
-    VkDynamicViewportState state = {0};
-    VkResult result;
-
-    result = vkCreateDynamicViewportState(dev, info, &state);
-
-    t_assert(result == VK_SUCCESS);
-    t_assert(state.handle);
-    t_cleanup_push_vk_dynamic_viewport_state(dev, state);
-
-    return state;
-}
-
-VkDynamicRasterState
-__qoCreateDynamicRasterState(VkDevice dev,
-                             const VkDynamicRasterStateCreateInfo *info)
-{
-    VkDynamicRasterState state = {0};
-    VkResult result;
-
-    result = vkCreateDynamicRasterState(dev, info, &state);
-
-    t_assert(result == VK_SUCCESS);
-    t_assert(state.handle);
-    t_cleanup_push_vk_dynamic_raster_state(dev, state);
-
-    return state;
-}
-
-VkDynamicColorBlendState
-__qoCreateDynamicColorBlendState(VkDevice dev,
-                                  const VkDynamicColorBlendStateCreateInfo *info)
-{
-    VkDynamicColorBlendState state = {0};
-    VkResult result;
-
-    result = vkCreateDynamicColorBlendState(dev, info, &state);
-
-    t_assert(result == VK_SUCCESS);
-    t_assert(state.handle);
-    t_cleanup_push_vk_dynamic_color_blend_state(dev, state);
-
-    return state;
-}
-
-VkDynamicDepthStencilState
-__qoCreateDynamicDepthStencilState(VkDevice dev,
-                                   const VkDynamicDepthStencilStateCreateInfo *info)
-{
-    VkDynamicDepthStencilState state = {0};
-    VkResult result;
-
-    result = vkCreateDynamicDepthStencilState(dev, info, &state);
-
-    t_assert(result == VK_SUCCESS);
-    t_assert(state.handle);
-    t_cleanup_push_vk_dynamic_depth_stencil_state(dev, state);
-
-    return state;
 }
 
 VkCmdBuffer
@@ -456,21 +390,6 @@ __qoCreateImageView(VkDevice dev, const VkImageViewCreateInfo *info)
     return view;
 }
 
-VkAttachmentView
-__qoCreateAttachmentView(VkDevice dev, const VkAttachmentViewCreateInfo *info)
-{
-    VkAttachmentView view = {0};
-    VkResult result;
-
-    result = vkCreateAttachmentView(dev, info, &view);
-
-    t_assert(result == VK_SUCCESS);
-    t_assert(view.handle);
-    t_cleanup_push_vk_attachment_view(dev, view);
-
-    return view;
-}
-
 VkShader
 __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
 {
@@ -508,6 +427,7 @@ __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
             .module = module,
             .pName = "main",
             .flags = 0,
+            .stage = info->stage,
         }, &shader);
 
     t_assert(result == VK_SUCCESS);

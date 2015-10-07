@@ -46,7 +46,7 @@ test(void)
             },
             {
                 QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
-                .format = VK_FORMAT_D24_UNORM,
+                .format = VK_FORMAT_D24_UNORM_X8,
                 .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
             },
         },
@@ -55,7 +55,7 @@ test(void)
             {
                 QO_SUBPASS_DESCRIPTION_DEFAULTS,
                 .colorCount = 1,
-                .colorAttachments = (VkAttachmentReference[]) {
+                .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,
                         .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -159,10 +159,10 @@ test(void)
             .renderPass = pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
-            .attachmentCount = 2,
-            .pAttachmentClearValues = (VkClearValue[]) {
-                { .color = { .f32 = { 0.2, 0.2, 0.2, 1.0 } } },
-                { .ds = { .depth = params->depth_clear_value } },
+            .clearValueCount = 2,
+            .pClearValues = (VkClearValue[]) {
+                { .color = { .float32 = { 0.2, 0.2, 0.2, 1.0 } } },
+                { .depthStencil = { .depth = params->depth_clear_value } },
             }
         }, VK_RENDER_PASS_CONTENTS_INLINE);
 
@@ -172,8 +172,8 @@ test(void)
 
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
-    vkCmdDraw(t_cmd_buffer, 0, 3, 0, 1);
-    vkCmdDraw(t_cmd_buffer, 3, 3, 1, 1);
+    vkCmdDraw(t_cmd_buffer, 3, 1, 0, 0);
+    vkCmdDraw(t_cmd_buffer, 3, 1, 3, 1);
 
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
@@ -183,7 +183,7 @@ test(void)
 test_define {
     .name = "func.depthstencil.basic-depth.clear-0.0.op-less",
     .start = test,
-    .depthstencil_format = VK_FORMAT_D24_UNORM,
+    .depthstencil_format = VK_FORMAT_D24_UNORM_X8,
     .user_data = &(test_params_t) {
         .depth_compare_op = VK_COMPARE_OP_LESS,
         .depth_clear_value = 0.0,
@@ -193,7 +193,7 @@ test_define {
 test_define {
     .name = "func.depthstencil.basic-depth.clear-0.0.op-greater",
     .start = test,
-    .depthstencil_format = VK_FORMAT_D24_UNORM,
+    .depthstencil_format = VK_FORMAT_D24_UNORM_X8,
     .user_data = &(test_params_t) {
         .depth_compare_op = VK_COMPARE_OP_GREATER,
         .depth_clear_value = 0.0,
@@ -203,7 +203,7 @@ test_define {
 test_define {
     .name = "func.depthstencil.basic-depth.clear-0.5.op-greater-equal",
     .start = test,
-    .depthstencil_format = VK_FORMAT_D24_UNORM,
+    .depthstencil_format = VK_FORMAT_D24_UNORM_X8,
     .user_data = &(test_params_t) {
         .depth_clear_value = 0.5,
         .depth_compare_op = VK_COMPARE_OP_GREATER_EQUAL,
@@ -213,7 +213,7 @@ test_define {
 test_define {
     .name = "func.depthstencil.basic-depth.clear-1.0.op-greater",
     .start = test,
-    .depthstencil_format = VK_FORMAT_D24_UNORM,
+    .depthstencil_format = VK_FORMAT_D24_UNORM_X8,
     .user_data = &(test_params_t) {
         .depth_clear_value = 1.0,
         .depth_compare_op = VK_COMPARE_OP_GREATER,

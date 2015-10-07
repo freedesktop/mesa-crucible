@@ -148,7 +148,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
             {
                 QO_SUBPASS_DESCRIPTION_DEFAULTS,
                 .colorCount = 1,
-                .colorAttachments = (VkAttachmentReference[]) {
+                .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,
                         .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -162,9 +162,9 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
             .renderPass = pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
-            .attachmentCount = 1,
-            .pAttachmentClearValues = (VkClearValue[]) {
-                { .color = { .f32 = { 1.0, 0.0, 0.0, 1.0 } } },
+            .clearValueCount = 1,
+            .pClearValues = (VkClearValue[]) {
+                { .color = { .float32 = { 1.0, 0.0, 0.0, 1.0 } } },
             }
         }, VK_RENDER_PASS_CONTENTS_INLINE);
 
@@ -184,7 +184,6 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
 
         VkBufferView ubo_view = qoCreateBufferView(t_device,
             .buffer = ubo,
-            .viewType = VK_BUFFER_VIEW_TYPE_RAW,
             .format = VK_FORMAT_R32_SFLOAT,
             .range = ubo_size);
 
@@ -253,7 +252,6 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
             for (int j = 0; j < 12; j++) {
                 desc_info[j].bufferView = qoCreateBufferView(t_device,
                     .buffer = ubo,
-                    .viewType = VK_BUFFER_VIEW_TYPE_RAW,
                     .format = VK_FORMAT_R32_SFLOAT,
                     .offset = offsets[j],
                     .range = ubo_size);
@@ -279,7 +277,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
                                     &set[i], 0, NULL);
         }
 
-        vkCmdDraw(t_cmd_buffer, i, 1, 0, 1);
+        vkCmdDraw(t_cmd_buffer, 1, 1, i, 0);
     }
 
     vkCmdEndRenderPass(t_cmd_buffer);

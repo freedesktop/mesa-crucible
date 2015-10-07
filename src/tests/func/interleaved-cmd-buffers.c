@@ -39,7 +39,8 @@ static const VkBufferImageCopy copy = {
     .imageSubresource = {
         .aspect = VK_IMAGE_ASPECT_COLOR,
         .mipLevel = 0,
-        .arraySlice = 0,
+        .arrayLayer = 0,
+        .arraySize = 1,
     },
     .imageOffset = { .x = 0, .y = 0, .z = 0 },
     .imageExtent = {
@@ -63,7 +64,7 @@ setup_src(struct src *src)
            .depth = 1,
        },
        .tiling = VK_IMAGE_TILING_LINEAR,
-       .usage = VK_IMAGE_USAGE_GENERAL);
+       .usage = VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT);
 
     VkMemoryRequirements mem_reqs =
        qoGetImageMemoryRequirements(t_device, image);
@@ -97,8 +98,7 @@ setup_dest(struct dest *dest)
 
     size_t buffer_size = 4 * t_width * t_height;
 
-    VkBuffer buffer = qoCreateBuffer(t_device, .size = buffer_size,
-                                     .usage = VK_BUFFER_USAGE_GENERAL);
+    VkBuffer buffer = qoCreateBuffer(t_device, .size = buffer_size);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
         .memoryTypeIndex = t_mem_type_index_for_mmap);
