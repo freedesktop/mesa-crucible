@@ -97,7 +97,6 @@ extern "C" {
 #define QO_NULL_INSTANCE                            ((VkInstance) {0})
 #define QO_NULL_QUEUE                               ((VkQueue) {0})
 
-#define QO_NULL_ATTACHMENT_VIEW                     ((VkAttachmentView) {0})
 #define QO_NULL_BUFFER                              ((VkBuffer) {0})
 #define QO_NULL_BUFFER_VIEW                         ((VkBufferView) {0})
 #define QO_NULL_CMD_POOL                            ((VkCmdPool) {0})
@@ -293,18 +292,6 @@ typedef struct QoShaderCreateInfo_ {
         .baseArrayLayer = 0, \
         .arraySize = 1, \
     }
-
-#define QO_ATTACHMENT_VIEW_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_ATTACHMENT_VIEW_CREATE_INFO, \
-    .mipLevel = 0, \
-    .baseArraySlice = 0, \
-    .arraySize = 1
-
-#define QO_DEPTH_STENCIL_VIEW_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_DEPTH_STENCIL_VIEW_CREATE_INFO, \
-    .mipLevel = 0, \
-    .baseArraySlice = 0, \
-    .arraySize = 1
 
 #define QO_SHADER_CREATE_INFO_DEFAULTS \
     .sType =VK_STRUCTURE_TYPE_SHADER_CREATE_INFO
@@ -556,17 +543,6 @@ VkImageView qoCreateImageView(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
-VkAttachmentView qoCreateAttachmentView(VkDevice dev, ...);
-#else
-#define qoCreateAttachmentView(dev, ...) \
-    __qoCreateAttachmentView(dev, \
-        &(VkAttachmentViewCreateInfo) { \
-            QO_ATTACHMENT_VIEW_CREATE_INFO_DEFAULTS, \
-            ##__VA_ARGS__, \
-        })
-#endif
-
-#ifdef DOXYGEN
 VkShader qoCreateShader(VkDevice dev, ...);
 #else
 #define qoCreateShader(dev, ...) \
@@ -609,7 +585,6 @@ VkPipeline qoCreateGraphicsPipeline(VkDevice dev,
                                     const QoExtraGraphicsPipelineCreateInfo *info);
 VkImage __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info);
 VkImageView __qoCreateImageView(VkDevice dev, const VkImageViewCreateInfo *info);
-VkAttachmentView __qoCreateAttachmentView(VkDevice dev, const VkAttachmentViewCreateInfo *info);
 VkShader __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info);
 
 #ifdef __cplusplus

@@ -82,11 +82,6 @@ struct cmd_cru_image {
     cru_image_t *image;
 };
 
-struct cmd_vk_attachment_view {
-    VkDevice dev;
-    VkAttachmentView x;
-};
-
 struct cmd_vk_buffer {
     VkDevice dev;
     VkBuffer x;
@@ -311,12 +306,6 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
         }
 
         // Non-dispatchable Vulkan objects
-        case CRU_CLEANUP_CMD_VK_ATTACHMENT_VIEW: {
-            CMD_CREATE(struct cmd_vk_attachment_view);
-            CMD_SET(dev);
-            CMD_SET(x);
-            break;
-        }
         case CRU_CLEANUP_CMD_VK_BUFFER: {
             CMD_CREATE(struct cmd_vk_buffer);
             CMD_SET(dev);
@@ -549,11 +538,6 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
         }
 
         // Non-dispatchable Vulkan objects
-        case CRU_CLEANUP_CMD_VK_ATTACHMENT_VIEW: {
-            CMD_GET(struct cmd_vk_attachment_view);
-            CMD_DO(vkDestroyAttachmentView(cmd->dev, cmd->x));
-            break;
-        }
         case CRU_CLEANUP_CMD_VK_BUFFER: {
             CMD_GET(struct cmd_vk_buffer);
             CMD_DO(vkDestroyBuffer(cmd->dev, cmd->x));

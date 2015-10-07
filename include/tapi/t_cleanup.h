@@ -60,7 +60,6 @@ static inline void t_cleanup_push_cru_image(cru_image_t *x)                     
 static inline void t_cleanup_push_vk_instance(VkInstance x)                                                         { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_INSTANCE, x); }
 static inline void t_cleanup_push_vk_device(VkDevice x)                                                             { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_DEVICE, x); }
 
-static inline void t_cleanup_push_vk_attachment_view(VkDevice dev, VkAttachmentView x)                              { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_ATTACHMENT_VIEW, dev, x); }
 static inline void t_cleanup_push_vk_buffer(VkDevice dev, VkBuffer x)                                               { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_BUFFER, dev, x); }
 static inline void t_cleanup_push_vk_buffer_view(VkDevice dev, VkBufferView x)                                      { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_BUFFER_VIEW, dev, x); }
 static inline void t_cleanup_push_vk_cmd_buffer(VkDevice dev, VkCmdBuffer x)                                        { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_CMD_BUFFER, dev, x); }

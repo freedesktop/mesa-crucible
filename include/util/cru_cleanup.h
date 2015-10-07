@@ -40,7 +40,6 @@ enum cru_cleanup_cmd {
     CRU_CLEANUP_CMD_FREE,
     CRU_CLEANUP_CMD_CRU_CLEANUP_STACK,
     CRU_CLEANUP_CMD_CRU_IMAGE,
-    CRU_CLEANUP_CMD_VK_ATTACHMENT_VIEW,
     CRU_CLEANUP_CMD_VK_BUFFER,
     CRU_CLEANUP_CMD_VK_BUFFER_VIEW,
     CRU_CLEANUP_CMD_VK_CMD_BUFFER,
@@ -103,7 +102,6 @@ static inline void cru_cleanup_push_vk_device(cru_cleanup_stack_t *c, VkDevice x
 
 static inline void cru_cleanup_push_vk_buffer(cru_cleanup_stack_t *c, VkDevice dev, VkBuffer x)                                             { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_BUFFER,                        dev, x); }
 static inline void cru_cleanup_push_vk_buffer_view(cru_cleanup_stack_t *c, VkDevice dev, VkBufferView x)                                    { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_BUFFER_VIEW,                   dev, x); }
-static inline void cru_cleanup_push_vk_color_attachment_view(cru_cleanup_stack_t *c, VkDevice dev, VkAttachmentView x)                      { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_ATTACHMENT_VIEW,               dev, x); }
 static inline void cru_cleanup_push_vk_command_buffer(cru_cleanup_stack_t *c, VkDevice dev, VkCmdBuffer x)                                  { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_CMD_BUFFER,                    dev, x); }
 static inline void cru_cleanup_push_vk_descriptor_pool(cru_cleanup_stack_t *c, VkDevice dev, VkDescriptorPool x)                            { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DESCRIPTOR_POOL,               dev, x); }
 static inline void cru_cleanup_push_vk_descriptor_set(cru_cleanup_stack_t *c, VkDevice dev, VkDescriptorPool pool, VkDescriptorSet set)     { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET,                dev, pool, set); }

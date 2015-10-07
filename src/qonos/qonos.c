@@ -454,21 +454,6 @@ __qoCreateImageView(VkDevice dev, const VkImageViewCreateInfo *info)
     return view;
 }
 
-VkAttachmentView
-__qoCreateAttachmentView(VkDevice dev, const VkAttachmentViewCreateInfo *info)
-{
-    VkAttachmentView view = {0};
-    VkResult result;
-
-    result = vkCreateAttachmentView(dev, info, &view);
-
-    t_assert(result == VK_SUCCESS);
-    t_assert(view.handle);
-    t_cleanup_push_vk_attachment_view(dev, view);
-
-    return view;
-}
-
 VkShader
 __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
 {

@@ -133,141 +133,93 @@ t_setup_phys_dev_mem_props(void)
 }
 
 static void
-t_setup_attachment(VkDevice dev,
-                   VkFormat format,
-                   VkImageUsageFlags image_usage_flags,
-                   uint32_t width, uint32_t height,
-                   VkImage *out_image,
-                   VkAttachmentView *out_attachment_view)
-{
-    GET_CURRENT_TEST(t);
-    ASSERT_TEST_IN_SETUP_PHASE;
-
-    if (format == VK_FORMAT_UNDEFINED) {
-        *out_image = QO_NULL_IMAGE;
-        *out_attachment_view = QO_NULL_ATTACHMENT_VIEW;
-        return;
-    }
-
-    t_assert(width > 0);
-    t_assert(height > 0);
-
-    *out_image = qoCreateImage(dev,
-        .format = format,
-        .extent = {
-            .width = width,
-            .height = height,
-            .depth = 1,
-        },
-        .usage = image_usage_flags);
-
-    VkDeviceMemory mem = qoAllocImageMemory(dev, *out_image,
-        .memoryTypeIndex = t->vk.mem_type_index_for_device_access);
-
-    qoBindImageMemory(dev, *out_image, mem, /*offset*/ 0);
-
-    *out_attachment_view = qoCreateAttachmentView(dev,
-        .image = *out_image,
-        .format = format);
-}
-
-static void
 t_setup_framebuffer(void)
 {
     ASSERT_TEST_IN_SETUP_PHASE;
     GET_CURRENT_TEST(t);
 
-    VkAttachmentBindInfo bind_info[2];
-    uint32_t att_count = 0;
-
     if (t->def->no_image)
         return;
 
-    t_setup_attachment(t->vk.device, VK_FORMAT_R8G8B8A8_UNORM,
-                       VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
-                       | VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT,
-                       t->ref.width, t->ref.height,
-                       &t->vk.color_image,
-                       &t->vk.color_attachment_view);
+    VkImageView attachments[2];
+    uint32_t n_attachments = 0;
 
-    bind_info[att_count++] = (VkAttachmentBindInfo) {
-        .view = t->vk.color_attachment_view,
-        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-    };
+    t_assert(t->ref.width > 0);
+    t_assert(t->ref.height > 0);
+
+    t->vk.color_image = qoCreateImage(t->vk.device,
+        .format = VK_FORMAT_R8G8B8A8_UNORM,
+        .extent = {
+            .width = t->ref.width,
+            .height = t->ref.height,
+            .depth = 1,
+        },
+        .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
+                 VK_IMAGE_USAGE_SAMPLED_BIT |
+                 VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT);
+
+    VkDeviceMemory color_mem = qoAllocImageMemory(t->vk.device,
+        t->vk.color_image,
+        .memoryTypeIndex = t->vk.mem_type_index_for_device_access);
+
+    qoBindImageMemory(t->vk.device, t->vk.color_image, color_mem,
+                      /*offset*/ 0);
+
+    t->vk.color_image_view = qoCreateImageView(t->vk.device,
+        QO_IMAGE_VIEW_CREATE_INFO_DEFAULTS,
+        .image = t->vk.color_image,
+        .format = VK_FORMAT_R8G8B8A8_UNORM,
+        .subresourceRange = {
+            .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+            .baseMipLevel = 0,
+            .mipLevels = 1,
+            .baseArrayLayer = 0,
+            .arraySize = 1,
+        });
+
+    attachments[n_attachments++] = t->vk.color_image_view;
 
     if (t->def->depthstencil_format != VK_FORMAT_UNDEFINED) {
-        t_setup_attachment(t->vk.device, t->def->depthstencil_format,
-                           VK_IMAGE_USAGE_DEPTH_STENCIL_BIT
-                           | VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT,
-                           t->ref.width, t->ref.height,
-                           &t->vk.ds_image,
-                           &t->vk.ds_attachment_view);
+        t->vk.ds_image = qoCreateImage(t->vk.device,
+            .format = t->def->depthstencil_format,
+            .extent = {
+                .width = t->ref.width,
+                .height = t->ref.height,
+                .depth = 1,
+            },
+            .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_BIT |
+                     VK_IMAGE_USAGE_SAMPLED_BIT |
+                     VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT);
 
-        bind_info[att_count++] = (VkAttachmentBindInfo) {
-            .view = t->vk.ds_attachment_view,
-            .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-        };
-    }
+        VkDeviceMemory ds_mem = qoAllocImageMemory(t->vk.device,
+            t->vk.ds_image,
+            .memoryTypeIndex = t->vk.mem_type_index_for_device_access);
 
-    t->vk.framebuffer = qoCreateFramebuffer(t->vk.device,
-        .width = t->ref.width,
-        .height = t->ref.height,
-        .attachmentCount = att_count,
-        .pAttachments = bind_info);
-}
+        qoBindImageMemory(t->vk.device, t->vk.ds_image, ds_mem,
+                          /*offset*/ 0);
 
-static void
-t_setup_image_views(void)
-{
-    ASSERT_TEST_IN_SETUP_PHASE;
-    GET_CURRENT_TEST(t);
-
-    if (t->vk.color_image.handle) {
-        t->vk.color_image_view = qoCreateImageView(t->vk.device,
-            .image = t->vk.color_image,
-            .viewType = VK_IMAGE_VIEW_TYPE_2D,
-            .format = VK_FORMAT_R8G8B8A8_UNORM,
+        t->vk.depthstencil_image_view = qoCreateImageView(t->vk.device,
+            QO_IMAGE_VIEW_CREATE_INFO_DEFAULTS,
+            .image = t->vk.ds_image,
+            .format = t->def->depthstencil_format,
             .subresourceRange = {
-                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT |
+                              VK_IMAGE_ASPECT_STENCIL_BIT,
                 .baseMipLevel = 0,
                 .mipLevels = 1,
                 .baseArrayLayer = 0,
                 .arraySize = 1,
             });
+
+        attachments[n_attachments++] = t->vk.depthstencil_image_view;
     }
 
-    if (t->vk.ds_image.handle) {
-        const cru_format_info_t *finfo =
-            t_format_info(t->def->depthstencil_format);
-
-        if (finfo->depth_format) {
-            t->vk.depth_image_view = qoCreateImageView(t->vk.device,
-                .image = t->vk.ds_image,
-                .viewType = VK_IMAGE_VIEW_TYPE_2D,
-                .format = finfo->depth_format,
-                .subresourceRange = {
-                    .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
-                    .baseMipLevel = 0,
-                    .mipLevels = 1,
-                    .baseArrayLayer = 0,
-                    .arraySize = 1,
-                });
-        }
-
-        if (finfo->stencil_format) {
-            t->vk.stencil_image_view = qoCreateImageView(t->vk.device,
-                .image = t->vk.ds_image,
-                .viewType = VK_IMAGE_VIEW_TYPE_2D,
-                .format = finfo->stencil_format,
-                .subresourceRange = {
-                    .aspectMask = VK_IMAGE_ASPECT_STENCIL_BIT,
-                    .baseMipLevel = 0,
-                    .mipLevels = 1,
-                    .baseArrayLayer = 0,
-                    .arraySize = 1,
-                });
-        }
-    }
+    t->vk.framebuffer = qoCreateFramebuffer(t->vk.device,
+        .width = t->ref.width,
+        .height = t->ref.height,
+        .layers = 1,
+        .attachmentCount = n_attachments,
+        .pAttachments = attachments);
 }
 
 void
@@ -305,7 +257,6 @@ t_setup_vulkan(void)
     t_cleanup_push_vk_device(t->vk.device);
 
     t_setup_framebuffer();
-    t_setup_image_views();
 
     vkGetDeviceQueue(t->vk.device, 0, 0, &t->vk.queue);
 
