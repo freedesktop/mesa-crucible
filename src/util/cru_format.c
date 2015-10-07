@@ -55,11 +55,11 @@ cru_format_info_table[] = {
         .depth_format = VK_FORMAT_D16_UNORM,
     },
     {
-        FMT(VK_FORMAT_D24_UNORM),
+        FMT(VK_FORMAT_D24_UNORM_X8),
         .num_type = CRU_NUM_TYPE_UNORM,
         .num_channels = 1,
         .cpp = 3,
-        .depth_format = VK_FORMAT_D24_UNORM,
+        .depth_format = VK_FORMAT_D24_UNORM_X8,
     },
     {
         FMT(VK_FORMAT_D32_SFLOAT),
@@ -88,7 +88,7 @@ cru_format_info_table[] = {
         .num_type = CRU_NUM_TYPE_UNDEFINED,
         .num_channels = 2,
         .cpp = 4,
-        .depth_format = VK_FORMAT_D24_UNORM,
+        .depth_format = VK_FORMAT_D24_UNORM_X8,
         .stencil_format = VK_FORMAT_S8_UINT,
     },
     {

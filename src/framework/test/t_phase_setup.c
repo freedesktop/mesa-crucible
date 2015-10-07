@@ -187,7 +187,7 @@ t_setup_framebuffer(void)
                 .height = t->ref.height,
                 .depth = 1,
             },
-            .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_BIT |
+            .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT |
                      VK_IMAGE_USAGE_SAMPLED_BIT |
                      VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT);
 
