@@ -102,42 +102,6 @@ __t_cmd_buffer(void)
     return &t->vk.cmd_buffer;
 }
 
-const VkDynamicViewportState *
-__t_dynamic_vp_state(void)
-{
-    ASSERT_TEST_IN_MAJOR_PHASE;
-    GET_CURRENT_TEST(t);
-
-    return &t->vk.dynamic_vp_state;
-}
-
-const VkDynamicRasterState *
-__t_dynamic_rs_state(void)
-{
-    ASSERT_TEST_IN_MAJOR_PHASE;
-    GET_CURRENT_TEST(t);
-
-    return &t->vk.dynamic_rs_state;
-}
-
-const VkDynamicColorBlendState *
-__t_dynamic_cb_state(void)
-{
-    ASSERT_TEST_IN_MAJOR_PHASE;
-    GET_CURRENT_TEST(t);
-
-    return &t->vk.dynamic_cb_state;
-}
-
-const VkDynamicDepthStencilState *
-__t_dynamic_ds_state(void)
-{
-    ASSERT_TEST_IN_MAJOR_PHASE;
-    GET_CURRENT_TEST(t);
-
-    return &t->vk.dynamic_ds_state;
-}
-
 const VkImage *
 __t_color_image(void)
 {

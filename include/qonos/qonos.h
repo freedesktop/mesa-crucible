@@ -181,14 +181,30 @@ typedef struct QoShaderCreateInfo_ {
     .rasterizerDiscardEnable = false, \
     .fillMode = VK_FILL_MODE_SOLID, \
     .cullMode = VK_CULL_MODE_NONE, \
-    .frontFace = VK_FRONT_FACE_CCW
+    .frontFace = VK_FRONT_FACE_CCW, \
+    .depthBias = 0.0f, \
+    .depthBiasClamp = 0.0f, \
+    .slopeScaledDepthBias = 0.0f, \
+    .lineWidth = 1.0f
 
 #define QO_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO, \
     .depthTestEnable = false, \
     .depthWriteEnable = false, \
     .depthBoundsTestEnable = false, \
-    .stencilTestEnable = false
+    .stencilTestEnable = false, \
+    .front = { \
+        .stencilCompareMask = ~0,   /* default in OpenGL ES 3.1 */ \
+        .stencilWriteMask = ~0,     /* default in OpenGL ES 3.1 */ \
+        .stencilReference = 0,      /* default in OpenGL ES 3.1 */ \
+    }, \
+    .back = { \
+        .stencilCompareMask = ~0,   /* default in OpenGL ES 3.1 */ \
+        .stencilWriteMask = ~0,     /* default in OpenGL ES 3.1 */ \
+        .stencilReference = 0,      /* default in OpenGL ES 3.1 */ \
+    }, \
+    .minDepthBounds = 0.0f, /* default in OpenGL ES 3.1 */ \
+    .maxDepthBounds = 1.0f  /* default in OpenGL ES 3.1 */ \
 
 #define QO_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO, \
@@ -205,31 +221,8 @@ typedef struct QoShaderCreateInfo_ {
     .attachmentCount = 1, \
     .pAttachments = (VkPipelineColorBlendAttachmentState []) { \
        { QO_PIPELINE_COLOR_BLEND_ATTACHMENT_STATE_DEFAULTS }, \
-    }
-
-#define QO_DYNAMIC_VIEWPORT_STATE_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_DYNAMIC_VIEWPORT_STATE_CREATE_INFO, \
-    .viewportAndScissorCount = 0
-
-#define QO_DYNAMIC_RASTER_STATE_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_DYNAMIC_RASTER_STATE_CREATE_INFO, \
-    .depthBias = 0.0f, \
-    .depthBiasClamp = 0.0f, \
-    .slopeScaledDepthBias = 0.0f, \
-    .lineWidth = 1.0f
-
-#define QO_DYNAMIC_COLOR_BLEND_STATE_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_DYNAMIC_COLOR_BLEND_STATE_CREATE_INFO, \
+    }, \
     .blendConst = {0.0f, 0.0f, 0.0f, 0.0f} /* default in OpenGL ES 3.1 */
-
-#define QO_DYNAMIC_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_DYNAMIC_DEPTH_STENCIL_STATE_CREATE_INFO, \
-    .minDepthBounds = 0.0f, /* default in OpenGL ES 3.1 */ \
-    .maxDepthBounds = 1.0f, /* default in OpenGL ES 3.1 */ \
-    .stencilReadMask = ~0,  /* default in OpenGL ES 3.1 */ \
-    .stencilWriteMask = ~0, /* default in OpenGL ES 3.1 */ \
-    .stencilFrontRef = 0,   /* default in OpenGL ES 3.1 */ \
-    .stencilBackRef = 0     /* default in OpenGL ES 3.1 */
 
 #define QO_CMD_BUFFER_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_CREATE_INFO, \
@@ -426,50 +419,6 @@ VkDescriptorSetLayout qoCreateDescriptorSetLayout(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
-VkDynamicViewportStateCreateInfo qoCreateDynamicVpState(VkDevice dev, ...);
-#else
-#define qoCreateDynamicViewportState(dev, ...) \
-    __qoCreateDynamicViewportState(dev, \
-        &(VkDynamicViewportStateCreateInfo) { \
-            QO_DYNAMIC_VIEWPORT_STATE_CREATE_INFO_DEFAULTS, \
-            ##__VA_ARGS__, \
-        })
-#endif
-
-#ifdef DOXYGEN
-VkDynamicRasterStateCreateInfo qoCreateDynamicRasterState(VkDevice dev, ...);
-#else
-#define qoCreateDynamicRasterState(dev, ...) \
-    __qoCreateDynamicRasterState(dev, \
-        &(VkDynamicRasterStateCreateInfo) { \
-            QO_DYNAMIC_RASTER_STATE_CREATE_INFO_DEFAULTS, \
-            ##__VA_ARGS__, \
-        })
-#endif
-
-#ifdef DOXYGEN
-VkDynamicColorBlendStateCreateInfo qoCreateDynamicColorBlendState(VkDevice dev, ...);
-#else
-#define qoCreateDynamicColorBlendState(dev, ...) \
-    __qoCreateDynamicColorBlendState(dev, \
-        &(VkDynamicColorBlendStateCreateInfo) { \
-            QO_DYNAMIC_COLOR_BLEND_STATE_CREATE_INFO_DEFAULTS, \
-            ##__VA_ARGS__, \
-        })
-#endif
-
-#ifdef DOXYGEN
-VkDynamicDepthStencilStateCreateInfo qoCreateDynamicDepthStencilState(VkDevice dev, ...);
-#else
-#define qoCreateDynamicDepthStencilState(dev, ...) \
-    __qoCreateDynamicDepthStencilState(dev, \
-        &(VkDynamicDepthStencilStateCreateInfo) { \
-            QO_DYNAMIC_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS, \
-            ##__VA_ARGS__, \
-        })
-#endif
-
-#ifdef DOXYGEN
 VkCmdBuffer qoCreateCommandBuffer(VkDevice dev, VkCmdPool pool, ...);
 #else
 #define qoCreateCommandBuffer(dev, pool, ...) \
@@ -570,10 +519,6 @@ VkResult qoAllocDescriptorSets(VkDevice dev, VkDescriptorPool descriptorPool,
                                VkDescriptorSetUsage usage, uint32_t count,
                                const VkDescriptorSetLayout *layouts,
                                VkDescriptorSet *sets);
-VkDynamicViewportState __qoCreateDynamicViewportState(VkDevice dev, const VkDynamicViewportStateCreateInfo *info);
-VkDynamicRasterState __qoCreateDynamicRasterState(VkDevice dev, const VkDynamicRasterStateCreateInfo *info);
-VkDynamicColorBlendState __qoCreateDynamicColorBlendState(VkDevice dev, const VkDynamicColorBlendStateCreateInfo *info);
-VkDynamicDepthStencilState __qoCreateDynamicDepthStencilState(VkDevice dev, const VkDynamicDepthStencilStateCreateInfo *info);
 VkCmdBuffer __qoCreateCommandBuffer(VkDevice dev, VkCmdPool pool, const VkCmdBufferCreateInfo *info);
 VkResult __qoBeginCommandBuffer(VkCmdBuffer cmd, const VkCmdBufferBeginInfo *info);
 VkResult __qoEndCommandBuffer(VkCmdBuffer cmd);

@@ -782,9 +782,6 @@ copy_color_images_with_draw(const test_data_t *data,
 {
     VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
-    vkCmdBindDynamicRasterState(cmd, t_dynamic_rs_state);
-    vkCmdBindDynamicColorBlendState(cmd, t_dynamic_cb_state);
-    vkCmdBindDynamicDepthStencilState(cmd, t_dynamic_ds_state);
     vkCmdBindVertexBuffers(cmd, /*startBinding*/ 0, /*bindingCount*/ 1,
                            (VkBuffer[]) { data->draw.vertex_buffer},
                            (VkDeviceSize[]) { data->draw.vertex_buffer_offset });
@@ -794,22 +791,15 @@ copy_color_images_with_draw(const test_data_t *data,
         const uint32_t width = extents[i].width;
         const uint32_t height = extents[i].height;
 
-        vkCmdBindDynamicViewportState(cmd,
-            qoCreateDynamicViewportState(t_device,
-                .viewportAndScissorCount = 1,
-                .pViewports = (VkViewport[]) {
-                    {
-                        .originX = 0,
-                        .originY = 0,
-                        .width = width,
-                        .height = height,
-                        .minDepth = 0,
-                        .maxDepth = 1
-                    },
-                },
-                .pScissors = (VkRect2D[]) {
-                    { { 0, 0 }, { width, height } },
-                }));
+        vkCmdSetViewport(cmd, 1,
+            &(VkViewport) {
+                .originX = 0,
+                .originY = 0,
+                .width = width,
+                .height = height,
+                .minDepth = 0,
+                .maxDepth = 1
+            });
 
         VkFramebuffer fb = qoCreateFramebuffer(t_device,
             .attachmentCount = 1,

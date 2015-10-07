@@ -122,10 +122,6 @@ make_secondary_cmd_buffer(VkRenderPass pass, VkPipeline pipeline,
         .framebuffer = t_framebuffer);
 
     vkCmdBindPipeline(secondary, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-    vkCmdBindDynamicViewportState(secondary, t_dynamic_vp_state);
-    vkCmdBindDynamicRasterState(secondary, t_dynamic_rs_state);
-    vkCmdBindDynamicColorBlendState(secondary, t_dynamic_cb_state);
-    vkCmdBindDynamicDepthStencilState(secondary, t_dynamic_ds_state);
 
     return secondary;
 }

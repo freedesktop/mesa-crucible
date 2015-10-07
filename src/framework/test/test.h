@@ -148,11 +148,6 @@ struct test {
         VkCmdBuffer cmd_buffer;
         VkFramebuffer framebuffer;
 
-        VkDynamicViewportState dynamic_vp_state;
-        VkDynamicRasterState dynamic_rs_state;
-        VkDynamicColorBlendState dynamic_cb_state;
-        VkDynamicDepthStencilState dynamic_ds_state;
-
         VkImage color_image;
         VkImageView color_image_view;
 

@@ -262,26 +262,6 @@ t_setup_vulkan(void)
 
     t->vk.pipeline_cache = qoCreatePipelineCache(t->vk.device);
 
-    t->vk.dynamic_vp_state = qoCreateDynamicViewportState(t->vk.device,
-        .viewportAndScissorCount = 1,
-        .pViewports = (VkViewport[]) {
-            {
-                .originX = 0,
-                .originY = 0,
-                .width = t->ref.width,
-                .height = t->ref.height,
-                .minDepth = 0,
-                .maxDepth = 1
-            },
-        },
-        .pScissors = (VkRect2D[]) {
-            {{ 0, 0 }, { t->ref.width, t->ref.height }},
-        }
-    );
-    t->vk.dynamic_rs_state = qoCreateDynamicRasterState(t->vk.device);
-    t->vk.dynamic_cb_state = qoCreateDynamicColorBlendState(t->vk.device);
-    t->vk.dynamic_ds_state = qoCreateDynamicDepthStencilState(t->vk.device);
-
     VkResult res = vkCreateCommandPool(t->vk.device,
         &(VkCmdPoolCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_CMD_POOL_CREATE_INFO,
@@ -294,10 +274,6 @@ t_setup_vulkan(void)
     t->vk.cmd_buffer = qoCreateCommandBuffer(t->vk.device, t->vk.cmd_pool);
 
     qoBeginCommandBuffer(t->vk.cmd_buffer);
-    vkCmdBindDynamicViewportState(t->vk.cmd_buffer, t->vk.dynamic_vp_state);
-    vkCmdBindDynamicRasterState(t->vk.cmd_buffer, t->vk.dynamic_rs_state);
-    vkCmdBindDynamicColorBlendState(t->vk.cmd_buffer, t->vk.dynamic_cb_state);
-    vkCmdBindDynamicDepthStencilState(t->vk.cmd_buffer, t->vk.dynamic_ds_state);
 }
 
 void

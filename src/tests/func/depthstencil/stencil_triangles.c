@@ -131,13 +131,18 @@ clear_stencil_with_quad(void)
                            /*startBinding*/ 0, /*bindingCount*/ 0,
                            NULL, NULL);
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-    vkCmdBindDynamicDepthStencilState(t_cmd_buffer,
-        qoCreateDynamicDepthStencilState(t_device,
-            QO_DYNAMIC_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS,
-            .stencilReadMask = 0xff,
-            .stencilWriteMask = 0xff,
-            .stencilFrontRef = params->clear_value.stencil,
-            .stencilBackRef = params->clear_value.stencil));
+    vkCmdSetStencilCompareMask(t_cmd_buffer,
+                               VK_STENCIL_FACE_FRONT_BIT |
+                               VK_STENCIL_FACE_BACK_BIT,
+                               0xff);
+    vkCmdSetStencilWriteMask(t_cmd_buffer,
+                             VK_STENCIL_FACE_FRONT_BIT |
+                             VK_STENCIL_FACE_BACK_BIT,
+                             0xff);
+    vkCmdSetStencilReference(t_cmd_buffer,
+                             VK_STENCIL_FACE_FRONT_BIT |
+                             VK_STENCIL_FACE_BACK_BIT,
+                             params->clear_value.stencil);
     vkCmdDraw(t_cmd_buffer,
               /*vertexCount*/ 4, /*instanceCount*/ 1,
               /*firstVertex*/ 0, /*firstInstance*/ 0);
@@ -277,13 +282,18 @@ draw_triangle(void)
                            /*startBinding*/ 0, /*bindingCount*/ 0,
                            NULL, NULL);
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-    vkCmdBindDynamicDepthStencilState(t_cmd_buffer,
-        qoCreateDynamicDepthStencilState(t_device,
-            QO_DYNAMIC_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS,
-            .stencilReadMask = 0xff,
-            .stencilWriteMask = 0xff,
-            .stencilFrontRef = params->stencil_ref,
-            .stencilBackRef = params->stencil_ref));
+    vkCmdSetStencilCompareMask(t_cmd_buffer,
+                               VK_STENCIL_FACE_FRONT_BIT |
+                               VK_STENCIL_FACE_BACK_BIT,
+                               0xff);
+    vkCmdSetStencilWriteMask(t_cmd_buffer,
+                             VK_STENCIL_FACE_FRONT_BIT |
+                             VK_STENCIL_FACE_BACK_BIT,
+                             0xff);
+    vkCmdSetStencilReference(t_cmd_buffer,
+                             VK_STENCIL_FACE_FRONT_BIT |
+                             VK_STENCIL_FACE_BACK_BIT,
+                             params->stencil_ref);
     vkCmdDraw(t_cmd_buffer,
               /*vertexCount*/ 3, /*instanceCount*/ 3,
               /*firstVertex*/ 0, /*firstInstance*/ 0);

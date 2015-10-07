@@ -50,10 +50,6 @@ enum cru_cleanup_cmd {
     CRU_CLEANUP_CMD_VK_DEVICE,
     CRU_CLEANUP_CMD_VK_DEVICE_MEMORY,
     CRU_CLEANUP_CMD_VK_DEVICE_MEMORY_MAP,
-    CRU_CLEANUP_CMD_VK_DYNAMIC_COLOR_BLEND_STATE,
-    CRU_CLEANUP_CMD_VK_DYNAMIC_DEPTH_STENCIL_STATE,
-    CRU_CLEANUP_CMD_VK_DYNAMIC_RASTER_STATE,
-    CRU_CLEANUP_CMD_VK_DYNAMIC_VIEWPORT_STATE,
     CRU_CLEANUP_CMD_VK_EVENT,
     CRU_CLEANUP_CMD_VK_FENCE,
     CRU_CLEANUP_CMD_VK_FRAMEBUFFER,
@@ -106,10 +102,6 @@ static inline void cru_cleanup_push_vk_command_buffer(cru_cleanup_stack_t *c, Vk
 static inline void cru_cleanup_push_vk_descriptor_pool(cru_cleanup_stack_t *c, VkDevice dev, VkDescriptorPool x)                            { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DESCRIPTOR_POOL,               dev, x); }
 static inline void cru_cleanup_push_vk_descriptor_set(cru_cleanup_stack_t *c, VkDevice dev, VkDescriptorPool pool, VkDescriptorSet set)     { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET,                dev, pool, set); }
 static inline void cru_cleanup_push_vk_descriptor_set_layout(cru_cleanup_stack_t *c, VkDevice dev, VkDescriptorSetLayout x)                 { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET_LAYOUT,         dev, x); }
-static inline void cru_cleanup_push_vk_dynamic_color_blend_state(cru_cleanup_stack_t *c, VkDevice dev, VkDynamicColorBlendState x)          { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DYNAMIC_COLOR_BLEND_STATE,     dev, x); }
-static inline void cru_cleanup_push_vk_dynamic_depth_stencil_state(cru_cleanup_stack_t *c, VkDevice dev, VkDynamicDepthStencilState x)      { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DYNAMIC_DEPTH_STENCIL_STATE,   dev, x); }
-static inline void cru_cleanup_push_vk_dynamic_raster_state(cru_cleanup_stack_t *c, VkDevice dev, VkDynamicRasterState x)                   { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DYNAMIC_RASTER_STATE,          dev, x); }
-static inline void cru_cleanup_push_vk_dynamic_viewport_state(cru_cleanup_stack_t *c, VkDevice dev, VkDynamicViewportState x)               { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DYNAMIC_VIEWPORT_STATE,        dev, x); }
 static inline void cru_cleanup_push_vk_event(cru_cleanup_stack_t *c, VkDevice dev, VkEvent x)                                               { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_EVENT,                         dev, x); }
 static inline void cru_cleanup_push_vk_fence(cru_cleanup_stack_t *c, VkDevice dev, VkFence x)                                               { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_FENCE,                         dev, x); }
 static inline void cru_cleanup_push_vk_framebuffer(cru_cleanup_stack_t *c, VkDevice dev, VkFramebuffer x)                                   { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_FRAMEBUFFER,                   dev, x); }

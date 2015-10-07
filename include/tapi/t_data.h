@@ -62,10 +62,6 @@ typedef struct cru_image cru_image_t;
 #define t_queue (*__t_queue())
 #define t_cmd_pool (*__t_cmd_pool())
 #define t_cmd_buffer (*__t_cmd_buffer())
-#define t_dynamic_vp_state (*__t_dynamic_vp_state())
-#define t_dynamic_rs_state (*__t_dynamic_rs_state())
-#define t_dynamic_cb_state (*__t_dynamic_cb_state())
-#define t_dynamic_ds_state (*__t_dynamic_ds_state())
 #define t_color_image (*__t_color_image())
 #define t_color_attachment_view (*__t_color_attachment_view())
 #define t_color_image_view (*__t_color_image_view())
@@ -90,10 +86,6 @@ const uint32_t __t_mem_type_index_for_device_access(void);
 const VkQueue *__t_queue(void);
 const VkCmdPool *__t_cmd_pool(void);
 const VkCmdBuffer *__t_cmd_buffer(void);
-const VkDynamicViewportState *__t_dynamic_vp_state(void);
-const VkDynamicRasterState *__t_dynamic_rs_state(void);
-const VkDynamicColorBlendState *__t_dynamic_cb_state(void);
-const VkDynamicDepthStencilState *__t_dynamic_ds_state(void);
 const VkImage *__t_color_image(void);
 const VkImageView *__t_color_image_view(void);
 const VkImage *__t_depthstencil_image(void);

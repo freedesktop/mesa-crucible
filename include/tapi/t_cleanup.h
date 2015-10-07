@@ -69,10 +69,6 @@ static inline void t_cleanup_push_vk_descriptor_set(VkDevice dev, VkDescriptorPo
 static inline void t_cleanup_push_vk_descriptor_set_layout(VkDevice dev, VkDescriptorSetLayout x)                   { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET_LAYOUT, dev, x); }
 static inline void t_cleanup_push_vk_device_memory(VkDevice dev, VkDeviceMemory x)                                  { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_DEVICE_MEMORY, dev, x); }
 static inline void t_cleanup_push_vk_device_memory_map(VkDevice dev, VkDeviceMemory x)                              { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_DEVICE_MEMORY_MAP, dev, x); }
-static inline void t_cleanup_push_vk_dynamic_color_blend_state(VkDevice dev, VkDynamicColorBlendState x)            { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_DYNAMIC_COLOR_BLEND_STATE, dev, x); }
-static inline void t_cleanup_push_vk_dynamic_depth_stencil_state(VkDevice dev, VkDynamicDepthStencilState x)        { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_DYNAMIC_DEPTH_STENCIL_STATE, dev, x); }
-static inline void t_cleanup_push_vk_dynamic_raster_state(VkDevice dev, VkDynamicRasterState x)                     { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_DYNAMIC_RASTER_STATE, dev, x); }
-static inline void t_cleanup_push_vk_dynamic_viewport_state(VkDevice dev, VkDynamicViewportState x)                 { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_DYNAMIC_VIEWPORT_STATE, dev, x); }
 static inline void t_cleanup_push_vk_event(VkDevice dev, VkEvent x)                                                 { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_EVENT, dev, x); }
 static inline void t_cleanup_push_vk_fence(VkDevice dev, VkFence x)                                                 { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_FENCE, dev, x); }
 static inline void t_cleanup_push_vk_framebuffer(VkDevice dev, VkFramebuffer x)                                     { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_FRAMEBUFFER, dev, x); }
