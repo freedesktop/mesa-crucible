@@ -184,7 +184,8 @@ t_setup_framebuffer(void)
         return;
 
     t_setup_attachment(t->vk.device, VK_FORMAT_R8G8B8A8_UNORM,
-                       VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+                       VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
+                       | VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT,
                        t->ref.width, t->ref.height,
                        &t->vk.color_image,
                        &t->vk.color_attachment_view);
@@ -196,7 +197,8 @@ t_setup_framebuffer(void)
 
     if (t->def->depthstencil_format != VK_FORMAT_UNDEFINED) {
         t_setup_attachment(t->vk.device, t->def->depthstencil_format,
-                           VK_IMAGE_USAGE_DEPTH_STENCIL_BIT,
+                           VK_IMAGE_USAGE_DEPTH_STENCIL_BIT
+                           | VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT,
                            t->ref.width, t->ref.height,
                            &t->vk.ds_image,
                            &t->vk.ds_attachment_view);
