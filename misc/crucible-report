@@ -5,7 +5,7 @@ NAME
   crucible-report - a script for generating reports from crucible runs
 
 SYNOPSIS
-  crucible-report log1 log2"""
+  crucible-report log1 [log2]"""
 
 import re
 import sys
@@ -61,35 +61,56 @@ def colored_status(status):
     color = status_color[status]
     return '\x1b[' + str(90 + color) + 'm' + status + '\x1b[0m'
 
-if len(sys.argv) < 3:
+if len(sys.argv) < 2 or len(sys.argv) > 3:
     print(usage)
     sys.exit(3)
 
 run1 = parse_results(sys.argv[1])
-run2 = parse_results(sys.argv[2])
 
-num_tests = len(run1.keys())
-fixed = 0
-regressions = 0
+if len(sys.argv) == 2:
+    counts = {
+        'pass' : 0,
+        'fail' : 0,
+        'skip' : 0,
+        'lost' : 0,
+    }
 
-for name in set(run1.keys()) | set(run2.keys()):
-    # If a test wasn't run, consider it skipped.
-    status1 = run1.get(name, 'skip')
-    status2 = run2.get(name, 'skip')
+    for name, status in run1.items():
+        counts[status] += 1
+        print(' {0:>5s} : {1}'.format(colored_status(status), name))
 
-    if status1 == status2:
-        continue
+    print('================================')
+    print('  pass:  {0}'.format(counts['pass']))
+    print('  skip:  {0}'.format(counts['skip']))
+    print('  fail:  {0}'.format(counts['fail']))
+    print('  lost:  {0}'.format(counts['lost']))
+    print('  total: {0}'.format(len(run1)))
 
-    if status_score[status1] < status_score[status2]:
-        fixed += 1
-    else:
-        regressions += 1
+else:
+    run2 = parse_results(sys.argv[2])
 
-    print(' {0:>5s} -> {1:<5s} : {2}'.format(colored_status(status1),
-                                             colored_status(status2), name))
+    num_tests = len(run1.keys())
+    fixed = 0
+    regressions = 0
 
-print('================================')
-print('  fixed:      {0}'.format(fixed))
-print('  regressed:  {0}'.format(regressions))
-print('  unchanged:  {0}'.format(num_tests - fixed - regressions))
-print('  total:      {0}'.format(num_tests))
+    for name in set(run1.keys()) | set(run2.keys()):
+        # If a test wasn't run, consider it skipped.
+        status1 = run1.get(name, 'skip')
+        status2 = run2.get(name, 'skip')
+
+        if status1 == status2:
+            continue
+
+        if status_score[status1] < status_score[status2]:
+            fixed += 1
+        else:
+            regressions += 1
+
+        print(' {0:>5s} -> {1:<5s} : {2}'.format(colored_status(status1),
+                                                 colored_status(status2), name))
+
+    print('================================')
+    print('  fixed:      {0}'.format(fixed))
+    print('  regressed:  {0}'.format(regressions))
+    print('  unchanged:  {0}'.format(num_tests - fixed - regressions))
+    print('  total:      {0}'.format(num_tests))
