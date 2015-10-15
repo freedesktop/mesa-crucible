@@ -232,7 +232,7 @@ t_setup_vulkan(void)
             .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
             .pAppInfo = &(VkApplicationInfo) {
                 .pAppName = "crucible",
-                .apiVersion = 1,
+                .apiVersion = VK_API_VERSION,
             },
             .pAllocCb = &(VkAllocCallbacks) {
                 .pfnAlloc = test_vk_alloc,
