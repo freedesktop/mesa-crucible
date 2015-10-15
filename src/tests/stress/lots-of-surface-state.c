@@ -291,22 +291,11 @@ test_lots_of_surface_state_vs(bool use_dynamic_offsets)
     VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
         layout(location = 0) out vec4 v_color;
-        layout(set = 0, binding =  0) uniform block0  { float f; } u0;
-        layout(set = 0, binding =  1) uniform block1  { float f; } u1;
-        layout(set = 0, binding =  2) uniform block2  { float f; } u2;
-        layout(set = 0, binding =  3) uniform block3  { float f; } u3;
-        layout(set = 0, binding =  4) uniform block4  { float f; } u4;
-        layout(set = 0, binding =  5) uniform block5  { float f; } u5;
-        layout(set = 0, binding =  6) uniform block6  { float f; } u6;
-        layout(set = 0, binding =  7) uniform block7  { float f; } u7;
-        layout(set = 0, binding =  8) uniform block8  { float f; } u8;
-        layout(set = 0, binding =  9) uniform block9  { float f; } u9;
-        layout(set = 0, binding = 10) uniform block10 { float f; } u10;
-        layout(set = 0, binding = 11) uniform block11 { float f; } u11;
+        layout(set = 0, binding =  0) uniform block { float f; } u[12];
         void main()
         {
-            float zero = u0.f + u1.f + u2.f + u3.f + u4.f + u5.f;
-            float one = u6.f + u7.f + u8.f + u9.f + u10.f + u11.f;
+            float zero = u[0].f + u[1].f + u[2].f + u[3].f + u[4].f + u[5].f;
+            float one = u[6].f + u[7].f + u[8].f + u[9].f + u[10].f + u[11].f;
 
             v_color = vec4(zero, one, zero, one);
             gl_Position = a_position;
@@ -364,22 +353,11 @@ test_lots_of_surface_state_fs(bool use_dynamic_offsets)
     // The fragment shader takes 12 UBOs.
     VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
         layout(location = 0) out vec4 f_color;
-        layout(set = 0, binding =  0) uniform block0  { float f; } u0;
-        layout(set = 0, binding =  1) uniform block1  { float f; } u1;
-        layout(set = 0, binding =  2) uniform block2  { float f; } u2;
-        layout(set = 0, binding =  3) uniform block3  { float f; } u3;
-        layout(set = 0, binding =  4) uniform block4  { float f; } u4;
-        layout(set = 0, binding =  5) uniform block5  { float f; } u5;
-        layout(set = 0, binding =  6) uniform block6  { float f; } u6;
-        layout(set = 0, binding =  7) uniform block7  { float f; } u7;
-        layout(set = 0, binding =  8) uniform block8  { float f; } u8;
-        layout(set = 0, binding =  9) uniform block9  { float f; } u9;
-        layout(set = 0, binding = 10) uniform block10 { float f; } u10;
-        layout(set = 0, binding = 11) uniform block11 { float f; } u11;
+        layout(set = 0, binding =  0) uniform block { float f; } u[12];
         void main()
         {
-            float zero = u0.f + u1.f + u2.f + u3.f + u4.f + u5.f;
-            float one = u6.f + u7.f + u8.f + u9.f + u10.f + u11.f;
+            float zero = u[0].f + u[1].f + u[2].f + u[3].f + u[4].f + u[5].f;
+            float one = u[6].f + u[7].f + u[8].f + u[9].f + u[10].f + u[11].f;
 
             f_color = vec4(zero, one, zero, one);
         }

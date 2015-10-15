@@ -32,25 +32,22 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
         layout(location = 1) in vec4 a_color;
         layout(set = 0, binding = 0) uniform block1 {
             vec4 color;
-        } u1;
-        layout(set = 0, binding = 1) uniform block2 {
-            vec4 color;
-        } u2;
+        } u1[2];
         layout(set = 1, binding = 0) uniform block3 {
             vec4 color;
-        } u3;
+        } u2;
         layout(location = 0) out vec4 v_color;
         void main()
         {
             gl_Position = a_position;
-            v_color = a_color + u1.color + u2.color + u3.color;
+            v_color = a_color + u1[0].color + u1[1].color + u2.color;
         }
     );
 
     VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
         layout(location = 0) out vec4 f_color;
         layout(location = 0) in vec4 v_color;
-        layout(set = 0, binding = 0) uniform sampler2D tex;
+        layout(set = 0, binding = 1) uniform sampler2D tex;
         void main()
         {
             f_color = v_color + texture(tex, vec2(0.1, 0.1));
