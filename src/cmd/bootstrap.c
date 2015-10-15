@@ -135,6 +135,7 @@ start(const cru_command_t *cmd, int argc, char **argv)
     test = test_create(.def = def,
                        .enable_bootstrap = true,
                        .enable_cleanup_phase = false,
+                       .enable_spir_v = true,
                        .bootstrap_image_width = opt_image_width,
                        .bootstrap_image_height = opt_image_height);
     if (!test) {
