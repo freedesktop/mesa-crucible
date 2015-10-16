@@ -25,6 +25,7 @@
 #include "qonos/qonos.h"
 #include "qonos_pipeline-spirv.h"
 #include "tapi/t_cleanup.h"
+#include "tapi/t_data.h"
 #include "tapi/t_result.h"
 
 VkPipeline
@@ -34,10 +35,16 @@ qoCreateGraphicsPipeline(VkDevice device,
 {
     VkGraphicsPipelineCreateInfo pipeline_info;
     VkPipelineInputAssemblyStateCreateInfo ia_info;
+    VkViewport viewport;
+    VkRect2D scissor;
+    VkPipelineViewportStateCreateInfo vp_info;
     VkPipelineRasterStateCreateInfo rs_info;
     VkPipelineMultisampleStateCreateInfo ms_info;
+    VkPipelineDepthStencilStateCreateInfo ds_info;
     VkPipelineColorBlendStateCreateInfo cb_info;
     VkPipelineShaderStageCreateInfo stage_info[VK_SHADER_STAGE_NUM];
+    VkDynamicState dynamic_states[VK_DYNAMIC_STATE_NUM];
+    VkPipelineDynamicStateCreateInfo dy_info;
     VkPipeline pipeline;
     VkResult result;
 
@@ -59,6 +66,33 @@ qoCreateGraphicsPipeline(VkDevice device,
         pipeline_info.pInputAssemblyState = &ia_info;
     }
 
+    if (pipeline_info.pViewportState == NULL) {
+        vp_info = (VkPipelineViewportStateCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+            .viewportCount = 1,
+            .scissorCount = 1,
+        };
+
+        if (!(extra->dynamicStates & (1u << VK_DYNAMIC_STATE_VIEWPORT))) {
+            viewport = (VkViewport) {
+                0.0, 0.0,
+                t_width, t_height,
+                0.0, 1.0
+            };
+            vp_info.pViewports = &viewport;
+        }
+
+        if (!(extra->dynamicStates & (1u << VK_DYNAMIC_STATE_SCISSOR))) {
+            scissor = (VkRect2D) {
+                { 0, 0 },
+                {t_width, t_height }
+            };
+            vp_info.pScissors = &scissor;
+        }
+
+        pipeline_info.pViewportState = &vp_info;
+    }
+
     if (pipeline_info.pRasterState == NULL) {
         rs_info = (VkPipelineRasterStateCreateInfo) {
             QO_PIPELINE_RASTER_STATE_CREATE_INFO_DEFAULTS,
@@ -73,11 +107,33 @@ qoCreateGraphicsPipeline(VkDevice device,
         pipeline_info.pMultisampleState = &ms_info;
     }
 
+    if (pipeline_info.pDepthStencilState == NULL) {
+        ds_info = (VkPipelineDepthStencilStateCreateInfo) {
+            QO_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS,
+        };
+        pipeline_info.pDepthStencilState = &ds_info;
+    }
+
     if (pipeline_info.pColorBlendState == NULL) {
         cb_info = (VkPipelineColorBlendStateCreateInfo) {
             QO_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO_DEFAULTS,
         };
         pipeline_info.pColorBlendState = &cb_info;
+    }
+
+    if (pipeline_info.pDynamicState == NULL) {
+        int count = 0;
+        for (int s = 0; s < VK_DYNAMIC_STATE_NUM; s++) {
+            if (extra->dynamicStates & (1u << s))
+                dynamic_states[count++] = s;
+        }
+
+        dy_info = (VkPipelineDynamicStateCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+            .dynamicStateCount = count,
+            .pDynamicStates = dynamic_states,
+        };
+        pipeline_info.pDynamicState = &dy_info;
     }
 
     // Look for vertex or fragment shaders in the chain

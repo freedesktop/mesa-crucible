@@ -1111,6 +1111,8 @@ init_draw_data(test_draw_data_t *draw_data)
             .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN,
             .vertexShader = vs,
             .fragmentShader = fs,
+            .dynamicStates = (1 << VK_DYNAMIC_STATE_VIEWPORT) |
+                             (1 << VK_DYNAMIC_STATE_SCISSOR),
             .pNext =
         &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
