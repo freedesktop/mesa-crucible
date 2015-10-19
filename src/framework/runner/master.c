@@ -133,7 +133,6 @@ static slave_t * master_find_unborn_slave(void);
 static void master_cleanup_dead_slave(slave_t *slave);
 
 static void master_collect_result(int timeout_ms);
-static void master_collect_results(void);
 
 static void master_report_result(const test_def_t *def, test_result_t result);
 static bool master_send_packet(slave_t *slave, const dispatch_packet_t *pk);
@@ -311,7 +310,7 @@ master_dispatch_loop_with_fork(void)
         if (master.goto_next_phase)
             return;
 
-        master_collect_results();
+        master_collect_result(0);
         if (master.goto_next_phase)
             return;
     }
@@ -329,7 +328,7 @@ master_dispatch_test(const test_def_t *def)
         return;
 
     while (master.cur_dispatched_tests == master.max_dispatched_tests) {
-        master_collect_results();
+        master_collect_result(0);
         if (master.goto_next_phase)
             return;
     }
@@ -547,23 +546,6 @@ master_collect_result(int timeout_ms)
         return;
 
     master_handle_epoll_event(&event);
-}
-
-static void
-master_collect_results(void)
-{
-    struct epoll_event event;
-
-    for (;;) {
-        master_yield_to_sigint();
-        if (master.goto_next_phase)
-            return;
-
-        if (epoll_wait(master.epoll_fd, &event, 1, /*timeout*/ 0) <= 0)
-            return;
-
-        master_handle_epoll_event(&event);
-    }
 }
 
 static void
