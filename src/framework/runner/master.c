@@ -492,8 +492,14 @@ master_cleanup_dead_slave(slave_t *slave)
     slave_pipe_drain_to_fd(&slave->stdout_pipe, STDOUT_FILENO);
     slave_pipe_drain_to_fd(&slave->stderr_pipe, STDERR_FILENO);
 
-    // Any remaining tests owned by this slave are lost. They no longer count
-    // towards any dispatch limits.
+    // Any remaining tests owned by the slave are lost.
+    for (uint32_t i = 0; i < slave->tests.len; ++i) {
+        const test_def_t *def = slave->tests.data[i];
+        log_tag("lost", "%s", def->name);
+        fflush(stdout);
+    }
+
+    assert(master.cur_dispatched_tests >= slave->tests.len);
     master.cur_dispatched_tests -= slave->tests.len;
     slave->tests.len = 0;
 
