@@ -44,6 +44,28 @@ clear_stencil_with_quad(void)
 {
     const test_params_t *params = t_user_data;
 
+    VkRenderPass pass = qoCreateRenderPass(t_device,
+        .attachmentCount = 1,
+        .pAttachments = (VkAttachmentDescription[]) {
+            {
+                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
+                .format = VK_FORMAT_S8_UINT,
+                .loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+                .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+            },
+        },
+        .subpassCount = 1,
+        .pSubpasses = (VkSubpassDescription[]) {
+            {
+                QO_SUBPASS_DESCRIPTION_DEFAULTS,
+                .colorCount = 0,
+                .depthStencilAttachment = {
+                    .attachment = 1,
+                    .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                },
+            },
+        });
+
     VkPipeline pipeline = qoCreateGraphicsPipeline(t_device,
         t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
@@ -95,30 +117,10 @@ clear_stencil_with_quad(void)
                 },
             },
             .layout = QO_NULL_PIPELINE_LAYOUT,
+            .renderPass = pass,
+            .subpass = 0,
         }}
     );
-
-    VkRenderPass pass = qoCreateRenderPass(t_device,
-        .attachmentCount = 1,
-        .pAttachments = (VkAttachmentDescription[]) {
-            {
-                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
-                .format = VK_FORMAT_S8_UINT,
-                .loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-                .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-            },
-        },
-        .subpassCount = 1,
-        .pSubpasses = (VkSubpassDescription[]) {
-            {
-                QO_SUBPASS_DESCRIPTION_DEFAULTS,
-                .colorCount = 0,
-                .depthStencilAttachment = {
-                    .attachment = 1,
-                    .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-                },
-            },
-        });
 
     vkCmdBeginRenderPass(t_cmd_buffer,
         &(VkRenderPassBeginInfo) {
@@ -153,6 +155,40 @@ static void
 draw_triangle(void)
 {
     const test_params_t *params = t_user_data;
+
+    VkRenderPass pass = qoCreateRenderPass(t_device,
+        .attachmentCount = 2,
+        .pAttachments = (VkAttachmentDescription[]) {
+            {
+                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
+                .format = VK_FORMAT_R8G8B8A8_UNORM,
+                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+                .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+            },
+            {
+                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
+                .format = VK_FORMAT_S8_UINT,
+                .loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+                .storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+            },
+        },
+        .subpassCount = 1,
+        .pSubpasses = (VkSubpassDescription[]) {
+            {
+                QO_SUBPASS_DESCRIPTION_DEFAULTS,
+                .colorCount = 1,
+                .pColorAttachments = (VkAttachmentReference[]) {
+                    {
+                        .attachment = 0,
+                        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                    },
+                },
+                .depthStencilAttachment = {
+                    .attachment = 1,
+                    .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                },
+            },
+        });
 
     VkPipeline pipeline = qoCreateGraphicsPipeline(t_device,
         t_pipeline_cache,
@@ -230,42 +266,10 @@ draw_triangle(void)
                 },
             },
             .layout = QO_NULL_PIPELINE_LAYOUT,
+            .renderPass = pass,
+            .subpass = 0,
         }}
     );
-
-    VkRenderPass pass = qoCreateRenderPass(t_device,
-        .attachmentCount = 2,
-        .pAttachments = (VkAttachmentDescription[]) {
-            {
-                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
-                .format = VK_FORMAT_R8G8B8A8_UNORM,
-                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-                .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-            },
-            {
-                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
-                .format = VK_FORMAT_S8_UINT,
-                .loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-                .storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-            },
-        },
-        .subpassCount = 1,
-        .pSubpasses = (VkSubpassDescription[]) {
-            {
-                QO_SUBPASS_DESCRIPTION_DEFAULTS,
-                .colorCount = 1,
-                .pColorAttachments = (VkAttachmentReference[]) {
-                    {
-                        .attachment = 0,
-                        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                    },
-                },
-                .depthStencilAttachment = {
-                    .attachment = 1,
-                    .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-                },
-            },
-        });
 
     vkCmdBeginRenderPass(t_cmd_buffer,
         &(VkRenderPassBeginInfo) {

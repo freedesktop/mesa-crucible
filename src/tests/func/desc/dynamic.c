@@ -23,9 +23,9 @@
 
 #include "dynamic-spirv.h"
 
-static void
-create_pipeline(VkDevice device, VkPipeline *pipeline,
-                VkPipelineLayout pipeline_layout)
+static VkPipeline
+create_pipeline(VkDevice device, VkPipelineLayout pipeline_layout,
+                VkRenderPass pass)
 {
     VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
@@ -71,7 +71,7 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
         },
     };
 
-    *pipeline = qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
+    return qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
             QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS,
             .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
@@ -82,7 +82,9 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .pVertexInputState = &vi_create_info,
             .flags = 0,
-            .layout = pipeline_layout
+            .layout = pipeline_layout,
+            .renderPass = pass,
+            .subpass = 0,
         }});
 }
 
@@ -96,6 +98,29 @@ create_pipeline(VkDevice device, VkPipeline *pipeline,
 static void
 test(void)
 {
+    VkRenderPass pass = qoCreateRenderPass(t_device,
+        .attachmentCount = 1,
+        .pAttachments = (VkAttachmentDescription[]) {
+            {
+                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
+                .format = VK_FORMAT_R8G8B8A8_UNORM,
+                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+            },
+        },
+        .subpassCount = 1,
+        .pSubpasses = (VkSubpassDescription[]) {
+            {
+                QO_SUBPASS_DESCRIPTION_DEFAULTS,
+                .colorCount = 1,
+                .pColorAttachments = (VkAttachmentReference[]) {
+                    {
+                        .attachment = 0,
+                        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                    },
+                },
+            }
+        });
+
     VkDescriptorSetLayout set_layout[1];
 
     set_layout[0] = qoCreateDescriptorSetLayout(t_device,
@@ -113,8 +138,7 @@ test(void)
         .descriptorSetCount = 1,
         .pSetLayouts = set_layout);
 
-    VkPipeline pipeline;
-    create_pipeline(t_device, &pipeline, pipeline_layout);
+    VkPipeline pipeline = create_pipeline(t_device, pipeline_layout, pass);
 
     VkDescriptorSet set[1];
     qoAllocDescriptorSets(t_device, QO_NULL_DESCRIPTOR_POOL,
@@ -172,29 +196,6 @@ test(void)
                 },
             },
         }, 0, NULL);
-
-    VkRenderPass pass = qoCreateRenderPass(t_device,
-        .attachmentCount = 1,
-        .pAttachments = (VkAttachmentDescription[]) {
-            {
-                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
-                .format = VK_FORMAT_R8G8B8A8_UNORM,
-                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-            },
-        },
-        .subpassCount = 1,
-        .pSubpasses = (VkSubpassDescription[]) {
-            {
-                QO_SUBPASS_DESCRIPTION_DEFAULTS,
-                .colorCount = 1,
-                .pColorAttachments = (VkAttachmentReference[]) {
-                    {
-                        .attachment = 0,
-                        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                    },
-                },
-            }
-        });
 
     vkCmdBeginRenderPass(t_cmd_buffer,
         &(VkRenderPassBeginInfo) {

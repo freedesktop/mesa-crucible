@@ -55,7 +55,7 @@ make_vbo(void)
 }
 
 static VkPipeline
-create_pipeline()
+create_pipeline(VkRenderPass pass)
 {
     return qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
@@ -64,8 +64,9 @@ create_pipeline()
             .pNext =
         &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+            .renderPass = pass,
+            .subpass = 0,
         }});
-
 }
 
 static VkRenderPass
@@ -130,8 +131,8 @@ static void
 test_small_secondaries(void)
 {
     VkBuffer vbo = make_vbo();
-    VkPipeline pipeline = create_pipeline();
     VkRenderPass pass = create_and_begin_render_pass();
+    VkPipeline pipeline = create_pipeline(pass);
 
     VkCmdBuffer secondaries[1024];
 
@@ -164,8 +165,8 @@ static void
 do_test_large_secondary(VkCmdBufferOptimizeFlags opt_flags)
 {
     VkBuffer vbo = make_vbo();
-    VkPipeline pipeline = create_pipeline();
     VkRenderPass pass = create_and_begin_render_pass();
+    VkPipeline pipeline = create_pipeline(pass);
 
     VkCmdBuffer secondary =
         make_secondary_cmd_buffer(pass, pipeline, opt_flags);

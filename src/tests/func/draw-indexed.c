@@ -105,6 +105,8 @@ test(void)
                 .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
                 .primitiveRestartEnable = false,
             },
+            .renderPass = pass,
+            .subpass = 0,
         }});
 
     restart_pipeline = qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
@@ -119,6 +121,8 @@ test(void)
                 .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
                 .primitiveRestartEnable = true,
             },
+            .renderPass = pass,
+            .subpass = 0,
         }});
 
     static const struct {

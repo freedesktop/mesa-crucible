@@ -36,6 +36,29 @@ static void
 test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
                            bool use_dynamic_offsets)
 {
+    VkRenderPass pass = qoCreateRenderPass(t_device,
+        .attachmentCount = 1,
+        .pAttachments = (VkAttachmentDescription[]) {
+            {
+                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
+                .format = VK_FORMAT_R8G8B8A8_UNORM,
+                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+            },
+        },
+        .subpassCount = 1,
+        .pSubpasses = (VkSubpassDescription[]) {
+            {
+                QO_SUBPASS_DESCRIPTION_DEFAULTS,
+                .colorCount = 1,
+                .pColorAttachments = (VkAttachmentReference[]) {
+                    {
+                        .attachment = 0,
+                        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                    },
+                },
+            }
+        });
+
     //  Create the descriptor set layout.
     VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
             .count = 1,
@@ -86,7 +109,9 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .pVertexInputState = &vi_create_info,
             .flags = 0,
-            .layout = pipeline_layout
+            .layout = pipeline_layout,
+            .renderPass = pass,
+            .subpass = 0,
         }});
 
     size_t ubo_size = 1024 * 3 * sizeof(float);
@@ -133,29 +158,6 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
     for (int i = 0; i < 1024; i++) {
         ubo_map[i] = ((float)rand() / RAND_MAX) * 3 - 1;
     }
-
-    VkRenderPass pass = qoCreateRenderPass(t_device,
-        .attachmentCount = 1,
-        .pAttachments = (VkAttachmentDescription[]) {
-            {
-                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
-                .format = VK_FORMAT_R8G8B8A8_UNORM,
-                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-            },
-        },
-        .subpassCount = 1,
-        .pSubpasses = (VkSubpassDescription[]) {
-            {
-                QO_SUBPASS_DESCRIPTION_DEFAULTS,
-                .colorCount = 1,
-                .pColorAttachments = (VkAttachmentReference[]) {
-                    {
-                        .attachment = 0,
-                        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                    },
-                },
-            }
-        });
 
     vkCmdBeginRenderPass(t_cmd_buffer,
         &(VkRenderPassBeginInfo) {

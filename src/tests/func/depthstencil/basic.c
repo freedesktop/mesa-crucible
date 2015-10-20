@@ -121,6 +121,8 @@ test(void)
             },
             .flags = 0,
             .layout = QO_NULL_PIPELINE_LAYOUT,
+            .renderPass = pass,
+            .subpass = 0,
         }});
 
     static const float vertex_data[] = {
