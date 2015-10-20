@@ -1083,6 +1083,10 @@ init_draw_data(test_draw_data_t *draw_data)
         layout(set = 0, binding = 0) uniform sampler2D u_tex;
         layout(location = 0) out vec4 f_color;
 
+        // glslang doesn't get the Vulkan default right so we have to
+        // manually re-declare gl_FragCoord
+        layout(origin_upper_left) in vec4 gl_FragCoord;
+
         void main()
         {
             f_color = texelFetch(u_tex, ivec2(gl_FragCoord), 0);
