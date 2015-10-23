@@ -189,7 +189,7 @@ qoCreateGraphicsPipeline(VkDevice device,
         pipeline_info.pVertexInputState = &vi_info;
     }
 
-    if (!has_vs || !has_fs) {
+    if (!has_vs || !has_fs || extra->geometryShader.handle) {
         /* Make a copy of the shader stages so that we can modify it */
         assert(pipeline_info.stageCount < VK_SHADER_STAGE_NUM);
         memcpy(stage_info, pipeline_info.pStages,
@@ -218,6 +218,18 @@ qoCreateGraphicsPipeline(VkDevice device,
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
                 .stage = VK_SHADER_STAGE_VERTEX,
                 .shader = vs,
+                .pSpecializationInfo = NULL,
+            };
+    }
+
+    if (extra->geometryShader.handle) {
+        // We're assuming here that they didn't try to set the geometry
+        // shader both ways (through extra and normally).
+        stage_info[pipeline_info.stageCount++] =
+            (VkPipelineShaderStageCreateInfo) {
+                .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+                .stage = VK_SHADER_STAGE_GEOMETRY,
+                .shader = extra->geometryShader,
                 .pSpecializationInfo = NULL,
             };
     }

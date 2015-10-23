@@ -128,6 +128,7 @@ typedef struct QoExtraGraphicsPipelineCreateInfo_ {
     VkGraphicsPipelineCreateInfo *pNext;
     VkPrimitiveTopology topology;
     VkShader vertexShader;
+    VkShader geometryShader;
     VkShader fragmentShader;
     uint32_t dynamicStates; // Bitfield
 } QoExtraGraphicsPipelineCreateInfo;
