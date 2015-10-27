@@ -505,6 +505,7 @@ VkShader qoCreateShader(VkDevice dev, ...);
 #endif
 
 void qoEnumeratePhysicalDevices(VkInstance instance, uint32_t *count, VkPhysicalDevice *physical_devices);
+void qoGetPhysicalDeviceProperties(VkPhysicalDevice physical_dev, VkPhysicalDeviceProperties *properties);
 void qoGetPhysicalDeviceMemoryProperties(VkPhysicalDevice physical_dev, VkPhysicalDeviceMemoryProperties *mem_props);
 VkResult qoQueueSubmit(VkQueue queue, uint32_t cmdBufferCount, const VkCmdBuffer *cmdBuffers, VkFence fence);
 VkDeviceMemory __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info);

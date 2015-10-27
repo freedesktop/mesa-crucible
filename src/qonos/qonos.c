@@ -35,6 +35,16 @@ qoEnumeratePhysicalDevices(VkInstance instance, uint32_t *count,
 }
 
 void
+qoGetPhysicalDeviceProperties(VkPhysicalDevice physical_dev,
+                              VkPhysicalDeviceProperties *properties)
+{
+    VkResult result;
+
+    result = vkGetPhysicalDeviceProperties(physical_dev, properties);
+    t_assert(result == VK_SUCCESS);
+}
+
+void
 qoGetPhysicalDeviceMemoryProperties(
         VkPhysicalDevice physical_dev,
         VkPhysicalDeviceMemoryProperties *mem_props)
