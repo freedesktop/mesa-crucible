@@ -140,6 +140,7 @@ struct test {
     struct {
         VkInstance instance;
         VkPhysicalDevice physical_dev;
+        VkPhysicalDeviceProperties physical_dev_props;
         VkPhysicalDeviceMemoryProperties physical_dev_mem_props;
         VkDevice device;
         VkQueue queue;

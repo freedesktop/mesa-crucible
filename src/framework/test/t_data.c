@@ -48,6 +48,15 @@ __t_physical_dev(void)
     return &t->vk.physical_dev;
 }
 
+const VkPhysicalDeviceProperties *
+__t_physical_dev_props(void)
+{
+    ASSERT_TEST_IN_MAJOR_PHASE;
+    GET_CURRENT_TEST(t);
+
+    return &t->vk.physical_dev_props;
+}
+
 const VkPhysicalDeviceMemoryProperties *
 __t_physical_dev_mem_props(void)
 {

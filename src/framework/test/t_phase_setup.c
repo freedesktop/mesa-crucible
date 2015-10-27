@@ -91,6 +91,8 @@ t_setup_phys_dev(void)
     count = 1;
     qoEnumeratePhysicalDevices(t->vk.instance, &count, &t->vk.physical_dev);
     t_assertf(count == 1, "enumerated %u physical devices, expected 1", count);
+
+    qoGetPhysicalDeviceProperties(t->vk.physical_dev, &t->vk.physical_dev_props);
 }
 
 static void
