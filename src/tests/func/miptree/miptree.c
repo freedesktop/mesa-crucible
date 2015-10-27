@@ -1003,21 +1003,15 @@ miptree_compare_images(const miptree_t *mt)
 {
     test_result_t result = TEST_RESULT_PASS;
     const mipslice_t *slice;
-
     string_t slice_desc = STRING_INIT;
-    string_t ref_filename = STRING_INIT;
-    string_t actual_filename = STRING_INIT;
 
     vkQueueWaitIdle(t_queue);
 
     cru_vec_foreach(slice, &mt->mipslices) {
         mipslice_get_description(slice, &slice_desc);
 
-        string_printf(&ref_filename, "%s.ref.png", string_data(&slice_desc));
-        string_printf(&actual_filename, "%s.actual.png", string_data(&slice_desc));
-
-        t_dump_image_f(slice->src_cru_image, string_data(&ref_filename));
-        t_dump_image_f(slice->dest_cru_image, string_data(&actual_filename));
+        t_dump_image_f(slice->src_cru_image, "%s.ref.png", string_data(&slice_desc));
+        t_dump_image_f(slice->dest_cru_image, "%s.actual.png", string_data(&slice_desc));
 
         if (!cru_image_compare(slice->src_cru_image, slice->dest_cru_image)) {
             loge("image incorrect at %s", string_data(&slice_desc));
