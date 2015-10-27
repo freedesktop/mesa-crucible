@@ -2,6 +2,7 @@
 /data/*.actual.png
 /data/*.actual-stencil.png
 /data/*.seq*.png
+/data/func.clear.load-clear.*.png
 /data/func.miptree.*.png
 /doc/*.1
 /doc/*.5
