@@ -66,13 +66,7 @@ test_timestamp(void)
     t_assert(poll(NULL, 0, 100) == 0);
     b = get_timestamp();
 
-    VkResult result;
-    VkPhysicalDeviceProperties props;
-
-    result = vkGetPhysicalDeviceProperties(t_physical_dev, &props);
-    t_assert(result == VK_SUCCESS);
-
-    freq = props.limits.timestampFrequency / 1000;
+    freq = t_physical_dev_props->limits.timestampFrequency / 1000;
     elapsed_ms = (b - a) / freq;
     printf("difference: %lu - %lu = %lu\n", b / freq, a / freq, elapsed_ms);
     if (elapsed_ms < 90 || elapsed_ms > 110)
