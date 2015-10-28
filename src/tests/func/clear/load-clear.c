@@ -36,6 +36,8 @@
 /// TODO: Test attachments of 1D, 3D, and cube map images.
 /// TODO: Test multisampled attachments.
 
+#include <math.h>
+
 #include "tapi/t.h"
 #include "util/cru_format.h"
 
@@ -133,11 +135,13 @@ test(void)
             },
         };
 
+        // Converting normalized float to normalized unorm8 requires rounding
+        // to the nearest int.
         const uint8_t clear_value_u8[] = {
-            255 * clear_values[i].color.float32[0],
-            255 * clear_values[i].color.float32[1],
-            255 * clear_values[i].color.float32[2],
-            255 * clear_values[i].color.float32[3],
+            roundf(255 * clear_values[i].color.float32[0]),
+            roundf(255 * clear_values[i].color.float32[1]),
+            roundf(255 * clear_values[i].color.float32[2]),
+            roundf(255 * clear_values[i].color.float32[3]),
         };
 
         size_t dest_buffer_size = format_info->cpp * width * height;
