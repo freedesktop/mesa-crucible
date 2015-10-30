@@ -26,9 +26,10 @@
 static void
 push_vs_offset(float x, float y)
 {
-    float vec2[2] = { x, y };
+    /* The offset is storred in two floats with one float of padding */
+    float offset[3] = { x, 0, y };
     vkCmdPushConstants(t_cmd_buffer, QO_NULL_PIPELINE_LAYOUT,
-                       VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(vec2), vec2);
+                       VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(offset), offset);
 }
 
 static void
@@ -89,19 +90,27 @@ test_push_constants(void)
 
     VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
-        uniform vec2 offset;
+        layout(push_constant, std140) uniform Push {
+            float offset_x;
+            float pad;
+            float offset_y;
+        } u_push;
         void main()
         {
-            gl_Position = a_position + vec4(offset.xy, 0.0, 0.0);
+            gl_Position = a_position;
+            gl_Position.x += u_push.offset_x;
+            gl_Position.y += u_push.offset_y;
         }
     );
 
     VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
-        uniform vec4 u_color;
+        layout(push_constant, std140) uniform Push {
+            vec4 color;
+        } u_push;
         layout(location = 0) out vec4 f_color;
         void main()
         {
-            f_color = u_color;
+            f_color = u_push.color;
         }
     );
 
