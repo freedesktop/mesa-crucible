@@ -23,23 +23,47 @@
 
 #include "dynamic-spirv.h"
 
+struct params {
+    VkDescriptorType descriptor_type;
+};
+
 static VkPipeline
-create_pipeline(VkDevice device, VkPipelineLayout pipeline_layout,
-                VkRenderPass pass)
+create_pipeline(VkDevice device,
+                VkPipelineLayout pipeline_layout, VkRenderPass pass)
 {
-    VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
-        layout(location = 0) in vec4 a_position;
-        layout(std140, set = 0, binding = 0) uniform block1 {
-            vec4 color;
-            vec4 offset;
-        } u1;
-        layout(location = 0) flat out vec4 v_color;
-        void main()
-        {
-            gl_Position = a_position + u1.offset;
-            v_color = u1.color;
-        }
-    );
+    const struct params *params = t_user_data;
+
+    VkShader vs;
+    if (params->descriptor_type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC) {
+        vs = qoCreateShaderGLSL(t_device, VERTEX,
+            layout(location = 0) in vec4 a_position;
+            layout(std140, set = 0, binding = 0) uniform block1 {
+                vec4 color;
+                vec4 offset;
+            } u1;
+            layout(location = 0) flat out vec4 v_color;
+            void main()
+            {
+                gl_Position = a_position + u1.offset;
+                v_color = u1.color;
+            });
+    } else {
+        vs = qoCreateShaderGLSL(t_device, VERTEX,
+            layout(location = 0) in vec4 a_position;
+            layout(std140, set = 0, binding = 0) uniform block2 {
+                uint i;
+            } u1;
+            layout(std140, set = 0, binding = 1) buffer block1 {
+                vec4 color;
+                vec4 offset;
+            } s1[2];
+            layout(location = 0) flat out vec4 v_color;
+            void main()
+            {
+                gl_Position = a_position + s1[u1.i].offset;
+                v_color = s1[u1.i].color;
+            });
+    }
 
     VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
         layout(location = 0) out vec4 f_color;
@@ -122,13 +146,20 @@ test(void)
         });
 
     VkDescriptorSetLayout set_layout[1];
+    const struct params *params = t_user_data;
 
     set_layout[0] = qoCreateDescriptorSetLayout(t_device,
-            .count = 1,
+            .count = 2,
             .pBinding = (VkDescriptorSetLayoutBinding[]) {
                 {
-                    .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
+                    .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                     .arraySize = 1,
+                    .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+                    .pImmutableSamplers = NULL,
+                },
+                {
+                    .descriptorType = params->descriptor_type,
+                    .arraySize = 2,
                     .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
                     .pImmutableSamplers = NULL,
                 },
@@ -190,7 +221,7 @@ test(void)
                 .destBinding = 0,
                 .destArrayElement = 0,
                 .count = 1,
-                .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
+                .descriptorType = params->descriptor_type,
                 .pDescriptors = (VkDescriptorInfo[]) {
                     { .bufferView = buffer_view },
                 },
@@ -240,6 +271,17 @@ test(void)
 }
 
 test_define {
-    .name = "func.desc.dynamic",
+    .name = "func.desc.dynamic.storage-buffer",
     .start = test,
+    .user_data = &(struct params) {
+        .descriptor_type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC
+    }
+};
+
+test_define {
+    .name = "func.desc.dynamic.uniform-buffer",
+    .start = test,
+    .user_data = &(struct params) {
+        .descriptor_type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC
+    }
 };
