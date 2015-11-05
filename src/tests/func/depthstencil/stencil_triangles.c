@@ -50,8 +50,8 @@ clear_stencil_with_quad(void)
             {
                 QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
                 .format = VK_FORMAT_S8_UINT,
-                .loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-                .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+                .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+                .stencilOp = VK_ATTACHMENT_STORE_OP_STORE,
             },
         },
         .subpassCount = 1,
@@ -168,8 +168,8 @@ draw_triangle(void)
             {
                 QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
                 .format = VK_FORMAT_S8_UINT,
-                .loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-                .storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+                .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
+                .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
             },
         },
         .subpassCount = 1,
