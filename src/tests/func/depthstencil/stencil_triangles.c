@@ -34,123 +34,6 @@ typedef struct test_params {
     VkStencilOp stencil_fail_op;
 } test_params_t;
 
-/// \brief Clear the stencil buffer by drawing a quad.
-///
-/// (2015-08-27) We clear the stencil buffer by drawing a quad instead of using
-/// vkCmdClearDepthStencil* or VK_ATTACHMENT_LOAD_OP_CLEAR because stencil
-/// clears do not yet work in Mesa.
-static void
-clear_stencil_with_quad(void)
-{
-    const test_params_t *params = t_user_data;
-
-    VkRenderPass pass = qoCreateRenderPass(t_device,
-        .attachmentCount = 1,
-        .pAttachments = (VkAttachmentDescription[]) {
-            {
-                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
-                .format = VK_FORMAT_S8_UINT,
-                .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-                .stencilOp = VK_ATTACHMENT_STORE_OP_STORE,
-            },
-        },
-        .subpassCount = 1,
-        .pSubpasses = (VkSubpassDescription[]) {
-            {
-                QO_SUBPASS_DESCRIPTION_DEFAULTS,
-                .colorCount = 0,
-                .depthStencilAttachment = {
-                    .attachment = 1,
-                    .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-                },
-            },
-        });
-
-    VkPipeline pipeline = qoCreateGraphicsPipeline(t_device,
-        t_pipeline_cache,
-        &(QoExtraGraphicsPipelineCreateInfo) {
-            QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS,
-            .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN,
-            .vertexShader = qoCreateShaderGLSL(t_device, VERTEX,
-                void main()
-                {
-                    // Draw a full quad.
-                    if (gl_VertexID == 0) {
-                        gl_Position = vec4(-1, -1, 0, 1);
-                    } else if (gl_VertexID == 1) {
-                        gl_Position = vec4(+1, -1, 0, 1);
-                    } else if (gl_VertexID == 2) {
-                        gl_Position = vec4(+1, +1, 0, 1);
-                    } else if (gl_VertexID == 3) {
-                        gl_Position = vec4(-1, +1, 0, 1);
-                    }
-                    // XXX: spirv_to_nir doesn't handle switch yet
-                    // switch (gl_VertexID) {
-                    // case 0: gl_Position = vec4(-1, -1, 0, 1); break;
-                    // case 1: gl_Position = vec4(+1, -1, 0, 1); break;
-                    // case 2: gl_Position = vec4(+1, +1, 0, 1); break;
-                    // case 3: gl_Position = vec4(-1, +1, 0, 1); break;
-                    // }
-                }
-            ),
-            .fragmentShader = qoCreateShaderGLSL(t_device, FRAGMENT,
-                void main() {}
-            ),
-            .pNext =
-        &(VkGraphicsPipelineCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-            .pVertexInputState = &(VkPipelineVertexInputStateCreateInfo) {
-                .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-                .bindingCount = 0,
-                .attributeCount = 0,
-            },
-            .pDepthStencilState = &(VkPipelineDepthStencilStateCreateInfo) {
-                QO_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS,
-                .stencilTestEnable = true,
-                .front = (VkStencilOpState) {
-                    .stencilCompareOp = VK_COMPARE_OP_ALWAYS,
-                    .stencilPassOp = VK_STENCIL_OP_REPLACE,
-                },
-                .back = (VkStencilOpState) {
-                    .stencilCompareOp = VK_COMPARE_OP_ALWAYS,
-                    .stencilPassOp = VK_STENCIL_OP_REPLACE,
-                },
-            },
-            .layout = QO_NULL_PIPELINE_LAYOUT,
-            .renderPass = pass,
-            .subpass = 0,
-        }}
-    );
-
-    vkCmdBeginRenderPass(t_cmd_buffer,
-        &(VkRenderPassBeginInfo) {
-            .renderPass = pass,
-            .framebuffer = t_framebuffer,
-            .renderArea = { { 0, 0 }, { t_width, t_height } },
-        },
-        VK_RENDER_PASS_CONTENTS_INLINE);
-    vkCmdBindVertexBuffers(t_cmd_buffer,
-                           /*startBinding*/ 0, /*bindingCount*/ 0,
-                           NULL, NULL);
-    vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-    vkCmdSetStencilCompareMask(t_cmd_buffer,
-                               VK_STENCIL_FACE_FRONT_BIT |
-                               VK_STENCIL_FACE_BACK_BIT,
-                               0xff);
-    vkCmdSetStencilWriteMask(t_cmd_buffer,
-                             VK_STENCIL_FACE_FRONT_BIT |
-                             VK_STENCIL_FACE_BACK_BIT,
-                             0xff);
-    vkCmdSetStencilReference(t_cmd_buffer,
-                             VK_STENCIL_FACE_FRONT_BIT |
-                             VK_STENCIL_FACE_BACK_BIT,
-                             params->clear_value.stencil);
-    vkCmdDraw(t_cmd_buffer,
-              /*vertexCount*/ 4, /*instanceCount*/ 1,
-              /*firstVertex*/ 0, /*firstInstance*/ 0);
-    vkCmdEndRenderPass(t_cmd_buffer);
-}
-
 static void
 draw_triangle(void)
 {
@@ -168,7 +51,7 @@ draw_triangle(void)
             {
                 QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
                 .format = VK_FORMAT_S8_UINT,
-                .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
+                .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
                 .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
             },
         },
@@ -276,9 +159,10 @@ draw_triangle(void)
             .renderPass = pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
-            .clearValueCount = 1,
+            .clearValueCount = 2,
             .pClearValues = (VkClearValue[]) {
                 { .color = { .float32 = { 0.2, 0.2, 0.2, 1.0 } } },
+                { .depthStencil = params->clear_value },
             },
         },
         VK_RENDER_PASS_CONTENTS_INLINE);
@@ -307,9 +191,7 @@ draw_triangle(void)
 static void
 test(void)
 {
-    clear_stencil_with_quad();
     draw_triangle();
-
     qoEndCommandBuffer(t_cmd_buffer);
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
 }
