@@ -84,12 +84,6 @@ test(void)
 
     qoBindBufferMemory(t_device, buffer, mem, 0);
 
-    VkBufferView buffer_view;
-    buffer_view = qoCreateBufferView(t_device,
-        .buffer = buffer,
-        .format = VK_FORMAT_R32G32B32A32_SFLOAT,
-        .offset = 0, .range = 64);
-
     VkSampler sampler = qoCreateSampler(t_device,
         .magFilter = VK_TEX_FILTER_LINEAR,
         .minFilter = VK_TEX_FILTER_LINEAR,
@@ -115,7 +109,13 @@ test(void)
                 .count = 1,
                 .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                 .pDescriptors = (VkDescriptorInfo[]) {
-                    { .bufferView = buffer_view },
+                    {
+                        .bufferInfo = {
+                            .buffer = buffer,
+                            .offset = 0,
+                            .range = 64,
+                        }
+                    },
                 },
             },
             {
