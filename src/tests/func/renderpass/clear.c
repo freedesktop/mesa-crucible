@@ -254,7 +254,7 @@ test(void)
 }
 
 test_define {
-    .name = "func.clear.load-clear.attachments-8",
+    .name = "func.renderpass.clear.color08",
     .start = test,
     .no_image = true,
 };

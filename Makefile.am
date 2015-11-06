@@ -73,7 +73,6 @@ bin_crucible_SOURCES = \
 	src/tests/example/basic.c \
 	src/tests/example/images.c \
 	src/tests/example/messages.c \
-	src/tests/func/clear/load-clear.c \
 	src/tests/func/cmd-buffer/secondary.c \
 	src/tests/func/copy/copy-buffer.c \
 	src/tests/func/depthstencil/basic.c \
@@ -87,6 +86,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/interleaved-cmd-buffers.c \
 	src/tests/func/miptree/miptree.c \
 	src/tests/func/push-constants/basic.c \
+	src/tests/func/renderpass/clear.c \
 	src/tests/stress/lots-of-surface-state.c \
 	src/tests/self/concurrent-output.c \
 	src/util/cru_cleanup.c \
