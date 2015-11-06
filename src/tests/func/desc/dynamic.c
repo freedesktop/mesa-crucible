@@ -196,11 +196,6 @@ test(void)
     };
     memcpy(map, color, sizeof(color));
 
-    VkBufferView buffer_view = qoCreateBufferView(t_device,
-        .buffer = buffer,
-        .format = VK_FORMAT_R32G32B32A32_SFLOAT,
-        .range = sizeof(color));
-
     uint32_t vertex_offset = 1024;
     static const float vertex_data[] = {
         // Triangle coordinates
@@ -223,7 +218,13 @@ test(void)
                 .count = 1,
                 .descriptorType = params->descriptor_type,
                 .pDescriptors = (VkDescriptorInfo[]) {
-                    { .bufferView = buffer_view },
+                    {
+                        .bufferInfo = {
+                           .buffer = buffer,
+                           .offset = 0,
+                           .range = sizeof(color),
+                        },
+                    }
                 },
             },
         }, 0, NULL);
