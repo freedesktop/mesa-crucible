@@ -184,14 +184,16 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
                               VK_DESCRIPTOR_SET_USAGE_STATIC,
                               1, &set_layout, set);
 
-        VkBufferView ubo_view = qoCreateBufferView(t_device,
-            .buffer = ubo,
-            .format = VK_FORMAT_R32_SFLOAT,
-            .range = ubo_size);
-
         VkDescriptorInfo desc_info[12];
-        for (int i = 0; i < 12; i++)
-            desc_info[i] = (VkDescriptorInfo) { .bufferView = ubo_view };
+        for (int i = 0; i < 12; i++) {
+            desc_info[i] = (VkDescriptorInfo) {
+                .bufferInfo = {
+                    .buffer = ubo,
+                    .offset = 0,
+                    .range = ubo_size,
+                },
+            };
+        }
 
         vkUpdateDescriptorSets(t_device,
             /*writeCount*/ 1,
@@ -252,11 +254,13 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
         } else {
             VkDescriptorInfo desc_info[12];
             for (int j = 0; j < 12; j++) {
-                desc_info[j].bufferView = qoCreateBufferView(t_device,
-                    .buffer = ubo,
-                    .format = VK_FORMAT_R32_SFLOAT,
-                    .offset = offsets[j],
-                    .range = ubo_size);
+                desc_info[j] = (VkDescriptorInfo) {
+                    .bufferInfo = {
+                        .buffer = ubo,
+                        .offset = offsets[j],
+                        .range = 4,
+                    },
+                };
             }
 
             vkUpdateDescriptorSets(t_device,
