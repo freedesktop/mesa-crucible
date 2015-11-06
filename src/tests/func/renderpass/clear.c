@@ -22,11 +22,6 @@
 /// @file
 /// @brief Test VK_ATTACHMENT_LOAD_OP_CLEAR
 ///
-/// Create a render pass that clears each attachment to a unique clear color
-/// using VK_ATTACHMENT_LOAD_OP_CLEAR.  Submit a command buffer that trivially
-/// begins then ends the render pass.  Then confirm that each attachment is
-/// filled with the expected clear color.
-///
 /// TODO: Test a render pass in which some attachments have a normalized
 /// format and some have an integer format.
 /// TODO: Test a render pass that contains multiple color attachments and
@@ -41,23 +36,25 @@
 #include "tapi/t.h"
 #include "util/cru_format.h"
 
-static const uint32_t num_attachments = 8;
-static const uint32_t width = 64;
-static const uint32_t height = 64;
-
 static void
-check_requirements(void)
+check_requirements(uint32_t num_color_attachments)
 {
-    if (num_attachments > t_physical_dev_props->limits.maxColorAttachments) {
+    if (num_color_attachments >
+        t_physical_dev_props->limits.maxColorAttachments)
+    {
         t_skipf("test requires %d color attachments, but physical device "
-                "supports only %d", num_attachments,
+                "supports only %d", num_color_attachments,
                 t_physical_dev_props->limits.maxColorAttachments);
     }
 }
 
 static void
-test(void)
+test_color8(void)
 {
+    static const uint32_t num_attachments = 8;
+    static const uint32_t width = 64;
+    static const uint32_t height = 64;
+
     VkFormat formats[num_attachments];
     VkImage images[num_attachments];
     VkImageView att_views[num_attachments];
@@ -69,7 +66,7 @@ test(void)
     cru_image_t *ref_images[num_attachments];
     cru_image_t *actual_images[num_attachments];
 
-    check_requirements();
+    check_requirements(num_attachments);
 
     for (uint32_t i = 0; i < num_attachments; ++i) {
         formats[i] = VK_FORMAT_R8G8B8A8_UNORM;
@@ -253,8 +250,12 @@ test(void)
     t_end(result);
 }
 
+/// Create a render pass that clears each attachment to a unique clear color
+/// using VK_ATTACHMENT_LOAD_OP_CLEAR.  Submit a command buffer that trivially
+/// begins then ends the render pass.  Then confirm that each attachment is
+/// filled with the expected clear color.
 test_define {
     .name = "func.renderpass.clear.color08",
-    .start = test,
+    .start = test_color8,
     .no_image = true,
 };
