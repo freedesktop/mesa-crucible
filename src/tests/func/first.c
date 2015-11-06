@@ -292,7 +292,7 @@ test(void)
             {
                 .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
                 .destSet = set[0],
-                .destBinding = 2,
+                .destBinding = 1,
                 .destArrayElement = 0,
                 .count = 1,
                 .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
@@ -306,7 +306,7 @@ test(void)
             {
                 .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
                 .destSet = set[0],
-                .destBinding = 3,
+                .destBinding = 2,
                 .destArrayElement = 0,
                 .count = 1,
                 .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
