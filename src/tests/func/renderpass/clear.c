@@ -250,6 +250,80 @@ test_color8(void)
     t_end(result);
 }
 
+static void
+test_color_render_area(void)
+{
+    const VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
+
+    VkRenderPass pass = qoCreateRenderPass(t_device,
+        .attachmentCount = 1,
+        .pAttachments = (VkAttachmentDescription[]) {
+            {
+                .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION,
+                .format = format,
+                .samples = 1,
+                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+                .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+                .initialLayout = VK_IMAGE_LAYOUT_GENERAL,
+                .finalLayout = VK_IMAGE_LAYOUT_GENERAL,
+            },
+        },
+        .subpassCount = 1,
+        .pSubpasses = (VkSubpassDescription[]) {
+            {
+                .sType = VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION,
+                .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+                .colorCount = 1,
+                .pColorAttachments = (VkAttachmentReference[]) {
+                    {
+                        .attachment = 0,
+                        .layout = VK_IMAGE_LAYOUT_GENERAL,
+                    },
+                },
+                .depthStencilAttachment = {
+                    .attachment = VK_ATTACHMENT_UNUSED,
+                },
+            },
+        });
+
+    // Clear the whole image to green.
+    vkCmdBeginRenderPass(t_cmd_buffer,
+        &(VkRenderPassBeginInfo) {
+            .renderPass = pass,
+            .framebuffer = t_framebuffer,
+            .renderArea = {
+                { 0, 0 },
+                { t_width, t_height },
+            },
+            .clearValueCount = 1,
+            .pClearValues = (VkClearValue[]) {
+                { .color = { .float32 = { 0, 1, 0, 1 }}},
+            },
+        },
+        VK_RENDER_PASS_CONTENTS_INLINE);
+    vkCmdEndRenderPass(t_cmd_buffer);
+
+    // Clear a subregion to blue.
+    vkCmdBeginRenderPass(t_cmd_buffer,
+        &(VkRenderPassBeginInfo) {
+            .renderPass = pass,
+            .framebuffer = t_framebuffer,
+            .renderArea = {
+                { t_width / 4, t_height / 4 },
+                { t_width / 2, t_height / 2 },
+            },
+            .clearValueCount = 1,
+            .pClearValues = (VkClearValue[]) {
+                { .color = { .float32 = { 0, 0, 1, 1 }}},
+            },
+        },
+        VK_RENDER_PASS_CONTENTS_INLINE);
+    vkCmdEndRenderPass(t_cmd_buffer);
+
+    qoEndCommandBuffer(t_cmd_buffer);
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
+}
+
 /// Create a render pass that clears each attachment to a unique clear color
 /// using VK_ATTACHMENT_LOAD_OP_CLEAR.  Submit a command buffer that trivially
 /// begins then ends the render pass.  Then confirm that each attachment is
@@ -258,4 +332,12 @@ test_define {
     .name = "func.renderpass.clear.color08",
     .start = test_color8,
     .no_image = true,
+};
+
+/// Submit two renderpasses that draw to the same framebuffer. The first
+/// clears the whole framebuffer. The second clears a subrect of the
+/// framebuffer to a different color using VkRenderPassBeginInfo::renderArea.
+test_define {
+    .name = "func.renderpass.clear.color-render-area",
+    .start = test_color_render_area,
 };
