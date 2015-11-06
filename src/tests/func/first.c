@@ -195,15 +195,6 @@ test(void)
            uniform_data,
            sizeof(uniform_data));
 
-    VkBufferView buffer_view[3];
-    for (int i = 0; i < ARRAY_LENGTH(buffer_view); ++i) {
-        buffer_view[i] = qoCreateBufferView(t_device,
-            .buffer = uniform_buffer,
-            .format = VK_FORMAT_R32G32B32A32_SFLOAT,
-            .offset = 4 * sizeof(float) * i,
-            .range = 64);
-    }
-
     static const float vertex_data[] = {
         // Triangle coordinates
         -0.5, -0.5, 0.0, 1.0,
@@ -285,8 +276,20 @@ test(void)
                 .count = 2,
                 .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                 .pDescriptors = (VkDescriptorInfo[]) {
-                    { .bufferView = buffer_view[0] },
-                    { .bufferView = buffer_view[1] },
+                    {
+                        .bufferInfo = {
+                            .buffer = uniform_buffer,
+                            .offset = 0,
+                            .range = 64,
+                        },
+                    },
+                    {
+                        .bufferInfo = {
+                            .buffer = uniform_buffer,
+                            .offset = 4 * sizeof(float),
+                            .range = 64,
+                        },
+                    }
                 },
             },
             {
@@ -322,7 +325,13 @@ test(void)
                 .count = 1,
                 .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                 .pDescriptors = (VkDescriptorInfo[]) {
-                    { .bufferView = buffer_view[2], },
+                    {
+                        .bufferInfo = {
+                            .buffer = uniform_buffer,
+                            .offset = 4 * sizeof(float) * 2,
+                            .range = 64,
+                        },
+                    }
                 },
             },
         }, 0, NULL);
