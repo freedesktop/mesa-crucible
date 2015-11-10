@@ -25,6 +25,7 @@
 #include "tapi/t_data.h"
 #include "util/xalloc.h"
 #include "util/misc.h"
+#include "util/log.h"
 
 #include "cru_image.h"
 
@@ -191,8 +192,11 @@ copy(cru_vk_image_t *self, enum copy_direction dir)
         goto cleanup;
 
     r = vkWaitForFences(dev, 1, &fence, true, /*timeout*/ UINT64_MAX);
-    if (r != VK_SUCCESS)
+    if (r != VK_SUCCESS) {
+        if (r == VK_TIMEOUT)
+            logw("vkWaitForFences timed out!");
         goto cleanup;
+    }
 
 cleanup:
     if (fence.handle)
