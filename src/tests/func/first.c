@@ -131,7 +131,7 @@ test(void)
     VkDescriptorSetLayout set_layout[2];
 
     set_layout[0] = qoCreateDescriptorSetLayout(t_device,
-            .count = 3,
+            .count = 2,
             .pBinding = (VkDescriptorSetLayoutBinding[]) {
                 {
                     .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -140,13 +140,7 @@ test(void)
                     .pImmutableSamplers = NULL,
                 },
                 {
-                    .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
-                    .arraySize = 1,
-                    .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-                    .pImmutableSamplers = NULL,
-                },
-                {
-                    .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
+                    .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                     .arraySize = 1,
                     .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
                     .pImmutableSamplers = NULL,
@@ -266,7 +260,7 @@ test(void)
         .borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK);
 
     vkUpdateDescriptorSets(t_device,
-        4, /* writeCount */
+        3, /* writeCount */
         (VkWriteDescriptorSet[]) {
             {
                 .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
@@ -298,23 +292,13 @@ test(void)
                 .destBinding = 1,
                 .destArrayElement = 0,
                 .count = 1,
-                .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+                .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                 .pDescriptors = (VkDescriptorInfo[]) {
                     {
                         .imageView = tex_view,
                         .imageLayout = VK_IMAGE_LAYOUT_GENERAL,
+                        .sampler = sampler,
                     },
-                },
-            },
-            {
-                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .destSet = set[0],
-                .destBinding = 2,
-                .destArrayElement = 0,
-                .count = 1,
-                .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
-                .pDescriptors = (VkDescriptorInfo[]) {
-                    { .sampler = sampler, },
                 },
             },
             {
