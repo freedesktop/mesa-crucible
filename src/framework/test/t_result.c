@@ -248,6 +248,16 @@ t_compare_stencil_image(void)
     if (!t->def->ref_stencil_filename)
         return true;
 
+    // Check to see if we can actually blit from this format.  Not all
+    // hardware supports reading stencil after all.
+    VkFormatProperties format_props;
+    vkGetPhysicalDeviceFormatProperties(t->vk.physical_dev,
+                                        t->def->depthstencil_format,
+                                        &format_props);
+    if (!(format_props.optimalTilingFeatures &
+          VK_FORMAT_FEATURE_BLIT_SOURCE_BIT))
+        return true;
+
     const cru_format_info_t *finfo = t_format_info(t->def->depthstencil_format);
 
     cru_image_t *actual_image = t_new_cru_image_from_vk_image(t->vk.device,
