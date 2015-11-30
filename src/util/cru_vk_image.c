@@ -64,9 +64,9 @@ cleanup_map(cru_vk_image_t *self)
 {
     if (self->map.pixels)
         vkUnmapMemory(self->vk_dev, self->map.vk_mem);
-    if (self->map.vk_mem.handle)
+    if (self->map.vk_mem != VK_NULL_HANDLE)
         vkFreeMemory(self->vk_dev, self->map.vk_mem);
-    if (self->map.vk_buffer.handle)
+    if (self->map.vk_buffer != VK_NULL_HANDLE)
         vkDestroyBuffer(self->vk_dev, self->map.vk_buffer);
 
     self->map = (typeof(self->map)) {0};
@@ -199,7 +199,7 @@ copy(cru_vk_image_t *self, enum copy_direction dir)
     }
 
 cleanup:
-    if (fence.handle)
+    if (fence != VK_NULL_HANDLE)
         vkDestroyFence(dev, fence);
     if (cmd)
         vkDestroyCommandBuffer(dev, cmd);

@@ -86,6 +86,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/interleaved-cmd-buffers.c \
 	src/tests/func/miptree/miptree.c \
 	src/tests/func/push-constants/basic.c \
+	src/tests/func/ssbo/interleave.c \
 	src/tests/func/renderpass/clear.c \
 	src/tests/stress/lots-of-surface-state.c \
 	src/tests/self/concurrent-output.c \
@@ -115,6 +116,7 @@ BUILT_SOURCES = \
 	src/tests/func/miptree/miptree-spirv.h \
 	src/tests/func/miptree/miptree_gen.c \
 	src/tests/func/push-constants/basic-spirv.h \
+	src/tests/func/ssbo/interleave-spirv.h \
 	src/tests/stress/lots-of-surface-state-spirv.h
 
 bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread -lpng16

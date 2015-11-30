@@ -189,7 +189,7 @@ qoCreateGraphicsPipeline(VkDevice device,
         pipeline_info.pVertexInputState = &vi_info;
     }
 
-    if (!has_vs || !has_fs || extra->geometryShader.handle) {
+    if (!has_vs || !has_fs || extra->geometryShader != VK_NULL_HANDLE) {
         /* Make a copy of the shader stages so that we can modify it */
         assert(pipeline_info.stageCount < VK_SHADER_STAGE_NUM);
         memcpy(stage_info, pipeline_info.pStages,
@@ -200,7 +200,7 @@ qoCreateGraphicsPipeline(VkDevice device,
     if (!has_vs) {
         VkShader vs = extra->vertexShader;
 
-        if (!vs.handle) {
+        if (!vs != VK_NULL_HANDLE) {
             vs = qoCreateShaderGLSL(device, VERTEX,
                 layout(location = 0) in vec4 a_position;
                 layout(location = 1) in vec4 a_color;
@@ -222,7 +222,7 @@ qoCreateGraphicsPipeline(VkDevice device,
             };
     }
 
-    if (extra->geometryShader.handle) {
+    if (extra->geometryShader != VK_NULL_HANDLE) {
         // We're assuming here that they didn't try to set the geometry
         // shader both ways (through extra and normally).
         stage_info[pipeline_info.stageCount++] =
@@ -237,7 +237,7 @@ qoCreateGraphicsPipeline(VkDevice device,
     if (!has_fs) {
         VkShader fs = extra->fragmentShader;
 
-        if (!fs.handle) {
+        if (!fs != VK_NULL_HANDLE) {
             fs = qoCreateShaderGLSL(device, FRAGMENT,
                 layout(location = 0) out vec4 f_color;
                 layout(location = 0) in vec4 v_color;
@@ -261,7 +261,7 @@ qoCreateGraphicsPipeline(VkDevice device,
                                        1, &pipeline_info, &pipeline);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(pipeline.handle);
+    t_assert(pipeline != VK_NULL_HANDLE);
     t_cleanup_push_vk_pipeline(device, pipeline);
 
     return pipeline;

@@ -140,7 +140,7 @@ __t_depthstencil_image(void)
     GET_CURRENT_TEST(t);
 
     t_assert(!t->def->no_image);
-    t_assert(t->vk.ds_image.handle);
+    t_assert(t->vk.ds_image != VK_NULL_HANDLE);
 
     return &t->vk.ds_image;
 }
@@ -152,7 +152,7 @@ __t_depthstencil_image_view(void)
     GET_CURRENT_TEST(t);
 
     t_assert(!t->def->no_image);
-    t_assert(t->vk.depthstencil_image_view.handle);
+    t_assert(t->vk.depthstencil_image_view != VK_NULL_HANDLE);
 
     return &t->vk.depthstencil_image_view;
 }

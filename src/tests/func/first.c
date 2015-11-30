@@ -40,7 +40,10 @@ create_pipeline(VkDevice device, VkPipelineLayout pipeline_layout,
         void main()
         {
             gl_Position = a_position;
-            v_color = a_color + u1[0].color + u1[1].color + u2.color;
+            v_color = a_color +
+                      u1[0].color +
+                      u1[1].color +
+                      u2.color;
         }
     );
 

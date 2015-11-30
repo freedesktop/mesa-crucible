@@ -126,7 +126,7 @@ __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info)
     result = vkAllocMemory(dev, info, &memory);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(memory.handle);
+    t_assert(memory != VK_NULL_HANDLE);
     t_cleanup_push_vk_device_memory(dev, memory);
 
     return memory;
@@ -195,7 +195,7 @@ __qoCreatePipelineCache(VkDevice dev, const VkPipelineCacheCreateInfo *info)
     result = vkCreatePipelineCache(dev, info, &pipeline_cache);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(pipeline_cache.handle);
+    t_assert(pipeline_cache != VK_NULL_HANDLE);
     t_cleanup_push_vk_pipeline_cache(dev, pipeline_cache);
 
     return pipeline_cache;
@@ -210,7 +210,7 @@ __qoCreatePipelineLayout(VkDevice dev, const VkPipelineLayoutCreateInfo *info)
     result = vkCreatePipelineLayout(dev, info, &pipeline_layout);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(pipeline_layout.handle);
+    t_assert(pipeline_layout != VK_NULL_HANDLE);
     t_cleanup_push_vk_pipeline_layout(dev, pipeline_layout);
 
     return pipeline_layout;
@@ -225,7 +225,7 @@ __qoCreateSampler(VkDevice dev, const VkSamplerCreateInfo *info)
     result = vkCreateSampler(dev, info, &sampler);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(sampler.handle);
+    t_assert(sampler != VK_NULL_HANDLE);
     t_cleanup_push_vk_sampler(dev, sampler);
 
     return sampler;
@@ -241,7 +241,7 @@ __qoCreateDescriptorSetLayout(VkDevice dev,
     result = vkCreateDescriptorSetLayout(dev, info, &layout);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(layout.handle);
+    t_assert(layout != VK_NULL_HANDLE);
     t_cleanup_push_vk_descriptor_set_layout(dev, layout);
 
     return layout;
@@ -261,7 +261,7 @@ qoAllocDescriptorSets(VkDevice dev, VkDescriptorPool descriptorPool,
     t_assert(result == VK_SUCCESS);
 
     for (uint32_t i = 0; i < count; ++i) {
-        t_assert(sets[i].handle);
+        t_assert(sets[i] != VK_NULL_HANDLE);
         t_cleanup_push_vk_descriptor_set(dev, descriptorPool, sets[i]);
     }
 
@@ -277,7 +277,7 @@ __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info)
     result = vkCreateBuffer(dev, info, &buffer);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(buffer.handle);
+    t_assert(buffer != VK_NULL_HANDLE);
     t_cleanup_push_vk_buffer(dev, buffer);
 
     return buffer;
@@ -292,7 +292,7 @@ __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info)
     result = vkCreateBufferView(dev, info, &view);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(view.handle);
+    t_assert(view != VK_NULL_HANDLE);
     t_cleanup_push_vk_buffer_view(dev, view);
 
     return view;
@@ -347,7 +347,7 @@ __qoCreateFramebuffer(VkDevice dev, const VkFramebufferCreateInfo *info)
     result = vkCreateFramebuffer(dev, info, &fb);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(fb.handle);
+    t_assert(fb != VK_NULL_HANDLE);
     t_cleanup_push_vk_framebuffer(dev, fb);
 
     return fb;
@@ -362,7 +362,7 @@ __qoCreateRenderPass(VkDevice dev, const VkRenderPassCreateInfo *info)
     result = vkCreateRenderPass(dev, info, &pass);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(pass.handle);
+    t_assert(pass != VK_NULL_HANDLE);
     t_cleanup_push_vk_render_pass(dev, pass);
 
     return pass;
@@ -379,7 +379,7 @@ __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info)
     result = vkCreateImage(dev, info, &image);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(image.handle);
+    t_assert(image != VK_NULL_HANDLE);
     t_cleanup_push_vk_image(dev, image);
 
     return image;
@@ -394,7 +394,7 @@ __qoCreateImageView(VkDevice dev, const VkImageViewCreateInfo *info)
     result = vkCreateImageView(dev, info, &view);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(view.handle);
+    t_assert(view != VK_NULL_HANDLE);
     t_cleanup_push_vk_image_view(dev, view);
 
     return view;
@@ -428,7 +428,7 @@ __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
     result = vkCreateShaderModule(dev, &module_info, &module);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(module.handle);
+    t_assert(module != VK_NULL_HANDLE);
     t_cleanup_push_vk_shader_module(dev, module);
 
     result = vkCreateShader(dev,
@@ -441,7 +441,7 @@ __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
         }, &shader);
 
     t_assert(result == VK_SUCCESS);
-    t_assert(shader.handle);
+    t_assert(shader != VK_NULL_HANDLE);
     t_cleanup_push_vk_shader(dev, shader);
 
     return shader;
