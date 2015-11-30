@@ -158,12 +158,12 @@ qoCreateGraphicsPipeline(VkDevice device,
             {
                 .binding = 0,
                 .strideInBytes = 8,
-                .stepRate = VK_VERTEX_INPUT_STEP_RATE_VERTEX
+                .inputRate = VK_VERTEX_INPUT_RATE_VERTEX
             },
             {
                 .binding = 1,
                 .strideInBytes = 16,
-                .stepRate = VK_VERTEX_INPUT_STEP_RATE_INSTANCE
+                .inputRate = VK_VERTEX_INPUT_RATE_INSTANCE
             }
         },
         .attributeCount = 2,

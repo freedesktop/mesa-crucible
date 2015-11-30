@@ -84,7 +84,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
             {
                 .binding = 0,
                 .strideInBytes = 8,
-                .stepRate = VK_VERTEX_INPUT_STEP_RATE_VERTEX,
+                .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
             },
         },
         .attributeCount = 1,

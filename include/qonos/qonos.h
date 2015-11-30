@@ -151,9 +151,9 @@ typedef struct QoShaderCreateInfo_ {
     .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTER_STATE_CREATE_INFO, \
     .depthClipEnable = false, \
     .rasterizerDiscardEnable = false, \
-    .fillMode = VK_FILL_MODE_SOLID, \
+    .polygonMode = VK_POLYGON_MODE_FILL, \
     .cullMode = VK_CULL_MODE_NONE, \
-    .frontFace = VK_FRONT_FACE_CCW, \
+    .frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE, \
     .depthBias = 0.0f, \
     .depthBiasClamp = 0.0f, \
     .slopeScaledDepthBias = 0.0f, \

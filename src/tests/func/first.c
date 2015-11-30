@@ -64,12 +64,12 @@ create_pipeline(VkDevice device, VkPipelineLayout pipeline_layout,
             {
                 .binding = 0,
                 .strideInBytes = 16, // TODO: What is this? rgba_f32? xyzw_f32?
-                .stepRate = VK_VERTEX_INPUT_STEP_RATE_VERTEX,
+                .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
             },
             {
                 .binding = 1,
                 .strideInBytes = 0,
-                .stepRate = VK_VERTEX_INPUT_STEP_RATE_VERTEX,
+                .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
             },
         },
         .attributeCount = 2,

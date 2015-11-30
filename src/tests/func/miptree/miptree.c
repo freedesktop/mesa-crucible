@@ -1111,7 +1111,7 @@ init_draw_data(test_draw_data_t *draw_data)
                     {
                         .binding = 0,
                         .strideInBytes = num_position_components * sizeof(float),
-                        .stepRate = VK_VERTEX_INPUT_STEP_RATE_VERTEX,
+                        .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
                     },
                 },
                 .attributeCount = 1,

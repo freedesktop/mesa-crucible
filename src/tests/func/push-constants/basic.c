@@ -74,7 +74,7 @@ test_push_constants(void)
             {
                 .binding = 0,
                 .strideInBytes = 8,
-                .stepRate = VK_VERTEX_INPUT_STEP_RATE_VERTEX
+                .inputRate = VK_VERTEX_INPUT_RATE_VERTEX
             },
         },
         .attributeCount = 1,

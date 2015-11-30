@@ -81,7 +81,7 @@ create_pipeline(VkDevice device,
             {
                 .binding = 0,
                 .strideInBytes = 16,
-                .stepRate = VK_VERTEX_INPUT_STEP_RATE_VERTEX,
+                .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
             },
         },
         .attributeCount = 1,
