@@ -154,9 +154,9 @@ typedef struct QoShaderCreateInfo_ {
     .polygonMode = VK_POLYGON_MODE_FILL, \
     .cullMode = VK_CULL_MODE_NONE, \
     .frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE, \
-    .depthBias = 0.0f, \
+    .depthBiasConstantFactor = 0.0f, \
     .depthBiasClamp = 0.0f, \
-    .slopeScaledDepthBias = 0.0f, \
+    .depthBiasSlopeFactor = 0.0f, \
     .lineWidth = 1.0f
 
 #define QO_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS \
@@ -166,14 +166,14 @@ typedef struct QoShaderCreateInfo_ {
     .depthBoundsTestEnable = false, \
     .stencilTestEnable = false, \
     .front = { \
-        .stencilCompareMask = ~0,   /* default in OpenGL ES 3.1 */ \
-        .stencilWriteMask = ~0,     /* default in OpenGL ES 3.1 */ \
-        .stencilReference = 0,      /* default in OpenGL ES 3.1 */ \
+        .compareMask = ~0,  /* default in OpenGL ES 3.1 */ \
+        .writeMask = ~0,    /* default in OpenGL ES 3.1 */ \
+        .reference = 0,     /* default in OpenGL ES 3.1 */ \
     }, \
     .back = { \
-        .stencilCompareMask = ~0,   /* default in OpenGL ES 3.1 */ \
-        .stencilWriteMask = ~0,     /* default in OpenGL ES 3.1 */ \
-        .stencilReference = 0,      /* default in OpenGL ES 3.1 */ \
+        .compareMask = ~0,  /* default in OpenGL ES 3.1 */ \
+        .writeMask = ~0,    /* default in OpenGL ES 3.1 */ \
+        .reference = 0,     /* default in OpenGL ES 3.1 */ \
     }, \
     .minDepthBounds = 0.0f, /* default in OpenGL ES 3.1 */ \
     .maxDepthBounds = 1.0f  /* default in OpenGL ES 3.1 */ \
@@ -194,7 +194,7 @@ typedef struct QoShaderCreateInfo_ {
     .pAttachments = (VkPipelineColorBlendAttachmentState []) { \
        { QO_PIPELINE_COLOR_BLEND_ATTACHMENT_STATE_DEFAULTS }, \
     }, \
-    .blendConst = {0.0f, 0.0f, 0.0f, 0.0f} /* default in OpenGL ES 3.1 */
+    .blendConstants = {0.0f, 0.0f, 0.0f, 0.0f} /* default in OpenGL ES 3.1 */
 
 #define QO_COMMAND_BUFFER_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_CREATE_INFO, \
