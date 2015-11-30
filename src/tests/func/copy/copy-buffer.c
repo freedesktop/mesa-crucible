@@ -78,8 +78,8 @@ test_large_copy(void)
     vkCmdCopyBuffer(cmdBuffer, buffer1, buffer2, 1,
         &(VkBufferCopy) {
             .srcOffset = 0,
-            .destOffset = 0,
-            .copySize = buffer_size,
+            .dstOffset = 0,
+            .size = buffer_size,
         });
 
     vkCmdPipelineBarrier(cmdBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, true, 1,

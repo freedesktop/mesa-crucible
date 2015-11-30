@@ -45,7 +45,7 @@ struct cru_vk_image {
 
     struct {
         VkImage vk_image;
-        VkImageAspect vk_aspect;
+        VkImageAspectFlagBits vk_aspect;
         uint32_t miplevel;
         uint32_t array_slice;
     } target;
@@ -148,10 +148,10 @@ copy(cru_vk_image_t *self, enum copy_direction dir)
     const VkBufferImageCopy region = {
         .bufferOffset = 0,
         .imageSubresource = {
-            .aspect = self->target.vk_aspect,
+            .aspectMask = self->target.vk_aspect,
             .mipLevel = self->target.miplevel,
-            .arrayLayer = self->target.array_slice,
-            .arraySize = 1,
+            .baseArrayLayer = self->target.array_slice,
+            .layerCount = 1,
         },
         .imageOffset = { .x = 0, .y = 0, .z = 0 },
         .imageExtent = {

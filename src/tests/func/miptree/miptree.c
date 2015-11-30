@@ -612,10 +612,10 @@ miptree_upload_copy_from_buffer(const test_data_t *data)
         VkBufferImageCopy copy = {
             .bufferOffset = slice->buffer_offset,
             .imageSubresource = {
-                .aspect = params->aspect,
+                .aspectMask = params->aspect,
                 .mipLevel = slice->level,
-                .arrayLayer = slice->array_slice,
-                .arraySize = 1,
+                .baseArrayLayer = slice->array_slice,
+                .layerCount = 1,
             },
             .imageOffset = {
                 .x = 0,
@@ -651,10 +651,10 @@ miptree_download_copy_to_buffer(const test_data_t *data)
         VkBufferImageCopy copy = {
             .bufferOffset = slice->buffer_offset,
             .imageSubresource = {
-                .aspect = params->aspect,
+                .aspectMask = params->aspect,
                 .mipLevel = slice->level,
-                .arrayLayer = slice->array_slice,
-                .arraySize = 1,
+                .baseArrayLayer = slice->array_slice,
+                .layerCount = 1,
             },
             .imageOffset = {
                 .x = 0,
@@ -690,20 +690,20 @@ miptree_upload_copy_from_linear_image(const test_data_t *data)
     cru_vec_foreach(slice, &mt->mipslices) {
         VkImageCopy copy = {
             .srcSubresource = {
-                .aspect = params->aspect,
+                .aspectMask = params->aspect,
                 .mipLevel = 0,
-                .arrayLayer = 0,
-                .arraySize = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1,
             },
             .srcOffset = { .x = 0, .y = 0, .z = 0 },
 
-            .destSubresource = {
-                .aspect = params->aspect,
+            .dstSubresource = {
+                .aspectMask = params->aspect,
                 .mipLevel = slice->level,
-                .arrayLayer = slice->array_slice,
-                .arraySize = 1,
+                .baseArrayLayer = slice->array_slice,
+                .layerCount = 1,
             },
-            .destOffset = {
+            .dstOffset = {
                 .x = 0,
                 .y = 0,
                 .z = slice->z_offset,
@@ -738,10 +738,10 @@ miptree_download_copy_to_linear_image(const test_data_t *data)
     cru_vec_foreach(slice, &mt->mipslices) {
         VkImageCopy copy = {
             .srcSubresource = {
-                .aspect = params->aspect,
+                .aspectMask = params->aspect,
                 .mipLevel = slice->level,
-                .arrayLayer = slice->array_slice,
-                .arraySize = 1,
+                .baseArrayLayer = slice->array_slice,
+                .layerCount = 1,
             },
             .srcOffset = {
                 .x = 0,
@@ -749,13 +749,13 @@ miptree_download_copy_to_linear_image(const test_data_t *data)
                 .z = slice->z_offset,
             },
 
-            .destSubresource = {
-                .aspect = params->aspect,
+            .dstSubresource = {
+                .aspectMask = params->aspect,
                 .mipLevel = 0,
-                .arrayLayer = 0,
-                .arraySize = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1,
             },
-            .destOffset = { .x = 0, .y = 0, .z = 0 },
+            .dstOffset = { .x = 0, .y = 0, .z = 0 },
 
             .extent = {
                 .width = slice->width,
@@ -876,7 +876,7 @@ miptree_upload_copy_with_draw(const test_data_t *data)
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
             .format = params->format,
             .subresourceRange = {
-                .aspectMask = 1 << params->aspect,
+                .aspectMask = params->aspect,
                 .baseMipLevel = 0,
                 .mipLevels = 1,
                 .baseArrayLayer = 0,
@@ -888,7 +888,7 @@ miptree_upload_copy_with_draw(const test_data_t *data)
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
             .format = params->format,
             .subresourceRange = {
-                .aspectMask = 1 << params->aspect,
+                .aspectMask = params->aspect,
                 .baseMipLevel = slice->level,
                 .mipLevels = 1,
                 .baseArrayLayer = slice->array_slice,
@@ -927,7 +927,7 @@ miptree_download_copy_with_draw(const test_data_t *data)
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
             .format = params->format,
             .subresourceRange = {
-                .aspectMask = 1 << params->aspect,
+                .aspectMask = params->aspect,
                 .baseMipLevel = slice->level,
                 .mipLevels = 1,
                 .baseArrayLayer = slice->array_slice,

@@ -37,10 +37,10 @@ struct dest {
 static const VkBufferImageCopy copy = {
     .bufferOffset = 0,
     .imageSubresource = {
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
         .mipLevel = 0,
-        .arrayLayer = 0,
-        .arraySize = 1,
+        .baseArrayLayer = 0,
+        .layerCount = 1,
     },
     .imageOffset = { .x = 0, .y = 0, .z = 0 },
     .imageExtent = {

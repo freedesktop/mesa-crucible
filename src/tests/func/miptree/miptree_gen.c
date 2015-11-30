@@ -33,7 +33,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 512,
@@ -59,7 +59,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 512,
@@ -85,7 +85,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 512,
@@ -111,7 +111,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 512,
@@ -137,7 +137,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 512,
@@ -163,7 +163,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 512,
@@ -189,7 +189,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 512,
@@ -215,7 +215,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 512,
@@ -241,7 +241,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 512,
@@ -267,7 +267,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 512,
@@ -293,7 +293,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 512,
@@ -319,7 +319,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 512,
@@ -345,7 +345,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 512,
@@ -371,7 +371,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 512,
@@ -397,7 +397,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 512,
@@ -423,7 +423,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 512,
@@ -449,7 +449,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -475,7 +475,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -501,7 +501,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -527,7 +527,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -553,7 +553,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -579,7 +579,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -605,7 +605,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -631,7 +631,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -657,7 +657,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -683,7 +683,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -709,7 +709,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -735,7 +735,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -761,7 +761,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -787,7 +787,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -813,7 +813,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -839,7 +839,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -865,7 +865,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -891,7 +891,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 512,
@@ -917,7 +917,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -943,7 +943,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -969,7 +969,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -995,7 +995,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -1021,7 +1021,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -1047,7 +1047,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -1073,7 +1073,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -1099,7 +1099,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -1125,7 +1125,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -1151,7 +1151,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -1177,7 +1177,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -1203,7 +1203,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -1229,7 +1229,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -1255,7 +1255,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -1281,7 +1281,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -1307,7 +1307,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -1333,7 +1333,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -1359,7 +1359,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 512,
@@ -1385,7 +1385,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 1,
         .width = 32,
@@ -1411,7 +1411,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 1,
         .width = 32,
@@ -1437,7 +1437,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 1,
         .width = 32,
@@ -1463,7 +1463,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 1,
         .width = 32,
@@ -1489,7 +1489,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 2,
         .width = 32,
@@ -1515,7 +1515,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 2,
         .width = 32,
@@ -1541,7 +1541,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 2,
         .width = 32,
@@ -1567,7 +1567,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_R8G8B8A8_UNORM,
-        .aspect = VK_IMAGE_ASPECT_COLOR,
+        .aspect = VK_IMAGE_ASPECT_COLOR_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 2,
         .width = 32,
@@ -1593,7 +1593,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 1024,
@@ -1619,7 +1619,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 1024,
@@ -1645,7 +1645,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 1024,
@@ -1671,7 +1671,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 1024,
@@ -1697,7 +1697,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 1024,
@@ -1723,7 +1723,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 1024,
@@ -1749,7 +1749,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 1024,
@@ -1775,7 +1775,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 1024,
@@ -1801,7 +1801,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 1024,
@@ -1827,7 +1827,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 1024,
@@ -1853,7 +1853,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 1024,
@@ -1879,7 +1879,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 1024,
@@ -1905,7 +1905,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 1024,
@@ -1931,7 +1931,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 1024,
@@ -1957,7 +1957,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 1024,
@@ -1983,7 +1983,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 1024,
@@ -2009,7 +2009,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 1024,
@@ -2035,7 +2035,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 1024,
@@ -2061,7 +2061,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 1024,
@@ -2087,7 +2087,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 1024,
@@ -2113,7 +2113,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 1024,
@@ -2139,7 +2139,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 1024,
@@ -2165,7 +2165,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 1024,
@@ -2191,7 +2191,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 1024,
@@ -2217,7 +2217,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 1024,
@@ -2243,7 +2243,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 1024,
@@ -2269,7 +2269,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 1024,
@@ -2295,7 +2295,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 1024,
@@ -2321,7 +2321,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 1024,
@@ -2347,7 +2347,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 1024,
@@ -2373,7 +2373,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 1024,
@@ -2399,7 +2399,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 1024,
@@ -2425,7 +2425,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 1,
         .width = 1024,
@@ -2451,7 +2451,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 1,
         .width = 1024,
@@ -2477,7 +2477,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 1,
         .width = 1024,
@@ -2503,7 +2503,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 1,
         .width = 1024,
@@ -2529,7 +2529,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 2,
         .width = 1024,
@@ -2555,7 +2555,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 2,
         .width = 1024,
@@ -2581,7 +2581,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 2,
         .width = 1024,
@@ -2607,7 +2607,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_D32_SFLOAT,
-        .aspect = VK_IMAGE_ASPECT_DEPTH,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 2,
         .width = 1024,
@@ -2633,7 +2633,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_S8_UINT,
-        .aspect = VK_IMAGE_ASPECT_STENCIL,
+        .aspect = VK_IMAGE_ASPECT_STENCIL_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 1024,
@@ -2659,7 +2659,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_S8_UINT,
-        .aspect = VK_IMAGE_ASPECT_STENCIL,
+        .aspect = VK_IMAGE_ASPECT_STENCIL_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 1,
         .width = 1024,
@@ -2685,7 +2685,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_S8_UINT,
-        .aspect = VK_IMAGE_ASPECT_STENCIL,
+        .aspect = VK_IMAGE_ASPECT_STENCIL_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 1024,
@@ -2711,7 +2711,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_S8_UINT,
-        .aspect = VK_IMAGE_ASPECT_STENCIL,
+        .aspect = VK_IMAGE_ASPECT_STENCIL_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_1D,
         .levels = 2,
         .width = 1024,
@@ -2737,7 +2737,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_S8_UINT,
-        .aspect = VK_IMAGE_ASPECT_STENCIL,
+        .aspect = VK_IMAGE_ASPECT_STENCIL_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 1024,
@@ -2763,7 +2763,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_S8_UINT,
-        .aspect = VK_IMAGE_ASPECT_STENCIL,
+        .aspect = VK_IMAGE_ASPECT_STENCIL_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 1,
         .width = 1024,
@@ -2789,7 +2789,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_S8_UINT,
-        .aspect = VK_IMAGE_ASPECT_STENCIL,
+        .aspect = VK_IMAGE_ASPECT_STENCIL_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 1024,
@@ -2815,7 +2815,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_S8_UINT,
-        .aspect = VK_IMAGE_ASPECT_STENCIL,
+        .aspect = VK_IMAGE_ASPECT_STENCIL_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_2D,
         .levels = 2,
         .width = 1024,
@@ -2841,7 +2841,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_S8_UINT,
-        .aspect = VK_IMAGE_ASPECT_STENCIL,
+        .aspect = VK_IMAGE_ASPECT_STENCIL_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 1,
         .width = 1024,
@@ -2867,7 +2867,7 @@ test_define {
     .no_image = true,
     .user_data = &(test_params_t) {
         .format = VK_FORMAT_S8_UINT,
-        .aspect = VK_IMAGE_ASPECT_STENCIL,
+        .aspect = VK_IMAGE_ASPECT_STENCIL_BIT,
         .view_type = VK_IMAGE_VIEW_TYPE_3D,
         .levels = 2,
         .width = 1024,

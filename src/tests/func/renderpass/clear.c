@@ -222,10 +222,10 @@ test_color8(void)
             &(VkBufferImageCopy) {
                 .bufferOffset = 0,
                 .imageSubresource = {
-                    .aspect = VK_IMAGE_ASPECT_COLOR,
+                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
                     .mipLevel = 0,
-                    .arrayLayer= 0,
-                    .arraySize = 1,
+                    .baseArrayLayer= 0,
+                    .layerCount = 1,
                 },
                 .imageOffset = { 0, 0, 0 },
                 .imageExtent = { width, height, 1 },

@@ -201,7 +201,7 @@ t_compare_color_image(void)
 
     cru_image_t *actual_image = t_new_cru_image_from_vk_image(t->vk.device,
             t->vk.queue, t->vk.color_image, VK_FORMAT_R8G8B8A8_UNORM,
-            VK_IMAGE_ASPECT_COLOR, t->ref.width, t->ref.height,
+            VK_IMAGE_ASPECT_COLOR_BIT, t->ref.width, t->ref.height,
             /*miplevel*/ 0, /*array_slice*/ 0);
 
     if (t->opt.bootstrap) {
@@ -262,7 +262,7 @@ t_compare_stencil_image(void)
 
     cru_image_t *actual_image = t_new_cru_image_from_vk_image(t->vk.device,
             t->vk.queue, t->vk.ds_image, finfo->stencil_format,
-            VK_IMAGE_ASPECT_STENCIL, t->ref.width, t->ref.height,
+            VK_IMAGE_ASPECT_STENCIL_BIT, t->ref.width, t->ref.height,
             /*miplevel*/ 0, /*array_slice*/ 0);
 
     if (t->opt.bootstrap) {
