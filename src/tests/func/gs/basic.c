@@ -176,7 +176,7 @@ test_basic_gs(void)
 
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
-    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
 }
 
 test_define {

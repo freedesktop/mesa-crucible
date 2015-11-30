@@ -168,7 +168,7 @@ test(void)
     VkPipeline pipeline = create_pipeline(t_device, pipeline_layout, pass);
 
     VkDescriptorSet set[2];
-    qoAllocDescriptorSets(t_device, QO_NULL_DESCRIPTOR_POOL,
+    qoAllocDescriptorSets(t_device, VK_NULL_HANDLE,
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           2, set_layout, set);
 
@@ -350,7 +350,7 @@ test(void)
               /*firstVertex*/ 0, /*firstInstance*/ 0);
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
-    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
 }
 
 test_define {

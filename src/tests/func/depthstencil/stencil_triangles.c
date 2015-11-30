@@ -148,7 +148,7 @@ draw_triangle(void)
                     .stencilFailOp = params->stencil_fail_op,
                 },
             },
-            .layout = QO_NULL_PIPELINE_LAYOUT,
+            .layout = VK_NULL_HANDLE,
             .renderPass = pass,
             .subpass = 0,
         }}
@@ -193,7 +193,7 @@ test(void)
 {
     draw_triangle();
     qoEndCommandBuffer(t_cmd_buffer);
-    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
 }
 
 #include "stencil_triangles_gen.c"

@@ -233,7 +233,7 @@ test_color8(void)
     }
 
     qoEndCommandBuffer(cmd);
-    qoQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
+    qoQueueSubmit(t_queue, 1, &cmd, VK_NULL_HANDLE);
     vkQueueWaitIdle(t_queue);
 
     test_result_t result = TEST_RESULT_PASS;
@@ -321,7 +321,7 @@ test_color_render_area(void)
     vkCmdEndRenderPass(t_cmd_buffer);
 
     qoEndCommandBuffer(t_cmd_buffer);
-    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
 }
 
 /// Create a render pass that clears each attachment to a unique clear color

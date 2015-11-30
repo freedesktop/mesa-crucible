@@ -120,7 +120,7 @@ test(void)
                 .depthCompareOp = params->depth_compare_op,
             },
             .flags = 0,
-            .layout = QO_NULL_PIPELINE_LAYOUT,
+            .layout = VK_NULL_HANDLE,
             .renderPass = pass,
             .subpass = 0,
         }});
@@ -179,7 +179,7 @@ test(void)
 
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
-    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
 }
 
 test_define {

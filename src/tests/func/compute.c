@@ -73,7 +73,7 @@ test(void)
         }, &pipeline);
 
     VkDescriptorSet set;
-    qoAllocDescriptorSets(t_device, QO_NULL_DESCRIPTOR_POOL,
+    qoAllocDescriptorSets(t_device, VK_NULL_HANDLE,
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           1, &set_layout, &set);
 
@@ -141,7 +141,7 @@ test(void)
     vkCmdDispatch(t_cmd_buffer, 8, 2, 2);
 
     qoEndCommandBuffer(t_cmd_buffer);
-    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
 }
 
 test_define {

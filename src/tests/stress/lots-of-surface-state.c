@@ -180,7 +180,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
     if (use_dynamic_offsets) {
         // Allocate and set up a single descriptor set.  We'll just re-bind
         // it with new dynamic offsets each time.
-        qoAllocDescriptorSets(t_device, QO_NULL_DESCRIPTOR_POOL,
+        qoAllocDescriptorSets(t_device, VK_NULL_HANDLE,
                               VK_DESCRIPTOR_SET_USAGE_STATIC,
                               1, &set_layout, set);
 
@@ -213,7 +213,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
         for (int i = 0; i < 1024; i++)
             layouts[i] = set_layout;
 
-        qoAllocDescriptorSets(t_device, QO_NULL_DESCRIPTOR_POOL,
+        qoAllocDescriptorSets(t_device, VK_NULL_HANDLE,
                               VK_DESCRIPTOR_SET_USAGE_STATIC,
                               1024, layouts, set);
     }
@@ -288,7 +288,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
 
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
-    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
 }
 
 static void

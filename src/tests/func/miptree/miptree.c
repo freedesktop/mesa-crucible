@@ -634,7 +634,7 @@ miptree_upload_copy_from_buffer(const test_data_t *data)
     }
 
     qoEndCommandBuffer(cmd);
-    vkQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
+    vkQueueSubmit(t_queue, 1, &cmd, VK_NULL_HANDLE);
 }
 
 static void
@@ -673,7 +673,7 @@ miptree_download_copy_to_buffer(const test_data_t *data)
     }
 
     qoEndCommandBuffer(cmd);
-    vkQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
+    vkQueueSubmit(t_queue, 1, &cmd, VK_NULL_HANDLE);
 }
 
 
@@ -722,7 +722,7 @@ miptree_upload_copy_from_linear_image(const test_data_t *data)
     }
 
     qoEndCommandBuffer(cmd);
-    vkQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
+    vkQueueSubmit(t_queue, 1, &cmd, VK_NULL_HANDLE);
 }
 
 static void
@@ -770,7 +770,7 @@ miptree_download_copy_to_linear_image(const test_data_t *data)
     }
 
     qoEndCommandBuffer(cmd);
-    vkQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
+    vkQueueSubmit(t_queue, 1, &cmd, VK_NULL_HANDLE);
 }
 
 static void
@@ -851,7 +851,7 @@ copy_color_images_with_draw(const test_data_t *data,
     }
 
     qoEndCommandBuffer(cmd);
-    qoQueueSubmit(t_queue, 1, &cmd, QO_NULL_FENCE);
+    qoQueueSubmit(t_queue, 1, &cmd, VK_NULL_HANDLE);
 }
 
 static void
@@ -1152,7 +1152,7 @@ init_draw_data(test_draw_data_t *draw_data)
            position_data, sizeof(position_data));
 
     VkDescriptorSet desc_sets[1];
-    qoAllocDescriptorSets(t_device, QO_NULL_DESCRIPTOR_POOL,
+    qoAllocDescriptorSets(t_device, VK_NULL_HANDLE,
                           VK_DESCRIPTOR_SET_USAGE_STATIC,
                           ARRAY_LENGTH(set_layouts),
                           set_layouts, desc_sets);

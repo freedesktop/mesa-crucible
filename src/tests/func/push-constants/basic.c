@@ -28,14 +28,14 @@ push_vs_offset(float x, float y)
 {
     /* The offset is storred in two floats with one float of padding */
     float offset[3] = { x, 0, y };
-    vkCmdPushConstants(t_cmd_buffer, QO_NULL_PIPELINE_LAYOUT,
+    vkCmdPushConstants(t_cmd_buffer, VK_NULL_HANDLE,
                        VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(offset), offset);
 }
 
 static void
 push_fs_color(unsigned first_component, unsigned num_components, float *c)
 {
-    vkCmdPushConstants(t_cmd_buffer, QO_NULL_PIPELINE_LAYOUT,
+    vkCmdPushConstants(t_cmd_buffer, VK_NULL_HANDLE,
                        VK_SHADER_STAGE_FRAGMENT_BIT,
                        first_component * sizeof(float),
                        num_components * sizeof(float), c);
@@ -186,7 +186,7 @@ test_push_constants(void)
 
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
-    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, QO_NULL_FENCE);
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
 }
 
 test_define {
