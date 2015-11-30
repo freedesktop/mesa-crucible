@@ -437,16 +437,16 @@ miptree_create(void)
             .depth = depth,
         },
         .tiling = VK_IMAGE_TILING_OPTIMAL,
-        .usage = VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT |
-                 VK_IMAGE_USAGE_TRANSFER_DESTINATION_BIT |
+        .usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
+                 VK_IMAGE_USAGE_TRANSFER_DST_BIT |
                  VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
                  VK_IMAGE_USAGE_SAMPLED_BIT);
     VkBuffer src_buffer = qoCreateBuffer(t_device,
         .size = buffer_size,
-        .usage = VK_BUFFER_USAGE_TRANSFER_SOURCE_BIT);
+        .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
     VkBuffer dest_buffer = qoCreateBuffer(t_device,
         .size = buffer_size,
-        .usage = VK_BUFFER_USAGE_TRANSFER_SOURCE_BIT);
+        .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 
     VkDeviceMemory image_mem = qoAllocImageMemory(t_device, image,
         .memoryTypeIndex = t_mem_type_index_for_device_access);
@@ -511,7 +511,7 @@ miptree_create(void)
                         .depth = 1,
                     },
                     .tiling = VK_IMAGE_TILING_LINEAR,
-                    .usage = VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT);
+                    .usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
                 qoBindImageMemory(t_device, src_vk_image, src_buffer_mem,
                                   buffer_offset);
                 break;
@@ -533,7 +533,7 @@ miptree_create(void)
                         .depth = 1,
                     },
                     .tiling = VK_IMAGE_TILING_LINEAR,
-                    .usage = VK_IMAGE_USAGE_TRANSFER_DESTINATION_BIT);
+                    .usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT);
                 qoBindImageMemory(t_device, dest_vk_image, dest_buffer_mem,
                                   buffer_offset);
                 break;

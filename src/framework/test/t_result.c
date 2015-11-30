@@ -255,7 +255,7 @@ t_compare_stencil_image(void)
                                         t->def->depthstencil_format,
                                         &format_props);
     if (!(format_props.optimalTilingFeatures &
-          VK_FORMAT_FEATURE_BLIT_SOURCE_BIT))
+          VK_FORMAT_FEATURE_BLIT_SRC_BIT))
         return true;
 
     const cru_format_info_t *finfo = t_format_info(t->def->depthstencil_format);

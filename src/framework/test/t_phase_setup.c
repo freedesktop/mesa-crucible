@@ -158,7 +158,7 @@ t_setup_framebuffer(void)
         },
         .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
                  VK_IMAGE_USAGE_SAMPLED_BIT |
-                 VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT);
+                 VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
 
     VkDeviceMemory color_mem = qoAllocImageMemory(t->vk.device,
         t->vk.color_image,
@@ -191,7 +191,7 @@ t_setup_framebuffer(void)
             },
             .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT |
                      VK_IMAGE_USAGE_SAMPLED_BIT |
-                     VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT);
+                     VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
 
         VkDeviceMemory ds_mem = qoAllocImageMemory(t->vk.device,
             t->vk.ds_image,

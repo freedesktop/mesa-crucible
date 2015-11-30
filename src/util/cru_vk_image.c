@@ -89,8 +89,8 @@ setup_map(cru_vk_image_t *self)
     r = vkCreateBuffer(dev, &(VkBufferCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
             .size = buffer_size,
-            .usage = VK_BUFFER_USAGE_TRANSFER_SOURCE_BIT |
-                     VK_BUFFER_USAGE_TRANSFER_DESTINATION_BIT,
+            .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT |
+                     VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         },
         &self->map.vk_buffer);
     if (r != VK_SUCCESS)

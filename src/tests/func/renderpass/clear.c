@@ -84,7 +84,7 @@ test_color8(void)
                 .depth = 1,
             },
             .tiling = VK_IMAGE_TILING_OPTIMAL,
-            .usage = VK_IMAGE_USAGE_TRANSFER_SOURCE_BIT |
+            .usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
                      VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
 
         VkDeviceMemory mem = qoAllocImageMemory(t_device, images[i],
@@ -111,7 +111,7 @@ test_color8(void)
             .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
             .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
             .initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-            .finalLayout = VK_IMAGE_LAYOUT_TRANSFER_SOURCE_OPTIMAL,
+            .finalLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
         };
 
         att_references[i] = (VkAttachmentReference) {
@@ -145,7 +145,7 @@ test_color8(void)
 
         dest_buffers[i] = qoCreateBuffer(t_device,
             .size = dest_buffer_size,
-            .usage = VK_BUFFER_USAGE_TRANSFER_DESTINATION_BIT);
+            .usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT);
 
         VkDeviceMemory dest_buffer_mem = qoAllocBufferMemory(t_device,
             dest_buffers[i], .memoryTypeIndex = t_mem_type_index_for_mmap);
@@ -216,7 +216,7 @@ test_color8(void)
     for (uint32_t i = 0; i < num_attachments; ++i) {
 
         vkCmdCopyImageToBuffer(cmd, images[i],
-            VK_IMAGE_LAYOUT_TRANSFER_SOURCE_OPTIMAL,
+            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
             dest_buffers[i],
             /*regionCount*/ 1,
             &(VkBufferImageCopy) {

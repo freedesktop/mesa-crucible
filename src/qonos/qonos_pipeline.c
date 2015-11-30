@@ -43,7 +43,7 @@ qoCreateGraphicsPipeline(VkDevice device,
     VkPipelineDepthStencilStateCreateInfo ds_info;
     VkPipelineColorBlendStateCreateInfo cb_info;
     VkPipelineShaderStageCreateInfo stage_info[VK_SHADER_STAGE_NUM];
-    VkDynamicState dynamic_states[VK_DYNAMIC_STATE_NUM];
+    VkDynamicState dynamic_states[VK_DYNAMIC_STATE_RANGE_SIZE];
     VkPipelineDynamicStateCreateInfo dy_info;
     VkPipeline pipeline;
     VkResult result;
@@ -123,7 +123,7 @@ qoCreateGraphicsPipeline(VkDevice device,
 
     if (pipeline_info.pDynamicState == NULL) {
         int count = 0;
-        for (int s = 0; s < VK_DYNAMIC_STATE_NUM; s++) {
+        for (int s = 0; s < VK_DYNAMIC_STATE_RANGE_SIZE; s++) {
             if (extra->dynamicStates & (1u << s))
                 dynamic_states[count++] = s;
         }
