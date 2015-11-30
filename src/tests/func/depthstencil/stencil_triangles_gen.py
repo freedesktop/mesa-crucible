@@ -29,27 +29,27 @@ Enum = namedtuple('Enum', ('vk', 'short'))
 VK_COMPARE_OP_ALWAYS        = Enum('VK_COMPARE_OP_ALWAYS',        'always')
 VK_COMPARE_OP_NEVER         = Enum('VK_COMPARE_OP_NEVER',         'never')
 VK_COMPARE_OP_LESS          = Enum('VK_COMPARE_OP_LESS',          'less')
-VK_COMPARE_OP_LESS_EQUAL    = Enum('VK_COMPARE_OP_LESS_EQUAL',    'less-equal')
+VK_COMPARE_OP_LESS_OR_EQUAL = Enum('VK_COMPARE_OP_LESS_OR_EQUAL', 'less-equal')
 VK_COMPARE_OP_EQUAL         = Enum('VK_COMPARE_OP_EQUAL',         'equal')
-VK_COMPARE_OP_GREATER_EQUAL = Enum('VK_COMPARE_OP_GREATER_EQUAL', 'greater-equal')
+VK_COMPARE_OP_GREATER_OR_EQUAL = Enum('VK_COMPARE_OP_GREATER_OR_EQUAL', 'greater-equal')
 VK_COMPARE_OP_GREATER       = Enum('VK_COMPARE_OP_GREATER',       'greater')
 
 VK_STENCIL_OP_KEEP      = Enum('VK_STENCIL_OP_KEEP',      'keep')
 VK_STENCIL_OP_ZERO      = Enum('VK_STENCIL_OP_ZERO',      'zero')
 VK_STENCIL_OP_REPLACE   = Enum('VK_STENCIL_OP_REPLACE',   'replace')
-VK_STENCIL_OP_INC_CLAMP = Enum('VK_STENCIL_OP_INC_CLAMP', 'inc-clamp')
-VK_STENCIL_OP_DEC_CLAMP = Enum('VK_STENCIL_OP_DEC_CLAMP', 'dec-clamp')
+VK_STENCIL_OP_INCREMENT_AND_CLAMP = Enum('VK_STENCIL_OP_INCREMENT_AND_CLAMP', 'inc-clamp')
+VK_STENCIL_OP_DECREMENT_AND_CLAMP = Enum('VK_STENCIL_OP_DECREMENT_AND_CLAMP', 'dec-clamp')
 VK_STENCIL_OP_INVERT    = Enum('VK_STENCIL_OP_INVERT',    'invert')
-VK_STENCIL_OP_INC_WRAP  = Enum('VK_STENCIL_OP_INC_WRAP',  'inc-wrap')
-VK_STENCIL_OP_DEC_WRAP  = Enum('VK_STENCIL_OP_DEC_WRAP',  'dec-wrap')
+VK_STENCIL_OP_INCREMENT_AND_WRAP = Enum('VK_STENCIL_OP_INCREMENT_AND_WRAP',  'inc-wrap')
+VK_STENCIL_OP_DECREMENT_AND_WRAP = Enum('VK_STENCIL_OP_DECREMENT_AND_WRAP',  'dec-wrap')
 
 VK_COMPARE_OPS = [
     VK_COMPARE_OP_ALWAYS,
     VK_COMPARE_OP_NEVER,
     VK_COMPARE_OP_LESS,
-    VK_COMPARE_OP_LESS_EQUAL,
+    VK_COMPARE_OP_LESS_OR_EQUAL,
     VK_COMPARE_OP_EQUAL,
-    VK_COMPARE_OP_GREATER_EQUAL,
+    VK_COMPARE_OP_GREATER_OR_EQUAL,
     VK_COMPARE_OP_GREATER,
 ]
 
@@ -57,11 +57,11 @@ VK_STENCIL_OPS = [
     VK_STENCIL_OP_KEEP,
     VK_STENCIL_OP_ZERO,
     VK_STENCIL_OP_REPLACE,
-    VK_STENCIL_OP_INC_CLAMP,
-    VK_STENCIL_OP_DEC_CLAMP,
+    VK_STENCIL_OP_INCREMENT_AND_CLAMP,
+    VK_STENCIL_OP_DECREMENT_AND_CLAMP,
     VK_STENCIL_OP_INVERT,
-    VK_STENCIL_OP_INC_WRAP,
-    VK_STENCIL_OP_DEC_WRAP,
+    VK_STENCIL_OP_INCREMENT_AND_WRAP,
+    VK_STENCIL_OP_DECREMENT_AND_WRAP,
 ]
 
 template = dedent("""
@@ -106,9 +106,9 @@ def iter_params():
 
     for p in (Params(0x17, 0x17, compare_op, pass_op, fail_op)
               for compare_op in (VK_COMPARE_OP_LESS,
-                                 VK_COMPARE_OP_LESS_EQUAL,
+                                 VK_COMPARE_OP_LESS_OR_EQUAL,
                                  VK_COMPARE_OP_EQUAL,
-                                 VK_COMPARE_OP_GREATER_EQUAL,
+                                 VK_COMPARE_OP_GREATER_OR_EQUAL,
                                  VK_COMPARE_OP_GREATER)
               for pass_op in VK_STENCIL_OPS
               for fail_op in VK_STENCIL_OPS):

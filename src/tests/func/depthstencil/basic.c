@@ -208,7 +208,7 @@ test_define {
     .depthstencil_format = VK_FORMAT_D24_UNORM_X8,
     .user_data = &(test_params_t) {
         .depth_clear_value = 0.5,
-        .depth_compare_op = VK_COMPARE_OP_GREATER_EQUAL,
+        .depth_compare_op = VK_COMPARE_OP_GREATER_OR_EQUAL,
     },
 };
 
