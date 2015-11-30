@@ -97,9 +97,7 @@ setup_map(cru_vk_image_t *self)
         goto fail;
 
     VkMemoryRequirements mem_reqs;
-    r = vkGetBufferMemoryRequirements(dev, self->map.vk_buffer, &mem_reqs);
-    if (r != VK_SUCCESS)
-        goto fail;
+    vkGetBufferMemoryRequirements(dev, self->map.vk_buffer, &mem_reqs);
 
     r = vkAllocMemory(dev, &(VkMemoryAllocInfo) {
             .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO,

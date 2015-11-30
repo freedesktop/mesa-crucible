@@ -38,10 +38,7 @@ void
 qoGetPhysicalDeviceProperties(VkPhysicalDevice physical_dev,
                               VkPhysicalDeviceProperties *properties)
 {
-    VkResult result;
-
-    result = vkGetPhysicalDeviceProperties(physical_dev, properties);
-    t_assert(result == VK_SUCCESS);
+    vkGetPhysicalDeviceProperties(physical_dev, properties);
 }
 
 void
@@ -49,20 +46,15 @@ qoGetPhysicalDeviceMemoryProperties(
         VkPhysicalDevice physical_dev,
         VkPhysicalDeviceMemoryProperties *mem_props)
 {
-    VkResult result;
-
-    result = vkGetPhysicalDeviceMemoryProperties(physical_dev, mem_props);
-    t_assert(result == VK_SUCCESS);
+    vkGetPhysicalDeviceMemoryProperties(physical_dev, mem_props);
 }
 
 VkMemoryRequirements
 qoGetBufferMemoryRequirements(VkDevice dev, VkBuffer buffer)
 {
-    VkResult result;
     VkMemoryRequirements mem_reqs = {0};
 
-    result = vkGetBufferMemoryRequirements(dev, buffer, &mem_reqs);
-    t_assert(result == VK_SUCCESS);
+    vkGetBufferMemoryRequirements(dev, buffer, &mem_reqs);
 
     return mem_reqs;
 }
@@ -70,11 +62,9 @@ qoGetBufferMemoryRequirements(VkDevice dev, VkBuffer buffer)
 VkMemoryRequirements
 qoGetImageMemoryRequirements(VkDevice dev, VkImage image)
 {
-    VkResult result;
     VkMemoryRequirements mem_reqs = {0};
 
-    result = vkGetImageMemoryRequirements(dev, image, &mem_reqs);
-    t_assert(result == VK_SUCCESS);
+    vkGetImageMemoryRequirements(dev, image, &mem_reqs);
 
     return mem_reqs;
 }
