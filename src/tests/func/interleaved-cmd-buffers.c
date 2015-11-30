@@ -29,7 +29,7 @@ struct src {
 };
 
 struct dest {
-    VkCmdBuffer cmd;
+    VkCommandBuffer cmd;
     VkBuffer buffer;
     cru_image_t *cru_image;
 };
@@ -88,13 +88,9 @@ setup_src(struct src *src)
 static void
 setup_dest(struct dest *dest)
 {
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    VkCommandBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
 
-    vkBeginCommandBuffer(cmd,
-        &(VkCmdBufferBeginInfo) {
-            .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_BEGIN_INFO,
-            .flags = 0,
-        });
+    qoBeginCommandBuffer(cmd, .flags = 0);
 
     size_t buffer_size = 4 * t_width * t_height;
 

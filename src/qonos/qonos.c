@@ -105,11 +105,11 @@ qoBindImageMemory(VkDevice device, VkImage image,
 
 VkResult
 qoQueueSubmit(VkQueue queue, uint32_t cmdBufferCount,
-              const VkCmdBuffer *cmdBuffers, VkFence fence)
+              const VkCommandBuffer *commandBuffers, VkFence fence)
 {
     VkResult result;
 
-    result = vkQueueSubmit(queue, cmdBufferCount, cmdBuffers, fence);
+    result = vkQueueSubmit(queue, cmdBufferCount, commandBuffers, fence);
     t_assert(result == VK_SUCCESS);
 
     return result;
@@ -298,14 +298,14 @@ __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info)
     return view;
 }
 
-VkCmdBuffer
-__qoCreateCommandBuffer(VkDevice dev, VkCmdPool pool,
-                        const VkCmdBufferCreateInfo *info)
+VkCommandBuffer
+__qoCreateCommandBuffer(VkDevice dev, VkCommandPool pool,
+                        const VkCommandBufferCreateInfo *info)
 {
-    VkCmdBuffer cmd = QO_NULL_CMD_BUFFER;
+    VkCommandBuffer cmd = VK_NULL_HANDLE;
     VkResult result;
 
-    assert(memcmp(&info->cmdPool, &pool, sizeof(pool)) == 0);
+    assert(info->commandPool == pool);
 
     result = vkCreateCommandBuffer(dev, info, &cmd);
 
@@ -317,7 +317,8 @@ __qoCreateCommandBuffer(VkDevice dev, VkCmdPool pool,
 }
 
 VkResult
-__qoBeginCommandBuffer(VkCmdBuffer cmd, const VkCmdBufferBeginInfo *info)
+__qoBeginCommandBuffer(VkCommandBuffer cmd,
+                       const VkCommandBufferBeginInfo *info)
 {
     VkResult result;
 
@@ -328,7 +329,7 @@ __qoBeginCommandBuffer(VkCmdBuffer cmd, const VkCmdBufferBeginInfo *info)
 }
 
 VkResult
-__qoEndCommandBuffer(VkCmdBuffer cmd)
+__qoEndCommandBuffer(VkCommandBuffer cmd)
 {
     VkResult result;
 
@@ -368,7 +369,7 @@ __qoCreateRenderPass(VkDevice dev, const VkRenderPassCreateInfo *info)
     return pass;
 }
 
-VkResult __qoEndCommandBuffer(VkCmdBuffer cmd);
+VkResult __qoEndCommandBuffer(VkCommandBuffer cmd);
 
 VkImage
 __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info)

@@ -265,8 +265,8 @@ t_setup_vulkan(void)
     t->vk.pipeline_cache = qoCreatePipelineCache(t->vk.device);
 
     VkResult res = vkCreateCommandPool(t->vk.device,
-        &(VkCmdPoolCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_CMD_POOL_CREATE_INFO,
+        &(VkCommandPoolCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
             .queueFamilyIndex = 0,
             .flags = 0,
         }, &t->vk.cmd_pool);

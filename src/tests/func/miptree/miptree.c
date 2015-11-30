@@ -605,7 +605,7 @@ miptree_upload_copy_from_buffer(const test_data_t *data)
     const miptree_t *mt = data->mt;
     const mipslice_t *slice;
 
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    VkCommandBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
     cru_vec_foreach(slice, &mt->mipslices) {
@@ -644,7 +644,7 @@ miptree_download_copy_to_buffer(const test_data_t *data)
     const miptree_t *mt = data->mt;
     const mipslice_t *slice;
 
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    VkCommandBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
     cru_vec_foreach(slice, &mt->mipslices) {
@@ -684,7 +684,7 @@ miptree_upload_copy_from_linear_image(const test_data_t *data)
     const miptree_t *mt = data->mt;
     const mipslice_t *slice;
 
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    VkCommandBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
     cru_vec_foreach(slice, &mt->mipslices) {
@@ -732,7 +732,7 @@ miptree_download_copy_to_linear_image(const test_data_t *data)
     const miptree_t *mt = data->mt;
     const mipslice_t *slice;
 
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    VkCommandBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
     cru_vec_foreach(slice, &mt->mipslices) {
@@ -780,7 +780,7 @@ copy_color_images_with_draw(const test_data_t *data,
                             VkImageView attachment_views[],
                             uint32_t count)
 {
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    VkCommandBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
     vkCmdBindVertexBuffers(cmd, /*startBinding*/ 0, /*bindingCount*/ 1,
                            (VkBuffer[]) { data->draw.vertex_buffer},
@@ -837,7 +837,7 @@ copy_color_images_with_draw(const test_data_t *data,
                 .clearValueCount = 1,
                 .pClearValues = NULL
             },
-            VK_RENDER_PASS_CONTENTS_INLINE);
+            VK_SUBPASS_CONTENTS_INLINE);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                                 data->draw.pipeline_layout,
                                 /*firstSet*/ 0,

@@ -104,18 +104,18 @@ create_and_begin_render_pass(void)
             .pClearValues = (VkClearValue[]) {
                 { .color = { .float32 = { 1.0, 0.0, 0.0, 1.0 } } },
             }
-        }, VK_RENDER_PASS_CONTENTS_SECONDARY_CMD_BUFFERS);
+        }, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
 
     return pass;
 }
 
-static VkCmdBuffer
+static VkCommandBuffer
 make_secondary_cmd_buffer(VkRenderPass pass, VkPipeline pipeline,
-                          VkCmdBufferOptimizeFlags opt_flags)
+                          VkCommandBufferOptimizeFlags opt_flags)
 {
-    VkCmdBuffer secondary =
+    VkCommandBuffer secondary =
         qoCreateCommandBuffer(t_device, t_cmd_pool,
-                              .level = VK_CMD_BUFFER_LEVEL_SECONDARY);
+                              .level = VK_COMMAND_BUFFER_LEVEL_SECONDARY);
 
     qoBeginCommandBuffer(secondary,
         .flags = opt_flags,
@@ -134,7 +134,7 @@ test_small_secondaries(void)
     VkRenderPass pass = create_and_begin_render_pass();
     VkPipeline pipeline = create_pipeline(pass);
 
-    VkCmdBuffer secondaries[1024];
+    VkCommandBuffer secondaries[1024];
 
     for (int i = 0; i < 1024; i++) {
         secondaries[i] =
@@ -162,13 +162,13 @@ test_define {
 };
 
 static void
-do_test_large_secondary(VkCmdBufferOptimizeFlags opt_flags)
+do_test_large_secondary(VkCommandBufferOptimizeFlags opt_flags)
 {
     VkBuffer vbo = make_vbo();
     VkRenderPass pass = create_and_begin_render_pass();
     VkPipeline pipeline = create_pipeline(pass);
 
-    VkCmdBuffer secondary =
+    VkCommandBuffer secondary =
         make_secondary_cmd_buffer(pass, pipeline, opt_flags);
 
     for (int i = 0; i < 1024; i++) {

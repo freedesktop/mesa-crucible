@@ -154,7 +154,7 @@ test_push_constants(void)
             .pClearValues = (VkClearValue[]) {
                 { .color = { .float32 = { 0.0, 0.0, 0.0, 1.0 } } },
             }
-        }, VK_RENDER_PASS_CONTENTS_INLINE);
+        }, VK_SUBPASS_CONTENTS_INLINE);
 
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
     vkCmdBindVertexBuffers(t_cmd_buffer, 0, 1,

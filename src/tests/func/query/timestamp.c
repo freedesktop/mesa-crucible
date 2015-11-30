@@ -39,7 +39,7 @@ get_timestamp(void)
 
     qoBindBufferMemory(t_device, buffer, mem, 0);
 
-    VkCmdBuffer cmdBuffer = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    VkCommandBuffer cmdBuffer = qoCreateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmdBuffer);
     vkCmdWriteTimestamp(cmdBuffer, VK_TIMESTAMP_TYPE_TOP, buffer, 0);
     vkCmdWriteTimestamp(cmdBuffer, VK_TIMESTAMP_TYPE_BOTTOM, buffer, 8);

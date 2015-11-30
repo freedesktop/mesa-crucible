@@ -93,7 +93,7 @@ __t_queue(void)
     return &t->vk.queue;
 }
 
-const VkCmdPool *
+const VkCommandPool *
 __t_cmd_pool(void)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;
@@ -102,7 +102,7 @@ __t_cmd_pool(void)
     return &t->vk.cmd_pool;
 }
 
-const VkCmdBuffer *
+const VkCommandBuffer *
 __t_cmd_buffer(void)
 {
     ASSERT_TEST_IN_MAJOR_PHASE;

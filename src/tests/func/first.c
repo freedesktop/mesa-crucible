@@ -332,7 +332,7 @@ test(void)
             .pClearValues = (VkClearValue[]) {
                 { .color = { .float32 = { 1.0, 0.0, 0.0, 1.0 } } },
             }
-        }, VK_RENDER_PASS_CONTENTS_INLINE);
+        }, VK_SUBPASS_CONTENTS_INLINE);
 
     vkCmdBindVertexBuffers(t_cmd_buffer, 0, 2,
                            (VkBuffer[]) { vertex_buffer, vertex_buffer },

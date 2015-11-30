@@ -165,7 +165,7 @@ draw_triangle(void)
                 { .depthStencil = params->clear_value },
             },
         },
-        VK_RENDER_PASS_CONTENTS_INLINE);
+        VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindVertexBuffers(t_cmd_buffer,
                            /*startBinding*/ 0, /*bindingCount*/ 0,
                            NULL, NULL);

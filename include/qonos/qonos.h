@@ -226,12 +226,12 @@ typedef struct QoShaderCreateInfo_ {
     }, \
     .blendConst = {0.0f, 0.0f, 0.0f, 0.0f} /* default in OpenGL ES 3.1 */
 
-#define QO_CMD_BUFFER_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_CREATE_INFO, \
-    .level = VK_CMD_BUFFER_LEVEL_PRIMARY
+#define QO_COMMAND_BUFFER_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_CREATE_INFO, \
+    .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY
 
-#define QO_CMD_BUFFER_BEGIN_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_BEGIN_INFO
+#define QO_COMMAND_BUFFER_BEGIN_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO
 
 #define QO_ATTACHMENT_DESCRIPTION_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION, \
@@ -421,30 +421,30 @@ VkDescriptorSetLayout qoCreateDescriptorSetLayout(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
-VkCmdBuffer qoCreateCommandBuffer(VkDevice dev, VkCmdPool pool, ...);
+VkCommandBuffer qoCreateCommandBuffer(VkDevice dev, VkCommandPool pool, ...);
 #else
 #define qoCreateCommandBuffer(dev, pool, ...) \
     __qoCreateCommandBuffer(dev, pool, \
-        &(VkCmdBufferCreateInfo) { \
-            QO_CMD_BUFFER_CREATE_INFO_DEFAULTS, \
-            .cmdPool = pool, \
+        &(VkCommandBufferCreateInfo) { \
+            QO_COMMAND_BUFFER_CREATE_INFO_DEFAULTS, \
+            .commandPool = pool, \
             ##__VA_ARGS__, \
         })
 #endif
 
 #ifdef DOXYGEN
-VkResult qoBeginCommandBuffer(VkCmdBuffer cmd, ...);
+VkResult qoBeginCommandBuffer(VkCommandBuffer cmd, ...);
 #else
 #define qoBeginCommandBuffer(cmd, ...) \
     __qoBeginCommandBuffer(cmd, \
-        &(VkCmdBufferBeginInfo) { \
-            QO_CMD_BUFFER_BEGIN_INFO_DEFAULTS, \
+        &(VkCommandBufferBeginInfo) { \
+            QO_COMMAND_BUFFER_BEGIN_INFO_DEFAULTS, \
             ##__VA_ARGS__, \
     })
 #endif
 
 #ifdef DOXYGEN
-VkResult qoEndCommandBuffer(VkCmdBuffer cmd);
+VkResult qoEndCommandBuffer(VkCommandBuffer cmd);
 #else
 #define qoEndCommandBuffer(cmd) __qoEndCommandBuffer(cmd)
 #endif
@@ -507,7 +507,7 @@ VkShader qoCreateShader(VkDevice dev, ...);
 void qoEnumeratePhysicalDevices(VkInstance instance, uint32_t *count, VkPhysicalDevice *physical_devices);
 void qoGetPhysicalDeviceProperties(VkPhysicalDevice physical_dev, VkPhysicalDeviceProperties *properties);
 void qoGetPhysicalDeviceMemoryProperties(VkPhysicalDevice physical_dev, VkPhysicalDeviceMemoryProperties *mem_props);
-VkResult qoQueueSubmit(VkQueue queue, uint32_t cmdBufferCount, const VkCmdBuffer *cmdBuffers, VkFence fence);
+VkResult qoQueueSubmit(VkQueue queue, uint32_t cmdBufferCount, const VkCommandBuffer *cmdBuffers, VkFence fence);
 VkDeviceMemory __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info);
 VkDeviceMemory __qoAllocMemoryFromRequirements(VkDevice dev, const VkMemoryRequirements *mem_reqs, const VkMemoryAllocInfo *override_info);
 VkDeviceMemory __qoAllocBufferMemory(VkDevice dev, VkBuffer buffer, const VkMemoryAllocInfo *override_info);
@@ -522,9 +522,9 @@ VkResult qoAllocDescriptorSets(VkDevice dev, VkDescriptorPool descriptorPool,
                                VkDescriptorSetUsage usage, uint32_t count,
                                const VkDescriptorSetLayout *layouts,
                                VkDescriptorSet *sets);
-VkCmdBuffer __qoCreateCommandBuffer(VkDevice dev, VkCmdPool pool, const VkCmdBufferCreateInfo *info);
-VkResult __qoBeginCommandBuffer(VkCmdBuffer cmd, const VkCmdBufferBeginInfo *info);
-VkResult __qoEndCommandBuffer(VkCmdBuffer cmd);
+VkCommandBuffer __qoCreateCommandBuffer(VkDevice dev, VkCommandPool pool, const VkCommandBufferCreateInfo *info);
+VkResult __qoBeginCommandBuffer(VkCommandBuffer cmd, const VkCommandBufferBeginInfo *info);
+VkResult __qoEndCommandBuffer(VkCommandBuffer cmd);
 VkFramebuffer __qoCreateFramebuffer(VkDevice dev, const VkFramebufferCreateInfo *info);
 VkRenderPass __qoCreateRenderPass(VkDevice dev, const VkRenderPassCreateInfo *info);
 

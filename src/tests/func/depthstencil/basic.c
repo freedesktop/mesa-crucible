@@ -166,7 +166,7 @@ test(void)
                 { .color = { .float32 = { 0.2, 0.2, 0.2, 1.0 } } },
                 { .depthStencil = { .depth = params->depth_clear_value } },
             }
-        }, VK_RENDER_PASS_CONTENTS_INLINE);
+        }, VK_SUBPASS_CONTENTS_INLINE);
 
     vkCmdBindVertexBuffers(t_cmd_buffer, 0, 2,
                            (VkBuffer[]) { vertex_buffer, vertex_buffer },

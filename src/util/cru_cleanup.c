@@ -94,12 +94,12 @@ struct cmd_vk_buffer_view {
 
 struct cmd_vk_cmd_buffer {
     VkDevice dev;
-    VkCmdBuffer x;
+    VkCommandBuffer x;
 };
 
 struct cmd_vk_cmd_pool {
     VkDevice dev;
-    VkCmdPool x;
+    VkCommandPool x;
 };
 
 struct cmd_vk_descriptor_pool {
@@ -298,13 +298,13 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
             CMD_SET(x);
             break;
         }
-        case CRU_CLEANUP_CMD_VK_CMD_BUFFER: {
+        case CRU_CLEANUP_CMD_VK_COMMAND_BUFFER: {
             CMD_CREATE(struct cmd_vk_cmd_buffer);
             CMD_SET(dev);
             CMD_SET(x);
             break;
         }
-        case CRU_CLEANUP_CMD_VK_CMD_POOL: {
+        case CRU_CLEANUP_CMD_VK_COMMAND_POOL: {
             CMD_CREATE(struct cmd_vk_cmd_pool);
             CMD_SET(dev);
             CMD_SET(x);
@@ -504,12 +504,12 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
             CMD_DO(vkDestroyBufferView(cmd->dev, cmd->x));
             break;
         }
-        case CRU_CLEANUP_CMD_VK_CMD_BUFFER: {
+        case CRU_CLEANUP_CMD_VK_COMMAND_BUFFER: {
             CMD_GET(struct cmd_vk_cmd_buffer);
             CMD_DO(vkDestroyCommandBuffer(cmd->dev, cmd->x));
             break;
         }
-        case CRU_CLEANUP_CMD_VK_CMD_POOL: {
+        case CRU_CLEANUP_CMD_VK_COMMAND_POOL: {
             CMD_GET(struct cmd_vk_cmd_pool);
             CMD_DO(vkDestroyCommandPool(cmd->dev, cmd->x));
             break;

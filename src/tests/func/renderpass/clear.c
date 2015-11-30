@@ -199,7 +199,7 @@ test_color8(void)
         .height = height,
         .layers = 1);
 
-    VkCmdBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    VkCommandBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
 
     qoBeginCommandBuffer(cmd);
     vkCmdBeginRenderPass(cmd,
@@ -210,7 +210,7 @@ test_color8(void)
             .clearValueCount = num_attachments,
             .pClearValues = clear_values,
         },
-        VK_RENDER_PASS_CONTENTS_INLINE);
+        VK_SUBPASS_CONTENTS_INLINE);
     vkCmdEndRenderPass(cmd);
 
     for (uint32_t i = 0; i < num_attachments; ++i) {
@@ -300,7 +300,7 @@ test_color_render_area(void)
                 { .color = { .float32 = { 0, 1, 0, 1 }}},
             },
         },
-        VK_RENDER_PASS_CONTENTS_INLINE);
+        VK_SUBPASS_CONTENTS_INLINE);
     vkCmdEndRenderPass(t_cmd_buffer);
 
     // Clear a subregion to blue.
@@ -317,7 +317,7 @@ test_color_render_area(void)
                 { .color = { .float32 = { 0, 0, 1, 1 }}},
             },
         },
-        VK_RENDER_PASS_CONTENTS_INLINE);
+        VK_SUBPASS_CONTENTS_INLINE);
     vkCmdEndRenderPass(t_cmd_buffer);
 
     qoEndCommandBuffer(t_cmd_buffer);

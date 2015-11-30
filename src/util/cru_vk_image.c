@@ -130,19 +130,19 @@ static VkResult
 copy(cru_vk_image_t *self, enum copy_direction dir)
 {
     VkDevice dev = self->vk_dev;
-    VkCmdBuffer cmd = {0};
+    VkCommandBuffer cmd = VK_NULL_HANDLE;
     VkFence fence = {0};
     VkResult r = VK_SUCCESS;
 
-    r = vkCreateCommandBuffer(dev, &(VkCmdBufferCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_CMD_POOL_CREATE_INFO,
+    r = vkCreateCommandBuffer(dev, &(VkCommandBufferCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
         },
         &cmd);
     if (r != VK_SUCCESS)
         goto cleanup;
 
-    r = vkBeginCommandBuffer(cmd, &(VkCmdBufferBeginInfo) {
-            .sType = VK_STRUCTURE_TYPE_CMD_BUFFER_BEGIN_INFO,
+    r = vkBeginCommandBuffer(cmd, &(VkCommandBufferBeginInfo) {
+            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
         });
     if (r != VK_SUCCESS)
         goto cleanup;

@@ -168,7 +168,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
             .pClearValues = (VkClearValue[]) {
                 { .color = { .float32 = { 1.0, 0.0, 0.0, 1.0 } } },
             }
-        }, VK_RENDER_PASS_CONTENTS_INLINE);
+        }, VK_SUBPASS_CONTENTS_INLINE);
 
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 

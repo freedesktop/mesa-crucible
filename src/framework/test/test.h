@@ -145,8 +145,8 @@ struct test {
         VkDevice device;
         VkQueue queue;
         VkPipelineCache pipeline_cache;
-        VkCmdPool cmd_pool;
-        VkCmdBuffer cmd_buffer;
+        VkCommandPool cmd_pool;
+        VkCommandBuffer cmd_buffer;
         VkFramebuffer framebuffer;
 
         VkImage color_image;
