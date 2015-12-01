@@ -111,14 +111,14 @@ create_and_begin_render_pass(void)
 
 static VkCommandBuffer
 make_secondary_cmd_buffer(VkRenderPass pass, VkPipeline pipeline,
-                          VkCommandBufferOptimizeFlags opt_flags)
+                          VkCommandBufferUsageFlags usage_flags)
 {
     VkCommandBuffer secondary =
         qoCreateCommandBuffer(t_device, t_cmd_pool,
                               .level = VK_COMMAND_BUFFER_LEVEL_SECONDARY);
 
     qoBeginCommandBuffer(secondary,
-        .flags = opt_flags,
+        .flags = usage_flags,
         .renderPass = pass,
         .framebuffer = t_framebuffer);
 
@@ -138,8 +138,7 @@ test_small_secondaries(void)
 
     for (int i = 0; i < 1024; i++) {
         secondaries[i] =
-            make_secondary_cmd_buffer(pass, pipeline,
-                                      VK_CMD_BUFFER_OPTIMIZE_SMALL_BATCH_BIT);
+            make_secondary_cmd_buffer(pass, pipeline, 0);
 
         vkCmdBindVertexBuffers(secondaries[i], 0, 2,
                                (VkBuffer[]) { vbo, vbo },
@@ -162,14 +161,14 @@ test_define {
 };
 
 static void
-do_test_large_secondary(VkCommandBufferOptimizeFlags opt_flags)
+do_test_large_secondary(VkCommandBufferUsageFlags usage_flags)
 {
     VkBuffer vbo = make_vbo();
     VkRenderPass pass = create_and_begin_render_pass();
     VkPipeline pipeline = create_pipeline(pass);
 
     VkCommandBuffer secondary =
-        make_secondary_cmd_buffer(pass, pipeline, opt_flags);
+        make_secondary_cmd_buffer(pass, pipeline, usage_flags);
 
     for (int i = 0; i < 1024; i++) {
         vkCmdBindVertexBuffers(secondary, 0, 2,
@@ -190,7 +189,7 @@ do_test_large_secondary(VkCommandBufferOptimizeFlags opt_flags)
 static void
 test_large_secondary(void)
 {
-    do_test_large_secondary(0);
+    do_test_large_secondary(VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 }
 
 test_define {
@@ -202,7 +201,7 @@ test_define {
 static void
 test_large_secondary_no_simultaneous(void)
 {
-    do_test_large_secondary(VK_CMD_BUFFER_OPTIMIZE_NO_SIMULTANEOUS_USE_BIT);
+    do_test_large_secondary(0);
 }
 
 test_define {
