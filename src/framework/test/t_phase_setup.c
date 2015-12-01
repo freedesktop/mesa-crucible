@@ -232,8 +232,8 @@ t_setup_vulkan(void)
     vkCreateInstance(
         &(VkInstanceCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-            .pAppInfo = &(VkApplicationInfo) {
-                .pAppName = "crucible",
+            .pApplicationInfo = &(VkApplicationInfo) {
+                .pApplicationName = "crucible",
                 .apiVersion = VK_API_VERSION,
             },
             .pAllocCb = &(VkAllocCallbacks) {
