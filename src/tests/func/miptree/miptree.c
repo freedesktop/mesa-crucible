@@ -79,7 +79,7 @@ enum miptree_download_method {
 
 struct test_params {
     VkFormat format;
-    VkImageAspect aspect;
+    VkImageAspectFlagBits aspect;
     VkImageViewType view_type;
     uint32_t levels;
     uint32_t width;

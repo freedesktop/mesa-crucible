@@ -89,7 +89,7 @@ cru_image_from_filename(const char *filename);
 ///
 malloclike cru_image_t *
 cru_image_from_vk_image(VkDevice dev, VkQueue queue, VkImage image,
-                        VkFormat format, VkImageAspect aspect,
+                        VkFormat format, VkImageAspectFlagBits aspect,
                         uint32_t level0_width, uint32_t level0_height,
                         uint32_t miplevel, uint32_t array_slice,
                         uint32_t tmp_mem_type_index);
