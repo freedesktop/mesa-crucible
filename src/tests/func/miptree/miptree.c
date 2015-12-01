@@ -430,7 +430,7 @@ miptree_create(void)
         .imageType = image_type_from_image_view_type(params->view_type),
         .format = format,
         .mipLevels = levels,
-        .arraySize = array_length,
+        .arrayLayers = array_length,
         .extent = {
             .width = width,
             .height = height,
@@ -504,7 +504,7 @@ miptree_create(void)
                 src_vk_image = qoCreateImage(t_device,
                     .format = format,
                     .mipLevels = 1,
-                    .arraySize = 1,
+                    .arrayLayers = 1,
                     .extent = {
                         .width = level_width,
                         .height = level_height,
@@ -526,7 +526,7 @@ miptree_create(void)
                 dest_vk_image = qoCreateImage(t_device,
                     .format = format,
                     .mipLevels = 1,
-                    .arraySize = 1,
+                    .arrayLayers = 1,
                     .extent = {
                         .width = level_width,
                         .height = level_height,
@@ -878,9 +878,9 @@ miptree_upload_copy_with_draw(const test_data_t *data)
             .subresourceRange = {
                 .aspectMask = params->aspect,
                 .baseMipLevel = 0,
-                .mipLevels = 1,
+                .levelCount = 1,
                 .baseArrayLayer = 0,
-                .arraySize = 1,
+                .layerCount = 1,
             });
 
         att_views[i] = qoCreateImageView(t_device,
@@ -890,9 +890,9 @@ miptree_upload_copy_with_draw(const test_data_t *data)
             .subresourceRange = {
                 .aspectMask = params->aspect,
                 .baseMipLevel = slice->level,
-                .mipLevels = 1,
+                .levelCount = 1,
                 .baseArrayLayer = slice->array_slice,
-                .arraySize = 1,
+                .layerCount = 1,
             });
     }
 
@@ -929,9 +929,9 @@ miptree_download_copy_with_draw(const test_data_t *data)
             .subresourceRange = {
                 .aspectMask = params->aspect,
                 .baseMipLevel = slice->level,
-                .mipLevels = 1,
+                .levelCount = 1,
                 .baseArrayLayer = slice->array_slice,
-                .arraySize = 1,
+                .layerCount = 1,
             });
 
         att_views[i] = qoCreateImageView(t_device,
@@ -941,8 +941,9 @@ miptree_download_copy_with_draw(const test_data_t *data)
             .subresourceRange = {
                 .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
                 .baseMipLevel = 0,
+                .levelCount = 1,
                 .baseArrayLayer = 0,
-                .arraySize = 1,
+                .layerCount = 1,
             });
     }
 

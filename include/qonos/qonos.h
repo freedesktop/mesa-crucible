@@ -127,9 +127,8 @@ typedef struct QoShaderCreateInfo_ {
 
 #define QO_PIPELINE_CACHE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO, \
-    .initialSize = 0, \
-    .initialData = NULL, \
-    .maxSize = UINT32_MAX
+    .initialDataSize = 0, \
+    .pInitialData = NULL
 
 #define QO_PIPELINE_LAYOUT_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO, \
@@ -242,7 +241,7 @@ typedef struct QoShaderCreateInfo_ {
     .tiling = VK_IMAGE_TILING_OPTIMAL, \
     .usage = 0, \
     .mipLevels = 1, \
-    .arraySize = 1, \
+    .arrayLayers = 1, \
     .samples = 1
 
 #define QO_IMAGE_VIEW_CREATE_INFO_DEFAULTS \
@@ -250,9 +249,9 @@ typedef struct QoShaderCreateInfo_ {
     .subresourceRange = { \
         .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT, \
         .baseMipLevel = 0, \
-        .mipLevels = 1, \
+        .levelCount = 1, \
         .baseArrayLayer = 0, \
-        .arraySize = 1, \
+        .layerCount = 1, \
     }
 
 #define QO_SHADER_CREATE_INFO_DEFAULTS \

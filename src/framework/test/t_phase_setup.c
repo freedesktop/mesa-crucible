@@ -174,9 +174,9 @@ t_setup_framebuffer(void)
         .subresourceRange = {
             .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
             .baseMipLevel = 0,
-            .mipLevels = 1,
+            .levelCount = 1,
             .baseArrayLayer = 0,
-            .arraySize = 1,
+            .layerCount = 1,
         });
 
     attachments[n_attachments++] = t->vk.color_image_view;
@@ -208,9 +208,9 @@ t_setup_framebuffer(void)
                 .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT |
                               VK_IMAGE_ASPECT_STENCIL_BIT,
                 .baseMipLevel = 0,
-                .mipLevels = 1,
+                .levelCount = 1,
                 .baseArrayLayer = 0,
-                .arraySize = 1,
+                .layerCount = 1,
             });
 
         attachments[n_attachments++] = t->vk.depthstencil_image_view;

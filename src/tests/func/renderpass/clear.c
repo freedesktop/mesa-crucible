@@ -77,7 +77,7 @@ test_color8(void)
             .imageType = VK_IMAGE_TYPE_2D,
             .format = formats[i],
             .mipLevels = 1,
-            .arraySize = 1,
+            .arrayLayers = 1,
             .extent = {
                 .width = width,
                 .height = height,
@@ -99,9 +99,9 @@ test_color8(void)
             .subresourceRange = {
                 .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
                 .baseMipLevel = 0,
-                .mipLevels = 1,
+                .levelCount = 1,
                 .baseArrayLayer = 0,
-                .arraySize = 1,
+                .layerCount = 1,
             });
 
         att_descs[i] = (VkAttachmentDescription) {
