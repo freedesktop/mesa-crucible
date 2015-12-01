@@ -249,12 +249,12 @@ test(void)
         .format = VK_FORMAT_R8G8B8A8_UNORM);
 
     VkSampler sampler = qoCreateSampler(t_device,
-        .magFilter = VK_TEX_FILTER_LINEAR,
-        .minFilter = VK_TEX_FILTER_LINEAR,
-        .mipMode = VK_TEX_MIPMAP_MODE_NEAREST,
-        .addressModeU = VK_TEX_ADDRESS_MODE_CLAMP,
-        .addressModeV = VK_TEX_ADDRESS_MODE_CLAMP,
-        .addressModeW = VK_TEX_ADDRESS_MODE_CLAMP,
+        .magFilter = VK_FILTER_LINEAR,
+        .minFilter = VK_FILTER_LINEAR,
+        .mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST,
+        .addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+        .addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+        .addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
         .mipLodBias = 0,
         .maxAnisotropy = 0,
         .compareOp = VK_COMPARE_OP_GREATER,
