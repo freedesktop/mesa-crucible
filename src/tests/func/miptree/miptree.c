@@ -793,8 +793,8 @@ copy_color_images_with_draw(const test_data_t *data,
 
         vkCmdSetViewport(cmd, 1,
             &(VkViewport) {
-                .originX = 0,
-                .originY = 0,
+                .x = 0,
+                .y = 0,
                 .width = width,
                 .height = height,
                 .minDepth = 0,
