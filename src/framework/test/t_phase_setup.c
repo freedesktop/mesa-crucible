@@ -249,8 +249,8 @@ t_setup_vulkan(void)
     vkCreateDevice(t->vk.physical_dev,
         &(VkDeviceCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-            .queueRecordCount = 1,
-            .pRequestedQueues = &(VkDeviceQueueCreateInfo) {
+            .queueCreateInfoCount = 1,
+            .pQueueCreateInfos = &(VkDeviceQueueCreateInfo) {
                 .queueFamilyIndex = 0,
                 .queueCount = 1,
             },
