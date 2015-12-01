@@ -204,7 +204,6 @@ typedef struct QoShaderCreateInfo_ {
     .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO
 
 #define QO_ATTACHMENT_DESCRIPTION_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION, \
     .samples = 1, \
     .loadOp = VK_ATTACHMENT_LOAD_OP_LOAD, \
     .storeOp = VK_ATTACHMENT_STORE_OP_STORE, \
@@ -212,7 +211,6 @@ typedef struct QoShaderCreateInfo_ {
     .finalLayout = VK_IMAGE_LAYOUT_GENERAL
 
 #define QO_SUBPASS_DESCRIPTION_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION, \
     .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS, \
     .inputCount = 0, \
     .pInputAttachments = NULL, \

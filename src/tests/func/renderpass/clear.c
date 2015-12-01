@@ -105,7 +105,6 @@ test_color8(void)
             });
 
         att_descs[i] = (VkAttachmentDescription) {
-            .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION,
             .format = formats[i],
             .samples = 1,
             .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
@@ -181,7 +180,6 @@ test_color8(void)
         .subpassCount = 1,
         .pSubpasses = (VkSubpassDescription[]) {
             {
-                .sType = VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION,
                 .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
                 .colorCount = num_attachments,
                 .pColorAttachments = att_references,
@@ -259,7 +257,6 @@ test_color_render_area(void)
         .attachmentCount = 1,
         .pAttachments = (VkAttachmentDescription[]) {
             {
-                .sType = VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION,
                 .format = format,
                 .samples = 1,
                 .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
@@ -271,7 +268,6 @@ test_color_render_area(void)
         .subpassCount = 1,
         .pSubpasses = (VkSubpassDescription[]) {
             {
-                .sType = VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION,
                 .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
                 .colorCount = 1,
                 .pColorAttachments = (VkAttachmentReference[]) {
