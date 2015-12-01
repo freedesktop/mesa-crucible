@@ -49,7 +49,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
         .pSubpasses = (VkSubpassDescription[]) {
             {
                 QO_SUBPASS_DESCRIPTION_DEFAULTS,
-                .colorCount = 1,
+                .colorAttachmentCount = 1,
                 .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,

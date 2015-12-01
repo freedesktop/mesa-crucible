@@ -85,7 +85,7 @@ create_and_begin_render_pass(void)
         .pSubpasses = (VkSubpassDescription[]) {
             {
                 QO_SUBPASS_DESCRIPTION_DEFAULTS,
-                .colorCount = 1,
+                .colorAttachmentCount = 1,
                 .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,

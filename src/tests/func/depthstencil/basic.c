@@ -54,14 +54,14 @@ test(void)
         .pSubpasses = (VkSubpassDescription[]) {
             {
                 QO_SUBPASS_DESCRIPTION_DEFAULTS,
-                .colorCount = 1,
+                .colorAttachmentCount = 1,
                 .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,
                         .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
                     },
                 },
-                .depthStencilAttachment = {
+                .pDepthStencilAttachment = &(VkAttachmentReference) {
                     .attachment = 1,
                     .layout = VK_IMAGE_LAYOUT_GENERAL,
                 }

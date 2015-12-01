@@ -216,14 +216,11 @@ typedef struct QoShaderCreateInfo_ {
 
 #define QO_SUBPASS_DESCRIPTION_DEFAULTS \
     .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS, \
-    .inputCount = 0, \
+    .inputAttachmentCount = 0, \
     .pInputAttachments = NULL, \
     .pResolveAttachments = NULL, \
-    .depthStencilAttachment = { \
-        .attachment = VK_ATTACHMENT_UNUSED, \
-        .layout = VK_IMAGE_LAYOUT_GENERAL, \
-    }, \
-    .preserveCount = 0, \
+    .pDepthStencilAttachment = NULL, \
+    .preserveAttachmentCount = 0, \
     .pPreserveAttachments = NULL
 
 #define QO_FRAMEBUFFER_CREATE_INFO_DEFAULTS \

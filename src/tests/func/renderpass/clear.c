@@ -181,11 +181,8 @@ test_color8(void)
         .pSubpasses = (VkSubpassDescription[]) {
             {
                 .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
-                .colorCount = num_attachments,
+                .colorAttachmentCount = num_attachments,
                 .pColorAttachments = att_references,
-                .depthStencilAttachment = {
-                    .attachment = VK_ATTACHMENT_UNUSED,
-                },
             },
         });
 
@@ -269,15 +266,12 @@ test_color_render_area(void)
         .pSubpasses = (VkSubpassDescription[]) {
             {
                 .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
-                .colorCount = 1,
+                .colorAttachmentCount = 1,
                 .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,
                         .layout = VK_IMAGE_LAYOUT_GENERAL,
                     },
-                },
-                .depthStencilAttachment = {
-                    .attachment = VK_ATTACHMENT_UNUSED,
                 },
             },
         });
