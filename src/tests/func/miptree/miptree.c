@@ -1106,21 +1106,21 @@ init_draw_data(test_draw_data_t *draw_data)
             .layout = pipeline_layout,
             .pVertexInputState = &(VkPipelineVertexInputStateCreateInfo) {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-                .bindingCount = 1,
+                .vertexBindingDescriptionCount = 1,
                 .pVertexBindingDescriptions = (VkVertexInputBindingDescription[]) {
                     {
                         .binding = 0,
-                        .strideInBytes = num_position_components * sizeof(float),
+                        .stride = num_position_components * sizeof(float),
                         .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
                     },
                 },
-                .attributeCount = 1,
+                .vertexAttributeDescriptionCount = 1,
                 .pVertexAttributeDescriptions = (VkVertexInputAttributeDescription[]) {
                     {
                         .location = 0,
                         .binding = 0,
                         .format = VK_FORMAT_R32G32_SFLOAT,
-                        .offsetInBytes = 0,
+                        .offset = 0,
                     },
                 },
             },

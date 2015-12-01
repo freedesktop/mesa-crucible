@@ -59,32 +59,32 @@ create_pipeline(VkDevice device, VkPipelineLayout pipeline_layout,
 
     VkPipelineVertexInputStateCreateInfo vi_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-        .bindingCount = 2,
+        .vertexBindingDescriptionCount = 2,
         .pVertexBindingDescriptions = (VkVertexInputBindingDescription[]) {
             {
                 .binding = 0,
-                .strideInBytes = 16, // TODO: What is this? rgba_f32? xyzw_f32?
+                .stride = 16, // TODO: What is this? rgba_f32? xyzw_f32?
                 .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
             },
             {
                 .binding = 1,
-                .strideInBytes = 0,
+                .stride = 0,
                 .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
             },
         },
-        .attributeCount = 2,
+        .vertexAttributeDescriptionCount = 2,
         .pVertexAttributeDescriptions = (VkVertexInputAttributeDescription[]) {
             {
                 .location = 0,
                 .binding = 0,
                 .format = VK_FORMAT_R32G32B32A32_SFLOAT,
-                .offsetInBytes = 0,
+                .offset = 0,
             },
             {
                 .location = 1,
                 .binding = 1,
                 .format = VK_FORMAT_R32G32B32A32_SFLOAT,
-                .offsetInBytes = 0,
+                .offset = 0,
             },
         },
     };

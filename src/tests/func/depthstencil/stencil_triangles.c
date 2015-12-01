@@ -131,8 +131,8 @@ draw_triangle(void)
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .pVertexInputState = &(VkPipelineVertexInputStateCreateInfo) {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-                .bindingCount = 0,
-                .attributeCount = 0,
+                .vertexBindingDescriptionCount = 0,
+                .vertexAttributeDescriptionCount = 0,
             },
             .pDepthStencilState = &(VkPipelineDepthStencilStateCreateInfo) {
                 QO_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO_DEFAULTS,

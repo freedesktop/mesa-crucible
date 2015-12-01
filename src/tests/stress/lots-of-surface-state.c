@@ -79,21 +79,21 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
 
     VkPipelineVertexInputStateCreateInfo vi_create_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-        .bindingCount = 1,
+        .vertexBindingDescriptionCount = 1,
         .pVertexBindingDescriptions = (VkVertexInputBindingDescription[]) {
             {
                 .binding = 0,
-                .strideInBytes = 8,
+                .stride = 8,
                 .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
             },
         },
-        .attributeCount = 1,
+        .vertexAttributeDescriptionCount = 1,
         .pVertexAttributeDescriptions = (VkVertexInputAttributeDescription[]) {
             {
                 .location = 0,
                 .binding = 0,
                 .format = VK_FORMAT_R32G32_SFLOAT,
-                .offsetInBytes = 0,
+                .offset = 0,
             },
         },
     };
