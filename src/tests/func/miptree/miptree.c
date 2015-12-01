@@ -815,12 +815,12 @@ copy_color_images_with_draw(const test_data_t *data,
             (VkWriteDescriptorSet[]) {
                 {
                     .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                    .destSet = data->draw.desc_sets[0],
-                    .destBinding = 0,
-                    .destArrayElement = 0,
-                    .count = 1,
+                    .dstSet = data->draw.desc_sets[0],
+                    .dstBinding = 0,
+                    .dstArrayElement = 0,
+                    .descriptorCount = 1,
                     .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
-                    .pDescriptors = (VkDescriptorInfo[]) {
+                    .pImageInfo = (VkDescriptorImageInfo[]) {
                         {
                             .imageView = tex_views[i],
                             .imageLayout = VK_IMAGE_LAYOUT_GENERAL,
@@ -1076,21 +1076,20 @@ init_draw_data(test_draw_data_t *draw_data)
         }
     );
 
-    VkDescriptorSetLayout set_layouts[] = {
-        [0] = qoCreateDescriptorSetLayout(t_device,
-            .count = 1,
-            .pBinding = (VkDescriptorSetLayoutBinding[]) {
-                {
-                    .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
-                    .arraySize = 1,
-                    .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-                },
-            }),
-    };
+    VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
+        .bindingCount = 1,
+        .pBinding = (VkDescriptorSetLayoutBinding[]) {
+            {
+                .binding = 0,
+                .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+                .descriptorCount = 1,
+                .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+            },
+        });
 
     VkPipelineLayout pipeline_layout = qoCreatePipelineLayout(t_device,
-        .descriptorSetCount = ARRAY_LENGTH(set_layouts),
-        .pSetLayouts = set_layouts);
+        .setLayoutCount = 1,
+        .pSetLayouts = &set_layout);
 
     VkPipeline pipeline = qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
@@ -1139,11 +1138,8 @@ init_draw_data(test_draw_data_t *draw_data)
     memcpy(qoMapMemory(t_device, vb_mem, /*offset*/ 0, vb_size, /*flags*/ 0),
            position_data, sizeof(position_data));
 
-    VkDescriptorSet desc_sets[1];
-    qoAllocDescriptorSets(t_device, VK_NULL_HANDLE,
-                          VK_DESCRIPTOR_SET_USAGE_STATIC,
-                          ARRAY_LENGTH(set_layouts),
-                          set_layouts, desc_sets);
+    VkDescriptorSet desc_set =
+        qoAllocateDescriptorSet(t_device, .pSetLayouts = &set_layout);
 
     // Prevent dumb bugs by initializing the struct in one shot.
     *draw_data = (test_draw_data_t) {
@@ -1154,7 +1150,7 @@ init_draw_data(test_draw_data_t *draw_data)
         .pipeline = pipeline,
         .render_pass = pass,
         .desc_sets = {
-            desc_sets[0],
+            desc_set,
         },
     };
 }

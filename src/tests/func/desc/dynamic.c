@@ -145,36 +145,35 @@ test(void)
             }
         });
 
-    VkDescriptorSetLayout set_layout[1];
     const struct params *params = t_user_data;
 
-    set_layout[0] = qoCreateDescriptorSetLayout(t_device,
-            .count = 2,
+    VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
+            .bindingCount = 2,
             .pBinding = (VkDescriptorSetLayoutBinding[]) {
                 {
+                    .binding = 0,
                     .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                    .arraySize = 1,
+                    .descriptorCount = 1,
                     .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
                     .pImmutableSamplers = NULL,
                 },
                 {
+                    .binding = 1,
                     .descriptorType = params->descriptor_type,
-                    .arraySize = 2,
+                    .descriptorCount = 2,
                     .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
                     .pImmutableSamplers = NULL,
                 },
             });
 
     VkPipelineLayout pipeline_layout = qoCreatePipelineLayout(t_device,
-        .descriptorSetCount = 1,
-        .pSetLayouts = set_layout);
+        .setLayoutCount = 1,
+        .pSetLayouts = &set_layout);
 
     VkPipeline pipeline = create_pipeline(t_device, pipeline_layout, pass);
 
-    VkDescriptorSet set[1];
-    qoAllocDescriptorSets(t_device, VK_NULL_HANDLE,
-                          VK_DESCRIPTOR_SET_USAGE_STATIC,
-                          1, set_layout, set);
+    VkDescriptorSet set =
+        qoAllocateDescriptorSet(t_device, .pSetLayouts = &set_layout);
 
     VkBuffer buffer = qoCreateBuffer(t_device, .size = 4096);
 
@@ -212,19 +211,15 @@ test(void)
         (VkWriteDescriptorSet[]) {
             {
                 .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .destSet = set[0],
-                .destBinding = 0,
-                .destArrayElement = 0,
-                .count = 1,
+                .dstSet = set,
+                .dstBinding = 0,
+                .dstArrayElement = 0,
+                .descriptorCount = 1,
                 .descriptorType = params->descriptor_type,
-                .pDescriptors = (VkDescriptorInfo[]) {
-                    {
-                        .bufferInfo = {
-                           .buffer = buffer,
-                           .offset = 0,
-                           .range = sizeof(color),
-                        },
-                    }
+                .pBufferInfo = &(VkDescriptorBufferInfo) {
+                    .buffer = buffer,
+                    .offset = 0,
+                    .range = sizeof(color),
                 },
             },
         }, 0, NULL);
@@ -249,21 +244,21 @@ test(void)
     vkCmdBindDescriptorSets(t_cmd_buffer,
                             VK_PIPELINE_BIND_POINT_GRAPHICS,
                             pipeline_layout, 0, 1,
-                            &set[0], 1, dynamic_offsets);
+                            &set, 1, dynamic_offsets);
     vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     dynamic_offsets[0] = 32;
     vkCmdBindDescriptorSets(t_cmd_buffer,
                             VK_PIPELINE_BIND_POINT_GRAPHICS,
                             pipeline_layout, 0, 1,
-                            &set[0], 1, dynamic_offsets);
+                            &set, 1, dynamic_offsets);
     vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     dynamic_offsets[0] = 64;
     vkCmdBindDescriptorSets(t_cmd_buffer,
                             VK_PIPELINE_BIND_POINT_GRAPHICS,
                             pipeline_layout, 0, 1,
-                            &set[0], 1, dynamic_offsets);
+                            &set, 1, dynamic_offsets);
     vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     vkCmdEndRenderPass(t_cmd_buffer);

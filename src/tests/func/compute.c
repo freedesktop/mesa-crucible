@@ -29,24 +29,26 @@ test(void)
     VkDescriptorSetLayout set_layout;
 
     set_layout = qoCreateDescriptorSetLayout(t_device,
-            .count = 2,
+            .bindingCount = 2,
             .pBinding = (VkDescriptorSetLayoutBinding[]) {
                 {
+                    .binding = 0,
                     .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                    .arraySize = 1,
+                    .descriptorCount = 1,
                     .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
                     .pImmutableSamplers = NULL,
                 },
                 {
+                    .binding = 1,
                     .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
-                    .arraySize = 1,
+                    .descriptorCount = 1,
                     .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
                     .pImmutableSamplers = NULL,
                 },
             });
 
     VkPipelineLayout pipeline_layout = qoCreatePipelineLayout(t_device,
-        .descriptorSetCount = 1,
+        .setLayoutCount = 1,
         .pSetLayouts = &set_layout);
 
     VkShader cs = qoCreateShaderGLSL(
@@ -72,10 +74,8 @@ test(void)
             .layout = pipeline_layout
         }, &pipeline);
 
-    VkDescriptorSet set;
-    qoAllocDescriptorSets(t_device, VK_NULL_HANDLE,
-                          VK_DESCRIPTOR_SET_USAGE_STATIC,
-                          1, &set_layout, &set);
+    VkDescriptorSet set =
+        qoAllocateDescriptorSet(t_device, .pSetLayouts = &set_layout);
 
     VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024);
 
@@ -103,29 +103,27 @@ test(void)
         (VkWriteDescriptorSet[]) {
             {
                 .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .destSet = set,
-                .destBinding = 0,
-                .destArrayElement = 0,
-                .count = 1,
+                .dstSet = set,
+                .dstBinding = 0,
+                .dstArrayElement = 0,
+                .descriptorCount = 1,
                 .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                .pDescriptors = (VkDescriptorInfo[]) {
+                .pBufferInfo = (VkDescriptorBufferInfo[]) {
                     {
-                        .bufferInfo = {
-                            .buffer = buffer,
-                            .offset = 0,
-                            .range = 64,
-                        }
+                        .buffer = buffer,
+                        .offset = 0,
+                        .range = 64,
                     },
                 },
             },
             {
                 .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .destSet = set,
-                .destBinding = 1,
-                .destArrayElement = 0,
-                .count = 1,
+                .dstSet = set,
+                .dstBinding = 1,
+                .dstArrayElement = 0,
+                .descriptorCount = 1,
                 .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
-                .pDescriptors = (VkDescriptorInfo[]) {
+                .pImageInfo = (VkDescriptorImageInfo[]) {
                     { .sampler = sampler, },
                 },
             },

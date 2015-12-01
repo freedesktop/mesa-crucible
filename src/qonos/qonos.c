@@ -237,25 +237,22 @@ __qoCreateDescriptorSetLayout(VkDevice dev,
     return layout;
 }
 
-VkResult
-qoAllocDescriptorSets(VkDevice dev, VkDescriptorPool descriptorPool,
-                      VkDescriptorSetUsage usage, uint32_t count,
-                      const VkDescriptorSetLayout *layouts,
-                      VkDescriptorSet *sets)
+VkDescriptorSet
+__qoAllocateDescriptorSet(VkDevice dev, const VkDescriptorSetAllocateInfo *info)
 {
+    VkDescriptorSet set;
     VkResult result;
 
-    memset(sets, 0, count * sizeof(sets[0]));
-    result = vkAllocDescriptorSets(dev, descriptorPool, usage, count, layouts,
-                                   sets);
+    t_assert(info->setLayoutCount == 1);
+    t_assert(info->pSetLayouts != NULL);
+
+    result = vkAllocateDescriptorSets(dev, info, &set);
+
     t_assert(result == VK_SUCCESS);
+    t_assert(set != VK_NULL_HANDLE);
+    t_cleanup_push_vk_descriptor_set(dev, info->descriptorPool, set);
 
-    for (uint32_t i = 0; i < count; ++i) {
-        t_assert(sets[i] != VK_NULL_HANDLE);
-        t_cleanup_push_vk_descriptor_set(dev, descriptorPool, sets[i]);
-    }
-
-    return result;
+    return set;
 }
 
 VkBuffer

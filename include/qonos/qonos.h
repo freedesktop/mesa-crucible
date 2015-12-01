@@ -133,7 +133,7 @@ typedef struct QoShaderCreateInfo_ {
 
 #define QO_PIPELINE_LAYOUT_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO, \
-    .descriptorSetCount = 0, \
+    .setLayoutCount = 0, \
     .pSetLayouts = NULL
 
 #define QO_SAMPLER_CREATE_INFO_DEFAULTS \
@@ -141,6 +141,11 @@ typedef struct QoShaderCreateInfo_ {
 
 #define QO_DESCRIPTOR_SET_LAYOUT_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO
+
+#define QO_DESCRIPTOR_SET_ALLOCATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO, \
+    .descriptorPool = VK_NULL_HANDLE, \
+    .setLayoutCount = 1
 
 #define QO_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO, \
@@ -383,6 +388,17 @@ VkDescriptorSetLayout qoCreateDescriptorSetLayout(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
+VkDescriptorSet qoAllocateDescriptorSet(VkDevice dev, ...);
+#else
+#define qoAllocateDescriptorSet(dev, ...) \
+    __qoAllocateDescriptorSet(dev, \
+        &(VkDescriptorSetAllocateInfo) { \
+            QO_DESCRIPTOR_SET_ALLOCATE_INFO_DEFAULTS, \
+            ##__VA_ARGS__, \
+        })
+#endif
+
+#ifdef DOXYGEN
 VkCommandBuffer qoCreateCommandBuffer(VkDevice dev, VkCommandPool pool, ...);
 #else
 #define qoCreateCommandBuffer(dev, pool, ...) \
@@ -480,10 +496,7 @@ VkPipelineCache __qoCreatePipelineCache(VkDevice dev, const VkPipelineCacheCreat
 VkPipelineLayout __qoCreatePipelineLayout(VkDevice dev, const VkPipelineLayoutCreateInfo *info);
 VkSampler __qoCreateSampler(VkDevice dev, const VkSamplerCreateInfo *info);
 VkDescriptorSetLayout __qoCreateDescriptorSetLayout(VkDevice dev, const VkDescriptorSetLayoutCreateInfo *info);
-VkResult qoAllocDescriptorSets(VkDevice dev, VkDescriptorPool descriptorPool,
-                               VkDescriptorSetUsage usage, uint32_t count,
-                               const VkDescriptorSetLayout *layouts,
-                               VkDescriptorSet *sets);
+VkDescriptorSet __qoAllocateDescriptorSet(VkDevice dev, const VkDescriptorSetAllocateInfo *info);
 VkCommandBuffer __qoCreateCommandBuffer(VkDevice dev, VkCommandPool pool, const VkCommandBufferCreateInfo *info);
 VkResult __qoBeginCommandBuffer(VkCommandBuffer cmd, const VkCommandBufferBeginInfo *info);
 VkResult __qoEndCommandBuffer(VkCommandBuffer cmd);

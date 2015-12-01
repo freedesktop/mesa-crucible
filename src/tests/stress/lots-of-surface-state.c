@@ -61,20 +61,21 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
 
     //  Create the descriptor set layout.
     VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
-            .count = 1,
+            .bindingCount = 1,
             .pBinding = (VkDescriptorSetLayoutBinding[]) {
                 {
+                    .binding = 0,
                     .descriptorType = use_dynamic_offsets ?
                                       VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC:
                                       VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                    .arraySize = 12,
+                    .descriptorCount = 12,
                     .stageFlags = (1 << ubo_stage),
                     .pImmutableSamplers = NULL,
                 },
             });
 
     VkPipelineLayout pipeline_layout = qoCreatePipelineLayout(t_device,
-        .descriptorSetCount = 1,
+        .setLayoutCount = 1,
         .pSetLayouts = &set_layout);
 
     VkPipelineVertexInputStateCreateInfo vi_create_info = {
@@ -180,18 +181,14 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
     if (use_dynamic_offsets) {
         // Allocate and set up a single descriptor set.  We'll just re-bind
         // it with new dynamic offsets each time.
-        qoAllocDescriptorSets(t_device, VK_NULL_HANDLE,
-                              VK_DESCRIPTOR_SET_USAGE_STATIC,
-                              1, &set_layout, set);
+        set[0] = qoAllocateDescriptorSet(t_device, .pSetLayouts = &set_layout);
 
-        VkDescriptorInfo desc_info[12];
+        VkDescriptorBufferInfo buffer_info[12];
         for (int i = 0; i < 12; i++) {
-            desc_info[i] = (VkDescriptorInfo) {
-                .bufferInfo = {
-                    .buffer = ubo,
-                    .offset = 0,
-                    .range = 4,
-                },
+            buffer_info[i] = (VkDescriptorBufferInfo) {
+                .buffer = ubo,
+                .offset = 0,
+                .range = 4,
             };
         }
 
@@ -200,12 +197,12 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
             (VkWriteDescriptorSet[]) {
                 {
                     .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                    .destSet = set[0],
-                    .destBinding = 0,
-                    .destArrayElement = 0,
-                    .count = 12,
+                    .dstSet = set[0],
+                    .dstBinding = 0,
+                    .dstArrayElement = 0,
+                    .descriptorCount = 12,
                     .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                    .pDescriptors = desc_info,
+                    .pBufferInfo = buffer_info,
                 },
             }, 0, NULL);
     } else {
@@ -213,9 +210,14 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
         for (int i = 0; i < 1024; i++)
             layouts[i] = set_layout;
 
-        qoAllocDescriptorSets(t_device, VK_NULL_HANDLE,
-                              VK_DESCRIPTOR_SET_USAGE_STATIC,
-                              1024, layouts, set);
+        VkResult result = vkAllocateDescriptorSets(t_device,
+            &(VkDescriptorSetAllocateInfo) {
+                .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+                .descriptorPool = VK_NULL_HANDLE,
+                .setLayoutCount = 1024,
+                .pSetLayouts = layouts,
+            }, set);
+        t_assert(result == VK_SUCCESS);
     }
 
     for (int i = 0; i < 1024; i++) {
@@ -252,14 +254,12 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
                                     pipeline_layout, 0, 1,
                                     set, 12, offsets);
         } else {
-            VkDescriptorInfo desc_info[12];
+            VkDescriptorBufferInfo buffer_info[12];
             for (int j = 0; j < 12; j++) {
-                desc_info[j] = (VkDescriptorInfo) {
-                    .bufferInfo = {
-                        .buffer = ubo,
-                        .offset = offsets[j],
-                        .range = 4,
-                    },
+                buffer_info[j] = (VkDescriptorBufferInfo) {
+                    .buffer = ubo,
+                    .offset = offsets[j],
+                    .range = 4,
                 };
             }
 
@@ -268,12 +268,12 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
                 (VkWriteDescriptorSet[]) {
                     {
                         .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                        .destSet = set[i],
-                        .destBinding = 0,
-                        .destArrayElement = 0,
-                        .count = 12,
+                        .dstSet = set[i],
+                        .dstBinding = 0,
+                        .dstArrayElement = 0,
+                        .descriptorCount = 12,
                         .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                        .pDescriptors = desc_info,
+                        .pBufferInfo = buffer_info,
                     },
                 }, 0, NULL);
 
