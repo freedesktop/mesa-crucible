@@ -208,7 +208,7 @@ typedef struct QoShaderCreateInfo_ {
     .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO
 
 #define QO_ATTACHMENT_DESCRIPTION_DEFAULTS \
-    .samples = 1, \
+    .samples = VK_SAMPLE_COUNT_1_BIT, \
     .loadOp = VK_ATTACHMENT_LOAD_OP_LOAD, \
     .storeOp = VK_ATTACHMENT_STORE_OP_STORE, \
     .initialLayout = VK_IMAGE_LAYOUT_GENERAL, \
@@ -239,7 +239,7 @@ typedef struct QoShaderCreateInfo_ {
     .usage = 0, \
     .mipLevels = 1, \
     .arrayLayers = 1, \
-    .samples = 1
+    .samples = VK_SAMPLE_COUNT_1_BIT
 
 #define QO_IMAGE_VIEW_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO, \
