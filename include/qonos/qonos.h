@@ -185,8 +185,8 @@ typedef struct QoShaderCreateInfo_ {
 
 #define QO_PIPELINE_COLOR_BLEND_ATTACHMENT_STATE_DEFAULTS \
     .blendEnable = false, \
-    .channelWriteMask = (VK_CHANNEL_R_BIT | VK_CHANNEL_G_BIT | \
-                         VK_CHANNEL_B_BIT | VK_CHANNEL_A_BIT)
+    .colorWriteMask = (VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | \
+                       VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT)
 
 #define QO_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO, \
