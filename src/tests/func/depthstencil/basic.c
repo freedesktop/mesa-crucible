@@ -108,8 +108,8 @@ test(void)
         &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .pVertexInputState = &vi_create_info,
-            .pRasterState = &(VkPipelineRasterStateCreateInfo) {
-                QO_PIPELINE_RASTER_STATE_CREATE_INFO_DEFAULTS,
+            .pRasterizationState = &(VkPipelineRasterizationStateCreateInfo) {
+                QO_PIPELINE_RASTERIZATION_STATE_CREATE_INFO_DEFAULTS,
                 .depthClipEnable = true,
                 .rasterizerDiscardEnable = false,
             },

@@ -147,8 +147,8 @@ typedef struct QoShaderCreateInfo_ {
     .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, \
     .primitiveRestartEnable = false
 
-#define QO_PIPELINE_RASTER_STATE_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTER_STATE_CREATE_INFO, \
+#define QO_PIPELINE_RASTERIZATION_STATE_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO, \
     .depthClipEnable = false, \
     .rasterizerDiscardEnable = false, \
     .polygonMode = VK_POLYGON_MODE_FILL, \
@@ -180,7 +180,7 @@ typedef struct QoShaderCreateInfo_ {
 
 #define QO_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO, \
-    .rasterSamples = 1, \
+    .rasterizationSamples = 1, \
     .pSampleMask = NULL
 
 #define QO_PIPELINE_COLOR_BLEND_ATTACHMENT_STATE_DEFAULTS \

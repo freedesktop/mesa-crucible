@@ -38,7 +38,7 @@ qoCreateGraphicsPipeline(VkDevice device,
     VkViewport viewport;
     VkRect2D scissor;
     VkPipelineViewportStateCreateInfo vp_info;
-    VkPipelineRasterStateCreateInfo rs_info;
+    VkPipelineRasterizationStateCreateInfo rs_info;
     VkPipelineMultisampleStateCreateInfo ms_info;
     VkPipelineDepthStencilStateCreateInfo ds_info;
     VkPipelineColorBlendStateCreateInfo cb_info;
@@ -93,11 +93,11 @@ qoCreateGraphicsPipeline(VkDevice device,
         pipeline_info.pViewportState = &vp_info;
     }
 
-    if (pipeline_info.pRasterState == NULL) {
-        rs_info = (VkPipelineRasterStateCreateInfo) {
-            QO_PIPELINE_RASTER_STATE_CREATE_INFO_DEFAULTS,
+    if (pipeline_info.pRasterizationState == NULL) {
+        rs_info = (VkPipelineRasterizationStateCreateInfo) {
+            QO_PIPELINE_RASTERIZATION_STATE_CREATE_INFO_DEFAULTS,
         };
-        pipeline_info.pRasterState = &rs_info;
+        pipeline_info.pRasterizationState = &rs_info;
     }
 
     if (pipeline_info.pMultisampleState == NULL) {
