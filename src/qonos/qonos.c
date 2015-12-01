@@ -409,7 +409,7 @@ __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
     } else if (info->glslSize > 0) {
         assert(info->pGlsl != NULL);
         module_info.codeSize = info->glslSize;
-        module_info.pCode = info->pGlsl;
+        module_info.pCode = (const uint32_t *)info->pGlsl;
     } else {
         assert(info->spirvSize > 0 && info->pSpirv != NULL);
         module_info.codeSize = info->spirvSize;
