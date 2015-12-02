@@ -24,18 +24,43 @@
 
 static void *
 test_vk_alloc(void *pUserData, size_t size, size_t alignment,
-             VkSystemAllocType allocType)
+              VkSystemAllocationScope scope)
 {
+    assert(pUserData == (void *)0xdeadbeef);
     void *mem = malloc(size);
     memset(mem, 139, size);
     return mem;
 }
 
+static void *
+test_vk_realloc(void *pUserData, void *pOriginal, size_t size,
+                size_t alignment, VkSystemAllocationScope scope)
+{
+    assert(pUserData == (void *)0xdeadbeef);
+    return realloc(pOriginal, size);
+}
+
 static void
 test_vk_free(void *pUserData, void *pMem)
 {
+    assert(pUserData == (void *)0xdeadbeef);
     free(pMem);
 }
+
+static void
+test_vk_dummy_notify(void *pUserData, size_t size,
+                     VkInternalAllocationType allocationType,
+                     VkSystemAllocationScope allocationScope)
+{ }
+
+static const VkAllocationCallbacks test_alloc_cb = {
+    .pUserData = (void *)0xdeadbeef,
+    .pfnAllocation = test_vk_alloc,
+    .pfnReallocation = test_vk_realloc,
+    .pfnFree = test_vk_free,
+    .pfnInternalAllocation = test_vk_dummy_notify,
+    .pfnInternalFree = test_vk_dummy_notify,
+};
 
 /// Find the best VkMemoryType whose properties contain each flag in
 /// required_flags and contain no flag in the union of required_flags and
@@ -236,12 +261,8 @@ t_setup_vulkan(void)
                 .pApplicationName = "crucible",
                 .apiVersion = VK_API_VERSION,
             },
-            .pAllocCb = &(VkAllocCallbacks) {
-                .pfnAlloc = test_vk_alloc,
-                .pfnFree = test_vk_free,
-            },
-        }, &t->vk.instance);
-    t_cleanup_push_vk_instance(t->vk.instance);
+        }, &test_alloc_cb, &t->vk.instance);
+    t_cleanup_push_vk_instance(t->vk.instance, &test_alloc_cb);
 
     t_setup_phys_dev();
     t_setup_phys_dev_mem_props();
@@ -254,9 +275,9 @@ t_setup_vulkan(void)
                 .queueFamilyIndex = 0,
                 .queueCount = 1,
             },
-        }, &t->vk.device);
+        }, NULL, &t->vk.device);
 
-    t_cleanup_push_vk_device(t->vk.device);
+    t_cleanup_push_vk_device(t->vk.device, NULL);
 
     t_setup_framebuffer();
 
@@ -269,7 +290,7 @@ t_setup_vulkan(void)
             .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
             .queueFamilyIndex = 0,
             .flags = 0,
-        }, &t->vk.cmd_pool);
+        }, NULL, &t->vk.cmd_pool);
     t_assert(res == VK_SUCCESS);
     t_cleanup_push_vk_cmd_pool(t->vk.device, t->vk.cmd_pool);
 

@@ -65,9 +65,9 @@ cleanup_map(cru_vk_image_t *self)
     if (self->map.pixels)
         vkUnmapMemory(self->vk_dev, self->map.vk_mem);
     if (self->map.vk_mem != VK_NULL_HANDLE)
-        vkFreeMemory(self->vk_dev, self->map.vk_mem);
+        vkFreeMemory(self->vk_dev, self->map.vk_mem, NULL);
     if (self->map.vk_buffer != VK_NULL_HANDLE)
-        vkDestroyBuffer(self->vk_dev, self->map.vk_buffer);
+        vkDestroyBuffer(self->vk_dev, self->map.vk_buffer, NULL);
 
     self->map = (typeof(self->map)) {0};
 }
@@ -92,6 +92,7 @@ setup_map(cru_vk_image_t *self)
             .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT |
                      VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         },
+        NULL,
         &self->map.vk_buffer);
     if (r != VK_SUCCESS)
         goto fail;
@@ -99,11 +100,12 @@ setup_map(cru_vk_image_t *self)
     VkMemoryRequirements mem_reqs;
     vkGetBufferMemoryRequirements(dev, self->map.vk_buffer, &mem_reqs);
 
-    r = vkAllocMemory(dev, &(VkMemoryAllocInfo) {
-            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO,
+    r = vkAllocateMemory(dev, &(VkMemoryAllocateInfo) {
+            .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
             .memoryTypeIndex = self->vk_tmp_mem_type_index,
             .allocationSize = mem_reqs.size,
         },
+        NULL,
         &self->map.vk_mem);
     if (r != VK_SUCCESS)
         goto fail;
@@ -128,12 +130,20 @@ static VkResult
 copy(cru_vk_image_t *self, enum copy_direction dir)
 {
     VkDevice dev = self->vk_dev;
+    VkCommandPool cmd_pool = VK_NULL_HANDLE;
     VkCommandBuffer cmd = VK_NULL_HANDLE;
     VkFence fence = {0};
     VkResult r = VK_SUCCESS;
 
-    r = vkCreateCommandBuffer(dev, &(VkCommandBufferCreateInfo) {
+    r = vkCreateCommandPool(dev, &(VkCommandPoolCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+        },
+        NULL,
+        &cmd_pool);
+
+    r = vkCreateCommandBuffer(dev, &(VkCommandBufferCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_CREATE_INFO,
+            .commandPool = cmd_pool,
         },
         &cmd);
     if (r != VK_SUCCESS)
@@ -181,6 +191,7 @@ copy(cru_vk_image_t *self, enum copy_direction dir)
     r = vkCreateFence(dev, &(VkFenceCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
         },
+        NULL,
         &fence);
     if (r != VK_SUCCESS)
         goto cleanup;
@@ -198,9 +209,11 @@ copy(cru_vk_image_t *self, enum copy_direction dir)
 
 cleanup:
     if (fence != VK_NULL_HANDLE)
-        vkDestroyFence(dev, fence);
+        vkDestroyFence(dev, fence, NULL);
     if (cmd)
         vkDestroyCommandBuffer(dev, cmd);
+    if (cmd_pool)
+        vkDestroyCommandPool(dev, cmd_pool, NULL);
 
     return r;
 }

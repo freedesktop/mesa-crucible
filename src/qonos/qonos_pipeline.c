@@ -258,7 +258,7 @@ qoCreateGraphicsPipeline(VkDevice device,
     }
 
     result = vkCreateGraphicsPipelines(device, pipeline_cache,
-                                       1, &pipeline_info, &pipeline);
+                                       1, &pipeline_info, NULL, &pipeline);
 
     t_assert(result == VK_SUCCESS);
     t_assert(pipeline != VK_NULL_HANDLE);

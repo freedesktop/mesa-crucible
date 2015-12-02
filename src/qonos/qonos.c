@@ -106,14 +106,14 @@ qoQueueSubmit(VkQueue queue, uint32_t cmdBufferCount,
 }
 
 VkDeviceMemory
-__qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info)
+__qoAllocMemory(VkDevice dev, const VkMemoryAllocateInfo *info)
 {
     VkDeviceMemory memory = {0};
     VkResult result;
 
     t_assert(info->memoryTypeIndex != QO_MEMORY_TYPE_INDEX_INVALID);
 
-    result = vkAllocMemory(dev, info, &memory);
+    result = vkAllocateMemory(dev, info, NULL, &memory);
 
     t_assert(result == VK_SUCCESS);
     t_assert(memory != VK_NULL_HANDLE);
@@ -125,9 +125,9 @@ __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info)
 VkDeviceMemory
 __qoAllocMemoryFromRequirements(VkDevice dev,
                                 const VkMemoryRequirements *mem_reqs,
-                                const VkMemoryAllocInfo *override_info)
+                                const VkMemoryAllocateInfo *override_info)
 {
-    VkMemoryAllocInfo info = *override_info;
+    VkMemoryAllocateInfo info = *override_info;
 
     if (info.allocationSize == 0)
         info.allocationSize = mem_reqs->size;
@@ -141,7 +141,7 @@ __qoAllocMemoryFromRequirements(VkDevice dev,
 
 VkDeviceMemory
 __qoAllocBufferMemory(VkDevice dev, VkBuffer buffer,
-                      const VkMemoryAllocInfo *override_info)
+                      const VkMemoryAllocateInfo *override_info)
 {
     VkMemoryRequirements mem_reqs =
         qoGetBufferMemoryRequirements(dev, buffer);
@@ -151,7 +151,7 @@ __qoAllocBufferMemory(VkDevice dev, VkBuffer buffer,
 
 VkDeviceMemory
 __qoAllocImageMemory(VkDevice dev, VkImage image,
-                     const VkMemoryAllocInfo *override_info)
+                     const VkMemoryAllocateInfo *override_info)
 {
     VkMemoryRequirements mem_reqs =
         qoGetImageMemoryRequirements(dev, image);
@@ -182,7 +182,7 @@ __qoCreatePipelineCache(VkDevice dev, const VkPipelineCacheCreateInfo *info)
     VkPipelineCache pipeline_cache = {0};
     VkResult result;
 
-    result = vkCreatePipelineCache(dev, info, &pipeline_cache);
+    result = vkCreatePipelineCache(dev, info, NULL, &pipeline_cache);
 
     t_assert(result == VK_SUCCESS);
     t_assert(pipeline_cache != VK_NULL_HANDLE);
@@ -197,7 +197,7 @@ __qoCreatePipelineLayout(VkDevice dev, const VkPipelineLayoutCreateInfo *info)
     VkPipelineLayout pipeline_layout = {0};
     VkResult result;
 
-    result = vkCreatePipelineLayout(dev, info, &pipeline_layout);
+    result = vkCreatePipelineLayout(dev, info, NULL, &pipeline_layout);
 
     t_assert(result == VK_SUCCESS);
     t_assert(pipeline_layout != VK_NULL_HANDLE);
@@ -212,7 +212,7 @@ __qoCreateSampler(VkDevice dev, const VkSamplerCreateInfo *info)
     VkSampler sampler = {0};
     VkResult result;
 
-    result = vkCreateSampler(dev, info, &sampler);
+    result = vkCreateSampler(dev, info, NULL, &sampler);
 
     t_assert(result == VK_SUCCESS);
     t_assert(sampler != VK_NULL_HANDLE);
@@ -228,7 +228,7 @@ __qoCreateDescriptorSetLayout(VkDevice dev,
     VkDescriptorSetLayout layout = {0};
     VkResult result;
 
-    result = vkCreateDescriptorSetLayout(dev, info, &layout);
+    result = vkCreateDescriptorSetLayout(dev, info, NULL, &layout);
 
     t_assert(result == VK_SUCCESS);
     t_assert(layout != VK_NULL_HANDLE);
@@ -261,7 +261,7 @@ __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info)
     VkBuffer buffer = {0};
     VkResult result;
 
-    result = vkCreateBuffer(dev, info, &buffer);
+    result = vkCreateBuffer(dev, info, NULL, &buffer);
 
     t_assert(result == VK_SUCCESS);
     t_assert(buffer != VK_NULL_HANDLE);
@@ -276,7 +276,7 @@ __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info)
     VkBufferView view = {0};
     VkResult result;
 
-    result = vkCreateBufferView(dev, info, &view);
+    result = vkCreateBufferView(dev, info, NULL, &view);
 
     t_assert(result == VK_SUCCESS);
     t_assert(view != VK_NULL_HANDLE);
@@ -332,7 +332,7 @@ __qoCreateFramebuffer(VkDevice dev, const VkFramebufferCreateInfo *info)
     VkFramebuffer fb = {0};
     VkResult result;
 
-    result = vkCreateFramebuffer(dev, info, &fb);
+    result = vkCreateFramebuffer(dev, info, NULL, &fb);
 
     t_assert(result == VK_SUCCESS);
     t_assert(fb != VK_NULL_HANDLE);
@@ -347,7 +347,7 @@ __qoCreateRenderPass(VkDevice dev, const VkRenderPassCreateInfo *info)
     VkRenderPass pass = {0};
     VkResult result;
 
-    result = vkCreateRenderPass(dev, info, &pass);
+    result = vkCreateRenderPass(dev, info, NULL, &pass);
 
     t_assert(result == VK_SUCCESS);
     t_assert(pass != VK_NULL_HANDLE);
@@ -364,7 +364,7 @@ __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info)
     VkImage image = {0};
     VkResult result;
 
-    result = vkCreateImage(dev, info, &image);
+    result = vkCreateImage(dev, info, NULL, &image);
 
     t_assert(result == VK_SUCCESS);
     t_assert(image != VK_NULL_HANDLE);
@@ -379,7 +379,7 @@ __qoCreateImageView(VkDevice dev, const VkImageViewCreateInfo *info)
     VkImageView view = {0};
     VkResult result;
 
-    result = vkCreateImageView(dev, info, &view);
+    result = vkCreateImageView(dev, info, NULL, &view);
 
     t_assert(result == VK_SUCCESS);
     t_assert(view != VK_NULL_HANDLE);
@@ -413,7 +413,7 @@ __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
         module_info.pCode = info->pSpirv;
     }
 
-    result = vkCreateShaderModule(dev, &module_info, &module);
+    result = vkCreateShaderModule(dev, &module_info, NULL, &module);
 
     t_assert(result == VK_SUCCESS);
     t_assert(module != VK_NULL_HANDLE);

@@ -72,7 +72,7 @@ test(void)
             },
             .flags = 0,
             .layout = pipeline_layout
-        }, &pipeline);
+        }, NULL, &pipeline);
 
     VkDescriptorSet set =
         qoAllocateDescriptorSet(t_device, .pSetLayouts = &set_layout);

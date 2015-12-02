@@ -115,8 +115,8 @@ typedef struct QoShaderCreateInfo_ {
 #define QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS \
     .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST
 
-#define QO_MEMORY_ALLOC_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOC_INFO, \
+#define QO_MEMORY_ALLOCATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO, \
     .memoryTypeIndex = QO_MEMORY_TYPE_INDEX_INVALID
 
 #define QO_BUFFER_CREATE_INFO_DEFAULTS \
@@ -267,8 +267,8 @@ VkDeviceMemory qoAllocMemory(VkDevice dev, ...);
 #else
 #define qoAllocMemory(dev, ...) \
     __qoAllocMemory(dev, \
-        &(VkMemoryAllocInfo) { \
-            QO_MEMORY_ALLOC_INFO_DEFAULTS, \
+        &(VkMemoryAllocateInfo) { \
+            QO_MEMORY_ALLOCATE_INFO_DEFAULTS, \
             ##__VA_ARGS__ , \
         })
 #endif
@@ -277,12 +277,12 @@ VkDeviceMemory qoAllocMemory(VkDevice dev, ...);
 VkDeviceMemory
 qoAllocMemoryFromRequirements(VkDevice dev,
                               const VkMemoryRequirements *mem_reqs,
-                              const VkMemoryAllocInfo *va_args override_info);
+                              const VkMemoryAllocateInfo *va_args override_info);
 #else
 #define qoAllocMemoryFromRequirements(dev, mem_reqs, ...) \
     __qoAllocMemoryFromRequirements((dev), (mem_reqs), \
-        &(VkMemoryAllocInfo) { \
-            QO_MEMORY_ALLOC_INFO_DEFAULTS, \
+        &(VkMemoryAllocateInfo) { \
+            QO_MEMORY_ALLOCATE_INFO_DEFAULTS, \
             ##__VA_ARGS__, \
         })
 #endif
@@ -290,12 +290,12 @@ qoAllocMemoryFromRequirements(VkDevice dev,
 #ifdef DOXYGEN
 VkDeviceMemory
 qoAllocBufferMemory(VkDevice dev, VkBuffer buffer,
-                    const VkMemoryAllocInfo *va_args override_info);
+                    const VkMemoryAllocateInfo *va_args override_info);
 #else
 #define qoAllocBufferMemory(dev, buffer, ...) \
     __qoAllocBufferMemory((dev), (buffer), \
-        &(VkMemoryAllocInfo) { \
-            QO_MEMORY_ALLOC_INFO_DEFAULTS, \
+        &(VkMemoryAllocateInfo) { \
+            QO_MEMORY_ALLOCATE_INFO_DEFAULTS, \
             ##__VA_ARGS__ , \
         })
 #endif
@@ -303,12 +303,12 @@ qoAllocBufferMemory(VkDevice dev, VkBuffer buffer,
 #ifdef DOXYGEN
 VkDeviceMemory
 qoAllocImageMemory(VkDevice dev, VkImage image,
-                    const VkMemoryAllocInfo *va_args override_info);
+                    const VkMemoryAllocateInfo *va_args override_info);
 #else
 #define qoAllocImageMemory(dev, image, ...) \
     __qoAllocImageMemory((dev), (image), \
-        &(VkMemoryAllocInfo) { \
-            QO_MEMORY_ALLOC_INFO_DEFAULTS, \
+        &(VkMemoryAllocateInfo) { \
+            QO_MEMORY_ALLOCATE_INFO_DEFAULTS, \
             ##__VA_ARGS__ , \
         })
 #endif
@@ -482,10 +482,10 @@ void qoEnumeratePhysicalDevices(VkInstance instance, uint32_t *count, VkPhysical
 void qoGetPhysicalDeviceProperties(VkPhysicalDevice physical_dev, VkPhysicalDeviceProperties *properties);
 void qoGetPhysicalDeviceMemoryProperties(VkPhysicalDevice physical_dev, VkPhysicalDeviceMemoryProperties *mem_props);
 VkResult qoQueueSubmit(VkQueue queue, uint32_t cmdBufferCount, const VkCommandBuffer *cmdBuffers, VkFence fence);
-VkDeviceMemory __qoAllocMemory(VkDevice dev, const VkMemoryAllocInfo *info);
-VkDeviceMemory __qoAllocMemoryFromRequirements(VkDevice dev, const VkMemoryRequirements *mem_reqs, const VkMemoryAllocInfo *override_info);
-VkDeviceMemory __qoAllocBufferMemory(VkDevice dev, VkBuffer buffer, const VkMemoryAllocInfo *override_info);
-VkDeviceMemory __qoAllocImageMemory(VkDevice dev, VkImage image, const VkMemoryAllocInfo *override_info);
+VkDeviceMemory __qoAllocMemory(VkDevice dev, const VkMemoryAllocateInfo *info);
+VkDeviceMemory __qoAllocMemoryFromRequirements(VkDevice dev, const VkMemoryRequirements *mem_reqs, const VkMemoryAllocateInfo *override_info);
+VkDeviceMemory __qoAllocBufferMemory(VkDevice dev, VkBuffer buffer, const VkMemoryAllocateInfo *override_info);
+VkDeviceMemory __qoAllocImageMemory(VkDevice dev, VkImage image, const VkMemoryAllocateInfo *override_info);
 VkBuffer __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info);
 VkBufferView __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info);
 VkPipelineCache __qoCreatePipelineCache(VkDevice dev, const VkPipelineCacheCreateInfo *info);

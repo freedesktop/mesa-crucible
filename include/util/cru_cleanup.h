@@ -93,8 +93,8 @@ static inline void cru_cleanup_push_free(cru_cleanup_stack_t *c, void *data)    
 static inline void cru_cleanup_push_cru_cleanup_stack(cru_cleanup_stack_t *c, cru_cleanup_stack_t *x)                                       { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_CRU_CLEANUP_STACK,                x); }
 static inline void cru_cleanup_push_cru_image(cru_cleanup_stack_t *c, cru_image_t *x)                                                       { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_CRU_IMAGE,                        x); }
 
-static inline void cru_cleanup_push_vk_instance(cru_cleanup_stack_t *c, VkInstance x)                                                       { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_INSTANCE,                      x); }
-static inline void cru_cleanup_push_vk_device(cru_cleanup_stack_t *c, VkDevice x)                                                           { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DEVICE,                        x); }
+static inline void cru_cleanup_push_vk_instance(cru_cleanup_stack_t *c, VkInstance x, const VkAllocationCallbacks *a)                       { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_INSTANCE,                      x, a); }
+static inline void cru_cleanup_push_vk_device(cru_cleanup_stack_t *c, VkDevice x, const VkAllocationCallbacks *a)                           { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DEVICE,                        x, a); }
 
 static inline void cru_cleanup_push_vk_buffer(cru_cleanup_stack_t *c, VkDevice dev, VkBuffer x)                                             { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_BUFFER,                        dev, x); }
 static inline void cru_cleanup_push_vk_buffer_view(cru_cleanup_stack_t *c, VkDevice dev, VkBufferView x)                                    { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_BUFFER_VIEW,                   dev, x); }
