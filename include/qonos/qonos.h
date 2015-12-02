@@ -200,9 +200,10 @@ typedef struct QoShaderCreateInfo_ {
     }, \
     .blendConstants = {0.0f, 0.0f, 0.0f, 0.0f} /* default in OpenGL ES 3.1 */
 
-#define QO_COMMAND_BUFFER_CREATE_INFO_DEFAULTS \
-    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_CREATE_INFO, \
-    .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY
+#define QO_COMMAND_BUFFER_ALLOCATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO, \
+    .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY, \
+    .bufferCount = 1
 
 #define QO_COMMAND_BUFFER_BEGIN_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO
@@ -395,12 +396,12 @@ VkDescriptorSet qoAllocateDescriptorSet(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
-VkCommandBuffer qoCreateCommandBuffer(VkDevice dev, VkCommandPool pool, ...);
+VkCommandBuffer qoAllocateCommandBuffer(VkDevice dev, VkCommandPool pool, ...);
 #else
-#define qoCreateCommandBuffer(dev, pool, ...) \
-    __qoCreateCommandBuffer(dev, pool, \
-        &(VkCommandBufferCreateInfo) { \
-            QO_COMMAND_BUFFER_CREATE_INFO_DEFAULTS, \
+#define qoAllocateCommandBuffer(dev, pool, ...) \
+    __qoAllocateCommandBuffer(dev, pool, \
+        &(VkCommandBufferAllocateInfo) { \
+            QO_COMMAND_BUFFER_ALLOCATE_INFO_DEFAULTS, \
             .commandPool = pool, \
             ##__VA_ARGS__, \
         })
@@ -493,7 +494,7 @@ VkPipelineLayout __qoCreatePipelineLayout(VkDevice dev, const VkPipelineLayoutCr
 VkSampler __qoCreateSampler(VkDevice dev, const VkSamplerCreateInfo *info);
 VkDescriptorSetLayout __qoCreateDescriptorSetLayout(VkDevice dev, const VkDescriptorSetLayoutCreateInfo *info);
 VkDescriptorSet __qoAllocateDescriptorSet(VkDevice dev, const VkDescriptorSetAllocateInfo *info);
-VkCommandBuffer __qoCreateCommandBuffer(VkDevice dev, VkCommandPool pool, const VkCommandBufferCreateInfo *info);
+VkCommandBuffer __qoAllocateCommandBuffer(VkDevice dev, VkCommandPool pool, const VkCommandBufferAllocateInfo *info);
 VkResult __qoBeginCommandBuffer(VkCommandBuffer cmd, const VkCommandBufferBeginInfo *info);
 VkResult __qoEndCommandBuffer(VkCommandBuffer cmd);
 VkFramebuffer __qoCreateFramebuffer(VkDevice dev, const VkFramebufferCreateInfo *info);

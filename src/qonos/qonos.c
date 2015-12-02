@@ -286,19 +286,20 @@ __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info)
 }
 
 VkCommandBuffer
-__qoCreateCommandBuffer(VkDevice dev, VkCommandPool pool,
-                        const VkCommandBufferCreateInfo *info)
+__qoAllocateCommandBuffer(VkDevice dev, VkCommandPool pool,
+                          const VkCommandBufferAllocateInfo *info)
 {
     VkCommandBuffer cmd = VK_NULL_HANDLE;
     VkResult result;
 
     assert(info->commandPool == pool);
+    assert(info->bufferCount == 1);
 
-    result = vkCreateCommandBuffer(dev, info, &cmd);
+    result = vkAllocateCommandBuffers(dev, info, &cmd);
 
     t_assert(result == VK_SUCCESS);
     t_assert(cmd);
-    t_cleanup_push_vk_cmd_buffer(dev, cmd);
+    t_cleanup_push_vk_cmd_buffer(dev, pool, cmd);
 
     return cmd;
 }

@@ -62,7 +62,7 @@ static inline void t_cleanup_push_vk_device(VkDevice x, const VkAllocationCallba
 
 static inline void t_cleanup_push_vk_buffer(VkDevice dev, VkBuffer x)                                               { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_BUFFER, dev, x); }
 static inline void t_cleanup_push_vk_buffer_view(VkDevice dev, VkBufferView x)                                      { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_BUFFER_VIEW, dev, x); }
-static inline void t_cleanup_push_vk_cmd_buffer(VkDevice dev, VkCommandBuffer x)                                        { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_COMMAND_BUFFER, dev, x); }
+static inline void t_cleanup_push_vk_cmd_buffer(VkDevice dev, VkCommandPool pool, VkCommandBuffer x)                                        { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_COMMAND_BUFFER, dev, pool, x); }
 static inline void t_cleanup_push_vk_cmd_pool(VkDevice dev, VkCommandPool x)                                            { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_COMMAND_POOL, dev, x); }
 static inline void t_cleanup_push_vk_descriptor_pool(VkDevice dev, VkDescriptorPool x)                              { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_DESCRIPTOR_POOL, dev, x); }
 static inline void t_cleanup_push_vk_descriptor_set(VkDevice dev, VkDescriptorPool pool, VkDescriptorSet set)       { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET, dev, pool, set); }

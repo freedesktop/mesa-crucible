@@ -53,7 +53,7 @@ test_large_copy(void)
     qoBindBufferMemory(t_device, buffer1, mem, 0);
     qoBindBufferMemory(t_device, buffer2, mem, total_buffer_reqs.size / 2);
 
-    VkCommandBuffer cmdBuffer = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    VkCommandBuffer cmdBuffer = qoAllocateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmdBuffer);
 
     vkCmdPipelineBarrier(cmdBuffer, 0, VK_PIPELINE_STAGE_TRANSFER_BIT, false, 2,

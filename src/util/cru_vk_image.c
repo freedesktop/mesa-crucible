@@ -141,9 +141,10 @@ copy(cru_vk_image_t *self, enum copy_direction dir)
         NULL,
         &cmd_pool);
 
-    r = vkCreateCommandBuffer(dev, &(VkCommandBufferCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_CREATE_INFO,
+    r = vkAllocateCommandBuffers(dev, &(VkCommandBufferAllocateInfo) {
+            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
             .commandPool = cmd_pool,
+            .bufferCount = 1,
         },
         &cmd);
     if (r != VK_SUCCESS)
@@ -211,7 +212,7 @@ cleanup:
     if (fence != VK_NULL_HANDLE)
         vkDestroyFence(dev, fence, NULL);
     if (cmd)
-        vkDestroyCommandBuffer(dev, cmd);
+        vkFreeCommandBuffers(dev, cmd_pool, 1, &cmd);
     if (cmd_pool)
         vkDestroyCommandPool(dev, cmd_pool, NULL);
 

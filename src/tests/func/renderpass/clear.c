@@ -194,7 +194,7 @@ test_color8(void)
         .height = height,
         .layers = 1);
 
-    VkCommandBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    VkCommandBuffer cmd = qoAllocateCommandBuffer(t_device, t_cmd_pool);
 
     qoBeginCommandBuffer(cmd);
     vkCmdBeginRenderPass(cmd,

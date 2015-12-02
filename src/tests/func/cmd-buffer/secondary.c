@@ -114,8 +114,8 @@ make_secondary_cmd_buffer(VkRenderPass pass, VkPipeline pipeline,
                           VkCommandBufferUsageFlags usage_flags)
 {
     VkCommandBuffer secondary =
-        qoCreateCommandBuffer(t_device, t_cmd_pool,
-                              .level = VK_COMMAND_BUFFER_LEVEL_SECONDARY);
+        qoAllocateCommandBuffer(t_device, t_cmd_pool,
+                                .level = VK_COMMAND_BUFFER_LEVEL_SECONDARY);
 
     qoBeginCommandBuffer(secondary,
         .flags = usage_flags,

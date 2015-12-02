@@ -605,7 +605,7 @@ miptree_upload_copy_from_buffer(const test_data_t *data)
     const miptree_t *mt = data->mt;
     const mipslice_t *slice;
 
-    VkCommandBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    VkCommandBuffer cmd = qoAllocateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
     cru_vec_foreach(slice, &mt->mipslices) {
@@ -644,7 +644,7 @@ miptree_download_copy_to_buffer(const test_data_t *data)
     const miptree_t *mt = data->mt;
     const mipslice_t *slice;
 
-    VkCommandBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    VkCommandBuffer cmd = qoAllocateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
     cru_vec_foreach(slice, &mt->mipslices) {
@@ -684,7 +684,7 @@ miptree_upload_copy_from_linear_image(const test_data_t *data)
     const miptree_t *mt = data->mt;
     const mipslice_t *slice;
 
-    VkCommandBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    VkCommandBuffer cmd = qoAllocateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
     cru_vec_foreach(slice, &mt->mipslices) {
@@ -732,7 +732,7 @@ miptree_download_copy_to_linear_image(const test_data_t *data)
     const miptree_t *mt = data->mt;
     const mipslice_t *slice;
 
-    VkCommandBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    VkCommandBuffer cmd = qoAllocateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
     cru_vec_foreach(slice, &mt->mipslices) {
@@ -780,7 +780,7 @@ copy_color_images_with_draw(const test_data_t *data,
                             VkImageView attachment_views[],
                             uint32_t count)
 {
-    VkCommandBuffer cmd = qoCreateCommandBuffer(t_device, t_cmd_pool);
+    VkCommandBuffer cmd = qoAllocateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
     vkCmdBindVertexBuffers(cmd, /*startBinding*/ 0, /*bindingCount*/ 1,
                            (VkBuffer[]) { data->draw.vertex_buffer},

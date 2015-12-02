@@ -294,7 +294,7 @@ t_setup_vulkan(void)
     t_assert(res == VK_SUCCESS);
     t_cleanup_push_vk_cmd_pool(t->vk.device, t->vk.cmd_pool);
 
-    t->vk.cmd_buffer = qoCreateCommandBuffer(t->vk.device, t->vk.cmd_pool);
+    t->vk.cmd_buffer = qoAllocateCommandBuffer(t->vk.device, t->vk.cmd_pool);
 
     qoBeginCommandBuffer(t->vk.cmd_buffer);
 }

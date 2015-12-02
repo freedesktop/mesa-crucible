@@ -98,7 +98,7 @@ static inline void cru_cleanup_push_vk_device(cru_cleanup_stack_t *c, VkDevice x
 
 static inline void cru_cleanup_push_vk_buffer(cru_cleanup_stack_t *c, VkDevice dev, VkBuffer x)                                             { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_BUFFER,                        dev, x); }
 static inline void cru_cleanup_push_vk_buffer_view(cru_cleanup_stack_t *c, VkDevice dev, VkBufferView x)                                    { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_BUFFER_VIEW,                   dev, x); }
-static inline void cru_cleanup_push_vk_command_buffer(cru_cleanup_stack_t *c, VkDevice dev, VkCommandBuffer x)                                  { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_COMMAND_BUFFER,                    dev, x); }
+static inline void cru_cleanup_push_vk_command_buffer(cru_cleanup_stack_t *c, VkDevice dev, VkCommandPool pool, VkCommandBuffer x)          { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_COMMAND_BUFFER,                    dev, pool, x); }
 static inline void cru_cleanup_push_vk_descriptor_pool(cru_cleanup_stack_t *c, VkDevice dev, VkDescriptorPool x)                            { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DESCRIPTOR_POOL,               dev, x); }
 static inline void cru_cleanup_push_vk_descriptor_set(cru_cleanup_stack_t *c, VkDevice dev, VkDescriptorPool pool, VkDescriptorSet set)     { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET,                dev, pool, set); }
 static inline void cru_cleanup_push_vk_descriptor_set_layout(cru_cleanup_stack_t *c, VkDevice dev, VkDescriptorSetLayout x)                 { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_DESCRIPTOR_SET_LAYOUT,         dev, x); }
