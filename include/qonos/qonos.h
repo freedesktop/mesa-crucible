@@ -97,20 +97,20 @@ extern "C" {
 typedef struct QoExtraGraphicsPipelineCreateInfo_ {
     VkGraphicsPipelineCreateInfo *pNext;
     VkPrimitiveTopology topology;
-    VkShader vertexShader;
-    VkShader geometryShader;
-    VkShader fragmentShader;
+    VkShaderModule vertexShader;
+    VkShaderModule geometryShader;
+    VkShaderModule fragmentShader;
     uint32_t dynamicStates; // Bitfield
 } QoExtraGraphicsPipelineCreateInfo;
 
-typedef struct QoShaderCreateInfo_ {
+typedef struct QoShaderModuleCreateInfo_ {
     void *pNext;
     size_t spirvSize;
     const void *pSpirv;
     size_t glslSize;
     const char *pGlsl;
     VkShaderStage stage;
-} QoShaderCreateInfo;
+} QoShaderModuleCreateInfo;
 
 #define QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS \
     .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST
@@ -469,11 +469,11 @@ VkImageView qoCreateImageView(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
-VkShader qoCreateShader(VkDevice dev, ...);
+VkShader qoCreateShaderModule(VkDevice dev, ...);
 #else
-#define qoCreateShader(dev, ...) \
-    __qoCreateShader(dev, \
-        &(QoShaderCreateInfo) { \
+#define qoCreateShaderModule(dev, ...) \
+    __qoCreateShaderModule(dev, \
+        &(QoShaderModuleCreateInfo) { \
             .pNext = NULL, \
             ##__VA_ARGS__, \
         })
@@ -505,7 +505,7 @@ VkPipeline qoCreateGraphicsPipeline(VkDevice dev,
                                     const QoExtraGraphicsPipelineCreateInfo *info);
 VkImage __qoCreateImage(VkDevice dev, const VkImageCreateInfo *info);
 VkImageView __qoCreateImageView(VkDevice dev, const VkImageViewCreateInfo *info);
-VkShader __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info);
+VkShaderModule __qoCreateShaderModule(VkDevice dev, const QoShaderModuleCreateInfo *info);
 
 #ifdef __cplusplus
 }

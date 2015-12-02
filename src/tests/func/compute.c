@@ -51,7 +51,7 @@ test(void)
         .setLayoutCount = 1,
         .pSetLayouts = &set_layout);
 
-    VkShader cs = qoCreateShaderGLSL(
+    VkShaderModule cs = qoCreateShaderModuleGLSL(
         t_device, COMPUTE,
 
         layout (local_size_x = 8, local_size_y = 2, local_size_z = 2) in;
@@ -68,7 +68,8 @@ test(void)
             .pNext = NULL,
             .stage = {
                 .stage = VK_SHADER_STAGE_COMPUTE,
-                .shader = cs,
+                .module = cs,
+                .pName = "main",
             },
             .flags = 0,
             .layout = pipeline_layout

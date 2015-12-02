@@ -63,7 +63,6 @@ enum cru_cleanup_cmd {
     CRU_CLEANUP_CMD_VK_RENDER_PASS,
     CRU_CLEANUP_CMD_VK_SAMPLER,
     CRU_CLEANUP_CMD_VK_SEMAPHORE,
-    CRU_CLEANUP_CMD_VK_SHADER,
     CRU_CLEANUP_CMD_VK_SHADER_MODULE,
 };
 
@@ -113,7 +112,6 @@ static inline void cru_cleanup_push_vk_query_pool(cru_cleanup_stack_t *c, VkDevi
 static inline void cru_cleanup_push_vk_render_pass(cru_cleanup_stack_t *c, VkDevice dev, VkRenderPass x)                                    { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_RENDER_PASS,                   dev, x); }
 static inline void cru_cleanup_push_vk_sampler(cru_cleanup_stack_t *c, VkDevice dev, VkSampler x)                                           { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_SAMPLER,                       dev, x); }
 static inline void cru_cleanup_push_vk_semaphore(cru_cleanup_stack_t *c, VkDevice dev, VkSemaphore x)                                       { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_SEMAPHORE,                     dev, x); }
-static inline void cru_cleanup_push_vk_shader(cru_cleanup_stack_t *c, VkDevice dev, VkShader x)                                             { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_SHADER,                        dev, x); }
 static inline void cru_cleanup_push_vk_shader_module(cru_cleanup_stack_t *c, VkDevice dev, VkShaderModule x)                                { cru_cleanup_push_command(c, CRU_CLEANUP_CMD_VK_SHADER_MODULE,                 dev, x); }
 
 #ifdef __cplusplus

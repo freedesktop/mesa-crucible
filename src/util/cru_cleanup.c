@@ -186,11 +186,6 @@ struct cmd_vk_semaphore {
     VkSemaphore x;
 };
 
-struct cmd_vk_shader {
-    VkDevice dev;
-    VkShader x;
-};
-
 struct cmd_vk_shader_module {
     VkDevice dev;
     VkShaderModule x;
@@ -419,12 +414,6 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
             CMD_SET(x);
             break;
         }
-        case CRU_CLEANUP_CMD_VK_SHADER: {
-            CMD_CREATE(struct cmd_vk_shader);
-            CMD_SET(dev);
-            CMD_SET(x);
-            break;
-        }
         case CRU_CLEANUP_CMD_VK_SHADER_MODULE: {
             CMD_CREATE(struct cmd_vk_shader_module);
             CMD_SET(dev);
@@ -603,11 +592,6 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
         case CRU_CLEANUP_CMD_VK_SEMAPHORE: {
             CMD_GET(struct cmd_vk_semaphore);
             CMD_DO(vkDestroySemaphore(cmd->dev, cmd->x, NULL));
-            break;
-        }
-        case CRU_CLEANUP_CMD_VK_SHADER: {
-            CMD_GET(struct cmd_vk_shader);
-            CMD_DO(vkDestroyShader(cmd->dev, cmd->x));
             break;
         }
         case CRU_CLEANUP_CMD_VK_SHADER_MODULE: {

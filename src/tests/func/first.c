@@ -27,7 +27,7 @@ static VkPipeline
 create_pipeline(VkDevice device, VkPipelineLayout pipeline_layout,
                 VkRenderPass pass)
 {
-    VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
+    VkShaderModule vs = qoCreateShaderModuleGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
         layout(location = 1) in vec4 a_color;
         layout(set = 0, binding = 0) uniform block1 {
@@ -47,7 +47,7 @@ create_pipeline(VkDevice device, VkPipelineLayout pipeline_layout,
         }
     );
 
-    VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
+    VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
         layout(location = 0) out vec4 f_color;
         layout(location = 0) in vec4 v_color;
         layout(set = 0, binding = 1) uniform sampler2D tex;

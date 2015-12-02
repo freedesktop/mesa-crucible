@@ -49,7 +49,7 @@ test_basic_gs(void)
             }
         });
 
-    VkShader gs = qoCreateShaderGLSL(t_device, GEOMETRY,
+    VkShaderModule gs = qoCreateShaderModuleGLSL(t_device, GEOMETRY,
         layout(points) in;
         layout(triangle_strip, max_vertices = 4) out;
         layout(location = 0) in vec4 v_color[];

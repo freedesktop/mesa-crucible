@@ -389,11 +389,10 @@ __qoCreateImageView(VkDevice dev, const VkImageViewCreateInfo *info)
     return view;
 }
 
-VkShader
-__qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
+VkShaderModule
+__qoCreateShaderModule(VkDevice dev, const QoShaderModuleCreateInfo *info)
 {
-    VkShaderModule module = {0};
-    VkShader shader = {0};
+    VkShaderModule module = VK_NULL_HANDLE;
     VkResult result;
 
     VkShaderModuleCreateInfo module_info = {
@@ -420,18 +419,5 @@ __qoCreateShader(VkDevice dev, const QoShaderCreateInfo *info)
     t_assert(module != VK_NULL_HANDLE);
     t_cleanup_push_vk_shader_module(dev, module);
 
-    result = vkCreateShader(dev,
-        &(VkShaderCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_SHADER_CREATE_INFO,
-            .module = module,
-            .pName = "main",
-            .flags = 0,
-            .stage = info->stage,
-        }, &shader);
-
-    t_assert(result == VK_SUCCESS);
-    t_assert(shader != VK_NULL_HANDLE);
-    t_cleanup_push_vk_shader(dev, shader);
-
-    return shader;
+    return module;
 }

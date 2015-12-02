@@ -88,7 +88,7 @@ test_push_constants(void)
         }
     };
 
-    VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
+    VkShaderModule vs = qoCreateShaderModuleGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
         layout(push_constant, std140) uniform Push {
             float offset_x;
@@ -103,7 +103,7 @@ test_push_constants(void)
         }
     );
 
-    VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
+    VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
         layout(push_constant, std140) uniform Push {
             vec4 color;
         } u_push;

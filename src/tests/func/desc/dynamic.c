@@ -33,9 +33,9 @@ create_pipeline(VkDevice device,
 {
     const struct params *params = t_user_data;
 
-    VkShader vs;
+    VkShaderModule vs;
     if (params->descriptor_type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC) {
-        vs = qoCreateShaderGLSL(t_device, VERTEX,
+        vs = qoCreateShaderModuleGLSL(t_device, VERTEX,
             layout(location = 0) in vec4 a_position;
             layout(std140, set = 0, binding = 0) uniform block1 {
                 vec4 color;
@@ -48,7 +48,7 @@ create_pipeline(VkDevice device,
                 v_color = u1.color;
             });
     } else {
-        vs = qoCreateShaderGLSL(t_device, VERTEX,
+        vs = qoCreateShaderModuleGLSL(t_device, VERTEX,
             layout(location = 0) in vec4 a_position;
             layout(std140, set = 0, binding = 0) uniform block2 {
                 uint i;
@@ -65,7 +65,7 @@ create_pipeline(VkDevice device,
             });
     }
 
-    VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
+    VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
         layout(location = 0) out vec4 f_color;
         layout(location = 0) flat in vec4 v_color;
         void main()

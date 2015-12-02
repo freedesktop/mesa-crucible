@@ -115,7 +115,7 @@ class Shader:
             self._dump_spirv_code(f, var_prefix + '_spir_v_src')
 
         f.write(dedent("""\
-            static const QoShaderCreateInfo {0}_info = {{
+            static const QoShaderModuleCreateInfo {0}_info = {{
                 .glslSize = sizeof({0}_glsl_src),
                 .pGlsl = {0}_glsl_src,
             """.format(var_prefix)))
@@ -130,7 +130,7 @@ class Shader:
 
         f.write('};')
 
-token_exp = re.compile(r'(qoShaderCreateInfoGLSL|qoCreateShaderGLSL|\(|\)|,)')
+token_exp = re.compile(r'(qoShaderModuleCreateInfoGLSL|qoCreateShaderModuleGLSL|\(|\)|,)')
 
 class Parser:
     def __init__(self, f):
@@ -184,7 +184,7 @@ class Parser:
         t = next(self.token_iter)
         assert t == '('
 
-        if macro == 'qoCreateShaderGLSL':
+        if macro == 'qoCreateShaderModuleGLSL':
             # Throw away the device parameter
             t = next(self.token_iter)
             t = next(self.token_iter)
@@ -204,7 +204,7 @@ class Parser:
 
     def run(self):
         for t in self.token_iter:
-            if t in ('qoShaderCreateInfoGLSL', 'qoCreateShaderGLSL'):
+            if t in ('qoShaderModuleCreateInfoGLSL', 'qoCreateShaderModuleGLSL'):
                 self.handle_macro(t)
 
 def open_file(name, mode):
@@ -221,9 +221,10 @@ def open_file(name, mode):
 def parse_args():
     description = dedent("""\
         This program scrapes a C file for any instance of the
-        qoShaderCreateInfoGLSL and qoCreateShaderGLSL macaros, grabs the
-        GLSL source code, compiles it to SPIR-V.  The resulting SPIR-V code
-        is written to another C file as an array of 32-bit words.
+        qoShaderModuleCreateInfoGLSL and qoCreateShaderModuleGLSL macaros,
+        grabs the GLSL source code, compiles it to SPIR-V.  The resulting
+        SPIR-V code is written to another C file as an array of 32-bit
+        words.
 
         If '-' is passed as the input file or output file, stdin or stdout
         will be used instead of a file on disc.""")
@@ -277,11 +278,11 @@ with open_file(outfname, 'w') as outfile:
         #define __QO_SHADER_INFO_VAR2(_line) __qonos_shader ## _line ## _info
         #define __QO_SHADER_INFO_VAR(_line) __QO_SHADER_INFO_VAR2(_line)
 
-        #define qoShaderCreateInfoGLSL(stage, ...)  \\
+        #define qoShaderModuleCreateInfoGLSL(stage, ...)  \\
             __QO_SHADER_INFO_VAR(__LINE__)
 
-        #define qoCreateShaderGLSL(dev, stage, ...) \\
-            __qoCreateShader((dev), &__QO_SHADER_INFO_VAR(__LINE__))
+        #define qoCreateShaderModuleGLSL(dev, stage, ...) \\
+            __qoCreateShaderModule((dev), &__QO_SHADER_INFO_VAR(__LINE__))
         """))
 
     for shader in parser.shaders:

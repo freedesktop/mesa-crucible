@@ -33,7 +33,8 @@
 // amount of actual batch buffer space.
 
 static void
-test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
+test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
+                           VkShaderStage ubo_stage,
                            bool use_dynamic_offsets)
 {
     VkRenderPass pass = qoCreateRenderPass(t_device,
@@ -294,7 +295,7 @@ test_lots_of_surface_state(VkShader vs, VkShader fs, VkShaderStage ubo_stage,
 static void
 test_lots_of_surface_state_vs(bool use_dynamic_offsets)
 {
-    VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
+    VkShaderModule vs = qoCreateShaderModuleGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
         layout(location = 0) out vec4 v_color;
         layout(set = 0, binding =  0) uniform block { float f; } u[12];
@@ -308,7 +309,7 @@ test_lots_of_surface_state_vs(bool use_dynamic_offsets)
         }
     );
 
-    VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
+    VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
         layout(location = 0) in vec4 v_color;
         layout(location = 0) out vec4 f_color;
         void main()
@@ -348,7 +349,7 @@ test_define {
 static void
 test_lots_of_surface_state_fs(bool use_dynamic_offsets)
 {
-    VkShader vs = qoCreateShaderGLSL(t_device, VERTEX,
+    VkShaderModule vs = qoCreateShaderModuleGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
         void main()
         {
@@ -357,7 +358,7 @@ test_lots_of_surface_state_fs(bool use_dynamic_offsets)
     );
 
     // The fragment shader takes 12 UBOs.
-    VkShader fs = qoCreateShaderGLSL(t_device, FRAGMENT,
+    VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
         layout(location = 0) out vec4 f_color;
         layout(set = 0, binding =  0) uniform block { float f; } u[12];
         void main()

@@ -198,10 +198,10 @@ qoCreateGraphicsPipeline(VkDevice device,
     }
 
     if (!has_vs) {
-        VkShader vs = extra->vertexShader;
+        VkShaderModule vs = extra->vertexShader;
 
         if (!vs != VK_NULL_HANDLE) {
-            vs = qoCreateShaderGLSL(device, VERTEX,
+            vs = qoCreateShaderModuleGLSL(device, VERTEX,
                 layout(location = 0) in vec4 a_position;
                 layout(location = 1) in vec4 a_color;
                 layout(location = 0) out vec4 v_color;
@@ -217,7 +217,8 @@ qoCreateGraphicsPipeline(VkDevice device,
             (VkPipelineShaderStageCreateInfo) {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
                 .stage = VK_SHADER_STAGE_VERTEX,
-                .shader = vs,
+                .module = vs,
+                .pName = "main",
                 .pSpecializationInfo = NULL,
             };
     }
@@ -229,16 +230,17 @@ qoCreateGraphicsPipeline(VkDevice device,
             (VkPipelineShaderStageCreateInfo) {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
                 .stage = VK_SHADER_STAGE_GEOMETRY,
-                .shader = extra->geometryShader,
+                .module = extra->geometryShader,
+                .pName = "main",
                 .pSpecializationInfo = NULL,
             };
     }
 
     if (!has_fs) {
-        VkShader fs = extra->fragmentShader;
+        VkShaderModule fs = extra->fragmentShader;
 
         if (!fs != VK_NULL_HANDLE) {
-            fs = qoCreateShaderGLSL(device, FRAGMENT,
+            fs = qoCreateShaderModuleGLSL(device, FRAGMENT,
                 layout(location = 0) out vec4 f_color;
                 layout(location = 0) in vec4 v_color;
                 void main()
@@ -252,7 +254,8 @@ qoCreateGraphicsPipeline(VkDevice device,
             (VkPipelineShaderStageCreateInfo) {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
                 .stage = VK_SHADER_STAGE_FRAGMENT,
-                .shader = fs,
+                .module = fs,
+                .pName = "main",
                 .pSpecializationInfo = NULL,
             };
     }
