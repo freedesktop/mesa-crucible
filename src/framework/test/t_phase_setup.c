@@ -133,23 +133,24 @@ t_setup_phys_dev_mem_props(void)
     // least one host-visible and host-coherent memory type.
     t->vk.mem_type_index_for_mmap = find_best_mem_type_index(
         &t->vk.physical_dev_mem_props,
-        /*require*/ VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-        /*allow*/ ~VK_MEMORY_PROPERTY_HOST_NON_COHERENT_BIT);
+        /*require*/ VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                    VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        /*allow*/ ~0);
 
     // The best memory type for device-access is one which gives the best
     // performance, which is likely one that is device-visible but not
     // host-visible.
     t->vk.mem_type_index_for_device_access = find_best_mem_type_index(
         &t->vk.physical_dev_mem_props,
-        /*require*/ VK_MEMORY_PROPERTY_DEVICE_ONLY,
-        /*allow*/ VK_MEMORY_PROPERTY_DEVICE_ONLY);
+        /*require*/ VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        /*allow*/ ~VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
     if (t->vk.mem_type_index_for_device_access == UINT32_MAX) {
         // There exists no device-only memory type. For device-access, then,
         // simply prefer the overall "best" memory type.
         t->vk.mem_type_index_for_device_access = find_best_mem_type_index(
             &t->vk.physical_dev_mem_props,
-            /*require*/ 0, /*allow*/ ~0);
+            /*require*/ VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, /*allow*/ ~0);
     }
 
     t_assertf(t->vk.mem_type_index_for_mmap != UINT32_MAX,
