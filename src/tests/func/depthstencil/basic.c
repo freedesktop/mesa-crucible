@@ -110,7 +110,6 @@ test(void)
             .pVertexInputState = &vi_create_info,
             .pRasterizationState = &(VkPipelineRasterizationStateCreateInfo) {
                 QO_PIPELINE_RASTERIZATION_STATE_CREATE_INFO_DEFAULTS,
-                .depthClipEnable = true,
                 .rasterizerDiscardEnable = false,
             },
             .pDepthStencilState = &(VkPipelineDepthStencilStateCreateInfo) {
