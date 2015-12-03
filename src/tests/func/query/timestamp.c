@@ -66,7 +66,7 @@ test_timestamp(void)
     t_assert(poll(NULL, 0, 100) == 0);
     b = get_timestamp();
 
-    freq = t_physical_dev_props->limits.timestampFrequency / 1000;
+    freq = 1 / (t_physical_dev_props->limits.timestampPeriod * 1000);
     elapsed_ms = (b - a) / freq;
     printf("difference: %lu - %lu = %lu\n", b / freq, a / freq, elapsed_ms);
     if (elapsed_ms < 90 || elapsed_ms > 110)
