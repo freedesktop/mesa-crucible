@@ -60,15 +60,16 @@ test_large_copy(void)
         (const void * []) {
             &(VkBufferMemoryBarrier) {
                 .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
-                .dstAccessMask = VK_ACCESS_HOST_WRITE_BIT,
-                .srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
+                .srcAccessMask = VK_ACCESS_HOST_WRITE_BIT,
+                .dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
                 .buffer = buffer1,
                 .offset = 0,
                 .size = buffer_size,
             },
             &(VkBufferMemoryBarrier) {
                 .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
-                .dstAccessMask = VK_ACCESS_HOST_WRITE_BIT,
+                .srcAccessMask = VK_ACCESS_HOST_WRITE_BIT,
+                .dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
                 .buffer = buffer2,
                 .offset = 0,
                 .size = buffer_size,
@@ -86,8 +87,8 @@ test_large_copy(void)
         (const void * []) {
             &(VkBufferMemoryBarrier) {
                 .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
-                .dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
-                .srcAccessMask = VK_ACCESS_HOST_READ_BIT,
+                .srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
+                .dstAccessMask = VK_ACCESS_HOST_READ_BIT,
                 .buffer = buffer2,
                 .offset = 0,
                 .size = buffer_size,
