@@ -26,35 +26,33 @@
 static uint64_t
 get_timestamp(void)
 {
-    size_t buffer_size = 1024;
-
-    VkBuffer buffer = qoCreateBuffer(t_device, .size = buffer_size);
-
-    VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
-
-    void *map = qoMapMemory(t_device, mem, /*offset*/ 0,
-                            buffer_size, /*flags*/ 0);
-    memset(map, 0x11, buffer_size);
-
-    qoBindBufferMemory(t_device, buffer, mem, 0);
+    VkQueryPool pool;
+    vkCreateQueryPool(t_device,
+        &(VkQueryPoolCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO,
+            .queryType = VK_QUERY_TYPE_TIMESTAMP,
+            .entryCount = 2,
+        }, NULL, &pool);
 
     VkCommandBuffer cmdBuffer = qoAllocateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmdBuffer);
-    vkCmdWriteTimestamp(cmdBuffer, VK_TIMESTAMP_TYPE_TOP, buffer, 0);
-    vkCmdWriteTimestamp(cmdBuffer, VK_TIMESTAMP_TYPE_BOTTOM, buffer, 8);
+    vkCmdWriteTimestamp(cmdBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, pool, 0);
+    vkCmdWriteTimestamp(cmdBuffer, VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, pool, 1);
     qoEndCommandBuffer(cmdBuffer);
 
     qoQueueSubmit(t_queue, 1, &cmdBuffer, VK_NULL_HANDLE);
 
     vkQueueWaitIdle(t_queue);
 
-    uint64_t *results = map, retval;
+    uint64_t results[2];
+    vkGetQueryPoolResults(t_device, pool, 0, 2,
+                          sizeof(results), results, sizeof *results,
+                          VK_QUERY_RESULT_64_BIT);
+
     printf("top timestamp:       %20ld  (%016lx)\n", results[0], results[0]);
     printf("bottom timestamp:    %20ld  (%016lx)\n", results[1], results[1]);
-    retval = results[0];
 
-    return retval;
+    return results[0];
 }
 
 static void
