@@ -634,7 +634,7 @@ miptree_upload_copy_from_buffer(const test_data_t *data)
     }
 
     qoEndCommandBuffer(cmd);
-    vkQueueSubmit(t_queue, 1, &cmd, VK_NULL_HANDLE);
+    qoQueueSubmit(t_queue, 1, &cmd, VK_NULL_HANDLE);
 }
 
 static void
@@ -673,7 +673,7 @@ miptree_download_copy_to_buffer(const test_data_t *data)
     }
 
     qoEndCommandBuffer(cmd);
-    vkQueueSubmit(t_queue, 1, &cmd, VK_NULL_HANDLE);
+    qoQueueSubmit(t_queue, 1, &cmd, VK_NULL_HANDLE);
 }
 
 
@@ -722,7 +722,7 @@ miptree_upload_copy_from_linear_image(const test_data_t *data)
     }
 
     qoEndCommandBuffer(cmd);
-    vkQueueSubmit(t_queue, 1, &cmd, VK_NULL_HANDLE);
+    qoQueueSubmit(t_queue, 1, &cmd, VK_NULL_HANDLE);
 }
 
 static void
@@ -770,7 +770,7 @@ miptree_download_copy_to_linear_image(const test_data_t *data)
     }
 
     qoEndCommandBuffer(cmd);
-    vkQueueSubmit(t_queue, 1, &cmd, VK_NULL_HANDLE);
+    qoQueueSubmit(t_queue, 1, &cmd, VK_NULL_HANDLE);
 }
 
 static void

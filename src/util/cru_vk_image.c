@@ -197,7 +197,11 @@ copy(cru_vk_image_t *self, enum copy_direction dir)
     if (r != VK_SUCCESS)
         goto cleanup;
 
-    r = vkQueueSubmit(self->vk_queue, 1, &cmd, fence);
+    r = vkQueueSubmit(self->vk_queue, 1,
+        &(VkSubmitInfo) {
+            .commandBufferCount = 1,
+            .pCommandBuffers = &cmd,
+        }, fence);
     if (r != VK_SUCCESS)
         goto cleanup;
 

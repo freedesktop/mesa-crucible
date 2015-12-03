@@ -99,7 +99,11 @@ qoQueueSubmit(VkQueue queue, uint32_t cmdBufferCount,
 {
     VkResult result;
 
-    result = vkQueueSubmit(queue, cmdBufferCount, commandBuffers, fence);
+    result = vkQueueSubmit(queue, 1,
+        &(VkSubmitInfo) {
+            .commandBufferCount = cmdBufferCount,
+            .pCommandBuffers = commandBuffers,
+        }, fence);
     t_assert(result == VK_SUCCESS);
 
     return result;
