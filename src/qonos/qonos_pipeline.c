@@ -28,6 +28,8 @@
 #include "tapi/t_data.h"
 #include "tapi/t_result.h"
 
+#define NUM_SHADER_STAGES 6
+
 VkPipeline
 qoCreateGraphicsPipeline(VkDevice device,
                          VkPipelineCache pipeline_cache,
@@ -42,7 +44,7 @@ qoCreateGraphicsPipeline(VkDevice device,
     VkPipelineMultisampleStateCreateInfo ms_info;
     VkPipelineDepthStencilStateCreateInfo ds_info;
     VkPipelineColorBlendStateCreateInfo cb_info;
-    VkPipelineShaderStageCreateInfo stage_info[VK_SHADER_STAGE_NUM];
+    VkPipelineShaderStageCreateInfo stage_info[NUM_SHADER_STAGES];
     VkDynamicState dynamic_states[VK_DYNAMIC_STATE_RANGE_SIZE];
     VkPipelineDynamicStateCreateInfo dy_info;
     VkPipeline pipeline;
@@ -140,10 +142,10 @@ qoCreateGraphicsPipeline(VkDevice device,
     bool has_fs = false, has_vs = false;
     for (unsigned i = 0; i < pipeline_info.stageCount; i++) {
         switch (pipeline_info.pStages[i].stage) {
-        case VK_SHADER_STAGE_VERTEX:
+        case VK_SHADER_STAGE_VERTEX_BIT:
             has_vs = true;
             break;
-        case VK_SHADER_STAGE_FRAGMENT:
+        case VK_SHADER_STAGE_FRAGMENT_BIT:
             has_fs = true;
             break;
         default:
@@ -191,7 +193,7 @@ qoCreateGraphicsPipeline(VkDevice device,
 
     if (!has_vs || !has_fs || extra->geometryShader != VK_NULL_HANDLE) {
         /* Make a copy of the shader stages so that we can modify it */
-        assert(pipeline_info.stageCount < VK_SHADER_STAGE_NUM);
+        assert(pipeline_info.stageCount < NUM_SHADER_STAGES);
         memcpy(stage_info, pipeline_info.pStages,
                pipeline_info.stageCount * sizeof(*pipeline_info.pStages));
         pipeline_info.pStages = stage_info;
@@ -216,7 +218,7 @@ qoCreateGraphicsPipeline(VkDevice device,
         stage_info[pipeline_info.stageCount++] =
             (VkPipelineShaderStageCreateInfo) {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-                .stage = VK_SHADER_STAGE_VERTEX,
+                .stage = VK_SHADER_STAGE_VERTEX_BIT,
                 .module = vs,
                 .pName = "main",
                 .pSpecializationInfo = NULL,
@@ -229,7 +231,7 @@ qoCreateGraphicsPipeline(VkDevice device,
         stage_info[pipeline_info.stageCount++] =
             (VkPipelineShaderStageCreateInfo) {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-                .stage = VK_SHADER_STAGE_GEOMETRY,
+                .stage = VK_SHADER_STAGE_GEOMETRY_BIT,
                 .module = extra->geometryShader,
                 .pName = "main",
                 .pSpecializationInfo = NULL,
@@ -253,7 +255,7 @@ qoCreateGraphicsPipeline(VkDevice device,
         stage_info[pipeline_info.stageCount++] =
             (VkPipelineShaderStageCreateInfo) {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-                .stage = VK_SHADER_STAGE_FRAGMENT,
+                .stage = VK_SHADER_STAGE_FRAGMENT_BIT,
                 .module = fs,
                 .pName = "main",
                 .pSpecializationInfo = NULL,

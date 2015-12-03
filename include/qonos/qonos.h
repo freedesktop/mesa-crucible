@@ -109,7 +109,7 @@ typedef struct QoShaderModuleCreateInfo_ {
     const void *pSpirv;
     size_t glslSize;
     const char *pGlsl;
-    VkShaderStage stage;
+    VkShaderStageFlagBits stage;
 } QoShaderModuleCreateInfo;
 
 #define QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS \

@@ -34,7 +34,7 @@
 
 static void
 test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
-                           VkShaderStage ubo_stage,
+                           VkShaderStageFlagBits ubo_stage,
                            bool use_dynamic_offsets)
 {
     VkRenderPass pass = qoCreateRenderPass(t_device,
@@ -70,7 +70,7 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
                                       VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC:
                                       VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                     .descriptorCount = 12,
-                    .stageFlags = (1 << ubo_stage),
+                    .stageFlags = ubo_stage,
                     .pImmutableSamplers = NULL,
                 },
             });
@@ -318,7 +318,7 @@ test_lots_of_surface_state_vs(bool use_dynamic_offsets)
         }
     );
 
-    test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_VERTEX,
+    test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_VERTEX_BIT,
                                use_dynamic_offsets);
 }
 
@@ -370,7 +370,7 @@ test_lots_of_surface_state_fs(bool use_dynamic_offsets)
         }
     );
 
-    test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_FRAGMENT,
+    test_lots_of_surface_state(vs, fs, VK_SHADER_STAGE_FRAGMENT_BIT,
                                use_dynamic_offsets);
 }
 
