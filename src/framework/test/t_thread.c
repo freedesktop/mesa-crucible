@@ -81,7 +81,7 @@ test_thread_start(void *arg)
 bool
 test_thread_create(test_t *t, void (*start)(void *arg), void *arg)
 {
-    pthread_t thread = NULL;
+    pthread_t thread;
     test_thread_arg_t *targ;
 
     targ = xmalloc(sizeof(*targ));
