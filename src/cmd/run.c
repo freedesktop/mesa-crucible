@@ -52,10 +52,16 @@ static int opt_separate_cleanup_thread = 1;
 //
 static const char *shortopts = "+:hj:I:";
 
+enum opt_name {
+    OPT_NAME_HELP = 'h',
+    OPT_NAME_JOBS = 'j',
+    OPT_NAME_ISLOATION = 'I',
+};
+
 static const struct option longopts[] = {
-    {"help",          no_argument,       NULL,           'h'},
-    {"jobs",          required_argument, NULL,           'j'},
-    {"isolation",     required_argument, NULL,           'I'},
+    {"help",          no_argument,       NULL,            OPT_NAME_HELP},
+    {"jobs",          required_argument, NULL,            OPT_NAME_JOBS},
+    {"isolation",     required_argument, NULL,            OPT_NAME_ISLOATION},
     {"fork",          no_argument,       &opt_fork,       true},
     {"no-fork",       no_argument,       &opt_fork,       false},
     {"no-cleanup",    no_argument,       &opt_no_cleanup, true},
@@ -112,11 +118,11 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
             goto done_getopt;
 	case 0:
 	    break;
-        case 'h':
+        case OPT_NAME_HELP:
             cru_command_page_help(cmd);
             exit(0);
             break;
-        case 'j':
+        case OPT_NAME_JOBS:
             if (!parse_i32(optarg, &opt_jobs)) {
                 cru_usage_error(cmd, "invalid value for --jobs");
             }
@@ -124,7 +130,7 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
                 cru_usage_error(cmd, "--jobs must be positive");
             }
             break;
-        case 'I':
+        case OPT_NAME_ISLOATION:
             if (cru_streq(optarg, "p") || cru_streq(optarg, "process")) {
                 opt_isolation = RUNNER_ISOLATION_MODE_PROCESS;
             } else if (cru_streq(optarg, "t") || cru_streq(optarg, "thread")) {
