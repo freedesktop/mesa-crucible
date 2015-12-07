@@ -81,6 +81,8 @@ AM_COND_IF([NO_PNG16],
            [libpng_LIBS="$libpng16_LIBS"])
 AC_SUBST(libpng_LIBS)
 
+PKG_CHECK_MODULES([LIBXML2], [libxml-2.0])
+
 AC_ARG_VAR([ASCIIDOC], [path to asciidoc executable])
 AC_SUBST([ASCIIDOC])
 AC_CHECK_PROGS([ASCIIDOC], [asciidoc])
