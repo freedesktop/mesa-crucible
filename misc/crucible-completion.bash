@@ -34,6 +34,7 @@ __crucible_run()
       --no-dump
       --no-cleanup
       --use-spir-v
+      --junit-xml
    "
 
    COMPREPLY=($(compgen -W "$flags $($1 ls-tests)" -- ${COMP_WORDS[COMP_CWORD]}))

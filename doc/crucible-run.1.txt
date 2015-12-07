@@ -12,6 +12,7 @@ SYNOPSIS
 *crucible run* [--fork|--no-fork] [--no-cleanup] [--dump|--no-dump]
                [--jobs=<jobs> | -j <jobs>] [--[no-]separate-cleanup-threads]
                [--use-spir-v|--no-spir-v] [--isolation=<method> | -I <method>]
+               [--junit-xml=<junit-xml-file>]
                [<pattern>...]
 
 DESCRIPTION
@@ -60,6 +61,9 @@ OPTIONS
     [fn1] The test's "result" thread is the one that chooses the test result,
     thus ending the test, usually by calling functions t_pass(), t_fail(), or
     t_assert().
+
+--junit-xml=<junit-xml-file>::
+    Write JUnit XML to the given file.
 
 EXAMPLES
 --------

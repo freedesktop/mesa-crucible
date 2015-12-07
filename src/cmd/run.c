@@ -37,6 +37,7 @@ static int opt_no_cleanup = 0;
 static int opt_dump = 0;
 static int opt_use_spir_v = 1;
 static int opt_separate_cleanup_thread = 1;
+static char *opt_junit_xml = NULL;
 
 // From man:getopt(3) :
 //
@@ -56,6 +57,10 @@ enum opt_name {
     OPT_NAME_HELP = 'h',
     OPT_NAME_JOBS = 'j',
     OPT_NAME_ISLOATION = 'I',
+
+    // Begin long-only options. They begin with the first char value outside
+    // the ASCII range.
+    OPT_NAME_JUNIT_XML = 128,
 };
 
 static const struct option longopts[] = {
@@ -69,6 +74,7 @@ static const struct option longopts[] = {
     {"no-dump",       no_argument,       &opt_dump,       false},
     {"use-spir-v",    no_argument,       &opt_use_spir_v, true},
     {"no-spir-v",     no_argument,       &opt_use_spir_v, false},
+    {"junit-xml",     required_argument, NULL,            OPT_NAME_JUNIT_XML},
 
     {"separate-cleanup-threads",    no_argument, &opt_separate_cleanup_thread, true},
     {"no-separate-cleanup-threads", no_argument, &opt_separate_cleanup_thread, false},
@@ -139,6 +145,10 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
                 cru_usage_error(cmd, "invalid value '%s' for --isolation",
                                 argv[optind-1]);
             }
+            break;
+        case OPT_NAME_JUNIT_XML:
+            opt_junit_xml = strdup(optarg);
+            logw("FINISHME: option --junit-xml");
             break;
         case ':':
             cru_usage_error(cmd, "%s requires an argument", argv[optind-1]);
