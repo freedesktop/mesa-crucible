@@ -68,6 +68,19 @@ if test "x$GLSLC" = "x"; then
     AC_MSG_ERROR([failed to find glslc])
 fi
 
+PKG_CHECK_MODULES([libpng16], [libpng16], [HAVE_LIBPNG16=1], [HAVE_LIBPNG16=0])
+AM_CONDITIONAL([NO_PNG16], [test $HAVE_LIBPNG16 = 0])
+AM_COND_IF([NO_PNG16],
+           [PKG_CHECK_MODULES([libpng12], [libpng12])])
+AM_COND_IF([NO_PNG16],
+           [libpng_CFLAGS="$libpng12_CFLAGS"],
+           [libpng_CFLAGS="$libpng16_CFLAGS"])
+AC_SUBST(libpng_CFLAGS)
+AM_COND_IF([NO_PNG16],
+           [libpng_LIBS="$libpng12_LIBS"],
+           [libpng_LIBS="$libpng16_LIBS"])
+AC_SUBST(libpng_LIBS)
+
 AC_ARG_VAR([ASCIIDOC], [path to asciidoc executable])
 AC_SUBST([ASCIIDOC])
 AC_CHECK_PROGS([ASCIIDOC], [asciidoc])

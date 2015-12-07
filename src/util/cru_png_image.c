@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <libpng16/png.h>
+#include <png.h>
 
 #include "util/log.h"
 #include "util/xalloc.h"
