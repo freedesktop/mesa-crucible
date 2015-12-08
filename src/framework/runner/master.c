@@ -109,6 +109,7 @@ static struct master {
     uint32_t num_pass;
     uint32_t num_fail;
     uint32_t num_skip;
+    uint32_t num_lost;
 
     uint32_t num_slaves;
     slave_t slaves[64];
@@ -218,9 +219,6 @@ master_print_header(void)
 static void
 master_print_summary(void)
 {
-    uint32_t num_ran = master.num_pass + master.num_fail + master.num_skip;
-    uint32_t num_lost = master.num_tests - num_ran;
-
     // A big, and perhaps unneeded, hammer.
     fflush(stdout);
     fflush(stderr);
@@ -230,7 +228,7 @@ master_print_summary(void)
     logi("pass %u", master.num_pass);
     logi("fail %u", master.num_fail);
     logi("skip %u", master.num_skip);
-    logi("lost %u", num_lost);
+    logi("lost %u", master.num_lost);
 }
 
 static void
@@ -494,8 +492,7 @@ master_cleanup_dead_slave(slave_t *slave)
     // Any remaining tests owned by the slave are lost.
     for (uint32_t i = 0; i < slave->tests.len; ++i) {
         const test_def_t *def = slave->tests.data[i];
-        log_tag("lost", "%s", def->name);
-        fflush(stdout);
+        master_report_result(def, TEST_RESULT_LOST);
     }
 
     assert(master.cur_dispatched_tests >= slave->tests.len);
@@ -558,6 +555,7 @@ master_report_result(const test_def_t *def, test_result_t result)
     case TEST_RESULT_PASS: master.num_pass++; break;
     case TEST_RESULT_FAIL: master.num_fail++; break;
     case TEST_RESULT_SKIP: master.num_skip++; break;
+    case TEST_RESULT_LOST: master.num_lost++; break;
     }
 }
 

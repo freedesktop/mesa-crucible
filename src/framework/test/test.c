@@ -35,6 +35,8 @@ test_result_to_string(test_result_t result)
         return "skip";
     case TEST_RESULT_FAIL:
         return "fail";
+    case TEST_RESULT_LOST:
+        return "lost";
     }
 
     cru_unreachable;

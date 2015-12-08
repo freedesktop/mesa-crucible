@@ -36,6 +36,7 @@ enum test_result {
     TEST_RESULT_PASS,
     TEST_RESULT_SKIP,
     TEST_RESULT_FAIL,
+    TEST_RESULT_LOST,
 };
 
 void test_result_merge(test_result_t *accum, test_result_t new_result);
