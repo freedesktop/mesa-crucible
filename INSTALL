@@ -7,6 +7,7 @@ External Dependencies
 - glslc, from Google's shaderc project (http://github.com/google/shaderc)
 - AsciiDoc (http://asciidoc.org)
 - ImageMagick (http://www.imagemagick.org/)
+- libxml2 (http://www.xmlsoft.org)
 
 
 Configure and Build
