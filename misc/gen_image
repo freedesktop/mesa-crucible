@@ -16,6 +16,7 @@ def die(msg):
 
 def parse_args():
     p = argparse.ArgumentParser()
+    p.add_argument('operation')
     p.add_argument('src_filename')
     p.add_argument('dest_filename')
     return p.parse_args()
@@ -25,6 +26,7 @@ def main():
 
     src_filename = args.src_filename
     dest_filename = args.dest_filename
+    operation = args.operation
 
     if re.search('grayscale', dest_filename):
         imread_flags = cv2.IMREAD_GRAYSCALE
@@ -40,7 +42,10 @@ def main():
     width = int(match.groups(0)[0])
     height = int(match.groups(0)[1])
 
-    res = cv2.resize(img, (width, height), interpolation = cv2.INTER_CUBIC)
+    if operation == 'scale':
+        res = cv2.resize(img, (width, height), interpolation = cv2.INTER_CUBIC)
+    else:
+        die('invalid operation: {!r}'.format(dest_filename))
 
     cv2.imwrite(dest_filename, res)
 
