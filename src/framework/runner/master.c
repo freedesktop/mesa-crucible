@@ -36,9 +36,13 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+#include <libxml/tree.h>
+
 #include "framework/test/test.h"
 #include "framework/test/test_def.h"
+
 #include "util/log.h"
+#include "util/string.h"
 
 #include "runner.h"
 #include "master.h"
@@ -114,11 +118,19 @@ static struct master {
     uint32_t num_slaves;
     slave_t slaves[64];
 
+    struct {
+        char *filepath;
+        FILE *file;
+        xmlDocPtr doc;
+        xmlNodePtr testsuite_node;
+    } junit;
+
 } master = {
     .epoll_fd = -1,
     .signal_fd = -1,
 };
 
+static uint32_t master_get_num_ran_tests(void);
 static void master_print_header(void);
 static void master_enter_dispatch_phase(void);
 static void master_enter_cleanup_phase(void);
@@ -173,6 +185,26 @@ static slave_t *find_slave_by_pid(pid_t pid);
          (s) < master.slaves + ARRAY_LENGTH(master.slaves);                 \
          (s) = (slave_t *) (s) + 1)
 
+/// Convert (const char *) to (const unsigned char *).
+///
+/// We need this annoying function because libxml2 strings are not (char *) but
+/// (xmlChar *), which is a typedef for (unsigned char *).
+static inline const unsigned char *
+u(const char *str)
+{
+    return (const unsigned char *) str;
+}
+
+static void
+junit_xml_error_handler(void *xml_ctx, const char *msg, ...)
+{
+    va_list va;
+
+    va_start(va, msg);
+    log_abort_v(msg, va);
+    va_end(va);
+}
+
 static void
 set_sigint_handler(sighandler_t handler)
 {
@@ -186,12 +218,145 @@ set_sigint_handler(sighandler_t handler)
     }
 }
 
+static bool
+junit_init(void)
+{
+    if (!runner_opts.junit_xml_filepath)
+        return true;
+
+    xmlSetGenericErrorFunc(/*ctx*/ NULL, junit_xml_error_handler);
+
+    master.junit.filepath = xstrdup(runner_opts.junit_xml_filepath);
+    master.junit.file = fopen(master.junit.filepath, "w");
+    if (!master.junit.file) {
+        loge("failed to open junit xml file: %s", master.junit.filepath);
+        free(master.junit.filepath);
+        return false;
+    }
+
+    xmlDocPtr doc = xmlNewDoc(u("1.0"));
+    doc->encoding = u(strdup("UTF-8"));
+
+    xmlNodePtr root_node = xmlNewNode(NULL, u("testsuites"));
+    xmlDocSetRootElement(doc, root_node);
+
+    xmlNodePtr testsuite_node = xmlNewChild(root_node, /*namespace*/ NULL,
+                                            /*name*/ u("testsuite"),
+                                            /*context*/ NULL);
+    xmlNewProp(testsuite_node, u("name"), u("crucible"));
+
+    master.junit.doc = doc;
+    master.junit.testsuite_node = testsuite_node;
+
+    return true;
+}
+
+static void
+junit_add_result(const test_def_t *def, test_result_t result)
+{
+    if (!master.junit.doc)
+        return;
+
+    xmlNodePtr testcase_node = xmlNewNode(NULL, u("testcase"));
+
+    // Insert the node's "status" attribute before the "name" attribute because
+    // that makes it easier to visually parse the results in the formatted XML.
+    // If formatted well, each status will be left-aligned like this:
+    //
+    //   <testcase status="pass" name="cheddar"/>
+    //   <testcase status="pass" name="mozarella"/>
+    //   <testcase status="fail" name="blue-cheese"/>
+    xmlNewProp(testcase_node, u("status"), u(test_result_to_string(result)));
+    xmlNewProp(testcase_node, u("name"), u(def->name));
+
+    switch (result) {
+    case TEST_RESULT_PASS:
+        break;
+    case TEST_RESULT_FAIL:
+        // In JUnit, a testcase "failure" occurs when the test intentionally
+        // fails, for example, by calling t_fail() or t_assert(...). Crashes
+        // are not failures.
+        //
+        // FINISHME: Capture the tests's reason for failure in the JUnit XML by
+        // capturing its stdout and stderr.
+        xmlNewChild(testcase_node, NULL, u("failure"), NULL);
+        break;
+    case TEST_RESULT_SKIP:
+        xmlNewChild(testcase_node, NULL, u("skipped"), NULL);
+        break;
+    case TEST_RESULT_LOST: {
+            // In JUnit, as testcase "error" occurs when a test unintentionally
+            // fails, for example, by crashing. An "error" is more extreme than
+            // a "failure".
+            //
+            // FINISHME: Report exit code of lost test, when possible.
+            xmlNodePtr error_node = xmlNewChild(testcase_node, NULL, u("error"),
+                                                NULL);
+            xmlNewProp(error_node, u("type"), u("lost"));
+            xmlNewProp(error_node, u("message"), u("test was lost, it likely crashed"));
+            break;
+    }
+    }
+
+    xmlAddChild(master.junit.testsuite_node, testcase_node);
+}
+
+static bool
+junit_finish(void)
+{
+    bool rc = true;
+
+    xmlDocPtr doc = master.junit.doc;
+    if (!doc)
+        return rc;
+
+    string_t buf = STRING_INIT;
+    xmlNodePtr root_node = xmlDocGetRootElement(doc);
+    xmlNodePtr testsuite_node = master.junit.testsuite_node;
+
+    string_printf(&buf, "%u", master_get_num_ran_tests());
+    xmlNewProp(root_node, u("tests"), u(string_data(&buf)));
+    xmlNewProp(testsuite_node, u("tests"), u(string_data(&buf)));
+
+    string_printf(&buf, "%u", master.num_fail);
+    xmlNewProp(root_node, u("failures"), u(string_data(&buf)));
+    xmlNewProp(testsuite_node, u("failures"), u(string_data(&buf)));
+
+    string_printf(&buf, "%u", master.num_lost);
+    xmlNewProp(root_node, u("errors"), u(string_data(&buf)));
+    xmlNewProp(testsuite_node, u("errors"), u(string_data(&buf)));
+
+    string_printf(&buf, "%u", master.num_skip);
+    xmlNewProp(root_node, u("disabled"), u(string_data(&buf)));
+    xmlNewProp(testsuite_node, u("disabled"), u(string_data(&buf)));
+
+    if (xmlDocFormatDump(master.junit.file, doc,
+                         /*format*/ 1) == -1) {
+        loge("failed to write junit xml file: %s", master.junit.filepath);
+        rc = false;
+    }
+
+    if (fclose(master.junit.file) == -1) {
+        loge("failed to close junit xml file: %s", master.junit.filepath);
+        rc = false;
+    }
+
+    free(master.junit.filepath);
+    xmlFreeDoc(master.junit.doc);
+    memset(&master.junit, 0, sizeof(master.junit));
+
+    return rc;
+}
+
 bool
 master_run(uint32_t num_tests)
 {
     master.num_tests = num_tests;
     master.max_dispatched_tests = CLAMP(runner_opts.jobs,
                                         1, ARRAY_LENGTH(master.slaves));
+
+    if (!junit_init())
+        return false;
 
     master_init_epoll();
     set_sigint_handler(master_handle_sigint);
@@ -204,7 +369,17 @@ master_run(uint32_t num_tests)
     set_sigint_handler(SIG_DFL);
     master_finish_epoll();
 
+    if (!junit_finish())
+        return false;
+
     return master.num_pass + master.num_skip == master.num_tests;
+}
+
+static uint32_t
+master_get_num_ran_tests(void)
+{
+    return master.num_pass + master.num_fail + master.num_skip +
+           master.num_lost;
 }
 
 static void
@@ -224,7 +399,7 @@ master_print_summary(void)
     fflush(stderr);
 
     logi("================================");
-    logi("ran %u tests", master.num_tests);
+    logi("ran %u tests", master_get_num_ran_tests());
     logi("pass %u", master.num_pass);
     logi("fail %u", master.num_fail);
     logi("skip %u", master.num_skip);
@@ -557,6 +732,8 @@ master_report_result(const test_def_t *def, test_result_t result)
     case TEST_RESULT_SKIP: master.num_skip++; break;
     case TEST_RESULT_LOST: master.num_lost++; break;
     }
+
+    junit_add_result(def, result);
 }
 
 static bool

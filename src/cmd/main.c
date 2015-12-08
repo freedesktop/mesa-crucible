@@ -19,6 +19,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
+#include <libxml/xmlversion.h>
+
 #include "util/xalloc.h"
 
 #include "cmd.h"
@@ -101,6 +103,8 @@ int
 main(int argc, char **argv)
 {
     const cru_command_t *cmd = NULL;
+
+    LIBXML_TEST_VERSION;
 
     parse_args(&argc, argv);
     assert(opt_command);

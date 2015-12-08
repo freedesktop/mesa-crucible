@@ -48,6 +48,9 @@ struct runner_opts {
     bool no_image_dumps;
     bool use_spir_v;
     bool use_separate_cleanup_threads;
+
+    /// The runner will write JUnit XML to this path, if not NULL.
+    const char *junit_xml_filepath;
 };
 
 bool runner_init(runner_opts_t *opts);

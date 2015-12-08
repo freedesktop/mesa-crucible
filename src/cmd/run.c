@@ -148,7 +148,6 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
             break;
         case OPT_NAME_JUNIT_XML:
             opt_junit_xml = strdup(optarg);
-            logw("FINISHME: option --junit-xml");
             break;
         case ':':
             cru_usage_error(cmd, "%s requires an argument", argv[optind-1]);
@@ -245,6 +244,7 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
         .use_separate_cleanup_threads = opt_separate_cleanup_thread,
         .no_image_dumps = !opt_dump,
         .use_spir_v = opt_use_spir_v,
+        .junit_xml_filepath = opt_junit_xml,
     });
 
     if (!ok) {
