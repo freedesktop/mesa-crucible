@@ -228,6 +228,8 @@ data/pink-leaves-%.png: \
 	    --convert-tool="$(IMAGEMAGICK_CONVERT)" \
 	    $< $@
 
-TESTS = src/tests/self/concurrent-output.bash
+TESTS = \
+	src/tests/self/bad-test-names.bash \
+	src/tests/self/concurrent-output.bash
 
 CLEANFILES = $(man1_MANS) $(BUILT_SOURCES) $(built_data_files)
