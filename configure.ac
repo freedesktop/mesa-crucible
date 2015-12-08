@@ -43,17 +43,6 @@ fi
 AC_SUBST([MESA_CPPFLAGS])
 AC_SUBST([MESA_LDFLAGS])
 
-AC_ARG_WITH([minigbm],
-    [AS_HELP_STRING([--with-minigbm@<:@=PATH@:>@],
-                    [Path to minigbm repo for headers and libraries])])
-if test "x$with_minigbm" != x; then
-    MINIGBM_CPPFLAGS=-I$with_minigbm/usr/include
-    MINIGBM_LDFLAGS="-L$with_minigbm/usr/lib -R$with_minigbm/usr/lib"
-fi
-
-AC_SUBST([MINIGBM_CPPFLAGS])
-AC_SUBST([MINIGBM_LDFLAGS])
-
 AC_CHECK_PROGS([PYTHON2], [python2 python])
 AC_CHECK_PROGS([PYTHON3], [python3])
 AC_CHECK_PROGS([IMAGEMAGICK_CONVERT], [convert])
