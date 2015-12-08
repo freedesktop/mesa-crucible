@@ -83,3 +83,12 @@ xzallocn(size_t n, size_t size)
 
     return xzalloc(total_size);
 }
+
+char *
+xstrdup(const char *s)
+{
+    char *t = strdup(s);
+    if (!t)
+        cru_oom();
+    return t;
+}

@@ -36,6 +36,7 @@ malloclike void *xrealloc(void *mem, size_t size);
 malloclike void *xreallocn(void *mem, size_t n, size_t size);
 malloclike void *xzalloc(size_t size);
 malloclike void *xzallocn(size_t n, size_t size);
+malloclike char *xstrdup(const char *s);
 
 #ifdef __cplusplus
 }
