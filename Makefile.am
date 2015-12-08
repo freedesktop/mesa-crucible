@@ -204,20 +204,20 @@ all: data
 data: $(built_data_files)
 	@
 
-data/grass-2048x1024.jpg: $(srcdir)/data/grass-2014x1536.jpg
-	$(AM_V_GEN)
-	@$(IMAGEMAGICK_CONVERT) $< -crop 2048x1024 $@
-	@cp data/grass-2048x1024-0.jpg $@
+data/grass-2048x1024.jpg: \
+    $(srcdir)/data/grass-2014x1536.jpg \
+    $(srcdir)/misc/gen_image
+	$(AM_V_GEN) $(PYTHON2) $(srcdir)/misc/gen_image crop $< $@
 
 data/grass-%.png: \
     $(srcdir)/data/grass-2048x1024.jpg \
     $(srcdir)/misc/gen_image
 	$(AM_V_GEN) $(PYTHON2) $(srcdir)/misc/gen_image scale $< $@
 
-data/pink-leaves-2048x1024.jpg: $(srcdir)/data/pink-leaves-3264x2448.jpg
-	$(AM_V_GEN)
-	@$(IMAGEMAGICK_CONVERT) $< -crop 2048x1024 $@
-	@cp data/pink-leaves-2048x1024-2.jpg $@
+data/pink-leaves-2048x1024.jpg: \
+    $(srcdir)/data/pink-leaves-3264x2448.jpg \
+    $(srcdir)/misc/gen_image
+	$(AM_V_GEN) $(PYTHON2) $(srcdir)/misc/gen_image crop $< $@
 
 data/pink-leaves-%.png: \
     $(srcdir)/data/pink-leaves-2048x1024.jpg \

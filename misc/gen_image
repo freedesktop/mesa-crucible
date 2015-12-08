@@ -44,6 +44,8 @@ def main():
 
     if operation == 'scale':
         res = cv2.resize(img, (width, height), interpolation = cv2.INTER_CUBIC)
+    elif operation == 'crop':
+        res = img[:width, :height]
     else:
         die('invalid operation: {!r}'.format(dest_filename))
 

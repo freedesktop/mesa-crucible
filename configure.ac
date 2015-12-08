@@ -45,10 +45,6 @@ AC_SUBST([MESA_LDFLAGS])
 
 AC_CHECK_PROGS([PYTHON2], [python2 python])
 AC_CHECK_PROGS([PYTHON3], [python3])
-AC_CHECK_PROGS([IMAGEMAGICK_CONVERT], [convert])
-if test "x$IMAGEMAGICK_CONVERT" = x; then
-    AC_MSG_ERROR([failed to find ImageMagick convert])
-fi
 
 AC_ARG_VAR([GLSLC], [path to glslc executable])
 AC_SUBST([GLSLC])
