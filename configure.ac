@@ -20,6 +20,7 @@
 # IN THE SOFTWARE.
 
 AC_INIT([crucible], [0.1])
+AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AM_SILENT_RULES(yes)
 LT_INIT
@@ -45,6 +46,7 @@ AC_SUBST([MESA_LDFLAGS])
 
 AC_CHECK_PROGS([PYTHON2], [python2 python])
 AC_CHECK_PROGS([PYTHON3], [python3])
+AX_CHECK_PYTHON2_MODULE_OPENCV()
 
 AC_ARG_VAR([GLSLC], [path to glslc executable])
 AC_SUBST([GLSLC])
