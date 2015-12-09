@@ -23,8 +23,8 @@
 
 #include "compute-local-id-spirv.h"
 
-static void
-test(void)
+static VkDeviceMemory
+common_init(VkShaderModule cs, const uint32_t ssbo_size)
 {
     VkDescriptorSetLayout set_layout;
 
@@ -52,21 +52,6 @@ test(void)
         .setLayoutCount = 1,
         .pSetLayouts = &set_layout);
 
-    VkShaderModule cs = qoCreateShaderModuleGLSL(
-        t_device, COMPUTE,
-
-        layout(set = 0, binding = 0, std140) buffer Storage {
-           uint ua[];
-        } ssbo;
-
-        layout (local_size_x = 64) in;
-
-        void main()
-        {
-            ssbo.ua[gl_LocalInvocationID.x] = gl_LocalInvocationID.x;
-        }
-    );
-
     VkPipeline pipeline;
     vkCreateComputePipelines(t_device, t_pipeline_cache, 1,
         &(VkComputePipelineCreateInfo) {
@@ -84,7 +69,6 @@ test(void)
     VkDescriptorSet set =
         qoAllocateDescriptorSet(t_device, .pSetLayouts = &set_layout);
 
-    const uint32_t ssbo_size = 64 * sizeof(uint32_t);
     VkBuffer buffer_out = qoCreateBuffer(t_device, .size = ssbo_size);
     VkDeviceMemory mem_out = qoAllocBufferMemory(t_device, buffer_out,
         .memoryTypeIndex = t_mem_type_index_for_mmap);
@@ -115,11 +99,41 @@ test(void)
                             pipeline_layout, 0, 1,
                             &set, 0, NULL);
 
-    vkCmdDispatch(t_cmd_buffer, 1, 1, 1);
+    return mem_out;
+}
+
+static void
+dispatch_and_wait(uint32_t x, uint32_t y, uint32_t z)
+{
+    vkCmdDispatch(t_cmd_buffer, x, y, z);
 
     qoEndCommandBuffer(t_cmd_buffer);
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
     vkQueueWaitIdle(t_queue);
+}
+
+static void
+basic(void)
+{
+    VkShaderModule cs = qoCreateShaderModuleGLSL(
+        t_device, COMPUTE,
+
+        layout(set = 0, binding = 0, std140) buffer Storage {
+           uint ua[];
+        } ssbo;
+
+        layout (local_size_x = 64) in;
+
+        void main()
+        {
+            ssbo.ua[gl_LocalInvocationID.x] = gl_LocalInvocationID.x;
+        }
+    );
+
+    const uint32_t ssbo_size = 64 * sizeof(uint32_t);
+    VkDeviceMemory mem_out = common_init(cs, ssbo_size);
+
+    dispatch_and_wait(1, 1, 1);
 
     uint32_t *map_out = qoMapMemory(t_device, mem_out, 0, ssbo_size, 0);
     for (unsigned i = 0; i < 64; i++) {
@@ -132,6 +146,6 @@ test(void)
 
 test_define {
     .name = "func.compute.local-id.basic",
-    .start = test,
+    .start = basic,
     .no_image = true,
 };
