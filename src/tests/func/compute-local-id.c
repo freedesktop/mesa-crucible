@@ -149,3 +149,50 @@ test_define {
     .start = basic,
     .no_image = true,
 };
+
+static void
+push_constant(void)
+{
+    VkShaderModule cs = qoCreateShaderModuleGLSL(
+        t_device, COMPUTE,
+
+        layout(push_constant, std140) uniform Push {
+            uint add;
+        } pc;
+
+        layout(set = 0, binding = 0, std140) buffer Storage {
+           uint ua[];
+        } ssbo;
+
+        layout (local_size_x = 64) in;
+
+        void main()
+        {
+            ssbo.ua[gl_LocalInvocationID.x] = pc.add + gl_LocalInvocationID.x;
+        }
+    );
+
+    const uint32_t ssbo_size = 64 * sizeof(uint32_t);
+    VkDeviceMemory mem_out = common_init(cs, ssbo_size);
+
+    uint32_t add = 42;
+    vkCmdPushConstants(t_cmd_buffer, VK_NULL_HANDLE,
+                       VK_SHADER_STAGE_COMPUTE_BIT,
+                       0, sizeof(add), &add);
+
+    dispatch_and_wait(1, 1, 1);
+
+    uint32_t *map_out = qoMapMemory(t_device, mem_out, 0, ssbo_size, 0);
+    for (unsigned i = 0; i < 64; i++) {
+        t_assertf(map_out[i] == add + i,
+                  "buffer mismatch at uint %d: found %u, "
+                  "expected %u", i, map_out[i], add + i);
+    }
+    t_pass();
+}
+
+test_define {
+    .name = "func.compute.local-id.push-constant",
+    .start = push_constant,
+    .no_image = true,
+};
