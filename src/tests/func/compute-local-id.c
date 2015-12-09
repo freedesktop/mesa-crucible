@@ -196,3 +196,80 @@ test_define {
     .start = push_constant,
     .no_image = true,
 };
+
+/* Based on the piglit test:
+ * spec/arb_compute_shader/execution/basic-local-id-atomic.shader_test
+ */
+static void
+local_ids(void)
+{
+    if (t_physical_dev_props->limits.maxComputeWorkGroupInvocations < 512) {
+        t_skipf("test requires a workgroup size of 512, but physical device "
+                "supports only %d",
+                t_physical_dev_props->limits.maxComputeWorkGroupInvocations);
+    }
+
+    VkShaderModule cs = qoCreateShaderModuleGLSL(
+        t_device, COMPUTE,
+
+        layout(set = 0, binding = 0, std140) buffer Storage {
+           uint ua[];
+        } ssbo;
+
+        layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
+        void main()
+        {
+            uint x = gl_LocalInvocationID.x;
+            uint y = gl_LocalInvocationID.y;
+            uint z = gl_LocalInvocationID.z;
+
+            if (((x & y) & z) == 0u)
+                atomicAdd(ssbo.ua[0], 1);
+            if (((x | y) | z) == 7u)
+                atomicAdd(ssbo.ua[1], 1);
+            if (x == y && y == z)
+                atomicAdd(ssbo.ua[2], 1);
+            if (x != y && y != z && x != z)
+                atomicAdd(ssbo.ua[3], 1);
+            if (((x & y) & z) == 2u)
+                atomicAdd(ssbo.ua[4], 1);
+            if (((x | y) | z) == 5u)
+                atomicAdd(ssbo.ua[5], 1);
+            if (x < 4u && y < 4u && z < 4u)
+                atomicAdd(ssbo.ua[6], 1);
+            if (x >= 4u || y >= 4u || z >= 4u)
+                atomicAdd(ssbo.ua[7], 1);
+        }
+    );
+
+    const uint32_t ssbo_size = 8 * sizeof(uint32_t);
+    VkDeviceMemory mem_out = common_init(cs, ssbo_size);
+
+    dispatch_and_wait(1, 1, 1);
+
+    const uint32_t expected[] = {
+        343,
+        343,
+        8,
+        336,
+        49,
+        49,
+        64,
+        448,
+    };
+
+    uint32_t *map_out = qoMapMemory(t_device, mem_out, 0, ssbo_size, 0);
+    for (unsigned i = 0; i < ARRAY_LENGTH(expected); i++) {
+        t_assertf(map_out[i] == expected[i],
+                  "buffer mismatch at uint %d: found %u, "
+                  "expected %u", i, map_out[i], expected[i]);
+    }
+    t_pass();
+}
+
+test_define {
+    .name = "func.compute.local-id.local-ids",
+    .start = local_ids,
+    .no_image = true,
+};
