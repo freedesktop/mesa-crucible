@@ -244,6 +244,7 @@ typedef struct QoShaderModuleCreateInfo_ {
 
 #define QO_IMAGE_VIEW_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO, \
+    .viewType = VK_IMAGE_VIEW_TYPE_2D, \
     .subresourceRange = { \
         .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT, \
         .baseMipLevel = 0, \
