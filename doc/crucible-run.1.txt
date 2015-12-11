@@ -17,11 +17,25 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-Run tests in the order given on the command line. If no tests are given, then
-run all functional tests and stress tests (those whose name matches "func.*" or
-"stress.*"). The list of <pattern>s may consist of a mixture of literal test
-names and glob patterns. Crucible matches test names against glob patterns
-using *fnmatch(3)*.
+Run tests in the order given on the command line.  If no test patterns are
+given, then run all functional tests and stress tests (those whose name matches
+"func.\*" or "stress.*").
+
+PATTERN RULES
+-------------
+Crucible matches each test name against the given glob <pattern>s with
+*fnmatch(3)*. The patterns are tested in order from left to right, and the last
+matching pattern wins.  If no test pattern is given, then the implied pattern
+"*" is used.
+
+Test patterns that begin with \'!' denotes an exclude rule; otherwise the
+pattern denotes an include rule. If the first given pattern is an exclude
+pattern, then Crucible inserts an implied "*" as the first pattern.
+
+Special tests match only patterns with special prefixes.  Example tests match
+only patterns that start with "example.".  Crucible's self tests match only
+patterns that start with "self.". As a corollary, special tests do not match
+the pattern "*".
 
 OPTIONS
 -------
@@ -65,22 +79,19 @@ OPTIONS
 
 EXAMPLES
 --------
-* Run all tests (except example tests).
+* Run all functional tests and stress tests. The following invocations are all
+  equivalent.
 +
 ----
 $ crucible run
+$ crucible run '*'
+$ crucible run 'func.*' 'stress.*'
 ----
 
 * Run all example tests.
 +
 ----
 $ crucible run 'example.*'
-----
-
-* Run all functional and stress tests.
-+
-----
-$ crucible run 'func.*' 'stress.*'
 ----
 
 * Run one test.
@@ -102,6 +113,18 @@ $ crucible run func.miptree.2d.levels01 \
 ----
 $ crucible run 'func.miptree.cubemap.*' \
                'func.txf.*'
+----
+
+* Run all functional tests and stress tests except foo and bar.
++
+----
+$ crucible run '!foo' '!bar'
+----
+
+* Run all functional tests except the fooish tests.
++
+----
+$ crucible run 'func.*' '!func.fooish.*'
 ----
 
 SEE ALSO
