@@ -109,6 +109,10 @@ log_tag_v(const char *tag, const char *format, va_list va)
     vprintf(format, va);
     printf("\n");
 
+    // Don't buffer the log messages. If a GPU hang occurs, buffering makes it
+    // difficult to determine which test hung the GPU.
+    fflush(stdout);
+
     pthread_mutex_unlock(&log_mutex);
 }
 
