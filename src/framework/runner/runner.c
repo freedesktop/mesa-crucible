@@ -119,32 +119,6 @@ runner_run_tests(void)
     return master_run(runner_num_tests);
 }
 
-static inline void
-enable_test_def(test_def_t *def)
-{
-    ASSERT_RUNNER_IS_INIT;
-
-    if (!def->priv.enable)
-        ++runner_num_tests;
-
-    def->priv.enable = true;
-}
-
-void
-runner_enable_all_normal_tests(void)
-{
-    ASSERT_RUNNER_IS_INIT;
-
-    test_def_t *def;
-
-    cru_foreach_test_def(def) {
-        if (!test_def_match(def, "example.*") &&
-            !test_def_match(def, "self.*")) {
-            enable_test_def(def);
-        }
-    }
-}
-
 void
 runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
 {
@@ -153,11 +127,22 @@ runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
     test_def_t *def;
     char **glob;
 
+    bool include_all = testname_globs->len == 0;
+
     cru_foreach_test_def(def) {
+        bool enable = false;
+
+        if (include_all) {
+            enable = test_def_match(def, "*");
+        }
+
         cru_vec_foreach(glob, testname_globs) {
-            if (test_def_match(def, *glob)) {
-                enable_test_def(def);
-            }
+            enable = test_def_match(def, *glob);
+        }
+
+        if (enable) {
+            def->priv.enable = true;
+            ++runner_num_tests;
         }
     }
 }

@@ -252,11 +252,7 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    if (test_patterns.len == 0) {
-        runner_enable_all_normal_tests();
-    } else {
-        runner_enable_matching_tests(&test_patterns);
-    }
+    runner_enable_matching_tests(&test_patterns);
 
     if (runner_run_tests()) {
         exit(EXIT_SUCCESS);

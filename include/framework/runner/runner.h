@@ -54,6 +54,5 @@ struct runner_opts {
 };
 
 bool runner_init(runner_opts_t *opts);
-void runner_enable_all_normal_tests(void);
 void runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs);
 bool runner_run_tests(void);
