@@ -72,9 +72,7 @@ start(const cru_command_t *cmd, int argc, char **argv)
     parse_args(cmd, argc, argv);
 
     cru_foreach_test_def(def) {
-        if (!test_def_match(def, "example.*")) {
-            printf("%s\n", def->name);
-        }
+        printf("%s\n", def->name);
     }
 
     return 0;

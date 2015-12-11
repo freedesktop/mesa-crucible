@@ -13,7 +13,8 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-List all tests, except example tests.
+List all tests. This includes tests that are not ran by default, such as
+example tests ("example.*") and self tests ("self.*").
 
 SEE ALSO
 --------
