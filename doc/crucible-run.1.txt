@@ -18,12 +18,10 @@ SYNOPSIS
 DESCRIPTION
 -----------
 Run tests in the order given on the command line. If no tests are given, then
-run all tests (except example tests). The list of <pattern>s may consist of
-a mixture of literal test names and glob patterns.
-
-You can list all non-example tests with *crucible-ls-tests(1)*, and list
-examples tests with *crucible-ls-example-tests(1)*.  (Example tests are those
-whose names match "example.*").
+run all functional tests and stress tests (those whose name matches "func.*" or
+"stress.*"). The list of <pattern>s may consist of a mixture of literal test
+names and glob patterns. Crucible matches test names against glob patterns
+using *fnmatch(3)*.
 
 OPTIONS
 -------
