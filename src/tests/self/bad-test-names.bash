@@ -43,7 +43,7 @@ die() {
 
 bad_test_names() {
     "$CRUCIBLE_TOP"/bin/crucible ls-tests |
-    grep -E -v '^[a-zA-Z0-9_.-]+$'
+    grep -E -v '^[_a-zA-Z][_a-zA-Z0-9.-]*$'
 }
 
 main() {
