@@ -19,44 +19,42 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#pragma once
+#include <fnmatch.h>
 
-#include "util/misc.h"
-#include "util/cru_vec.h"
-#include "tapi/t_def.h"
+#include "framework/test/test_def.h"
 
-typedef struct test_def_vec test_def_vec_t;
-
-extern test_def_t __start_test_defs, __stop_test_defs;
-
-#define cru_foreach_test_def(def) \
-   for (def = &__start_test_defs; \
-        def < &__stop_test_defs; ++def)
-
-
-bool test_def_match(const test_def_t *def, const char *glob);
-const test_def_t *cru_find_def(const char *name);
-
-static pure inline uint64_t
-test_def_get_id(const test_def_t *def)
+/// Match the test name against the glob pattern.
+///
+/// Crucible's example tests and self tests are special. The user doesn't
+/// want to run them during normal test runs. Therefore example tests match
+/// only patterns that begin with a literal "example.", and self tests
+/// a literal "self.".
+bool
+test_def_match(const test_def_t *def, const char *glob)
 {
-    return def - &__start_test_defs;
-}
-
-static pure inline test_def_t *
-test_def_from_id(uint64_t id)
-{
-    test_def_t *def = &__start_test_defs + id;
-
-    if (def < &__stop_test_defs) {
-        return def;
-    } else {
-        return NULL;
+    if (strncmp("example.", def->name, 8) == 0 &&
+        strncmp("example.", glob, 8) != 0) {
+        return false;
     }
+
+    if (strncmp("self.", def->name, 5) == 0 &&
+        strncmp("self.", glob, 5) != 0) {
+        return false;
+    }
+
+    return fnmatch(glob, def->name, 0) == 0;
 }
 
-static inline uint32_t
-cru_num_defs(void)
+const test_def_t *
+cru_find_def(const char *name)
 {
-    return &__stop_test_defs - &__start_test_defs;
+    const test_def_t *def;
+
+    cru_foreach_test_def(def) {
+        if (cru_streq(def->name, name)) {
+            return def;
+        }
+    }
+
+    return NULL;
 }

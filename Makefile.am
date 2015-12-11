@@ -69,6 +69,7 @@ bin_crucible_SOURCES = \
 	src/framework/test/t_result.c \
 	src/framework/test/t_thread.c \
 	src/framework/test/test.c \
+	src/framework/test/test_def.c \
 	src/qonos/qonos.c \
 	src/qonos/qonos_pipeline.c \
 	src/tests/example/basic.c \
