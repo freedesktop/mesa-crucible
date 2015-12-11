@@ -32,6 +32,11 @@
 bool
 test_def_match(const test_def_t *def, const char *glob)
 {
+    // Strip the leading '!' modifier before performing the match.
+    while (glob && glob[0] == '!') {
+        ++glob;
+    }
+
     if (strncmp("example.", def->name, 8) == 0 &&
         strncmp("example.", glob, 8) != 0) {
         return false;

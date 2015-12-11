@@ -119,6 +119,19 @@ runner_run_tests(void)
     return master_run(runner_num_tests);
 }
 
+static bool
+glob_is_negative(const char *glob)
+{
+    bool neg = false;
+
+    while (glob && glob[0] == '!') {
+        ++glob;
+        neg = !neg;
+    }
+
+    return neg;
+}
+
 void
 runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
 {
@@ -127,17 +140,23 @@ runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
     test_def_t *def;
     char **glob;
 
-    bool include_all = testname_globs->len == 0;
+    const bool first_glob_is_neg = testname_globs->len > 0 &&
+                                   glob_is_negative(testname_globs->data[0]);
+
+    const bool implicit_all = testname_globs->len == 0 || first_glob_is_neg;
 
     cru_foreach_test_def(def) {
         bool enable = false;
 
-        if (include_all) {
+        if (implicit_all) {
             enable = test_def_match(def, "*");
         }
 
+        // Last matching glob wins.
         cru_vec_foreach(glob, testname_globs) {
-            enable = test_def_match(def, *glob);
+            if (test_def_match(def, *glob)) {
+                enable = !glob_is_negative(*glob);
+            }
         }
 
         if (enable) {
