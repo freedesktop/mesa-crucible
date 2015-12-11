@@ -54,9 +54,25 @@ test_def_from_id(uint64_t id)
     }
 }
 
+/// Match the test name against the glob pattern.
+///
+/// Crucible's example tests and self tests are special. The user doesn't
+/// want to run them during normal test runs. Therefore example tests match
+/// only patterns that begin with a literal "example.", and self tests
+/// a literal "self.".
 static inline bool
 test_def_match(const test_def_t *def, const char *glob)
 {
+    if (strncmp("example.", def->name, 8) == 0 &&
+        strncmp("example.", glob, 8) != 0) {
+        return false;
+    }
+
+    if (strncmp("self.", def->name, 5) == 0 &&
+        strncmp("self.", glob, 5) != 0) {
+        return false;
+    }
+
     return fnmatch(glob, def->name, 0) == 0;
 }
 
