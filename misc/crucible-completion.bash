@@ -1,4 +1,4 @@
-__crucible_commands="bootstrap dump-image test help ls-tests ls-example-tests run version"
+__crucible_commands="bootstrap dump-image test help ls-tests run version"
 
 __crucible_bootstrap()
 {

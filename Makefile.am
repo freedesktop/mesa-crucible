@@ -53,7 +53,6 @@ bin_crucible_SOURCES = \
 	src/cmd/bootstrap.c \
 	src/cmd/dump-image.c \
 	src/cmd/help.c \
-	src/cmd/ls_example_tests.c \
 	src/cmd/ls_tests.c \
 	src/cmd/main.c \
 	src/cmd/run.c \
@@ -137,7 +136,6 @@ man1_MANS = \
     doc/crucible-dump-image.1 \
     doc/crucible-help.1 \
     doc/crucible-tutorial.7 \
-    doc/crucible-ls-example-tests.1 \
     doc/crucible-ls-tests.1 \
     doc/crucible-run.1 \
     doc/crucible-version.1

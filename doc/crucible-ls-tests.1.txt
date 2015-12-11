@@ -15,7 +15,3 @@ DESCRIPTION
 -----------
 List all tests. This includes tests that are not ran by default, such as
 example tests ("example.*") and self tests ("self.*").
-
-SEE ALSO
---------
-*crucible-ls-example-tests(1)*

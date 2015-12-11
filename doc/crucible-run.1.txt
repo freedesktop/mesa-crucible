@@ -106,5 +106,4 @@ $ crucible run 'func.miptree.cubemap.*' \
 
 SEE ALSO
 --------
-*crucible-ls-tests(1)*,
-*crucible-ls-example-tests(1)*
+*crucible-ls-tests(1)*
