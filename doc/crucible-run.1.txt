@@ -17,7 +17,7 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-Run tests in the order given on the command line.  If no test patterns are
+Run all tests that match <pattern>.  If no <pattern> is
 given, then run all functional tests and stress tests (those whose name matches
 "func.\*" or "stress.*").
 
