@@ -11,7 +11,8 @@ import re
 import sys
 from textwrap import dedent
 
-cru_re = re.compile(r'^crucible:\s+(\w*)\s*:\s+(\S*)\s*$')
+cru_re = re.compile('^crucible(?:\s*\[(?P<pid>\w*)\s*\])?:' +
+                    '\s+(?P<status>\w*)\s*:\s+(?P<name>\S*)\s*$')
 
 def parse_results(fname):
     results = {}
@@ -21,8 +22,8 @@ def parse_results(fname):
             if not match:
                 continue
 
-            name = match.group(2)
-            status = match.group(1)
+            name = match.group('name')
+            status = match.group('status')
 
             # We don't want info mesages
             if status not in ('start', 'pass', 'fail', 'skip'):

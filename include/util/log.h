@@ -31,14 +31,14 @@
 extern "C" {
 #endif
 
-void log_tag(const char *tag, const char *format, ...) printflike(2, 3);
+void log_tag(const char *tag, pid_t pid, const char *format, ...) printflike(3, 4);
 void log_abort(const char *format, ...) printflike(1, 2);
 void loge(const char *format, ...) printflike(1, 2);
 void logw(const char *format, ...) printflike(1, 2);
 void logi(const char *format, ...) printflike(1, 2);
 void logd(const char *format, ...) printflike(1, 2);
 
-void log_tag_v(const char *tag, const char *format, va_list va);
+void log_tag_v(const char *tag, pid_t pid, const char *format, va_list va);
 void log_abort_v(const char *format, va_list va);
 void loge_v(const char *format, va_list va);
 void logw_v(const char *format, va_list va);
@@ -50,6 +50,13 @@ void logd_v(const char *format, va_list va);
 /// Alignment is useful when running tests, because. it's easier to visually to
 /// parse the output if all test names to start on the same column.
 void log_align_tags(bool enable);
+
+/// \brief Print pids associated with log messages.
+///
+/// Having the PID of a child process can be useful when trying to match
+/// test results to other information reported by the system such as GPU
+/// hangs or run-away processes.
+void log_print_pids(bool enable);
 
 #define log_finishme(format, ...) \
     __log_finishme(__FILE__, __LINE__, format, ##__VA_ARGS__)

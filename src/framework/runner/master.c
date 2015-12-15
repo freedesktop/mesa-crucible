@@ -147,7 +147,7 @@ static void master_cleanup_dead_slave(slave_t *slave);
 
 static void master_collect_result(int timeout_ms);
 
-static void master_report_result(const test_def_t *def, test_result_t result);
+static void master_report_result(const test_def_t *def, pid_t pid, test_result_t result);
 static bool master_send_packet(slave_t *slave, const dispatch_packet_t *pk);
 
 static void master_kill_all_slaves(void);
@@ -454,13 +454,13 @@ master_dispatch_loop_no_fork(void)
             continue;
 
         if (def->skip) {
-            master_report_result(def, TEST_RESULT_SKIP);
+            master_report_result(def, 0, TEST_RESULT_SKIP);
             continue;
         }
 
-        log_tag("start", "%s", def->name);
+        log_tag("start", 0, "%s", def->name);
         result = run_test_def(def);
-        master_report_result(def, result);
+        master_report_result(def, 0, result);
     }
 }
 
@@ -475,7 +475,7 @@ master_dispatch_loop_with_fork(void)
             continue;
 
         if (def->skip) {
-            master_report_result(def, TEST_RESULT_SKIP);
+            master_report_result(def, 0, TEST_RESULT_SKIP);
             continue;
         }
 
@@ -667,7 +667,7 @@ master_cleanup_dead_slave(slave_t *slave)
     // Any remaining tests owned by the slave are lost.
     for (uint32_t i = 0; i < slave->tests.len; ++i) {
         const test_def_t *def = slave->tests.data[i];
-        master_report_result(def, TEST_RESULT_LOST);
+        master_report_result(def, slave->pid, TEST_RESULT_LOST);
     }
 
     assert(master.cur_dispatched_tests >= slave->tests.len);
@@ -721,9 +721,9 @@ master_collect_result(int timeout_ms)
 }
 
 static void
-master_report_result(const test_def_t *def, test_result_t result)
+master_report_result(const test_def_t *def, pid_t pid, test_result_t result)
 {
-    log_tag(test_result_to_string(result), "%s", def->name);
+    log_tag(test_result_to_string(result), pid, "%s", def->name);
     fflush(stdout);
 
     switch (result) {
@@ -1053,7 +1053,7 @@ slave_start_test(slave_t *slave, const test_def_t *def)
     if (!slave_insert_test(slave, def))
         return false;
 
-    log_tag("start", "%s", def->name);
+    log_tag("start", slave->pid, "%s", def->name);
 
     if (!master_send_packet(slave, &pk)) {
         slave_rm_test(slave, def);
@@ -1103,7 +1103,7 @@ slave_drain_result_pipe(slave_t *slave)
             return;
 
         slave_rm_test(slave, pk.test_def);
-        master_report_result(pk.test_def, pk.result);
+        master_report_result(pk.test_def, slave->pid, pk.result);
     }
 }
 

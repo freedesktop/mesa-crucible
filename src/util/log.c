@@ -24,19 +24,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "framework/runner/runner.h"
 #include "framework/test/test.h"
 #include "util/log.h"
 
 static pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
 static bool log_has_aligned_tags = false;
+static bool log_should_print_pids = false;
 
 void
-log_tag(const char *tag, const char *format, ...)
+log_tag(const char *tag, pid_t pid, const char *format, ...)
 {
     va_list va;
 
     va_start(va, format);
-    log_tag_v(tag, format, va);
+    log_tag_v(tag, pid, format, va);
     va_end(va);
 }
 
@@ -91,15 +93,35 @@ logd(const char *format, ...)
 }
 
 void
-log_tag_v(const char *tag, const char *format, va_list va)
+log_tag_v(const char *tag, pid_t pid, const char *format, va_list va)
 {
     pthread_mutex_lock(&log_mutex);
 
-    if (log_has_aligned_tags) {
-        // Align to 7 because that's wide enough for "warning".
-        printf("crucible: %-7s: ", tag);
+    // Tags are aligned to 7 because that's wide enough for "warning".
+    // PID fields are aligned to 6 because that's enough for "master" and
+    // any 16-bit unsigned value.
+    if (log_should_print_pids) {
+        if (pid == 0) {
+            if (log_has_aligned_tags) {
+                printf("crucible [master]: %-7s: ", tag);
+            } else {
+                printf("crucible [master]: %s: ", tag);
+            }
+        } else {
+            assert(pid > 0 && pid <= UINT16_MAX);
+            int ipid = pid; // printf likes standard data types better
+            if (log_has_aligned_tags) {
+                printf("crucible [%-6d]: %-7s: ", ipid, tag);
+            } else {
+                printf("crucible [%-6d]: %s: ", ipid, tag);
+            }
+        }
     } else {
-        printf("crucible: %s: ", tag);
+        if (log_has_aligned_tags) {
+            printf("crucible: %-7s: ", tag);
+        } else {
+            printf("crucible: %s: ", tag);
+        }
     }
 
     if (test_is_current()) {
@@ -119,32 +141,32 @@ log_tag_v(const char *tag, const char *format, va_list va)
 void
 log_abort_v(const char *format, va_list va)
 {
-    log_tag_v("abort", format, va);
+    log_tag_v("abort", 0, format, va);
     abort();
 }
 
 void
 loge_v(const char *format, va_list va)
 {
-    log_tag_v("error", format, va);
+    log_tag_v("error", 0, format, va);
 }
 
 void
 logw_v(const char *format, va_list va)
 {
-    log_tag_v("warning", format, va);
+    log_tag_v("warning", 0, format, va);
 }
 
 void
 logi_v(const char *format, va_list va)
 {
-    log_tag_v("info", format, va);
+    log_tag_v("info", 0, format, va);
 }
 
 void
 logd_v(const char *format, va_list va)
 {
-    log_tag_v("debug", format, va);
+    log_tag_v("debug", 0, format, va);
 }
 
 void
@@ -185,6 +207,12 @@ log_internal_error_loc_v(const char *file, int line,
     printf("\n");
 
     abort();
+}
+
+void
+log_print_pids(bool enable)
+{
+    log_should_print_pids = enable;
 }
 
 void

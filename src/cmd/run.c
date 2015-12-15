@@ -33,6 +33,7 @@ static bool get_fork_mode(void);
 static runner_isolation_mode_t opt_isolation = RUNNER_ISOLATION_MODE_PROCESS;
 static int opt_jobs = 0;
 static int opt_fork = -1; // -1 => unset on cmdline
+static int opt_log_pids = 0;
 static int opt_no_cleanup = 0;
 static int opt_dump = 0;
 static int opt_use_spir_v = 1;
@@ -68,6 +69,7 @@ static const struct option longopts[] = {
     {"jobs",          required_argument, NULL,            OPT_NAME_JOBS},
     {"isolation",     required_argument, NULL,            OPT_NAME_ISLOATION},
     {"fork",          no_argument,       &opt_fork,       true},
+    {"log-pids",      no_argument,       &opt_log_pids,   true},
     {"no-fork",       no_argument,       &opt_fork,       false},
     {"no-cleanup",    no_argument,       &opt_no_cleanup, true},
     {"dump",          no_argument,       &opt_dump,       true},
@@ -246,6 +248,9 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
         .use_spir_v = opt_use_spir_v,
         .junit_xml_filepath = opt_junit_xml,
     });
+
+    if (opt_log_pids)
+        log_print_pids(true);
 
     if (!ok) {
         loge("failed to initialize the test runner");
