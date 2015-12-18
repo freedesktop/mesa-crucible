@@ -181,3 +181,59 @@ test_define {
     .start = basic,
     .no_image = true,
 };
+
+static void
+build_indirect_cmd_buffer(CTX *ctx)
+{
+    vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_COMPUTE,
+                      ctx->pipeline);
+
+    vkCmdBindDescriptorSets(t_cmd_buffer,
+                            VK_PIPELINE_BIND_POINT_COMPUTE,
+                            ctx->pipeline_layout, 0, 1,
+                            &ctx->set, 0, NULL);
+
+    vkCmdDispatchIndirect(t_cmd_buffer, ctx->ssbo_buf,
+                          3 * 64 * sizeof(uint32_t));
+
+    qoEndCommandBuffer(t_cmd_buffer);
+}
+
+static void
+indirect_dispatch_and_wait(CTX *ctx)
+{
+    uint32_t *ssbo = qoMapMemory(t_device, ctx->ssbo, 0, ctx->ssbo_size, 0);
+    for (unsigned i = 0; i < 3; i++)
+        ssbo[3 * 64 + i] = ctx->sizes[i];
+    vkUnmapMemory(t_device, ctx->ssbo);
+
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
+    vkQueueWaitIdle(t_queue);
+}
+
+static void
+indirect(void)
+{
+    CTX ctx;
+
+    ctx.ssbo_size = 65 * 3 * sizeof(uint32_t);
+    common_init(&ctx);
+
+    build_indirect_cmd_buffer(&ctx);
+
+    for (unsigned s = 0; s < ARRAY_LENGTH(scenarios); s++) {
+        const uint32_t *expected = scenarios[s];
+        ctx.sizes = expected;
+
+        indirect_dispatch_and_wait(&ctx);
+
+        verify_ssbo(&ctx);
+    }
+    t_pass();
+}
+
+test_define {
+    .name = "func.compute.num-workgroups.indirect",
+    .start = indirect,
+    .no_image = true,
+};
