@@ -81,6 +81,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/depthstencil/stencil_triangles.c \
 	src/tests/func/desc/dynamic.c \
 	src/tests/func/draw-indexed.c \
+	src/tests/func/event.c \
 	src/tests/func/gs/basic.c \
 	src/tests/func/query/timestamp.c \
 	src/tests/func/first.c \
