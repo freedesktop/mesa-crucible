@@ -84,37 +84,21 @@ draw_triangle(void)
                 // Draw 3 overlapping triangles.
                 void main()
                 {
-                    if (gl_VertexID == 0) {
-                        gl_Position = vec4(-0.6, -0.6, 0, 1);
-                    } else if (gl_VertexID == 1) {
-                        gl_Position = vec4(+0.6, -0.6, 0, 1);
-                    } else if (gl_VertexID == 2) {
-                        gl_Position = vec4( 0.0, +0.6, 0, 1);
+                    switch (gl_VertexID) {
+                    case 0: gl_Position = vec4(-0.6, -0.6, 0, 1); break;
+                    case 1: gl_Position = vec4(+0.6, -0.6, 0, 1); break;
+                    case 2: gl_Position = vec4( 0.0, +0.6, 0, 1); break;
                     }
-                    // XXX: spirv_to_nir doesn't handle switch yet
-                    // switch (gl_VertexID) {
-                    // case 0: gl_Position = vec4(-0.6, -0.6, 0, 1); break;
-                    // case 1: gl_Position = vec4(+0.6, -0.6, 0, 1); break;
-                    // case 2: gl_Position = vec4( 0.0, +0.6, 0, 1); break;
-                    // }
 
                     gl_Position.x += 0.2 * (gl_InstanceID - 1);
                     gl_Position.y += 0.2 * (gl_InstanceID - 1);
 
                     // blue, green, yellow
-                    if (gl_InstanceID == 0) {
-                        v_color = vec4(0.2,  0.2, 1.0, 1.0);
-                    } else if (gl_InstanceID == 1) {
-                        v_color = vec4(0.2,  1.0, 0.2, 1.0);
-                    } else if (gl_InstanceID == 2) {
-                        v_color = vec4(1.0,  1.0, 0.2, 1.0);
+                    switch (gl_InstanceID) {
+                    case 0: v_color = vec4(0.2,  0.2, 1.0, 1.0); break;
+                    case 1: v_color = vec4(0.2,  1.0, 0.2, 1.0); break;
+                    case 2: v_color = vec4(1.0,  1.0, 0.2, 1.0); break;
                     }
-                    // XXX: spirv_to_nir doesn't handle switch yet
-                    // switch (gl_InstanceID) {
-                    // case 0: v_color = vec4(0.2,  0.2, 1.0, 1.0); break;
-                    // case 1: v_color = vec4(0.2,  1.0, 0.2, 1.0); break;
-                    // case 2: v_color = vec4(1.0,  1.0, 0.2, 1.0); break;
-                    // }
                 }
             ),
             .fragmentShader = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
