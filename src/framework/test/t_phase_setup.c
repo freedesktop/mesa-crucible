@@ -226,13 +226,31 @@ t_setup_framebuffer(void)
         qoBindImageMemory(t->vk.device, t->vk.ds_image, ds_mem,
                           /*offset*/ 0);
 
+        VkImageAspectFlags aspect = 0;
+        switch (t->def->depthstencil_format) {
+        case VK_FORMAT_D16_UNORM:
+        case VK_FORMAT_X8_D24_UNORM_PACK32:
+        case VK_FORMAT_D32_SFLOAT:
+            aspect = VK_IMAGE_ASPECT_DEPTH_BIT;
+            break;
+        case VK_FORMAT_S8_UINT:
+            aspect = VK_IMAGE_ASPECT_STENCIL_BIT;
+            break;
+        case VK_FORMAT_D16_UNORM_S8_UINT:
+        case VK_FORMAT_D24_UNORM_S8_UINT:
+        case VK_FORMAT_D32_SFLOAT_S8_UINT:
+            aspect = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+            break;
+        default:
+            assert(!"Invalid depthstencil format");
+        }
+
         t->vk.depthstencil_image_view = qoCreateImageView(t->vk.device,
             QO_IMAGE_VIEW_CREATE_INFO_DEFAULTS,
             .image = t->vk.ds_image,
             .format = t->def->depthstencil_format,
             .subresourceRange = {
-                .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT |
-                              VK_IMAGE_ASPECT_STENCIL_BIT,
+                .aspectMask = aspect,
                 .baseMipLevel = 0,
                 .levelCount = 1,
                 .baseArrayLayer = 0,
