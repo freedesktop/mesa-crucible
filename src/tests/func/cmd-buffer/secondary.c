@@ -118,7 +118,7 @@ make_secondary_cmd_buffer(VkRenderPass pass, VkPipeline pipeline,
                                 .level = VK_COMMAND_BUFFER_LEVEL_SECONDARY);
 
     qoBeginCommandBuffer(secondary,
-        .flags = usage_flags,
+        .flags = usage_flags | VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT,
         .renderPass = pass,
         .framebuffer = t_framebuffer);
 
