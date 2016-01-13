@@ -174,10 +174,28 @@ done_getopt:
     }
 }
 
+// Do the command line args specify exactly one test?
 static bool
 one_test(void)
 {
-    return test_patterns.len == 1 && !strstr(test_patterns.data[0], "*");
+    if (test_patterns.len > 1)
+        return false;
+
+    const char *first_pattern = test_patterns.data[0];
+
+    if (first_pattern[0] == '!') {
+        // From the crucible-run(1) man page:
+        //
+        //      If the first given pattern is an exclude pattern, then Crucible
+        //      inserts an implied "*" as the first pattern.
+        return false;
+    }
+
+    // A glob may match multiple tests.
+    if (strstr(test_patterns.data[0], "*"))
+        return false;
+
+    return true;
 }
 
 static uint32_t
