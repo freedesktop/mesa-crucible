@@ -178,7 +178,7 @@ done_getopt:
 static bool
 one_test(void)
 {
-    if (test_patterns.len > 1)
+    if (test_patterns.len != 1)
         return false;
 
     const char *first_pattern = test_patterns.data[0];
