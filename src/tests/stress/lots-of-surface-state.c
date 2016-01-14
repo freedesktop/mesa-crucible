@@ -63,7 +63,7 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
     //  Create the descriptor set layout.
     VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
             .bindingCount = 1,
-            .pBinding = (VkDescriptorSetLayoutBinding[]) {
+            .pBindings = (VkDescriptorSetLayoutBinding[]) {
                 {
                     .binding = 0,
                     .descriptorType = use_dynamic_offsets ?
@@ -215,7 +215,7 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
             &(VkDescriptorSetAllocateInfo) {
                 .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
                 .descriptorPool = VK_NULL_HANDLE,
-                .setLayoutCount = 1024,
+                .descriptorSetCount = 1024,
                 .pSetLayouts = layouts,
             }, set);
         t_assert(result == VK_SUCCESS);

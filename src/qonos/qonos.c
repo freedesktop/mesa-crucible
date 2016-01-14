@@ -247,7 +247,7 @@ __qoAllocateDescriptorSet(VkDevice dev, const VkDescriptorSetAllocateInfo *info)
     VkDescriptorSet set;
     VkResult result;
 
-    t_assert(info->setLayoutCount == 1);
+    t_assert(info->descriptorSetCount == 1);
     t_assert(info->pSetLayouts != NULL);
 
     result = vkAllocateDescriptorSets(dev, info, &set);
@@ -297,7 +297,7 @@ __qoAllocateCommandBuffer(VkDevice dev, VkCommandPool pool,
     VkResult result;
 
     assert(info->commandPool == pool);
-    assert(info->bufferCount == 1);
+    assert(info->commandBufferCount == 1);
 
     result = vkAllocateCommandBuffers(dev, info, &cmd);
 

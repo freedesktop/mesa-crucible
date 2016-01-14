@@ -31,7 +31,7 @@ get_timestamp(void)
         &(VkQueryPoolCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO,
             .queryType = VK_QUERY_TYPE_TIMESTAMP,
-            .entryCount = 2,
+            .queryCount = 2,
         }, NULL, &pool);
 
     VkCommandBuffer cmdBuffer = qoAllocateCommandBuffer(t_device, t_cmd_pool);

@@ -171,7 +171,7 @@ test_event_wait_preset(void)
 	    vkCmdWaitEvents(cmd_buffer, 1, &event_a,
 			    VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
 			    VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
-			    0, NULL);
+			    0, NULL, 0, NULL, 0, NULL);
 	    vkCmdSetEvent(cmd_buffer, event_b,
 			  VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT);
     }
@@ -201,7 +201,7 @@ test_event_wait_set_later(void)
     vkCmdWaitEvents(cmd_buffer, 1, &event_a,
 		    VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
 		    VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
-		    0, NULL);
+		    0, NULL, 0, NULL, 0, NULL);
     vkCmdSetEvent(cmd_buffer, event_b,
 		  VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT);
     qoEndCommandBuffer(cmd_buffer);

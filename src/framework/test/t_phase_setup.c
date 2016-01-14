@@ -278,7 +278,7 @@ t_setup_vulkan(void)
             .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
             .pApplicationInfo = &(VkApplicationInfo) {
                 .pApplicationName = "crucible",
-                .apiVersion = VK_API_VERSION,
+                .apiVersion = VK_MAKE_VERSION(1, 0, 0),
             },
         }, &test_alloc_cb, &t->vk.instance);
     t_cleanup_push_vk_instance(t->vk.instance, &test_alloc_cb);

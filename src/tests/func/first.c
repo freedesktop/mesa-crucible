@@ -135,7 +135,7 @@ test(void)
 
     set_layout[0] = qoCreateDescriptorSetLayout(t_device,
             .bindingCount = 2,
-            .pBinding = (VkDescriptorSetLayoutBinding[]) {
+            .pBindings = (VkDescriptorSetLayoutBinding[]) {
                 {
                     .binding = 0,
                     .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -154,7 +154,7 @@ test(void)
 
     set_layout[1] = qoCreateDescriptorSetLayout(t_device,
             .bindingCount = 1,
-            .pBinding = (VkDescriptorSetLayoutBinding[]) {
+            .pBindings = (VkDescriptorSetLayoutBinding[]) {
                 {
                     .binding = 0,
                     .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -175,7 +175,7 @@ test(void)
         &(VkDescriptorSetAllocateInfo) {
             .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
             .descriptorPool = VK_NULL_HANDLE,
-            .setLayoutCount = 2,
+            .descriptorSetCount = 2,
             .pSetLayouts = set_layout,
         }, set);
     t_assert(result == VK_SUCCESS);

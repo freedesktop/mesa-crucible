@@ -144,7 +144,7 @@ typedef struct QoShaderModuleCreateInfo_ {
 #define QO_DESCRIPTOR_SET_ALLOCATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO, \
     .descriptorPool = VK_NULL_HANDLE, \
-    .setLayoutCount = 1
+    .descriptorSetCount = 1
 
 #define QO_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO, \
@@ -203,7 +203,7 @@ typedef struct QoShaderModuleCreateInfo_ {
 #define QO_COMMAND_BUFFER_ALLOCATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO, \
     .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY, \
-    .bufferCount = 1
+    .commandBufferCount = 1
 
 #define QO_COMMAND_BUFFER_BEGIN_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO

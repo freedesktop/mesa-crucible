@@ -144,7 +144,7 @@ copy(cru_vk_image_t *self, enum copy_direction dir)
     r = vkAllocateCommandBuffers(dev, &(VkCommandBufferAllocateInfo) {
             .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
             .commandPool = cmd_pool,
-            .bufferCount = 1,
+            .commandBufferCount = 1,
         },
         &cmd);
     if (r != VK_SUCCESS)

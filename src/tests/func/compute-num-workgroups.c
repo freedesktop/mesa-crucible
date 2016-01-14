@@ -40,7 +40,7 @@ common_init(CTX *ctx)
 
     set_layout = qoCreateDescriptorSetLayout(t_device,
             .bindingCount = 2,
-            .pBinding = (VkDescriptorSetLayoutBinding[]) {
+            .pBindings = (VkDescriptorSetLayoutBinding[]) {
                 {
                     .binding = 0,
                     .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,

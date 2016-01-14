@@ -119,8 +119,11 @@ make_secondary_cmd_buffer(VkRenderPass pass, VkPipeline pipeline,
 
     qoBeginCommandBuffer(secondary,
         .flags = usage_flags | VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT,
-        .renderPass = pass,
-        .framebuffer = t_framebuffer);
+        .pInheritanceInfo = (&(VkCommandBufferInheritanceInfo) {
+            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO,
+            .renderPass = pass,
+            .framebuffer = t_framebuffer,
+        }));
 
     vkCmdBindPipeline(secondary, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 

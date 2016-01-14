@@ -791,7 +791,7 @@ copy_color_images_with_draw(const test_data_t *data,
         const uint32_t width = extents[i].width;
         const uint32_t height = extents[i].height;
 
-        vkCmdSetViewport(cmd, 1,
+        vkCmdSetViewport(cmd, 0, 1,
             &(VkViewport) {
                 .x = 0,
                 .y = 0,
@@ -1079,7 +1079,7 @@ init_draw_data(test_draw_data_t *draw_data)
 
     VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
         .bindingCount = 1,
-        .pBinding = (VkDescriptorSetLayoutBinding[]) {
+        .pBindings = (VkDescriptorSetLayoutBinding[]) {
             {
                 .binding = 0,
                 .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,

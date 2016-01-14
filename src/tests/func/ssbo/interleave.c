@@ -35,7 +35,7 @@ test(void)
 {
     VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
         .bindingCount = 1,
-        .pBinding = (VkDescriptorSetLayoutBinding[]) {
+        .pBindings = (VkDescriptorSetLayoutBinding[]) {
             {
                 .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
                 .descriptorCount = 1,

@@ -56,9 +56,10 @@ test_large_copy(void)
     VkCommandBuffer cmdBuffer = qoAllocateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmdBuffer);
 
-    vkCmdPipelineBarrier(cmdBuffer, 0, VK_PIPELINE_STAGE_TRANSFER_BIT, false, 2,
-        (const void * []) {
-            &(VkBufferMemoryBarrier) {
+    vkCmdPipelineBarrier(cmdBuffer, 0, VK_PIPELINE_STAGE_TRANSFER_BIT, false,
+                         0, NULL, 2,
+        (VkBufferMemoryBarrier[]) {
+            {
                 .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
                 .srcAccessMask = VK_ACCESS_HOST_WRITE_BIT,
                 .dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
@@ -66,7 +67,7 @@ test_large_copy(void)
                 .offset = 0,
                 .size = buffer_size,
             },
-            &(VkBufferMemoryBarrier) {
+            {
                 .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
                 .srcAccessMask = VK_ACCESS_HOST_WRITE_BIT,
                 .dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
@@ -74,7 +75,7 @@ test_large_copy(void)
                 .offset = 0,
                 .size = buffer_size,
             },
-        });
+        }, 0, NULL);
 
     vkCmdCopyBuffer(cmdBuffer, buffer1, buffer2, 1,
         &(VkBufferCopy) {
@@ -83,17 +84,16 @@ test_large_copy(void)
             .size = buffer_size,
         });
 
-    vkCmdPipelineBarrier(cmdBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, true, 1,
-        (const void * []) {
-            &(VkBufferMemoryBarrier) {
-                .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
-                .srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
-                .dstAccessMask = VK_ACCESS_HOST_READ_BIT,
-                .buffer = buffer2,
-                .offset = 0,
-                .size = buffer_size,
-            },
-        });
+    vkCmdPipelineBarrier(cmdBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, true,
+                         0, NULL, 1,
+        &(VkBufferMemoryBarrier) {
+            .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
+            .srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
+            .dstAccessMask = VK_ACCESS_HOST_READ_BIT,
+            .buffer = buffer2,
+            .offset = 0,
+            .size = buffer_size,
+        }, 0, NULL);
 
     qoEndCommandBuffer(cmdBuffer);
     qoQueueSubmit(t_queue, 1, &cmdBuffer, VK_NULL_HANDLE);
