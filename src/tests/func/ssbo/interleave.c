@@ -56,10 +56,10 @@ test(void)
 
         void main()
         {
-           if (gl_VertexID % 2 == 0) {
-              ssbo.arr[gl_VertexID / 2].xz = data;
+           if (gl_VertexIndex % 2 == 0) {
+              ssbo.arr[gl_VertexIndex / 2].xz = data;
            } else {
-              ssbo.arr[gl_VertexID / 2].yw = data;
+              ssbo.arr[gl_VertexIndex / 2].yw = data;
            }
            gl_Position = vec4(data, 0, 1);
         }
