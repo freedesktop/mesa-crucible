@@ -65,7 +65,7 @@ common_init(CTX *ctx)
     VkShaderModule shader = qoCreateShaderModuleGLSL(
         t_device, COMPUTE,
 
-        layout(set = 0, binding = 0, std140) buffer Storage {
+        layout(set = 0, binding = 0, std430) buffer Storage {
            uvec3 uv3a[];
         } ssbo;
 
@@ -142,7 +142,7 @@ verify_ssbo(CTX *ctx)
     uint32_t *map_out = qoMapMemory(t_device, ctx->ssbo, 0, ctx->ssbo_size, 0);
     for (unsigned i = 0; i < 64; i++) {
         for (unsigned j = 0; j < 3; j++) {
-            uint32_t found = map_out[3 * i + j];
+            uint32_t found = map_out[4 * i + j];
             t_assertf(found == ctx->sizes[j],
                       "buffer mismatch at (%d, %d): found %u, "
                       "expected %u", i, j, found, ctx->sizes[j]);
@@ -162,7 +162,7 @@ basic(void)
 {
     CTX ctx;
 
-    ctx.ssbo_size = 64 * 3 * sizeof(uint32_t);
+    ctx.ssbo_size = 64 * 4 * sizeof(uint32_t);
     common_init(&ctx);
 
     for (unsigned s = 0; s < ARRAY_LENGTH(scenarios); s++) {
@@ -194,7 +194,7 @@ build_indirect_cmd_buffer(CTX *ctx)
                             &ctx->set, 0, NULL);
 
     vkCmdDispatchIndirect(t_cmd_buffer, ctx->ssbo_buf,
-                          3 * 64 * sizeof(uint32_t));
+                          4 * 64 * sizeof(uint32_t));
 
     qoEndCommandBuffer(t_cmd_buffer);
 }
@@ -204,7 +204,7 @@ indirect_dispatch_and_wait(CTX *ctx)
 {
     uint32_t *ssbo = qoMapMemory(t_device, ctx->ssbo, 0, ctx->ssbo_size, 0);
     for (unsigned i = 0; i < 3; i++)
-        ssbo[3 * 64 + i] = ctx->sizes[i];
+        ssbo[4 * 64 + i] = ctx->sizes[i];
     vkUnmapMemory(t_device, ctx->ssbo);
 
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
@@ -216,7 +216,7 @@ indirect(void)
 {
     CTX ctx;
 
-    ctx.ssbo_size = 65 * 3 * sizeof(uint32_t);
+    ctx.ssbo_size = 65 * 4 * sizeof(uint32_t);
     common_init(&ctx);
 
     build_indirect_cmd_buffer(&ctx);

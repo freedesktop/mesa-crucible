@@ -118,7 +118,7 @@ basic(void)
     VkShaderModule cs = qoCreateShaderModuleGLSL(
         t_device, COMPUTE,
 
-        layout(set = 0, binding = 0, std140) buffer Storage {
+        layout(set = 0, binding = 0, std430) buffer Storage {
            uint ua[];
         } ssbo;
 
@@ -156,11 +156,11 @@ push_constant(void)
     VkShaderModule cs = qoCreateShaderModuleGLSL(
         t_device, COMPUTE,
 
-        layout(push_constant, std140) uniform Push {
+        layout(push_constant, std430) uniform Push {
             uint add;
         } pc;
 
-        layout(set = 0, binding = 0, std140) buffer Storage {
+        layout(set = 0, binding = 0, std430) buffer Storage {
            uint ua[];
         } ssbo;
 
@@ -212,7 +212,7 @@ local_ids(void)
     VkShaderModule cs = qoCreateShaderModuleGLSL(
         t_device, COMPUTE,
 
-        layout(set = 0, binding = 0, std140) buffer Storage {
+        layout(set = 0, binding = 0, std430) buffer Storage {
            uint ua[];
         } ssbo;
 
