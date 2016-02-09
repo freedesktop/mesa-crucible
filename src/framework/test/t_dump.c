@@ -19,6 +19,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include "test.h"
 
 bool
@@ -40,10 +42,10 @@ t_dump_seq_image(cru_image_t *image)
         return;
 
     uint64_t seq = cru_refcount_get(&t->dump_seq);
-    t_assertf(seq <= 9999, "image sequence %llu exceeds 9999", seq);
+    t_assertf(seq <= 9999, "image sequence %" PRIu64 " exceeds 9999", seq);
 
     string_t filename = STRING_INIT;
-    string_printf(&filename, "%s.seq%04llu.png", t_name, seq);
+    string_printf(&filename, "%s.seq%04" PRIu64 ".png", t_name, seq);
     cru_image_write_file(image, string_data(&filename));
 }
 
