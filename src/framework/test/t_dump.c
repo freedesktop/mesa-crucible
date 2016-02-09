@@ -40,10 +40,10 @@ t_dump_seq_image(cru_image_t *image)
         return;
 
     uint64_t seq = cru_refcount_get(&t->dump_seq);
-    t_assertf(seq <= 9999, "image sequence %lu exceeds 9999", seq);
+    t_assertf(seq <= 9999, "image sequence %llu exceeds 9999", seq);
 
     string_t filename = STRING_INIT;
-    string_printf(&filename, "%s.seq%04lu.png", t_name, seq);
+    string_printf(&filename, "%s.seq%04llu.png", t_name, seq);
     cru_image_write_file(image, string_data(&filename));
 }
 

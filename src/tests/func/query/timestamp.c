@@ -49,8 +49,8 @@ get_timestamp(void)
                           sizeof(results), results, sizeof *results,
                           VK_QUERY_RESULT_64_BIT);
 
-    printf("top timestamp:       %20ld  (%016lx)\n", results[0], results[0]);
-    printf("bottom timestamp:    %20ld  (%016lx)\n", results[1], results[1]);
+    printf("top timestamp:       %20lld  (%016llx)\n", results[0], results[0]);
+    printf("bottom timestamp:    %20lld  (%016llx)\n", results[1], results[1]);
 
     return results[0];
 }
@@ -66,7 +66,7 @@ test_timestamp(void)
 
     freq = 1 / (t_physical_dev_props->limits.timestampPeriod * 1000);
     elapsed_ms = (b - a) / freq;
-    printf("difference: %lu - %lu = %lu\n", b / freq, a / freq, elapsed_ms);
+    printf("difference: %llu - %llu = %llu\n", b / freq, a / freq, elapsed_ms);
     if (elapsed_ms < 90 || elapsed_ms > 110)
         t_fail();
     else
