@@ -88,6 +88,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/compute.c \
 	src/tests/func/compute-local-id.c \
 	src/tests/func/compute-num-workgroups.c \
+	src/tests/func/input/fragcoord.c \
 	src/tests/func/interleaved-cmd-buffers.c \
 	src/tests/func/miptree/miptree.c \
 	src/tests/func/push-constants/basic.c \
@@ -120,6 +121,7 @@ BUILT_SOURCES = \
 	src/tests/func/compute-spirv.h \
 	src/tests/func/compute-local-id-spirv.h \
 	src/tests/func/compute-num-workgroups-spirv.h \
+	src/tests/func/input/fragcoord-spirv.h \
 	src/tests/func/miptree/miptree-spirv.h \
 	src/tests/func/miptree/miptree_gen.c \
 	src/tests/func/push-constants/basic-spirv.h \
