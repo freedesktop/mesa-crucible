@@ -88,10 +88,10 @@ bin_crucible_SOURCES = \
 	src/tests/func/compute.c \
 	src/tests/func/compute-local-id.c \
 	src/tests/func/compute-num-workgroups.c \
-	src/tests/func/input/fragcoord.c \
 	src/tests/func/interleaved-cmd-buffers.c \
 	src/tests/func/miptree/miptree.c \
 	src/tests/func/push-constants/basic.c \
+	src/tests/func/shader/fragcoord.c \
 	src/tests/func/ssbo/interleave.c \
 	src/tests/func/renderpass/clear.c \
 	src/tests/stress/lots-of-surface-state.c \
@@ -121,10 +121,10 @@ BUILT_SOURCES = \
 	src/tests/func/compute-spirv.h \
 	src/tests/func/compute-local-id-spirv.h \
 	src/tests/func/compute-num-workgroups-spirv.h \
-	src/tests/func/input/fragcoord-spirv.h \
 	src/tests/func/miptree/miptree-spirv.h \
 	src/tests/func/miptree/miptree_gen.c \
 	src/tests/func/push-constants/basic-spirv.h \
+	src/tests/func/shader/fragcoord-spirv.h \
 	src/tests/func/ssbo/interleave-spirv.h \
 	src/tests/stress/lots-of-surface-state-spirv.h
 

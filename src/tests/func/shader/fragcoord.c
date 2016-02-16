@@ -154,7 +154,7 @@ test_fragcoord(void)
 }
 
 test_define {
-    .name = "func.input.fragcoord",
+    .name = "func.shader.fragcoord",
     .start = test_fragcoord,
     .image_filename = "32x32-green.ref.png",
 };
