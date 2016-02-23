@@ -67,7 +67,9 @@ common_init(VkShaderModule cs, const uint32_t ssbo_size)
         }, NULL, &pipeline);
 
     VkDescriptorSet set =
-        qoAllocateDescriptorSet(t_device, .pSetLayouts = &set_layout);
+        qoAllocateDescriptorSet(t_device,
+                                .descriptorPool = t_descriptor_pool,
+                                .pSetLayouts = &set_layout);
 
     VkBuffer buffer_out = qoCreateBuffer(t_device, .size = ssbo_size);
     VkDeviceMemory mem_out = qoAllocBufferMemory(t_device, buffer_out,

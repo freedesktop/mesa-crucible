@@ -144,6 +144,7 @@ struct test {
         VkPhysicalDeviceMemoryProperties physical_dev_mem_props;
         VkDevice device;
         VkQueue queue;
+        VkDescriptorPool descriptor_pool;
         VkPipelineCache pipeline_cache;
         VkCommandPool cmd_pool;
         VkCommandBuffer cmd_buffer;

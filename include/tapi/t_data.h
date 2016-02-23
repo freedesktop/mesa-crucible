@@ -61,6 +61,7 @@ typedef struct cru_image cru_image_t;
 #define t_mem_type_index_for_device_access (__t_mem_type_index_for_device_access())
 #define t_device (*__t_device())
 #define t_queue (*__t_queue())
+#define t_descriptor_pool (*__t_descriptor_pool())
 #define t_cmd_pool (*__t_cmd_pool())
 #define t_cmd_buffer (*__t_cmd_buffer())
 #define t_color_image (*__t_color_image())
@@ -86,6 +87,7 @@ const VkPhysicalDeviceMemoryProperties *__t_physical_dev_mem_props(void);
 const uint32_t __t_mem_type_index_for_mmap(void);
 const uint32_t __t_mem_type_index_for_device_access(void);
 const VkQueue *__t_queue(void);
+const VkDescriptorPool *__t_descriptor_pool(void);
 const VkCommandPool *__t_cmd_pool(void);
 const VkCommandBuffer *__t_cmd_buffer(void);
 const VkImage *__t_color_image(void);

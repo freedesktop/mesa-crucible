@@ -268,6 +268,35 @@ t_setup_framebuffer(void)
         .pAttachments = attachments);
 }
 
+static void
+t_setup_descriptor_pool(void)
+{
+    ASSERT_TEST_IN_SETUP_PHASE;
+    GET_CURRENT_TEST(t);
+
+    VkDescriptorPoolSize pool_sizes[VK_DESCRIPTOR_TYPE_RANGE_SIZE];
+    for (uint32_t i = 0; i < VK_DESCRIPTOR_TYPE_RANGE_SIZE; i++) {
+        pool_sizes[i].type = i;
+        pool_sizes[i].descriptorCount = 5;
+    }
+
+    const VkDescriptorPoolCreateInfo create_info = {
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+        .pNext = NULL,
+        .flags = 0,
+        .maxSets = 1,
+        .poolSizeCount = 5,
+        .pPoolSizes = pool_sizes
+    };
+
+    VkResult res = vkCreateDescriptorPool(t->vk.device, &create_info, NULL,
+                                          &t->vk.descriptor_pool);
+    t_assert(res == VK_SUCCESS);
+    t_assert(t->vk.descriptor_pool != VK_NULL_HANDLE);
+
+    t_cleanup_push_vk_descriptor_pool(t->vk.device, t->vk.descriptor_pool);
+}
+
 void
 t_setup_vulkan(void)
 {
@@ -297,6 +326,8 @@ t_setup_vulkan(void)
         }, NULL, &t->vk.device);
 
     t_cleanup_push_vk_device(t->vk.device, NULL);
+
+    t_setup_descriptor_pool();
 
     t_setup_framebuffer();
 

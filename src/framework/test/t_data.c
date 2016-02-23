@@ -93,6 +93,15 @@ __t_queue(void)
     return &t->vk.queue;
 }
 
+const VkDescriptorPool *
+__t_descriptor_pool(void)
+{
+    ASSERT_TEST_IN_MAJOR_PHASE;
+    GET_CURRENT_TEST(t);
+
+    return &t->vk.descriptor_pool;
+}
+
 const VkCommandPool *
 __t_cmd_pool(void)
 {

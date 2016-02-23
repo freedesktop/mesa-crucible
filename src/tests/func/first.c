@@ -174,7 +174,7 @@ test(void)
     VkResult result = vkAllocateDescriptorSets(t_device,
         &(VkDescriptorSetAllocateInfo) {
             .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-            .descriptorPool = VK_NULL_HANDLE,
+            .descriptorPool = t_descriptor_pool,
             .descriptorSetCount = 2,
             .pSetLayouts = set_layout,
         }, set);

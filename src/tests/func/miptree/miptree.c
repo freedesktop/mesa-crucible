@@ -1140,7 +1140,9 @@ init_draw_data(test_draw_data_t *draw_data)
            position_data, sizeof(position_data));
 
     VkDescriptorSet desc_set =
-        qoAllocateDescriptorSet(t_device, .pSetLayouts = &set_layout);
+        qoAllocateDescriptorSet(t_device,
+                                .descriptorPool = t_descriptor_pool,
+                                .pSetLayouts = &set_layout);
 
     // Prevent dumb bugs by initializing the struct in one shot.
     *draw_data = (test_draw_data_t) {

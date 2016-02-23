@@ -76,7 +76,9 @@ test(void)
         }, NULL, &pipeline);
 
     VkDescriptorSet set =
-        qoAllocateDescriptorSet(t_device, .pSetLayouts = &set_layout);
+        qoAllocateDescriptorSet(t_device,
+                                .descriptorPool = t_descriptor_pool,
+                                .pSetLayouts = &set_layout);
 
     VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024);
 
