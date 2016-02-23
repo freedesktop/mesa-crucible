@@ -178,11 +178,39 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
                            (VkBuffer[]) { vbo },
                            (VkDeviceSize[]) { 0 });
 
+    const VkDescriptorPoolSize pool_sizes[2] = {
+        {
+            .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
+            .descriptorCount = 12
+        },
+        {
+            .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            .descriptorCount = 12
+        }
+    };
+
+    const VkDescriptorPoolCreateInfo create_info = {
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+        .pNext = NULL,
+        .flags = 0,
+        .maxSets = 1024,
+        .poolSizeCount = 2,
+        .pPoolSizes = pool_sizes
+    };
+
+    VkDescriptorPool desc_pool;
+    VkResult res = vkCreateDescriptorPool(t_device, &create_info, NULL,
+                                          &desc_pool);
+    t_assert(res == VK_SUCCESS);
+    t_cleanup_push_vk_descriptor_pool(t_device, desc_pool);
+
     VkDescriptorSet set[1024];
     if (use_dynamic_offsets) {
         // Allocate and set up a single descriptor set.  We'll just re-bind
         // it with new dynamic offsets each time.
-        set[0] = qoAllocateDescriptorSet(t_device, .pSetLayouts = &set_layout);
+        set[0] = qoAllocateDescriptorSet(t_device,
+                                         .descriptorPool = desc_pool,
+                                         .pSetLayouts = &set_layout);
 
         VkDescriptorBufferInfo buffer_info[12];
         for (int i = 0; i < 12; i++) {
@@ -214,7 +242,7 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
         VkResult result = vkAllocateDescriptorSets(t_device,
             &(VkDescriptorSetAllocateInfo) {
                 .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-                .descriptorPool = VK_NULL_HANDLE,
+                .descriptorPool = desc_pool,
                 .descriptorSetCount = 1024,
                 .pSetLayouts = layouts,
             }, set);
