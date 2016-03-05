@@ -107,6 +107,8 @@ draw_triangle(void)
 
                 void main()
                 {
+                    if (v_color.x > 5)
+                        discard;
                     f_color = v_color;
                 }
             ),
