@@ -185,7 +185,7 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
         },
         {
             .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-            .descriptorCount = 12
+            .descriptorCount = 12 * 1024
         }
     };
 
