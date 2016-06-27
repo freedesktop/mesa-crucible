@@ -410,6 +410,19 @@ miptree_destroy(miptree_t *mt)
     free(mt);
 }
 
+static void
+can_create_image(VkImageType type, VkImageTiling tiling,
+                 uint32_t usage, VkFormat format)
+{
+    VkImageFormatProperties fmt_properties;
+    VkResult result =
+              vkGetPhysicalDeviceImageFormatProperties(t_physical_dev, format,
+                                                       type, tiling, usage,
+                                                       0, &fmt_properties);
+    if (result == VK_ERROR_FORMAT_NOT_SUPPORTED)
+       t_end(TEST_RESULT_SKIP);
+}
+
 static const miptree_t *
 miptree_create(void)
 {
@@ -424,10 +437,19 @@ miptree_create(void)
     const uint32_t depth = params->depth;
     const uint32_t array_length = params->array_length;
     const size_t buffer_size = miptree_calc_buffer_size();
+    const uint32_t usage_bits = VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
+                                VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+                                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
+                                VK_IMAGE_USAGE_SAMPLED_BIT;
+    VkImageType image_type = image_type_from_image_view_type(params->view_type);
+
+    // Determine if an image can be created with this combination
+    can_create_image(image_type, VK_IMAGE_TILING_OPTIMAL,
+                     usage_bits, format);
 
     // Create the image that will contain the real miptree.
     VkImage image = qoCreateImage(t_device,
-        .imageType = image_type_from_image_view_type(params->view_type),
+        .imageType = image_type,
         .format = format,
         .mipLevels = levels,
         .arrayLayers = array_length,
@@ -437,10 +459,7 @@ miptree_create(void)
             .depth = depth,
         },
         .tiling = VK_IMAGE_TILING_OPTIMAL,
-        .usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
-                 VK_IMAGE_USAGE_TRANSFER_DST_BIT |
-                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
-                 VK_IMAGE_USAGE_SAMPLED_BIT);
+        .usage = usage_bits);
     VkBuffer src_buffer = qoCreateBuffer(t_device,
         .size = buffer_size,
         .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
@@ -501,6 +520,11 @@ miptree_create(void)
                 break;
             case MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE:
             case MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW:
+
+                // Determine if an image can be created with this combination
+                can_create_image(VK_IMAGE_TYPE_2D, VK_IMAGE_TILING_LINEAR,
+                                 VK_IMAGE_USAGE_TRANSFER_SRC_BIT, format);
+
                 src_vk_image = qoCreateImage(t_device,
                     .format = format,
                     .mipLevels = 1,
@@ -523,6 +547,11 @@ miptree_create(void)
                 break;
             case MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE:
             case MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW:
+
+                // Determine if an image can be created with this combination
+                can_create_image(VK_IMAGE_TYPE_2D, VK_IMAGE_TILING_LINEAR,
+                                 VK_IMAGE_USAGE_TRANSFER_DST_BIT, format);
+
                 dest_vk_image = qoCreateImage(t_device,
                     .format = format,
                     .mipLevels = 1,
