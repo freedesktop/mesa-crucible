@@ -207,6 +207,30 @@ t_setup_framebuffer(void)
 
     attachments[n_attachments++] = t->vk.color_image_view;
 
+    VkRenderPass color_pass = qoCreateRenderPass(t_device,
+        .attachmentCount = 1,
+        .pAttachments = (VkAttachmentDescription[]) {
+            {
+                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
+                .format = VK_FORMAT_R8G8B8A8_UNORM,
+            },
+        },
+        .subpassCount = 1,
+        .pSubpasses = (VkSubpassDescription[]) {
+            {
+                QO_SUBPASS_DESCRIPTION_DEFAULTS,
+                .colorAttachmentCount = 1,
+                .pColorAttachments = (VkAttachmentReference[]) {
+                    {
+                        .attachment = 0,
+                        .layout = VK_IMAGE_LAYOUT_GENERAL,
+                    },
+                },
+            }
+        });
+
+    VkRenderPass pass = color_pass;
+
     if (t->def->depthstencil_format != VK_FORMAT_UNDEFINED) {
         t->vk.ds_image = qoCreateImage(t->vk.device,
             .format = t->def->depthstencil_format,
@@ -258,9 +282,42 @@ t_setup_framebuffer(void)
             });
 
         attachments[n_attachments++] = t->vk.depthstencil_image_view;
+
+        VkRenderPass color_depth_pass = qoCreateRenderPass(t_device,
+            .attachmentCount = 2,
+            .pAttachments = (VkAttachmentDescription[]) {
+                {
+                    QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
+                    .format = VK_FORMAT_R8G8B8A8_UNORM,
+                },
+                {
+                    QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
+                    .format = t->def->depthstencil_format,
+                },
+            },
+            .subpassCount = 1,
+            .pSubpasses = (VkSubpassDescription[]) {
+                {
+                    QO_SUBPASS_DESCRIPTION_DEFAULTS,
+                    .colorAttachmentCount = 1,
+                    .pColorAttachments = (VkAttachmentReference[]) {
+                        {
+                            .attachment = 0,
+                            .layout = VK_IMAGE_LAYOUT_GENERAL,
+                        },
+                    },
+                    .pDepthStencilAttachment = &(VkAttachmentReference) {
+                        .attachment = 1,
+                        .layout = VK_IMAGE_LAYOUT_GENERAL,
+                    },
+                },
+            });
+
+        pass = color_depth_pass;
     }
 
     t->vk.framebuffer = qoCreateFramebuffer(t->vk.device,
+        .renderPass = pass,
         .width = t->ref.width,
         .height = t->ref.height,
         .layers = 1,
@@ -283,9 +340,9 @@ t_setup_descriptor_pool(void)
     const VkDescriptorPoolCreateInfo create_info = {
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
         .pNext = NULL,
-        .flags = 0,
+        .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
         .maxSets = 1,
-        .poolSizeCount = 5,
+        .poolSizeCount = VK_DESCRIPTOR_TYPE_RANGE_SIZE,
         .pPoolSizes = pool_sizes
     };
 
@@ -320,8 +377,10 @@ t_setup_vulkan(void)
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             .queueCreateInfoCount = 1,
             .pQueueCreateInfos = &(VkDeviceQueueCreateInfo) {
+                .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
                 .queueFamilyIndex = 0,
                 .queueCount = 1,
+                .pQueuePriorities = (float[]) {1.0f},
             },
         }, NULL, &t->vk.device);
 

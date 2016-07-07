@@ -101,6 +101,7 @@ qoQueueSubmit(VkQueue queue, uint32_t cmdBufferCount,
 
     result = vkQueueSubmit(queue, 1,
         &(VkSubmitInfo) {
+            .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
             .commandBufferCount = cmdBufferCount,
             .pCommandBuffers = commandBuffers,
         }, fence);

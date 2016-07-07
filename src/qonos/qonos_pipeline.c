@@ -130,12 +130,14 @@ qoCreateGraphicsPipeline(VkDevice device,
                 dynamic_states[count++] = s;
         }
 
-        dy_info = (VkPipelineDynamicStateCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
-            .dynamicStateCount = count,
-            .pDynamicStates = dynamic_states,
-        };
-        pipeline_info.pDynamicState = &dy_info;
+        if (count > 0) {
+           dy_info = (VkPipelineDynamicStateCreateInfo) {
+               .sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+               .dynamicStateCount = count,
+               .pDynamicStates = dynamic_states,
+           };
+           pipeline_info.pDynamicState = &dy_info;
+        }
     }
 
     // Look for vertex or fragment shaders in the chain

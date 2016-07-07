@@ -199,6 +199,7 @@ copy(cru_vk_image_t *self, enum copy_direction dir)
 
     r = vkQueueSubmit(self->vk_queue, 1,
         &(VkSubmitInfo) {
+            .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
             .commandBufferCount = 1,
             .pCommandBuffers = &cmd,
         }, fence);
