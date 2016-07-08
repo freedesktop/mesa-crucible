@@ -230,7 +230,7 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
                     .dstBinding = 0,
                     .dstArrayElement = 0,
                     .descriptorCount = 12,
-                    .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                    .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
                     .pBufferInfo = buffer_info,
                 },
             }, 0, NULL);
