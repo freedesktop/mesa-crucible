@@ -177,7 +177,11 @@ test(void)
                                 .descriptorPool = t_descriptor_pool,
                                 .pSetLayouts = &set_layout);
 
-    VkBuffer buffer = qoCreateBuffer(t_device, .size = 4096);
+    VkBuffer buffer = qoCreateBuffer(t_device,
+                                     .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT |
+                                              VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
+                                              VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                     .size = 4096);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
         .memoryTypeIndex = t_mem_type_index_for_mmap);
