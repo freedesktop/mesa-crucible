@@ -242,7 +242,7 @@ test(void)
             }
         }, VK_SUBPASS_CONTENTS_INLINE);
 
-    vkCmdBindVertexBuffers(t_cmd_buffer, 0, 2,
+    vkCmdBindVertexBuffers(t_cmd_buffer, 0, 1,
                            (VkBuffer[]) { buffer },
                            (VkDeviceSize[]) { vertex_offset });
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
