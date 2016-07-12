@@ -266,6 +266,7 @@ test(void)
 test_define {
     .name = "func.desc.dynamic.storage-buffer",
     .start = test,
+    .image_filename = "func.desc.dynamic.uniform-buffer.ref.png",
     .user_data = &(struct params) {
         .descriptor_type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC
     }
