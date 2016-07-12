@@ -50,18 +50,15 @@ create_pipeline(VkDevice device,
     } else {
         vs = qoCreateShaderModuleGLSL(t_device, VERTEX,
             layout(location = 0) in vec4 a_position;
-            layout(std140, set = 0, binding = 0) uniform block2 {
-                uint i;
-            } u1;
-            layout(std140, set = 0, binding = 1) buffer block1 {
+            layout(std140, set = 0, binding = 0) buffer block1 {
                 vec4 color;
                 vec4 offset;
-            } s1[2];
+            } s1;
             layout(location = 0) flat out vec4 v_color;
             void main()
             {
-                gl_Position = a_position + s1[u1.i].offset;
-                v_color = s1[u1.i].color;
+                gl_Position = a_position + s1.offset;
+                v_color = s1.color;
             });
     }
 
@@ -148,19 +145,12 @@ test(void)
     const struct params *params = t_user_data;
 
     VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
-            .bindingCount = 2,
+            .bindingCount = 1,
             .pBindings = (VkDescriptorSetLayoutBinding[]) {
                 {
                     .binding = 0,
-                    .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                    .descriptorCount = 1,
-                    .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-                    .pImmutableSamplers = NULL,
-                },
-                {
-                    .binding = 1,
                     .descriptorType = params->descriptor_type,
-                    .descriptorCount = 2,
+                    .descriptorCount = 1,
                     .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
                     .pImmutableSamplers = NULL,
                 },
@@ -218,7 +208,7 @@ test(void)
             {
                 .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
                 .dstSet = set,
-                .dstBinding = 1,
+                .dstBinding = 0,
                 .dstArrayElement = 0,
                 .descriptorCount = 1,
                 .descriptorType = params->descriptor_type,
