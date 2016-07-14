@@ -96,6 +96,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/ssbo/interleave.c \
 	src/tests/func/renderpass/clear.c \
 	src/tests/stress/lots-of-surface-state.c \
+	src/tests/stress/buffer_limit.c \
 	src/tests/self/concurrent-output.c \
 	src/util/cru_cleanup.c \
 	src/util/cru_format.c \
