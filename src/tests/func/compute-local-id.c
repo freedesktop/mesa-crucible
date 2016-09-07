@@ -48,9 +48,16 @@ common_init(VkShaderModule cs, const uint32_t ssbo_size)
                 },
             });
 
+    VkPushConstantRange constants = {
+        .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+        .offset = 0,
+        .size = 4,
+    };
     VkPipelineLayout pipeline_layout = qoCreatePipelineLayout(t_device,
         .setLayoutCount = 1,
-        .pSetLayouts = &set_layout);
+        .pSetLayouts = &set_layout,
+        .pushConstantRangeCount = 1,
+        .pPushConstantRanges = &constants);
 
     VkPipeline pipeline;
     vkCreateComputePipelines(t_device, t_pipeline_cache, 1,
