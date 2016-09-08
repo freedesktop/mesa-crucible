@@ -423,6 +423,34 @@ can_create_image(VkImageType type, VkImageTiling tiling,
        t_end(TEST_RESULT_SKIP);
 }
 
+static VkFormat
+get_color_format(VkFormat format)
+{
+    switch (format) {
+    case VK_FORMAT_D16_UNORM:
+        return VK_FORMAT_R16_UNORM;
+
+    case VK_FORMAT_D32_SFLOAT:
+        return VK_FORMAT_R32_SFLOAT;
+
+    case VK_FORMAT_S8_UINT:
+        return VK_FORMAT_R8_UINT;
+
+    case VK_FORMAT_X8_D24_UNORM_PACK32:
+        assert(!"No corresponding color format");
+        return VK_FORMAT_UNDEFINED;
+
+    case VK_FORMAT_D16_UNORM_S8_UINT:
+    case VK_FORMAT_D24_UNORM_S8_UINT:
+    case VK_FORMAT_D32_SFLOAT_S8_UINT:
+        assert(!"Combined depth-stencil formats are unsupported");
+        return VK_FORMAT_UNDEFINED;
+
+    default:
+        return format;
+    }
+}
+
 static const miptree_t *
 miptree_create(void)
 {
@@ -529,6 +557,7 @@ miptree_create(void)
             void *dest_pixels = dest_buffer_map + buffer_offset;
 
             uint32_t src_usage, dest_usage;
+            VkFormat dest_format;
             VkImage src_vk_image;
             VkImage dest_vk_image;
 
@@ -578,9 +607,11 @@ miptree_create(void)
                 switch (params->download_method) {
                 case MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE:
                     dest_usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+                    dest_format = format;
                     break;
                 case MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW:
                     dest_usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+                    dest_format = get_color_format(format);
                     break;
                 default:
                     assert(!"Unreachable");
@@ -588,10 +619,10 @@ miptree_create(void)
 
                 // Determine if an image can be created with this combination
                 can_create_image(VK_IMAGE_TYPE_2D, VK_IMAGE_TILING_LINEAR,
-                                 dest_usage, format);
+                                 dest_usage, dest_format);
 
                 dest_vk_image = qoCreateImage(t_device,
-                    .format = format,
+                    .format = dest_format,
                     .mipLevels = 1,
                     .arrayLayers = 1,
                     .extent = {
@@ -932,6 +963,9 @@ miptree_upload_copy_with_draw(const test_data_t *data)
     VkImageView att_views[num_views];
     VkExtent2D extents[num_views];
 
+    /* Only color buffers can be drawn into */
+    assert(params->aspect == VK_IMAGE_ASPECT_COLOR_BIT);
+
     for (uint32_t i = 0; i < mt->mipslices.len; ++i) {
         const mipslice_t *slice = &mt->mipslices.data[i];
 
@@ -1004,7 +1038,7 @@ miptree_download_copy_with_draw(const test_data_t *data)
         att_views[i] = qoCreateImageView(t_device,
             .image = slice->dest_vk_image,
             .viewType = params->view_type,
-            .format = params->format,
+            .format = get_color_format(params->format),
             .subresourceRange = {
                 .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
                 .baseMipLevel = 0,
