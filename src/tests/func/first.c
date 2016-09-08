@@ -51,9 +51,15 @@ create_pipeline(VkDevice device, VkPipelineLayout pipeline_layout,
         layout(location = 0) out vec4 f_color;
         layout(location = 0) in vec4 v_color;
         layout(set = 0, binding = 1) uniform sampler2D tex;
+
+        vec4 sample_at_01_01(sampler2D s)
+        {
+            return texture(s, vec2(0.1, 0.1));
+        }
+
         void main()
         {
-            f_color = v_color + texture(tex, vec2(0.1, 0.1));
+            f_color = v_color + sample_at_01_01(tex);
         }
     );
 
