@@ -138,6 +138,7 @@ depth_2d_params_iter = (
     for download_method in (
         'copy-to-buffer',
         'copy-to-linear-image',
+        'copy-with-draw',
     )
 )
 
@@ -216,6 +217,7 @@ stencil_2d_params_iter = (
     )
     for download_method in (
         'copy-to-buffer',
+        'copy-with-draw',
 
         # Intel doesn't support linear stencil images. See above comment.
         #'copy-to-linear-image',

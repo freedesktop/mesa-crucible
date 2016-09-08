@@ -2055,6 +2055,32 @@ test_define {
             ".levels01"
             ".array01"
             ".extent-1024x512"
+            ".upload-copy-from-buffer.download-copy-with-draw",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
+        .view_type = VK_IMAGE_VIEW_TYPE_2D,
+        .levels = 1,
+        .width = 1024,
+        .height = 512,
+        .depth = 1,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".view-2d"
+            ".levels01"
+            ".array01"
+            ".extent-1024x512"
             ".upload-copy-from-linear-image.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -2096,6 +2122,32 @@ test_define {
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".view-2d"
+            ".levels01"
+            ".array01"
+            ".extent-1024x512"
+            ".upload-copy-from-linear-image.download-copy-with-draw",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
+        .view_type = VK_IMAGE_VIEW_TYPE_2D,
+        .levels = 1,
+        .width = 1024,
+        .height = 512,
+        .depth = 1,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
     },
 };
 
@@ -2159,6 +2211,32 @@ test_define {
             ".levels01"
             ".array02"
             ".extent-1024x512"
+            ".upload-copy-from-buffer.download-copy-with-draw",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
+        .view_type = VK_IMAGE_VIEW_TYPE_2D,
+        .levels = 1,
+        .width = 1024,
+        .height = 512,
+        .depth = 1,
+        .array_length = 2,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".view-2d"
+            ".levels01"
+            ".array02"
+            ".extent-1024x512"
             ".upload-copy-from-linear-image.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -2208,6 +2286,32 @@ test_define {
             ".d32-sfloat"
             ".aspect-depth"
             ".view-2d"
+            ".levels01"
+            ".array02"
+            ".extent-1024x512"
+            ".upload-copy-from-linear-image.download-copy-with-draw",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
+        .view_type = VK_IMAGE_VIEW_TYPE_2D,
+        .levels = 1,
+        .width = 1024,
+        .height = 512,
+        .depth = 1,
+        .array_length = 2,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".view-2d"
             ".levels02"
             ".array01"
             ".extent-1024x512"
@@ -2252,6 +2356,32 @@ test_define {
         .array_length = 1,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".view-2d"
+            ".levels02"
+            ".array01"
+            ".extent-1024x512"
+            ".upload-copy-from-buffer.download-copy-with-draw",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
+        .view_type = VK_IMAGE_VIEW_TYPE_2D,
+        .levels = 2,
+        .width = 1024,
+        .height = 512,
+        .depth = 1,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
     },
 };
 
@@ -2313,6 +2443,32 @@ test_define {
             ".aspect-depth"
             ".view-2d"
             ".levels02"
+            ".array01"
+            ".extent-1024x512"
+            ".upload-copy-from-linear-image.download-copy-with-draw",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
+        .view_type = VK_IMAGE_VIEW_TYPE_2D,
+        .levels = 2,
+        .width = 1024,
+        .height = 512,
+        .depth = 1,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".view-2d"
+            ".levels02"
             ".array02"
             ".extent-1024x512"
             ".upload-copy-from-buffer.download-copy-to-buffer",
@@ -2367,6 +2523,32 @@ test_define {
             ".levels02"
             ".array02"
             ".extent-1024x512"
+            ".upload-copy-from-buffer.download-copy-with-draw",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
+        .view_type = VK_IMAGE_VIEW_TYPE_2D,
+        .levels = 2,
+        .width = 1024,
+        .height = 512,
+        .depth = 1,
+        .array_length = 2,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".view-2d"
+            ".levels02"
+            ".array02"
+            ".extent-1024x512"
             ".upload-copy-from-linear-image.download-copy-to-buffer",
     .start = test,
     .skip = false,
@@ -2408,6 +2590,32 @@ test_define {
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".d32-sfloat"
+            ".aspect-depth"
+            ".view-2d"
+            ".levels02"
+            ".array02"
+            ".extent-1024x512"
+            ".upload-copy-from-linear-image.download-copy-with-draw",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_D32_SFLOAT,
+        .aspect = VK_IMAGE_ASPECT_DEPTH_BIT,
+        .view_type = VK_IMAGE_VIEW_TYPE_2D,
+        .levels = 2,
+        .width = 1024,
+        .height = 512,
+        .depth = 1,
+        .array_length = 2,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
     },
 };
 
@@ -2755,6 +2963,32 @@ test_define {
             ".aspect-stencil"
             ".view-2d"
             ".levels01"
+            ".array01"
+            ".extent-1024x512"
+            ".upload-copy-from-buffer.download-copy-with-draw",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_S8_UINT,
+        .aspect = VK_IMAGE_ASPECT_STENCIL_BIT,
+        .view_type = VK_IMAGE_VIEW_TYPE_2D,
+        .levels = 1,
+        .width = 1024,
+        .height = 512,
+        .depth = 1,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".s8-uint"
+            ".aspect-stencil"
+            ".view-2d"
+            ".levels01"
             ".array02"
             ".extent-1024x512"
             ".upload-copy-from-buffer.download-copy-to-buffer",
@@ -2772,6 +3006,32 @@ test_define {
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".s8-uint"
+            ".aspect-stencil"
+            ".view-2d"
+            ".levels01"
+            ".array02"
+            ".extent-1024x512"
+            ".upload-copy-from-buffer.download-copy-with-draw",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_S8_UINT,
+        .aspect = VK_IMAGE_ASPECT_STENCIL_BIT,
+        .view_type = VK_IMAGE_VIEW_TYPE_2D,
+        .levels = 1,
+        .width = 1024,
+        .height = 512,
+        .depth = 1,
+        .array_length = 2,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
     },
 };
 
@@ -2807,6 +3067,32 @@ test_define {
             ".aspect-stencil"
             ".view-2d"
             ".levels02"
+            ".array01"
+            ".extent-1024x512"
+            ".upload-copy-from-buffer.download-copy-with-draw",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_S8_UINT,
+        .aspect = VK_IMAGE_ASPECT_STENCIL_BIT,
+        .view_type = VK_IMAGE_VIEW_TYPE_2D,
+        .levels = 2,
+        .width = 1024,
+        .height = 512,
+        .depth = 1,
+        .array_length = 1,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".s8-uint"
+            ".aspect-stencil"
+            ".view-2d"
+            ".levels02"
             ".array02"
             ".extent-1024x512"
             ".upload-copy-from-buffer.download-copy-to-buffer",
@@ -2824,6 +3110,32 @@ test_define {
         .array_length = 2,
         .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
         .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER,
+    },
+};
+
+test_define {
+    .name = "func.miptree"
+            ".s8-uint"
+            ".aspect-stencil"
+            ".view-2d"
+            ".levels02"
+            ".array02"
+            ".extent-1024x512"
+            ".upload-copy-from-buffer.download-copy-with-draw",
+    .start = test,
+    .skip = false,
+    .no_image = true,
+    .user_data = &(test_params_t) {
+        .format = VK_FORMAT_S8_UINT,
+        .aspect = VK_IMAGE_ASPECT_STENCIL_BIT,
+        .view_type = VK_IMAGE_VIEW_TYPE_2D,
+        .levels = 2,
+        .width = 1024,
+        .height = 512,
+        .depth = 1,
+        .array_length = 2,
+        .upload_method = MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER,
+        .download_method = MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
     },
 };
 
