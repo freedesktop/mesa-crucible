@@ -1138,7 +1138,7 @@ init_draw_data(test_draw_data_t *draw_data)
         .pAttachments = (VkAttachmentDescription[]) {
             {
                 QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
-                .format = params->format,
+                .format = get_color_format(params->format),
             },
         },
         .subpassCount = 1,
