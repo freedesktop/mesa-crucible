@@ -899,6 +899,18 @@ copy_color_images_with_draw(const test_data_t *data,
                 .maxDepth = 1
             });
 
+        vkCmdSetScissor(cmd, 0, 1,
+            &(VkRect2D) {
+                .offset = {
+                    .x = 0,
+                    .y = 0,
+                },
+                .extent = {
+                    .width = width,
+                    .height = height,
+                },
+            });
+
         VkFramebuffer fb = qoCreateFramebuffer(t_device,
             .attachmentCount = 1,
             .pAttachments = (VkImageView[]) {
