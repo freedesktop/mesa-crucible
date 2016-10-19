@@ -359,7 +359,7 @@ t_setup_vulkan(void)
 {
     GET_CURRENT_TEST(t);
 
-    vkCreateInstance(
+    VkResult res = vkCreateInstance(
         &(VkInstanceCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
             .pApplicationInfo = &(VkApplicationInfo) {
@@ -367,12 +367,13 @@ t_setup_vulkan(void)
                 .apiVersion = VK_MAKE_VERSION(1, 0, 0),
             },
         }, &test_alloc_cb, &t->vk.instance);
+    t_assert(res == VK_SUCCESS);
     t_cleanup_push_vk_instance(t->vk.instance, &test_alloc_cb);
 
     t_setup_phys_dev();
     t_setup_phys_dev_mem_props();
 
-    vkCreateDevice(t->vk.physical_dev,
+    res = vkCreateDevice(t->vk.physical_dev,
         &(VkDeviceCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             .queueCreateInfoCount = 1,
@@ -383,7 +384,7 @@ t_setup_vulkan(void)
                 .pQueuePriorities = (float[]) {1.0f},
             },
         }, NULL, &t->vk.device);
-
+    t_assert(res == VK_SUCCESS);
     t_cleanup_push_vk_device(t->vk.device, NULL);
 
     t_setup_descriptor_pool();
@@ -394,7 +395,7 @@ t_setup_vulkan(void)
 
     t->vk.pipeline_cache = qoCreatePipelineCache(t->vk.device);
 
-    VkResult res = vkCreateCommandPool(t->vk.device,
+    res = vkCreateCommandPool(t->vk.device,
         &(VkCommandPoolCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
             .queueFamilyIndex = 0,
