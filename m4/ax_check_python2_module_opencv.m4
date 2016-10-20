@@ -32,7 +32,7 @@ AC_DEFUN([AX_CHECK_PYTHON2_MODULE_OPENCV],
 [AC_MSG_CHECKING(if Python2 OpenCV modules is installed)
     $PYTHON2 -c "
 try:
-    import cv
+    import cv2
 except ImportError as err:
     import sys
     sys.exit(err)
