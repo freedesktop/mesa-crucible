@@ -40,5 +40,7 @@ except ImportError as err:
 
     if test $? -ne 0 ; then
        AC_MSG_ERROR([Python2 OpenCV module not found])
+    else
+       AC_MSG_RESULT([yes])
     fi
 ])
