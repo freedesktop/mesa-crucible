@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 
 #include <stdio.h>
+#include <math.h>
 #include "tapi/t.h"
 
 #include "lots-of-surface-state-spirv.h"
@@ -424,4 +425,340 @@ test_define {
     .name = "stress.lots-of-surface-state.fs.static",
     .start = test_lots_of_surface_state_fs_static,
     .image_filename = "32x32-green.ref.png",
+};
+
+static void
+test_lots_of_surface_state_cs(bool use_dynamic_offsets)
+{
+    // The compute shader takes 12 UBOs and one SSBO.
+    VkShaderModule cs = qoCreateShaderModuleGLSL(t_device, COMPUTE,
+        layout(local_size_x = 1) in;
+        layout(set = 0, binding = 0) uniform block { float f; } u[12];
+        layout(set = 0, binding = 1) buffer Storage {
+            float zero;
+            float one;
+        };
+        void main()
+        {
+            zero = u[0].f + u[1].f + u[2].f + u[3].f + u[4].f + u[5].f;
+            one = u[6].f + u[7].f + u[8].f + u[9].f + u[10].f + u[11].f;
+        }
+    );
+
+    //  Create the descriptor set layout.
+    VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
+        .bindingCount = 2,
+        .pBindings = (VkDescriptorSetLayoutBinding[]) {
+            {
+                .binding = 0,
+                .descriptorType = use_dynamic_offsets ?
+                                  VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC:
+                                  VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                .descriptorCount = 12,
+                .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+                .pImmutableSamplers = NULL,
+            },
+            {
+                .binding = 1,
+                .descriptorType = use_dynamic_offsets ?
+                                  VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC:
+                                  VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                .descriptorCount = 1,
+                .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+                .pImmutableSamplers = NULL,
+            },
+        });
+
+    VkPipelineLayout pipeline_layout = qoCreatePipelineLayout(t_device,
+        .setLayoutCount = 1,
+        .pSetLayouts = &set_layout);
+
+    VkPipeline pipeline;
+    vkCreateComputePipelines(t_device, t_pipeline_cache, 1,
+        &(const VkComputePipelineCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
+            .stage = {
+                .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+                .stage = VK_SHADER_STAGE_COMPUTE_BIT,
+                .module = cs,
+                .pName = "main",
+            },
+            .layout = pipeline_layout,
+        }, NULL, &pipeline);
+    t_cleanup_push_vk_pipeline(t_device, pipeline);
+
+    size_t ubo_size = 1024 * 3 * sizeof(float);
+
+    VkBuffer ubo =
+        qoCreateBuffer(t_device, .size = ubo_size,
+                       .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
+
+    VkDeviceMemory ubo_mem = qoAllocBufferMemory(t_device, ubo,
+        .memoryTypeIndex = t_mem_type_index_for_mmap);
+
+    float *const ubo_map = qoMapMemory(t_device, ubo_mem, /*offset*/ 0,
+                                       ubo_size, /*flags*/ 0);
+
+    qoBindBufferMemory(t_device, ubo, ubo_mem, /*offset*/ 0);
+
+    srand(0);
+
+    // Fill the first 1024 floats in the UBO with random numbers in the
+    // range [-1, 2].  Why that range?  Some are negative but it's centered
+    // around 0.5.  In other words, it seemed good at the time.
+    for (int i = 0; i < 1024; i++) {
+        ubo_map[i] = ((float)rand() / RAND_MAX) * 3 - 1;
+    }
+
+    size_t ssbo_size = 1024 * 2 * sizeof(float);
+
+    VkBuffer ssbo =
+        qoCreateBuffer(t_device, .size = ssbo_size,
+                       .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
+
+    VkDeviceMemory ssbo_mem = qoAllocBufferMemory(t_device, ssbo,
+        .memoryTypeIndex = t_mem_type_index_for_mmap);
+
+    qoBindBufferMemory(t_device, ssbo, ssbo_mem, /*offset*/ 0);
+
+    vkCmdPipelineBarrier(t_cmd_buffer,
+                         VK_PIPELINE_STAGE_HOST_BIT,
+                         VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+                         false, 0, NULL, 1,
+        (VkBufferMemoryBarrier[]) {
+            {
+                .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
+                .srcAccessMask = VK_ACCESS_HOST_WRITE_BIT,
+                .dstAccessMask = VK_ACCESS_SHADER_READ_BIT,
+                .buffer = ubo,
+                .offset = 0,
+                .size = ubo_size,
+            },
+        }, 0, NULL);
+
+    vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
+
+    const VkDescriptorPoolCreateInfo create_info = {
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+        .pNext = NULL,
+        .flags = 0,
+        .maxSets = 1024,
+        .poolSizeCount = 4,
+        .pPoolSizes = (const VkDescriptorPoolSize[]) {
+            {
+                .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
+                .descriptorCount = 12,
+            },
+            {
+                .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                .descriptorCount = 12 * 1024,
+            },
+            {
+                .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC,
+                .descriptorCount = 1,
+            },
+            {
+                .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                .descriptorCount = 1 * 1024,
+            },
+        }
+    };
+
+    VkDescriptorPool desc_pool;
+    VkResult res = vkCreateDescriptorPool(t_device, &create_info, NULL,
+                                          &desc_pool);
+    t_assert(res == VK_SUCCESS);
+    t_cleanup_push_vk_descriptor_pool(t_device, desc_pool);
+
+    VkDescriptorSet set[1024];
+    if (use_dynamic_offsets) {
+        // Allocate and set up a single descriptor set.  We'll just re-bind
+        // it with new dynamic offsets each time.
+        set[0] = qoAllocateDescriptorSet(t_device,
+                                         .descriptorPool = desc_pool,
+                                         .pSetLayouts = &set_layout);
+
+        VkDescriptorBufferInfo buffer_info[12];
+        for (int i = 0; i < 12; i++) {
+            buffer_info[i] = (VkDescriptorBufferInfo) {
+                .buffer = ubo,
+                .offset = 0,
+                .range = 4,
+            };
+        }
+
+
+        vkUpdateDescriptorSets(t_device,
+            /*writeCount*/ 2,
+            (VkWriteDescriptorSet[]) {
+                {
+                    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                    .dstSet = set[0],
+                    .dstBinding = 0,
+                    .dstArrayElement = 0,
+                    .descriptorCount = 12,
+                    .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
+                    .pBufferInfo = buffer_info,
+                },
+                {
+                    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                    .dstSet = set[0],
+                    .dstBinding = 1,
+                    .dstArrayElement = 0,
+                    .descriptorCount = 1,
+                    .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC,
+                    .pBufferInfo = &(const VkDescriptorBufferInfo) {
+                        .buffer = ssbo,
+                        .offset = 0,
+                        .range = 8,
+                    },
+                },
+            }, 0, NULL);
+    } else {
+        VkDescriptorSetLayout layouts[1024];
+        for (int i = 0; i < 1024; i++)
+            layouts[i] = set_layout;
+
+        VkResult result = vkAllocateDescriptorSets(t_device,
+            &(VkDescriptorSetAllocateInfo) {
+                .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+                .descriptorPool = desc_pool,
+                .descriptorSetCount = 1024,
+                .pSetLayouts = layouts,
+            }, set);
+        t_assert(result == VK_SUCCESS);
+    }
+
+    for (int i = 0; i < 1024; i++) {
+        uint32_t offsets[13];
+
+        // Compute the offsets and the extra data value.  These are
+        // computed so that the sum of the first 6 UBO entries will be zero
+        // and the sum of the second 6 will be one.
+        float sum = 0;
+        for (int j = 0; j < 5; j++) {
+            int idx = rand() % 1024;
+            offsets[j] = idx * sizeof(float);
+            sum += ubo_map[idx];
+        }
+
+        // The first batch should sum to zero.
+        ubo_map[1024 + i * 2 + 0] = 0 - sum;
+        offsets[5] = (1024 + i * 2 + 0) * sizeof(float);
+
+        sum = 0;
+        for (int j = 6; j < 11; j++) {
+            int idx = rand() % 1024;
+            offsets[j] = idx * sizeof(float);
+            sum += ubo_map[idx];
+        }
+
+        // The second batch should sum to one.
+        ubo_map[1024 + i * 2 + 1] = 1 - sum;
+        offsets[11] = (1024 + i * 2 + 1) * sizeof(float);
+
+        /* SSBO offset */
+        offsets[12] = i * 2 * sizeof(float);
+
+        if (use_dynamic_offsets) {
+            vkCmdBindDescriptorSets(t_cmd_buffer,
+                                    VK_PIPELINE_BIND_POINT_COMPUTE,
+                                    pipeline_layout, 0, 1,
+                                    set, 13, offsets);
+        } else {
+            VkDescriptorBufferInfo buffer_info[12];
+            for (int j = 0; j < 12; j++) {
+                buffer_info[j] = (VkDescriptorBufferInfo) {
+                    .buffer = ubo,
+                    .offset = offsets[j],
+                    .range = 4,
+                };
+            }
+
+            vkUpdateDescriptorSets(t_device,
+                /*writeCount*/ 2,
+                (VkWriteDescriptorSet[]) {
+                    {
+                        .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                        .dstSet = set[i],
+                        .dstBinding = 0,
+                        .dstArrayElement = 0,
+                        .descriptorCount = 12,
+                        .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                        .pBufferInfo = buffer_info,
+                    },
+                    {
+                        .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                        .dstSet = set[i],
+                        .dstBinding = 1,
+                        .dstArrayElement = 0,
+                        .descriptorCount = 1,
+                        .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                        .pBufferInfo = &(const VkDescriptorBufferInfo) {
+                            .buffer = ssbo,
+                            .offset = offsets[12],
+                            .range = 8,
+                        },
+                    },
+                }, 0, NULL);
+
+            vkCmdBindDescriptorSets(t_cmd_buffer,
+                                    VK_PIPELINE_BIND_POINT_COMPUTE,
+                                    pipeline_layout, 0, 1,
+                                    &set[i], 0, NULL);
+        }
+
+        vkCmdDispatch(t_cmd_buffer, 1, 1, 1);
+    }
+
+    vkCmdPipelineBarrier(t_cmd_buffer,
+                         VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+                         VK_PIPELINE_STAGE_HOST_BIT,
+                         false, 0, NULL, 1,
+        (VkBufferMemoryBarrier[]) {
+            {
+                .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
+                .srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
+                .dstAccessMask = VK_ACCESS_HOST_READ_BIT,
+                .buffer = ssbo,
+                .offset = 0,
+                .size = ssbo_size,
+            },
+        }, 0, NULL);
+
+    qoEndCommandBuffer(t_cmd_buffer);
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
+    vkQueueWaitIdle(t_queue);
+
+    float *const ssbo_map = qoMapMemory(t_device, ssbo_mem, /*offset*/ 0,
+                                        ssbo_size, /*flags*/ 0);
+
+    for (unsigned i = 0; i < 1024; i++) {
+        t_assert(fabs(ssbo_map[i * 2 + 0] - 0.0f) < 0.0001);
+        t_assert(fabs(ssbo_map[i * 2 + 1] - 1.0f) < 0.0001);
+    }
+}
+
+static void
+test_lots_of_surface_state_cs_dynamic(void)
+{
+    test_lots_of_surface_state_cs(true);
+}
+
+test_define {
+    .name = "stress.lots-of-surface-state.cs.dynamic",
+    .start = test_lots_of_surface_state_cs_dynamic,
+    .no_image = true,
+};
+
+static void
+test_lots_of_surface_state_cs_static(void)
+{
+    test_lots_of_surface_state_cs(false);
+}
+
+test_define {
+    .name = "stress.lots-of-surface-state.cs.static",
+    .start = test_lots_of_surface_state_cs_static,
+    .no_image = true,
 };

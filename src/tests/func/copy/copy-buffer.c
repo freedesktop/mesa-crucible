@@ -46,9 +46,10 @@ test_large_copy(void)
     for (unsigned i = 0; i < buffer_size / sizeof(*map32); i++)
         map32[i] = i;
 
-    // Fill the rest with 0
-    memset((char *)map + buffer_size, 0,
-           total_buffer_reqs.size - buffer_size);
+    // Fill the rest with 0xdeadbeef
+    uint32_t *map32_2 = map + buffer_size;
+    for (unsigned i = 0; i < buffer_size / sizeof(*map32); i++)
+        map32_2[i] = 0xdeadbeef;
 
     qoBindBufferMemory(t_device, buffer1, mem, 0);
     qoBindBufferMemory(t_device, buffer2, mem, total_buffer_reqs.size / 2);
@@ -99,7 +100,6 @@ test_large_copy(void)
     qoQueueSubmit(t_queue, 1, &cmdBuffer, VK_NULL_HANDLE);
     vkQueueWaitIdle(t_queue);
 
-    uint32_t *map32_2 = map + total_buffer_reqs.size / 2;
     for (unsigned i = 0; i < buffer_size / sizeof(*map32); i++) {
         t_assertf(map32[i] == map32_2[i],
                   "buffer mismatch at dword %d: found 0x%x, "
