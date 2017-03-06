@@ -290,12 +290,12 @@ test(void)
                     {
                         .buffer = uniform_buffer,
                         .offset = 0,
-                        .range = 64,
+                        .range = VK_WHOLE_SIZE,
                     },
                     {
                         .buffer = uniform_buffer,
                         .offset = 4 * sizeof(float),
-                        .range = 64,
+                        .range = VK_WHOLE_SIZE,
                     }
                 },
             },
@@ -325,7 +325,7 @@ test(void)
                     {
                         .buffer = uniform_buffer,
                         .offset = 4 * sizeof(float) * 2,
-                        .range = 64,
+                        .range = VK_WHOLE_SIZE,
                     }
                 },
             },
