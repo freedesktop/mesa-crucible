@@ -133,7 +133,7 @@ dispatch_and_wait(CTX *ctx)
 
     qoEndCommandBuffer(t_cmd_buffer);
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
-    vkQueueWaitIdle(t_queue);
+    qoQueueWaitIdle(t_queue);
 
     vkResetCommandBuffer(t_cmd_buffer, 0);
 }
@@ -210,7 +210,7 @@ indirect_dispatch_and_wait(CTX *ctx)
     vkUnmapMemory(t_device, ctx->ssbo);
 
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
-    vkQueueWaitIdle(t_queue);
+    qoQueueWaitIdle(t_queue);
 }
 
 static void

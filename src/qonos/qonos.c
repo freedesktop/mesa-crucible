@@ -110,6 +110,17 @@ qoQueueSubmit(VkQueue queue, uint32_t cmdBufferCount,
     return result;
 }
 
+VkResult
+qoQueueWaitIdle(VkQueue queue)
+{
+    VkResult result;
+
+    result = vkQueueWaitIdle(queue);
+    t_assert(result == VK_SUCCESS);
+
+    return result;
+}
+
 VkDeviceMemory
 __qoAllocMemory(VkDevice dev, const VkMemoryAllocateInfo *info)
 {

@@ -118,7 +118,7 @@ dispatch_and_wait(uint32_t x, uint32_t y, uint32_t z)
 
     qoEndCommandBuffer(t_cmd_buffer);
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
-    vkQueueWaitIdle(t_queue);
+    qoQueueWaitIdle(t_queue);
 }
 
 static void

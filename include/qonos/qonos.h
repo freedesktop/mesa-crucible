@@ -484,6 +484,7 @@ void qoEnumeratePhysicalDevices(VkInstance instance, uint32_t *count, VkPhysical
 void qoGetPhysicalDeviceProperties(VkPhysicalDevice physical_dev, VkPhysicalDeviceProperties *properties);
 void qoGetPhysicalDeviceMemoryProperties(VkPhysicalDevice physical_dev, VkPhysicalDeviceMemoryProperties *mem_props);
 VkResult qoQueueSubmit(VkQueue queue, uint32_t cmdBufferCount, const VkCommandBuffer *cmdBuffers, VkFence fence);
+VkResult qoQueueWaitIdle(VkQueue queue);
 VkDeviceMemory __qoAllocMemory(VkDevice dev, const VkMemoryAllocateInfo *info);
 VkDeviceMemory __qoAllocMemoryFromRequirements(VkDevice dev, const VkMemoryRequirements *mem_reqs, const VkMemoryAllocateInfo *override_info);
 VkDeviceMemory __qoAllocBufferMemory(VkDevice dev, VkBuffer buffer, const VkMemoryAllocateInfo *override_info);

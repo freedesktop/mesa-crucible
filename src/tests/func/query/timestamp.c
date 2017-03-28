@@ -44,7 +44,7 @@ get_timestamp(void)
 
     qoQueueSubmit(t_queue, 1, &cmdBuffer, VK_NULL_HANDLE);
 
-    vkQueueWaitIdle(t_queue);
+    qoQueueWaitIdle(t_queue);
 
     uint64_t results[2];
     vkGetQueryPoolResults(t_device, pool, 0, 2,

@@ -98,7 +98,7 @@ test_large_copy(void)
 
     qoEndCommandBuffer(cmdBuffer);
     qoQueueSubmit(t_queue, 1, &cmdBuffer, VK_NULL_HANDLE);
-    vkQueueWaitIdle(t_queue);
+    qoQueueWaitIdle(t_queue);
 
     for (unsigned i = 0; i < buffer_size / sizeof(*map32); i++) {
         t_assertf(map32[i] == map32_2[i],

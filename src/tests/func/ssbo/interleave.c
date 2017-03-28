@@ -197,7 +197,7 @@ test(void)
     vkCmdEndRenderPass(t_cmd_buffer);
     qoEndCommandBuffer(t_cmd_buffer);
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
-    vkQueueWaitIdle(t_queue);
+    qoQueueWaitIdle(t_queue);
 
     uint32_t *map_out = qoMapMemory(t_device, mem_out, 0, 4096, 0);
     for (unsigned i = 0; i < 1024; i++) {

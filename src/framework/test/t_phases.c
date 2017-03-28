@@ -84,7 +84,7 @@ t_enter_precleanup_phase(void)
 
     if (t->vk.queue) {
         // Don't prematurely end the test before the test has completed executing.
-        vkQueueWaitIdle(t->vk.queue);
+        qoQueueWaitIdle(t->vk.queue);
     }
 
     if (!t->result_is_final && !t->def->no_image) {

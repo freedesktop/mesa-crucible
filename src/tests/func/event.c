@@ -107,7 +107,7 @@ __create_and_wait(VkCommandBuffer *cmdBuffer)
 
 		qoQueueSubmit(t_queue, 1, cmdBuffer, VK_NULL_HANDLE);
 
-		vkQueueWaitIdle(t_queue);
+		qoQueueWaitIdle(t_queue);
 
 		return false;
 	}
@@ -216,7 +216,7 @@ test_event_wait_set_later(void)
     t_assert(result == VK_SUCCESS);
     t_assert(vkGetEventStatus(t_device, event_a) == VK_EVENT_SET);
 
-    vkQueueWaitIdle(t_queue);
+    qoQueueWaitIdle(t_queue);
 
     t_assert(vkGetEventStatus(t_device, event_a) == VK_EVENT_SET);
     t_assert(vkGetEventStatus(t_device, event_b) == VK_EVENT_SET);

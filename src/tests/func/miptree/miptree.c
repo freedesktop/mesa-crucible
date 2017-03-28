@@ -1107,7 +1107,7 @@ miptree_compare_images(const miptree_t *mt)
     const mipslice_t *slice;
     string_t slice_desc = STRING_INIT;
 
-    vkQueueWaitIdle(t_queue);
+    qoQueueWaitIdle(t_queue);
 
     cru_vec_foreach(slice, &mt->mipslices) {
         mipslice_get_description(slice, &slice_desc);

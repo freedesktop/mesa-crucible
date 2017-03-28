@@ -273,7 +273,7 @@ test(void)
     vkEndCommandBuffer(t_cmd_buffer);
 
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
-    vkQueueWaitIdle(t_queue);
+    qoQueueWaitIdle(t_queue);
 
     // Compare the expected and actual values
     t_assertf(CLEAR_VALUE == buffer_map[0] &&

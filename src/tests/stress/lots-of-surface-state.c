@@ -728,7 +728,7 @@ test_lots_of_surface_state_cs(bool use_dynamic_offsets)
 
     qoEndCommandBuffer(t_cmd_buffer);
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
-    vkQueueWaitIdle(t_queue);
+    qoQueueWaitIdle(t_queue);
 
     float *const ssbo_map = qoMapMemory(t_device, ssbo_mem, /*offset*/ 0,
                                         ssbo_size, /*flags*/ 0);
