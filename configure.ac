@@ -48,11 +48,11 @@ AC_CHECK_PROGS([PYTHON2], [python2 python])
 AC_CHECK_PROGS([PYTHON3], [python3])
 AX_CHECK_PYTHON2_MODULE_OPENCV()
 
-AC_ARG_VAR([GLSLC], [path to glslc executable])
-AC_SUBST([GLSLC])
-AC_CHECK_PROGS([GLSLC], [glslc])
-if test "x$GLSLC" = "x"; then
-    AC_MSG_ERROR([failed to find glslc])
+AC_ARG_VAR([GLSLANG], [path to glslangValidator executable])
+AC_SUBST([GLSLANG])
+AC_CHECK_PROGS([GLSLANG], [glslangValidator])
+if test "x$GLSLANG" = "x"; then
+    AC_MSG_ERROR([failed to find glslangValidator])
 fi
 
 PKG_CHECK_MODULES([libpng16], [libpng16], [HAVE_LIBPNG16=1], [HAVE_LIBPNG16=0])

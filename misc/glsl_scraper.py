@@ -34,31 +34,38 @@ class Shader:
 
         self.line = line
 
-    def __run_glslc(self, extra_args=[]):
-        stage_flag = '-fshader-stage='
+    def __run_glslang(self, extra_args=[]):
         if self.stage == 'VERTEX':
-            stage_flag += 'vertex'
+            stage = 'vert'
         elif self.stage == 'TESS_CONTROL':
-            stage_flag += 'tesscontrol'
+            stage = 'tesc'
         elif self.stage == 'TESS_EVALUATION':
-            stage_flag += 'tesseval'
+            stage = 'tese'
         elif self.stage == 'GEOMETRY':
-            stage_flag += 'geometry'
+            stage = 'geom'
         elif self.stage == 'FRAGMENT':
-            stage_flag += 'fragment'
+            stage = 'frag'
         elif self.stage == 'COMPUTE':
-            stage_flag += 'compute'
+            stage = 'comp'
         else:
             assert False
 
-        with subprocess.Popen([glslc] + extra_args +
-                              [stage_flag, '-std=450core', '-o', '-', '-'],
+        stage_flags = ['-S', stage]
+
+        in_file = tempfile.NamedTemporaryFile(suffix='.'+stage)
+        src = ('#version 450\n' + self.glsl).encode('utf-8')
+        in_file.write(src)
+        in_file.flush()
+        out_file = tempfile.NamedTemporaryFile(suffix='.spirv')
+        args = [glslang, '-H'] + extra_args + stage_flags
+        args += ['-o', out_file.name, in_file.name]
+        with subprocess.Popen(args,
                               stdout = subprocess.PIPE,
                               stderr = subprocess.PIPE,
                               stdin = subprocess.PIPE) as proc:
 
-            proc.stdin.write(self.glsl.encode('utf-8'))
             out, err = proc.communicate(timeout=30)
+            in_file.close()
 
             if proc.returncode != 0:
                 # Unfortunately, glslang dumps errors to standard out.
@@ -67,7 +74,10 @@ class Shader:
                 message = out.decode('utf-8') + '\n' + err.decode('utf-8')
                 raise ShaderCompileError(message.strip())
 
-            return out
+            out_file.seek(0)
+            spirv = out_file.read()
+            out_file.close()
+            return (spirv, out)
 
     def compile(self):
         def dwords(f):
@@ -78,9 +88,9 @@ class Shader:
                 assert len(dword_str) == 4
                 yield struct.unpack('I', dword_str)[0]
 
-        spirv = self.__run_glslc()
+        (spirv, assembly) = self.__run_glslang()
         self.dwords = list(dwords(io.BytesIO(spirv)))
-        self.assembly = str(self.__run_glslc(['-S']), 'utf-8')
+        self.assembly = str(assembly, 'utf-8')
 
     def _dump_glsl_code(self, f, var_name):
         # First dump the GLSL source as strings
@@ -238,10 +248,10 @@ def parse_args():
             formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('-o', '--outfile', default='-',
                         help='Output to the given file (default: stdout).')
-    p.add_argument('--with-glslc', metavar='PATH',
-                        default='glslc',
-                        dest='glslc',
-                        help='Full path to the glslc shader compiler.')
+    p.add_argument('--with-glslang', metavar='PATH',
+                        default='glslangValidator',
+                        dest='glslang',
+                        help='Full path to the glslangValidator shader compiler.')
     p.add_argument('--glsl-only', action='store_true')
     p.add_argument('infile', metavar='INFILE')
 
@@ -251,7 +261,7 @@ def parse_args():
 args = parse_args()
 infname = args.infile
 outfname = args.outfile
-glslc = args.glslc
+glslang = args.glslang
 glsl_only = args.glsl_only
 
 with open_file(infname, 'r') as infile:

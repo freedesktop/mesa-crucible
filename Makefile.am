@@ -164,7 +164,7 @@ bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread $(libpng_LIBS) \
 		     $(LIBXML2_LIBS)
 
 %-spirv.h: %.c misc/glsl_scraper.py
-	$(AM_V_GEN) $(PYTHON3) $(srcdir)/misc/glsl_scraper.py --with-glslc=$(GLSLC) -o $@ $<
+	$(AM_V_GEN) $(PYTHON3) $(srcdir)/misc/glsl_scraper.py --with-glslang=$(GLSLANG) -o $@ $<
 
 %_gen.c: %_gen.py
 	$(AM_V_GEN) $(PYTHON3) $<

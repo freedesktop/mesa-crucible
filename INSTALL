@@ -3,7 +3,7 @@ How to Build
 
 External Dependencies
 ---------------------
-- glslc, from Google's shaderc project (http://github.com/google/shaderc)
+- glslang, from Khronos's glslang project (https://github.com/KhronosGroup/glslang)
 - AsciiDoc (http://asciidoc.org)
 - libxml2 (http://www.xmlsoft.org)
 - Python3
