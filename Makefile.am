@@ -95,6 +95,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/push-constants/basic.c \
 	src/tests/func/shader/fragcoord.c \
 	src/tests/func/ssbo/interleave.c \
+	src/tests/func/sync/semaphore-fd.c \
 	src/tests/func/renderpass/clear.c \
 	src/tests/stress/lots-of-surface-state.c \
 	src/tests/stress/buffer_limit.c \
@@ -130,6 +131,7 @@ BUILT_SOURCES = \
 	src/tests/func/push-constants/basic-spirv.h \
 	src/tests/func/shader/fragcoord-spirv.h \
 	src/tests/func/ssbo/interleave-spirv.h \
+	src/tests/func/sync/semaphore-fd-spirv.h \
 	src/tests/stress/lots-of-surface-state-spirv.h
 
 bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread $(libpng_LIBS) \
