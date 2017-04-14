@@ -186,6 +186,24 @@ __t_assertfv(const char *file, int line, bool cond, const char *cond_string,
     t_end(TEST_RESULT_FAIL);
 }
 
+void
+t_require_ext(const char *name)
+{
+    GET_CURRENT_TEST(t);
+
+    for (uint32_t i = 0; i < t->vk.instance_extension_count; i++) {
+        if (!strcmp(name, t->vk.instance_extension_props[i].extensionName))
+            return;
+    }
+
+    for (uint32_t i = 0; i < t->vk.device_extension_count; i++) {
+        if (!strcmp(name, t->vk.device_extension_props[i].extensionName))
+            return;
+    }
+
+    t_skip();
+}
+
 static bool
 t_compare_color_image(void)
 {
