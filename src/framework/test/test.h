@@ -139,10 +139,14 @@ struct test {
     /// Vulkan data
     struct {
         VkInstance instance;
+        uint32_t instance_extension_count;
+        VkExtensionProperties *instance_extension_props;
         VkPhysicalDevice physical_dev;
         VkPhysicalDeviceProperties physical_dev_props;
         VkPhysicalDeviceMemoryProperties physical_dev_mem_props;
         VkDevice device;
+        uint32_t device_extension_count;
+        VkExtensionProperties *device_extension_props;
         VkQueue queue;
         VkDescriptorPool descriptor_pool;
         VkPipelineCache pipeline_cache;

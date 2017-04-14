@@ -358,20 +358,63 @@ void
 t_setup_vulkan(void)
 {
     GET_CURRENT_TEST(t);
+    VkResult res;
+    const char **ext_names;
 
-    VkResult res = vkCreateInstance(
+    res = vkEnumerateInstanceExtensionProperties(NULL,
+        &t->vk.instance_extension_count, NULL);
+    t_assert(res == VK_SUCCESS);
+
+    t->vk.instance_extension_props =
+        malloc(t->vk.instance_extension_count * sizeof(*t->vk.instance_extension_props));
+    t_assert(t->vk.instance_extension_props);
+    t_cleanup_push_free(t->vk.instance_extension_props);
+
+    res = vkEnumerateInstanceExtensionProperties(NULL,
+        &t->vk.instance_extension_count, t->vk.instance_extension_props);
+    t_assert(res == VK_SUCCESS);
+
+    ext_names = malloc(t->vk.instance_extension_count * sizeof(*ext_names));
+    t_assert(ext_names);
+
+    for (uint32_t i = 0; i < t->vk.instance_extension_count; i++)
+        ext_names[i] = t->vk.instance_extension_props[i].extensionName;
+
+    res = vkCreateInstance(
         &(VkInstanceCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
             .pApplicationInfo = &(VkApplicationInfo) {
                 .pApplicationName = "crucible",
                 .apiVersion = VK_MAKE_VERSION(1, 0, 0),
             },
+            .enabledExtensionCount = t->vk.instance_extension_count,
+            .ppEnabledExtensionNames = ext_names,
         }, &test_alloc_cb, &t->vk.instance);
+    free(ext_names);
     t_assert(res == VK_SUCCESS);
     t_cleanup_push_vk_instance(t->vk.instance, &test_alloc_cb);
 
     t_setup_phys_dev();
     t_setup_phys_dev_mem_props();
+
+    res = vkEnumerateDeviceExtensionProperties(t->vk.physical_dev, NULL,
+        &t->vk.device_extension_count, NULL);
+    t_assert(res == VK_SUCCESS);
+
+    t->vk.device_extension_props =
+        malloc(t->vk.device_extension_count * sizeof(*t->vk.device_extension_props));
+    t_assert(t->vk.device_extension_props);
+    t_cleanup_push_free(t->vk.device_extension_props);
+
+    res = vkEnumerateDeviceExtensionProperties(t->vk.physical_dev, NULL,
+        &t->vk.device_extension_count, t->vk.device_extension_props);
+    t_assert(res == VK_SUCCESS);
+
+    ext_names = malloc(t->vk.device_extension_count * sizeof(*ext_names));
+    t_assert(ext_names);
+
+    for (uint32_t i = 0; i < t->vk.device_extension_count; i++)
+        ext_names[i] = t->vk.device_extension_props[i].extensionName;
 
     res = vkCreateDevice(t->vk.physical_dev,
         &(VkDeviceCreateInfo) {
@@ -383,7 +426,10 @@ t_setup_vulkan(void)
                 .queueCount = 1,
                 .pQueuePriorities = (float[]) {1.0f},
             },
+            .enabledExtensionCount = t->vk.device_extension_count,
+            .ppEnabledExtensionNames = ext_names,
         }, NULL, &t->vk.device);
+    free(ext_names);
     t_assert(res == VK_SUCCESS);
     t_cleanup_push_vk_device(t->vk.device, NULL);
 
