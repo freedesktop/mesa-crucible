@@ -475,12 +475,40 @@ test_define {
 };
 
 static void
+require_handle_type(VkExternalSemaphoreHandleTypeFlagBitsKHX handle_type)
+{
+#define GET_FUNCTION_PTR(name) \
+    PFN_vk##name name = (PFN_vk##name)vkGetInstanceProcAddr(t_instance, "vk"#name)
+
+    GET_FUNCTION_PTR(GetPhysicalDeviceExternalSemaphorePropertiesKHX);
+
+#undef GET_FUNCTION_PTR
+
+    VkExternalSemaphorePropertiesKHX props = {
+        .sType = VK_STRUCTURE_TYPE_EXTERNAL_SEMAPHORE_PROPERTIES_KHX,
+    };
+    GetPhysicalDeviceExternalSemaphorePropertiesKHX(t_physical_dev,
+        &(VkPhysicalDeviceExternalSemaphoreInfoKHX) {
+            .handleType = handle_type,
+        }, &props);
+
+    const uint32_t features =
+        VK_EXTERNAL_SEMAPHORE_FEATURE_EXPORTABLE_BIT_KHX |
+        VK_EXTERNAL_SEMAPHORE_FEATURE_IMPORTABLE_BIT_KHX;
+
+    if ((props.externalSemaphoreFeatures & features) != features)
+        t_skip();
+}
+
+static void
 test_opaque_fd(void)
 {
     t_require_ext("VK_KHX_external_memory");
     t_require_ext("VK_KHX_external_memory_fd");
     t_require_ext("VK_KHX_external_semaphore");
     t_require_ext("VK_KHX_external_semaphore_fd");
+
+    require_handle_type(VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHX);
 
     struct test_context ctx1, ctx2;
     init_context(&ctx1, 1.0);
@@ -633,6 +661,8 @@ test_sync_fd(void)
     t_require_ext("VK_KHX_external_memory_fd");
     t_require_ext("VK_KHX_external_semaphore");
     t_require_ext("VK_KHX_external_semaphore_fd");
+
+    require_handle_type(VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_FENCE_FD_BIT_KHX);
 
     struct test_context ctx1, ctx2;
     init_context(&ctx1, 1.0);
