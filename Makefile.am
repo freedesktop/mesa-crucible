@@ -77,6 +77,7 @@ bin_crucible_SOURCES = \
 	src/tests/example/messages.c \
 	src/tests/func/cmd-buffer/secondary.c \
 	src/tests/func/copy/copy-buffer.c \
+	src/tests/func/4-vertex-buffers.c \
 	src/tests/func/depthstencil/basic.c \
 	src/tests/func/depthstencil/arrayed-clear.c \
 	src/tests/func/depthstencil/stencil_triangles.c \
@@ -115,6 +116,7 @@ bin_crucible_SOURCES = \
 
 BUILT_SOURCES = \
 	src/qonos/qonos_pipeline-spirv.h \
+	src/tests/func/4-vertex-buffers-spirv.h \
 	src/tests/func/depthstencil/basic-spirv.h \
 	src/tests/func/depthstencil/arrayed-clear-spirv.h \
 	src/tests/func/depthstencil/stencil_triangles-spirv.h \
