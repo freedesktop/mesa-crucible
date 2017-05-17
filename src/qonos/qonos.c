@@ -141,38 +141,55 @@ __qoAllocMemory(VkDevice dev, const VkMemoryAllocateInfo *info)
 VkDeviceMemory
 __qoAllocMemoryFromRequirements(VkDevice dev,
                                 const VkMemoryRequirements *mem_reqs,
-                                const VkMemoryAllocateInfo *override_info)
+                                const QoMemoryAllocateFromRequirementsInfo *info)
 {
-    VkMemoryAllocateInfo info = *override_info;
+    VkMemoryAllocateInfo alloc_info = {
+        .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+        .allocationSize = info->allocationSize,
+        .memoryTypeIndex = info->memoryTypeIndex,
+    };
 
-    if (info.allocationSize == 0)
-        info.allocationSize = mem_reqs->size;
+    if (alloc_info.allocationSize == 0)
+        alloc_info.allocationSize = mem_reqs->size;
 
-    t_assert(info.allocationSize >= mem_reqs->size);
-    t_assert(info.memoryTypeIndex != QO_MEMORY_TYPE_INDEX_INVALID);
-    t_assert((1 << info.memoryTypeIndex) & mem_reqs->memoryTypeBits);
+    t_assert(alloc_info.allocationSize >= mem_reqs->size);
 
-    return __qoAllocMemory(dev, &info);
+    if (alloc_info.memoryTypeIndex == QO_MEMORY_TYPE_INDEX_INVALID) {
+        const VkPhysicalDeviceMemoryProperties *props = t_physical_dev_mem_props;
+        for (uint32_t i = 0; i < props->memoryTypeCount; i++) {
+            const VkMemoryType *type = &props->memoryTypes[i];
+            if ((mem_reqs->memoryTypeBits & (1 << i)) &&
+                (type->propertyFlags & info->properties) == info->properties) {
+                alloc_info.memoryTypeIndex = i;
+                break;
+            }
+        }
+    }
+
+    t_assert(alloc_info.memoryTypeIndex != QO_MEMORY_TYPE_INDEX_INVALID);
+    t_assert((1 << alloc_info.memoryTypeIndex) & mem_reqs->memoryTypeBits);
+
+    return __qoAllocMemory(dev, &alloc_info);
 }
 
 VkDeviceMemory
 __qoAllocBufferMemory(VkDevice dev, VkBuffer buffer,
-                      const VkMemoryAllocateInfo *override_info)
+                      const QoMemoryAllocateFromRequirementsInfo *info)
 {
     VkMemoryRequirements mem_reqs =
         qoGetBufferMemoryRequirements(dev, buffer);
 
-    return __qoAllocMemoryFromRequirements(dev, &mem_reqs, override_info);
+    return __qoAllocMemoryFromRequirements(dev, &mem_reqs, info);
 }
 
 VkDeviceMemory
 __qoAllocImageMemory(VkDevice dev, VkImage image,
-                     const VkMemoryAllocateInfo *override_info)
+                     const QoMemoryAllocateFromRequirementsInfo *info)
 {
     VkMemoryRequirements mem_reqs =
         qoGetImageMemoryRequirements(dev, image);
 
-    return __qoAllocMemoryFromRequirements(dev, &mem_reqs, override_info);
+    return __qoAllocMemoryFromRequirements(dev, &mem_reqs, info);
 }
 
 void *
