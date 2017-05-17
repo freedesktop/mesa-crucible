@@ -62,44 +62,6 @@ static const VkAllocationCallbacks test_alloc_cb = {
     .pfnInternalFree = test_vk_dummy_notify,
 };
 
-/// Find the best VkMemoryType whose properties contain each flag in
-/// required_flags and contain no flag in the union of required_flags and
-/// allowed_flags.
-///
-/// On success, return the type's index into the
-/// VkPhysicalDeviceMemoryProperties::memoryTypes array.
-/// On failure, return UINT32_MAX.
-static uint32_t
-find_best_mem_type_index(
-        const VkPhysicalDeviceMemoryProperties *mem_props,
-        VkMemoryPropertyFlags required_flags,
-        VkMemoryPropertyFlags allowed_flags)
-{
-    uint32_t best_type_index = UINT32_MAX;
-    VkMemoryHeap best_heap;
-
-    allowed_flags |= required_flags;
-
-    for (uint32_t i = 0; i < mem_props->memoryTypeCount; ++i) {
-        VkMemoryType type = mem_props->memoryTypes[i];
-        VkMemoryHeap heap = mem_props->memoryHeaps[type.heapIndex];
-
-        if ((type.propertyFlags & required_flags) != required_flags)
-            continue;
-
-        if ((type.propertyFlags & ~allowed_flags) != 0)
-            continue;
-
-        // Prefer the type with the largest heap.
-        if (best_type_index == UINT32_MAX || heap.size > best_heap.size) {
-            best_type_index = i;
-            best_heap = heap;
-        }
-    }
-
-    return best_type_index;
-}
-
 static void
 t_setup_phys_dev(void)
 {
@@ -118,46 +80,6 @@ t_setup_phys_dev(void)
     t_assertf(count == 1, "enumerated %u physical devices, expected 1", count);
 
     qoGetPhysicalDeviceProperties(t->vk.physical_dev, &t->vk.physical_dev_props);
-}
-
-static void
-t_setup_phys_dev_mem_props(void)
-{
-    ASSERT_TEST_IN_SETUP_PHASE;
-    GET_CURRENT_TEST(t);
-
-    qoGetPhysicalDeviceMemoryProperties(t->vk.physical_dev,
-                                        &t->vk.physical_dev_mem_props);
-
-    // The Vulkan spec (git aaed022) requires the implementation to expose at
-    // least one host-visible and host-coherent memory type.
-    t->vk.mem_type_index_for_mmap = find_best_mem_type_index(
-        &t->vk.physical_dev_mem_props,
-        /*require*/ VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                    VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        /*allow*/ ~0);
-
-    // The best memory type for device-access is one which gives the best
-    // performance, which is likely one that is device-visible but not
-    // host-visible.
-    t->vk.mem_type_index_for_device_access = find_best_mem_type_index(
-        &t->vk.physical_dev_mem_props,
-        /*require*/ VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-        /*allow*/ ~VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-
-    if (t->vk.mem_type_index_for_device_access == UINT32_MAX) {
-        // There exists no device-only memory type. For device-access, then,
-        // simply prefer the overall "best" memory type.
-        t->vk.mem_type_index_for_device_access = find_best_mem_type_index(
-            &t->vk.physical_dev_mem_props,
-            /*require*/ VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, /*allow*/ ~0);
-    }
-
-    t_assertf(t->vk.mem_type_index_for_mmap != UINT32_MAX,
-              "failed to find a host-visible, host-coherent VkMemoryType in "
-              "VkPhysicalDeviceMemoryProperties");
-
-    t_assert(t->vk.mem_type_index_for_device_access != UINT32_MAX);
 }
 
 static void
@@ -188,7 +110,7 @@ t_setup_framebuffer(void)
 
     VkDeviceMemory color_mem = qoAllocImageMemory(t->vk.device,
         t->vk.color_image,
-        .memoryTypeIndex = t->vk.mem_type_index_for_device_access);
+        .properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     qoBindImageMemory(t->vk.device, t->vk.color_image, color_mem,
                       /*offset*/ 0);
@@ -245,7 +167,7 @@ t_setup_framebuffer(void)
 
         VkDeviceMemory ds_mem = qoAllocImageMemory(t->vk.device,
             t->vk.ds_image,
-            .memoryTypeIndex = t->vk.mem_type_index_for_device_access);
+            .properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
         qoBindImageMemory(t->vk.device, t->vk.ds_image, ds_mem,
                           /*offset*/ 0);
@@ -395,7 +317,9 @@ t_setup_vulkan(void)
     t_cleanup_push_vk_instance(t->vk.instance, &test_alloc_cb);
 
     t_setup_phys_dev();
-    t_setup_phys_dev_mem_props();
+
+    qoGetPhysicalDeviceMemoryProperties(t->vk.physical_dev,
+                                        &t->vk.physical_dev_mem_props);
 
     res = vkEnumerateDeviceExtensionProperties(t->vk.physical_dev, NULL,
         &t->vk.device_extension_count, NULL);

@@ -174,7 +174,7 @@ test(void)
                                      .size = 4096);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     void *map = qoMapMemory(t_device, mem, 0, 4096, 0);
     memset(map, 192, 4096);

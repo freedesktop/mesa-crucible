@@ -22,25 +22,6 @@
 /// \file
 /// \brief Test data
 ///
-/// Crucible provides some default Vulkan memory types, described below. On
-/// UMA systems, the default-provided types may be identical, because the
-/// Vulkan implementation may expose only a single type. On NUMA systems, the
-/// default-provided types are likely to be distinct. To ensure that your test
-/// works correctly on NUMA systems, write your test assuming that
-/// t_mem_type_index_for_mmap and t_mem_type_index_for_device_access point to
-/// distinct types.
-///
-///     - t_mem_type_index_for_mmap: Prefer this memory type when allocating
-///       memory that will be mapped with vkMapMemory. This type has properties
-///       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT and
-///       VK_MEMORY_PROPERTY_HOST_NON_COHERENT_BIT. The Vulkan spec requires
-///       implementations to expose at least one such memory type.
-///
-///     - t_mem_type_for_device_access: Prefer this memory type for best
-///       performance during device-access. This type may have no property but
-///       VK_MEMORY_PROPERTY_DEVICE_ONLY, which excludes support for
-///       vkMapMemory.
-///
 
 #pragma once
 
@@ -57,8 +38,6 @@ typedef struct cru_image cru_image_t;
 #define t_physical_dev (*__t_physical_dev())
 #define t_physical_dev_props  (__t_physical_dev_props())
 #define t_physical_dev_mem_props  (__t_physical_dev_mem_props())
-#define t_mem_type_index_for_mmap (__t_mem_type_index_for_mmap())
-#define t_mem_type_index_for_device_access (__t_mem_type_index_for_device_access())
 #define t_device (*__t_device())
 #define t_queue (*__t_queue())
 #define t_descriptor_pool (*__t_descriptor_pool())
@@ -84,8 +63,6 @@ const VkDevice *__t_device(void);
 const VkPhysicalDevice *__t_physical_dev(void);
 const VkPhysicalDeviceProperties *__t_physical_dev_props(void);
 const VkPhysicalDeviceMemoryProperties *__t_physical_dev_mem_props(void);
-const uint32_t __t_mem_type_index_for_mmap(void);
-const uint32_t __t_mem_type_index_for_device_access(void);
 const VkQueue *__t_queue(void);
 const VkDescriptorPool *__t_descriptor_pool(void);
 const VkCommandPool *__t_cmd_pool(void);

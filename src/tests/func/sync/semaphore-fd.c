@@ -447,7 +447,7 @@ test_sanity(void)
 
     VkDeviceMemory mem =
         qoAllocMemoryFromRequirements(ctx.device, &buffer_reqs,
-            .memoryTypeIndex = t_mem_type_index_for_mmap);
+            .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     qoBindBufferMemory(ctx.device, ctx.buffer, mem, 0);
 
@@ -528,7 +528,7 @@ test_opaque_fd(void)
 
     VkDeviceMemory mem1 =
         qoAllocMemoryFromRequirements(ctx1.device, &buffer_reqs,
-            .memoryTypeIndex = t_mem_type_index_for_mmap,
+            .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             .pNext = &(VkExportMemoryAllocateInfoKHX) {
                 .sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHX,
                 .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHX,
@@ -544,7 +544,7 @@ test_opaque_fd(void)
 
     VkDeviceMemory mem2 =
         qoAllocMemoryFromRequirements(ctx2.device, &buffer_reqs,
-            .memoryTypeIndex = t_mem_type_index_for_mmap,
+            .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             .pNext = &(VkImportMemoryFdInfoKHX) {
                 .sType = VK_STRUCTURE_TYPE_IMPORT_MEMORY_FD_INFO_KHX,
                 .handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHX,
@@ -682,7 +682,7 @@ test_sync_fd(void)
 
     VkDeviceMemory mem1 =
         qoAllocMemoryFromRequirements(ctx1.device, &buffer_reqs,
-            .memoryTypeIndex = t_mem_type_index_for_mmap,
+            .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             .pNext = &(VkExportMemoryAllocateInfoKHX) {
                 .sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHX,
                 .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHX,
@@ -698,7 +698,7 @@ test_sync_fd(void)
 
     VkDeviceMemory mem2 =
         qoAllocMemoryFromRequirements(ctx2.device, &buffer_reqs,
-            .memoryTypeIndex = t_mem_type_index_for_mmap,
+            .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             .pNext = &(VkImportMemoryFdInfoKHX) {
                 .sType = VK_STRUCTURE_TYPE_IMPORT_MEMORY_FD_INFO_KHX,
                 .handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHX,

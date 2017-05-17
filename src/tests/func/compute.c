@@ -83,7 +83,7 @@ test(void)
     VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
-        .memoryTypeIndex = t_mem_type_index_for_device_access);
+        .properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     qoBindBufferMemory(t_device, buffer, mem, 0);
 

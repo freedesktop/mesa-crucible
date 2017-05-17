@@ -69,7 +69,7 @@ test(void)
             .usage = VK_IMAGE_USAGE_SAMPLED_BIT |
                      VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT);
     VkDeviceMemory depth_mem1 = qoAllocImageMemory(t_device, depth_test,
-        .memoryTypeIndex = t_mem_type_index_for_device_access);
+        .properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     qoBindImageMemory(t_device, depth_test, depth_mem1, 0);
 
     VkImageView depth_test_view = qoCreateImageView(t_device,
@@ -111,7 +111,8 @@ test(void)
     VkBuffer buffer = qoCreateBuffer(t_device, .size = 4096, .usage =
 		    VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
     VkDeviceMemory buffer_mem = qoAllocBufferMemory(t_device, buffer, 
-        .memoryTypeIndex = t_mem_type_index_for_device_access);
+        .properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT |
+                      VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     qoBindBufferMemory(t_device, buffer, buffer_mem, 0);
 
     // Initialize the buffer floats to a known value

@@ -92,7 +92,7 @@ cru_image_from_vk_image(VkDevice dev, VkQueue queue, VkImage image,
                         VkFormat format, VkImageAspectFlagBits aspect,
                         uint32_t level0_width, uint32_t level0_height,
                         uint32_t miplevel, uint32_t array_slice,
-                        uint32_t tmp_mem_type_index);
+                        VkMemoryPropertyFlags tmp_mem_props);
 
 bool cru_image_write_file(cru_image_t *image, const char *filename);
 bool cru_image_copy(cru_image_t *dest, cru_image_t *src);

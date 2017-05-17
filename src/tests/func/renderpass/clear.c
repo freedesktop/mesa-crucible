@@ -88,7 +88,7 @@ test_color8(void)
                      VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
 
         VkDeviceMemory mem = qoAllocImageMemory(t_device, images[i],
-            .memoryTypeIndex = t_mem_type_index_for_device_access);
+            .properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
         qoBindImageMemory(t_device, images[i], mem, 0);
 
@@ -146,8 +146,9 @@ test_color8(void)
             .size = dest_buffer_size,
             .usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT);
 
-        VkDeviceMemory dest_buffer_mem = qoAllocBufferMemory(t_device,
-            dest_buffers[i], .memoryTypeIndex = t_mem_type_index_for_mmap);
+        VkDeviceMemory dest_buffer_mem =
+            qoAllocBufferMemory(t_device, dest_buffers[i],
+                .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         qoBindBufferMemory(t_device, dest_buffers[i], dest_buffer_mem,
                            /*offset*/ 0);

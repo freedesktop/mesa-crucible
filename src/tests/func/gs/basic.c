@@ -148,9 +148,8 @@ test_basic_gs(void)
                        .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
                                 VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 
-    VkDeviceMemory mem =
-        qoAllocBufferMemory(t_device, buffer,
-                            .memoryTypeIndex = t_mem_type_index_for_mmap);
+    VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     map = qoMapMemory(t_device, mem, 0, sizeof(vertex_data), 0);
     qoBindBufferMemory(t_device, buffer, mem, 0);

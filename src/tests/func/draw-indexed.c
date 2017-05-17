@@ -46,7 +46,7 @@ test(void)
                                      VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     map = qoMapMemory(t_device, mem, 0, buffer_size, 0);
     qoBindBufferMemory(t_device, buffer, mem, 0);

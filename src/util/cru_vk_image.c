@@ -41,7 +41,7 @@ struct cru_vk_image {
 
     VkDevice vk_dev;
     VkQueue vk_queue;
-    uint32_t vk_tmp_mem_type_index;
+    VkMemoryPropertyFlags vk_tmp_mem_props;
 
     struct {
         VkImage vk_image;
@@ -100,10 +100,22 @@ setup_map(cru_vk_image_t *self)
     VkMemoryRequirements mem_reqs;
     vkGetBufferMemoryRequirements(dev, self->map.vk_buffer, &mem_reqs);
 
+    uint32_t type_index = UINT32_MAX;
+    const VkPhysicalDeviceMemoryProperties *props = t_physical_dev_mem_props;
+    for (uint32_t i = 0; i < props->memoryTypeCount; i++) {
+        const VkMemoryType *type = &props->memoryTypes[i];
+        if ((mem_reqs.memoryTypeBits & (1 << i)) &&
+            (type->propertyFlags & self->vk_tmp_mem_props) == self->vk_tmp_mem_props) {
+            type_index = i;
+            break;
+        }
+    }
+    assert(type_index < props->memoryTypeCount);
+
     r = vkAllocateMemory(dev, &(VkMemoryAllocateInfo) {
             .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-            .memoryTypeIndex = self->vk_tmp_mem_type_index,
             .allocationSize = mem_reqs.size,
+            .memoryTypeIndex = type_index,
         },
         NULL,
         &self->map.vk_mem);
@@ -281,7 +293,7 @@ cru_image_from_vk_image(VkDevice dev, VkQueue queue, VkImage image,
                         VkFormat format, VkImageAspectFlagBits aspect,
                         uint32_t level0_width, uint32_t level0_height,
                         uint32_t miplevel, uint32_t array_slice,
-                        uint32_t tmp_mem_type_index)
+                        VkMemoryPropertyFlags tmp_mem_props)
 {
     cru_vk_image_t *self = xzalloc(sizeof(*self));
 
@@ -294,7 +306,7 @@ cru_image_from_vk_image(VkDevice dev, VkQueue queue, VkImage image,
 
     self->vk_dev = dev;
     self->vk_queue = queue;
-    self->vk_tmp_mem_type_index = tmp_mem_type_index;
+    self->vk_tmp_mem_props = tmp_mem_props;
     self->target.vk_image = image;
     self->target.vk_aspect = aspect;
     self->target.miplevel = miplevel;

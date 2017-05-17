@@ -123,7 +123,7 @@ test_fragcoord(void)
                                  .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
     VkDeviceMemory vb_mem = qoAllocBufferMemory(t_device, vb,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     qoBindBufferMemory(t_device, vb, vb_mem, 0);
 
     void *vb_map = qoMapMemory(t_device, vb_mem, 0, sizeof(vertices), 0);

@@ -147,7 +147,7 @@ test(void)
         .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
     VkDeviceMemory vertex_mem = qoAllocBufferMemory(t_device, vertex_buffer,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     qoBindBufferMemory(t_device, vertex_buffer, vertex_mem, /*offset*/ 0);
 

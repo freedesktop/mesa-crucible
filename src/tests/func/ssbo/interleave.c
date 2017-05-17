@@ -141,7 +141,7 @@ test(void)
     VkBuffer buffer_in = qoCreateBuffer(t_device, .size = 4096);
 
     VkDeviceMemory mem_in = qoAllocBufferMemory(t_device, buffer_in,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     uint32_t *map_in = qoMapMemory(t_device, mem_in, 0, 4096, 0);
     for (unsigned i = 0; i < 1024; i++)
@@ -151,7 +151,7 @@ test(void)
 
     VkBuffer buffer_out = qoCreateBuffer(t_device, .size = 4096);
     VkDeviceMemory mem_out = qoAllocBufferMemory(t_device, buffer_out,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     qoBindBufferMemory(t_device, buffer_out, mem_out, 0);
 
     vkUpdateDescriptorSets(t_device,

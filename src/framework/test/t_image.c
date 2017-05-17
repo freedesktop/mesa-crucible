@@ -47,7 +47,7 @@ t_new_cru_image_from_vk_image(VkDevice dev, VkQueue queue, VkImage image,
 
     cru_image_t *cimg = cru_image_from_vk_image(t_device, queue, image,
             format, aspect, level0_width, level0_height, miplevel,
-            array_slice, t_mem_type_index_for_mmap);
+            array_slice, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     if (!cimg)
         t_failf("%s: failed to create image", __func__);
 

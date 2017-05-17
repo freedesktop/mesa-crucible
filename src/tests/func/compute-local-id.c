@@ -80,7 +80,7 @@ common_init(VkShaderModule cs, const uint32_t ssbo_size)
 
     VkBuffer buffer_out = qoCreateBuffer(t_device, .size = ssbo_size);
     VkDeviceMemory mem_out = qoAllocBufferMemory(t_device, buffer_out,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     qoBindBufferMemory(t_device, buffer_out, mem_out, 0);
 
     vkUpdateDescriptorSets(t_device,

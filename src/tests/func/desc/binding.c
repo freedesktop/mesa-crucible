@@ -60,7 +60,7 @@ test(void)
                                      .size = buffer_size);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     qoBindBufferMemory(t_device, buffer, mem, 0);
 

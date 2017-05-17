@@ -70,7 +70,7 @@ setup_src(struct src *src)
        qoGetImageMemoryRequirements(t_device, image);
 
     VkDeviceMemory mem = qoAllocMemoryFromRequirements(t_device, &mem_reqs,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     void *vk_map = qoMapMemory(t_device, mem, 0, mem_reqs.size, 0);
 
@@ -97,7 +97,7 @@ setup_dest(struct dest *dest)
     VkBuffer buffer = qoCreateBuffer(t_device, .size = buffer_size);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     void *map = qoMapMemory(t_device, mem, /*offset*/ 0,
                             buffer_size, /*flags*/ 0);

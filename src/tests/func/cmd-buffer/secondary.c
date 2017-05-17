@@ -31,7 +31,7 @@ make_vbo(void)
                        .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
     VkDeviceMemory vbo_mem = qoAllocBufferMemory(t_device, vbo,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     float *vbo_map = qoMapMemory(t_device, vbo_mem, /*offset*/ 0,
                                  vbo_size, /*flags*/ 0);

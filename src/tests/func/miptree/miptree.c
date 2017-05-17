@@ -513,11 +513,11 @@ miptree_create(void)
         .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 
     VkDeviceMemory image_mem = qoAllocImageMemory(t_device, image,
-        .memoryTypeIndex = t_mem_type_index_for_device_access);
+        .properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     VkDeviceMemory src_buffer_mem = qoAllocBufferMemory(t_device, src_buffer,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     VkDeviceMemory dest_buffer_mem = qoAllocBufferMemory(t_device, dest_buffer,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     void *src_buffer_map = qoMapMemory(t_device, src_buffer_mem,
                                        /*offset*/ 0, buffer_size, 0);
@@ -1245,7 +1245,7 @@ init_draw_data(test_draw_data_t *draw_data)
                                  .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
     VkDeviceMemory vb_mem = qoAllocBufferMemory(t_device, vb,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     qoBindBufferMemory(t_device, vb, vb_mem, /*offset*/ 0);
 

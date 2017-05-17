@@ -159,9 +159,6 @@ struct test {
 
         VkImage ds_image;
         VkImageView depthstencil_image_view;
-
-        uint32_t mem_type_index_for_mmap;
-        uint32_t mem_type_index_for_device_access;
     } vk;
 };
 

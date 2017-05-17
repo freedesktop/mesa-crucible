@@ -124,7 +124,7 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
                        .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 
     VkDeviceMemory ubo_mem = qoAllocBufferMemory(t_device, ubo,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     float *const ubo_map = qoMapMemory(t_device, ubo_mem, /*offset*/ 0,
                                        ubo_size, /*flags*/ 0);
@@ -138,7 +138,7 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
                        .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
 
     VkDeviceMemory vbo_mem = qoAllocBufferMemory(t_device, vbo,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     float *const vbo_map = qoMapMemory(t_device, vbo_mem, /*offset*/ 0,
                                        vbo_size, /*flags*/ 0);
@@ -494,7 +494,7 @@ test_lots_of_surface_state_cs(bool use_dynamic_offsets)
                        .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 
     VkDeviceMemory ubo_mem = qoAllocBufferMemory(t_device, ubo,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     float *const ubo_map = qoMapMemory(t_device, ubo_mem, /*offset*/ 0,
                                        ubo_size, /*flags*/ 0);
@@ -517,7 +517,7 @@ test_lots_of_surface_state_cs(bool use_dynamic_offsets)
                        .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 
     VkDeviceMemory ssbo_mem = qoAllocBufferMemory(t_device, ssbo,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     qoBindBufferMemory(t_device, ssbo, ssbo_mem, /*offset*/ 0);
 

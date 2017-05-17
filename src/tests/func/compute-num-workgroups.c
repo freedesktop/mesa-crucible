@@ -96,7 +96,7 @@ common_init(CTX *ctx)
 
     ctx->ssbo_buf = qoCreateBuffer(t_device, .size = ctx->ssbo_size);
     ctx->ssbo = qoAllocBufferMemory(t_device, ctx->ssbo_buf,
-        .memoryTypeIndex = t_mem_type_index_for_mmap);
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     qoBindBufferMemory(t_device, ctx->ssbo_buf, ctx->ssbo, 0);
 
     vkUpdateDescriptorSets(t_device,

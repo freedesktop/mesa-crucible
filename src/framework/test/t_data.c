@@ -66,24 +66,6 @@ __t_physical_dev_mem_props(void)
     return &t->vk.physical_dev_mem_props;
 }
 
-const uint32_t
-__t_mem_type_index_for_mmap(void)
-{
-    ASSERT_TEST_IN_MAJOR_PHASE;
-    GET_CURRENT_TEST(t);
-
-    return t->vk.mem_type_index_for_mmap;
-}
-
-const uint32_t
-__t_mem_type_index_for_device_access(void)
-{
-    ASSERT_TEST_IN_MAJOR_PHASE;
-    GET_CURRENT_TEST(t);
-
-    return t->vk.mem_type_index_for_device_access;
-}
-
 const VkQueue *
 __t_queue(void)
 {

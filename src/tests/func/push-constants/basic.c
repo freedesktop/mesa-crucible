@@ -137,9 +137,8 @@ test_push_constants(void)
 
     VkBuffer vbo = qoCreateBuffer(t_device, .size = sizeof(vertices),
                                  .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-    VkDeviceMemory mem =
-        qoAllocBufferMemory(t_device, vbo,
-                            .memoryTypeIndex = t_mem_type_index_for_mmap);
+    VkDeviceMemory mem = qoAllocBufferMemory(t_device, vbo,
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     qoBindBufferMemory(t_device, vbo, mem, /*offset*/ 0);
     float *const vbo_map = qoMapMemory(t_device, mem, /*offset*/ 0,
                                        sizeof(vertices), /*flags*/ 0);
