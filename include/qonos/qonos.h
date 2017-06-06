@@ -222,7 +222,7 @@ typedef struct QoShaderModuleCreateInfo_ {
     .samples = VK_SAMPLE_COUNT_1_BIT, \
     .loadOp = VK_ATTACHMENT_LOAD_OP_LOAD, \
     .storeOp = VK_ATTACHMENT_STORE_OP_STORE, \
-    .initialLayout = VK_IMAGE_LAYOUT_GENERAL, \
+    .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED, \
     .finalLayout = VK_IMAGE_LAYOUT_GENERAL
 
 #define QO_SUBPASS_DESCRIPTION_DEFAULTS \
