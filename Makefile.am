@@ -96,6 +96,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/push-constants/basic.c \
 	src/tests/func/shader/fragcoord.c \
 	src/tests/func/shader/pack_unpack.c \
+	src/tests/func/shader_ballot/ext_shader_ballot.c \
 	src/tests/func/ssbo/interleave.c \
 	src/tests/func/sync/semaphore-fd.c \
 	src/tests/func/renderpass/clear.c \
@@ -136,6 +137,7 @@ BUILT_SOURCES = \
 	src/tests/func/push-constants/basic-spirv.h \
 	src/tests/func/shader/fragcoord-spirv.h \
 	src/tests/func/shader/pack_unpack-spirv.h \
+	src/tests/func/shader_ballot/ext_shader_ballot-spirv.h \
 	src/tests/func/ssbo/interleave-spirv.h \
 	src/tests/func/sync/semaphore-fd-spirv.h \
 	src/tests/stress/lots-of-surface-state-spirv.h
