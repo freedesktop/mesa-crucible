@@ -52,7 +52,7 @@ class Shader:
             assert False
 
         with subprocess.Popen([glslc] + extra_args +
-                              [stage_flag, '-std=430core', '-o', '-', '-'],
+                              [stage_flag, '-std=450core', '-o', '-', '-'],
                               stdout = subprocess.PIPE,
                               stderr = subprocess.PIPE,
                               stdin = subprocess.PIPE) as proc:
@@ -86,7 +86,7 @@ class Shader:
         # First dump the GLSL source as strings
         f.write('static const char {0}[] ='.format(var_name))
         f.write('\n__QO_SPIRV_' + self.stage)
-        f.write('\n"#version 330\\n"')
+        f.write('\n"#version 450\\n"')
         for line in self.glsl.splitlines():
             if not line.strip():
                 continue
