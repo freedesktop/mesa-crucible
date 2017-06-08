@@ -112,10 +112,12 @@ bin_crucible_SOURCES = \
 	src/util/cru_vec.c \
 	src/util/string.c \
 	src/util/xalloc.c \
+	src/util/simple_pipeline.c \
 	$(NULL)
 
 BUILT_SOURCES = \
 	src/qonos/qonos_pipeline-spirv.h \
+	src/util/simple_pipeline-spirv.h \
 	src/tests/func/4-vertex-buffers-spirv.h \
 	src/tests/func/depthstencil/basic-spirv.h \
 	src/tests/func/depthstencil/arrayed-clear-spirv.h \
