@@ -145,6 +145,7 @@ __qoAllocMemoryFromRequirements(VkDevice dev,
 {
     VkMemoryAllocateInfo alloc_info = {
         .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+        .pNext = info->pNext,
         .allocationSize = info->allocationSize,
         .memoryTypeIndex = info->memoryTypeIndex,
     };
