@@ -27,6 +27,7 @@ struct test_context {
     VkDevice device;
     VkQueue queue;
     VkBuffer buffer;
+    VkBuffer atomic;
 };
 
 /* This is odd so we start and end on the same queue */
@@ -35,7 +36,11 @@ struct test_context {
 #define LOCAL_WORKGROUP_SIZE 1024
 #define GLOBAL_WORKGROUP_SIZE 512
 
-#define TEST_BUFFER_SIZE (2 * 4 * LOCAL_WORKGROUP_SIZE)
+struct buffer_layout {
+    uint32_t atomic;
+    uint32_t order[NUM_HASH_ITERATIONS];
+    uint32_t data[LOCAL_WORKGROUP_SIZE][2];
+};
 
 static void
 init_context(struct test_context *ctx, float priority)
@@ -56,11 +61,27 @@ init_context(struct test_context *ctx, float priority)
 
     vkGetDeviceQueue(ctx->device, 0, 0, &ctx->queue);
 
-    ctx->buffer = qoCreateBuffer(ctx->device, .size = TEST_BUFFER_SIZE,
+    ctx->buffer = qoCreateBuffer(ctx->device, .size = sizeof(struct buffer_layout),
+        .usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
         .pNext = &(VkExternalMemoryBufferCreateInfoKHX) {
             .sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO_KHX,
             .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHX,
         });
+
+    ctx->atomic = qoCreateBuffer(ctx->device, .size = 4,
+                                 .usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
+    VkDeviceMemory atomic_mem = qoAllocBufferMemory(ctx->device, ctx->atomic);
+    uint32_t *atomic_map = qoMapMemory(ctx->device, atomic_mem, 0, 4, 0);
+    *atomic_map = 0;
+    vkFlushMappedMemoryRanges(ctx->device, 1,
+        &(VkMappedMemoryRange) {
+            .sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE,
+            .memory = atomic_mem,
+            .offset = 0,
+            .size = 4,
+        });
+    vkUnmapMemory(ctx->device, atomic_mem);
+    qoBindBufferMemory(ctx->device, ctx->atomic, atomic_mem, 0);
 }
 
 static void
@@ -86,8 +107,26 @@ create_command_buffer(struct test_context *ctx, int parity)
 {
     VkResult result;
 
-    VkShaderModule cs;
+    VkShaderModule atom_cs, cs;
     if (parity == 0) {
+        atom_cs = qoCreateShaderModuleGLSL(ctx->device, COMPUTE,
+            layout(set = 0, binding = 0, std430) buffer CtxStorage {
+               uint atomic;
+            } ctx;
+            layout(set = 0, binding = 1, std430) buffer GlobalStorage {
+               uint atomic;
+               uint order[];
+            } global;
+
+            layout (local_size_x = 1) in;
+
+            void main()
+            {
+                uint ctx_iter = atomicAdd(ctx.atomic, 1);
+                uint global_iter = atomicAdd(global.atomic, 1);
+                global.order[global_iter] = ctx_iter;
+            }
+        );
         cs = qoCreateShaderModuleGLSL(ctx->device, COMPUTE,
             layout(set = 0, binding = 0, std430) buffer Storage {
                ivec2 data[];
@@ -104,6 +143,24 @@ create_command_buffer(struct test_context *ctx, int parity)
             }
         );
     } else {
+        atom_cs = qoCreateShaderModuleGLSL(ctx->device, COMPUTE,
+            layout(set = 0, binding = 0, std430) buffer CtxStorage {
+               uint atomic;
+            } ctx;
+            layout(set = 0, binding = 1, std430) buffer GlobalStorage {
+               uint atomic;
+               uint order[];
+            } global;
+
+            layout (local_size_x = 1) in;
+
+            void main()
+            {
+                uint ctx_iter = atomicAdd(ctx.atomic, 1);
+                uint global_iter = atomicAdd(global.atomic, 1);
+                global.order[global_iter] = 0x10000 | ctx_iter;
+            }
+        );
         cs = qoCreateShaderModuleGLSL(ctx->device, COMPUTE,
             layout(set = 0, binding = 0, std430) buffer Storage {
                ivec2 data[];
@@ -121,6 +178,26 @@ create_command_buffer(struct test_context *ctx, int parity)
         );
     }
 
+    VkDescriptorSetLayout atom_set_layout = qoCreateDescriptorSetLayout(
+        ctx->device,
+        .bindingCount = 2,
+        .pBindings = (VkDescriptorSetLayoutBinding[]) {
+            {
+                .binding = 0,
+                .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                .descriptorCount = 1,
+                .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+                .pImmutableSamplers = NULL,
+            },
+            {
+                .binding = 1,
+                .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                .descriptorCount = 1,
+                .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+                .pImmutableSamplers = NULL,
+            },
+        });
+
     VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(ctx->device,
         .bindingCount = 1,
         .pBindings = (VkDescriptorSetLayoutBinding[]) {
@@ -133,9 +210,30 @@ create_command_buffer(struct test_context *ctx, int parity)
             },
         });
 
+    VkPipelineLayout atom_pipeline_layout = qoCreatePipelineLayout(ctx->device,
+        .setLayoutCount = 1,
+        .pSetLayouts = &atom_set_layout);
+
     VkPipelineLayout pipeline_layout = qoCreatePipelineLayout(ctx->device,
         .setLayoutCount = 1,
         .pSetLayouts = &set_layout);
+
+
+    VkPipeline atom_pipeline;
+    result = vkCreateComputePipelines(ctx->device, VK_NULL_HANDLE, 1,
+        &(VkComputePipelineCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
+            .pNext = NULL,
+            .stage = {
+                .stage = VK_SHADER_STAGE_COMPUTE_BIT,
+                .module = atom_cs,
+                .pName = "main",
+            },
+            .flags = 0,
+            .layout = atom_pipeline_layout
+        }, NULL, &atom_pipeline);
+    t_assert(result == VK_SUCCESS);
+    t_cleanup_push_vk_pipeline(ctx->device, atom_pipeline);
 
     VkPipeline pipeline;
     result = vkCreateComputePipelines(ctx->device, VK_NULL_HANDLE, 1,
@@ -158,23 +256,53 @@ create_command_buffer(struct test_context *ctx, int parity)
         &(VkDescriptorPoolCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
             .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-            .maxSets = 1,
+            .maxSets = 2,
             .poolSizeCount = 1,
             .pPoolSizes = &(VkDescriptorPoolSize) {
                 .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                .descriptorCount = 1,
+                .descriptorCount = 3,
             },
         }, NULL, &descriptor_pool);
     t_assert(result == VK_SUCCESS);
     t_cleanup_push_vk_descriptor_pool(ctx->device, descriptor_pool);
+
+    VkDescriptorSet atom_set = qoAllocateDescriptorSet(ctx->device,
+        .descriptorPool = descriptor_pool,
+        .pSetLayouts = &atom_set_layout);
 
     VkDescriptorSet set = qoAllocateDescriptorSet(ctx->device,
         .descriptorPool = descriptor_pool,
         .pSetLayouts = &set_layout);
 
     vkUpdateDescriptorSets(ctx->device,
-        /*writeCount*/ 1,
+        /*writeCount*/ 3,
         (VkWriteDescriptorSet[]) {
+            {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .dstSet = atom_set,
+                .dstBinding = 0,
+                .dstArrayElement = 0,
+                .descriptorCount = 1,
+                .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                .pBufferInfo = &(VkDescriptorBufferInfo) {
+                    .buffer = ctx->atomic,
+                    .offset = 0,
+                    .range = VK_WHOLE_SIZE,
+                },
+            },
+            {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .dstSet = atom_set,
+                .dstBinding = 1,
+                .dstArrayElement = 0,
+                .descriptorCount = 1,
+                .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                .pBufferInfo = &(VkDescriptorBufferInfo) {
+                    .buffer = ctx->buffer,
+                    .offset = 0,
+                    .range = VK_WHOLE_SIZE,
+                },
+            },
             {
                 .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
                 .dstSet = set,
@@ -184,7 +312,7 @@ create_command_buffer(struct test_context *ctx, int parity)
                 .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
                 .pBufferInfo = &(VkDescriptorBufferInfo) {
                     .buffer = ctx->buffer,
-                    .offset = 0,
+                    .offset = offsetof(struct buffer_layout, data),
                     .range = VK_WHOLE_SIZE,
                 },
             },
@@ -204,13 +332,6 @@ create_command_buffer(struct test_context *ctx, int parity)
     qoBeginCommandBuffer(cmd_buffer,
         .flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-    vkCmdBindPipeline(cmd_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
-
-    vkCmdBindDescriptorSets(cmd_buffer,
-                            VK_PIPELINE_BIND_POINT_COMPUTE,
-                            pipeline_layout, 0, 1,
-                            &set, 0, NULL);
-
     vkCmdPipelineBarrier(cmd_buffer,
                          VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
                          VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
@@ -228,6 +349,23 @@ create_command_buffer(struct test_context *ctx, int parity)
                             .size = VK_WHOLE_SIZE,
                          },
                          0, NULL);
+
+    vkCmdBindPipeline(cmd_buffer, VK_PIPELINE_BIND_POINT_COMPUTE,
+                      atom_pipeline);
+
+    vkCmdBindDescriptorSets(cmd_buffer,
+                            VK_PIPELINE_BIND_POINT_COMPUTE,
+                            atom_pipeline_layout, 0, 1,
+                            &atom_set, 0, NULL);
+
+    vkCmdDispatch(cmd_buffer, 1, 1, 1);
+
+    vkCmdBindPipeline(cmd_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
+
+    vkCmdBindDescriptorSets(cmd_buffer,
+                            VK_PIPELINE_BIND_POINT_COMPUTE,
+                            pipeline_layout, 0, 1,
+                            &set, 0, NULL);
 
     for (unsigned j = 0; j < GLOBAL_WORKGROUP_SIZE; j++) {
         vkCmdDispatch(cmd_buffer, 1, 1, 1);
@@ -381,54 +519,68 @@ init_memory_contents(struct test_context *ctx,
 
     VkDeviceMemory tmp_mem =
         qoAllocMemory(ctx->device,
-                      .allocationSize = TEST_BUFFER_SIZE,
+                      .allocationSize = sizeof(struct buffer_layout),
                       .memoryTypeIndex = 0 /* TODO */);
 
-    void *tmp_map = qoMapMemory(ctx->device, tmp_mem, 0, TEST_BUFFER_SIZE, 0);
-    memcpy(tmp_map, data, TEST_BUFFER_SIZE);
+    struct buffer_layout *map = qoMapMemory(ctx->device, tmp_mem, 0,
+                                            sizeof(struct buffer_layout), 0);
+    map->atomic = 0;
+    memset(map->order, -1, sizeof(map->order));
+    memcpy(map->data, data, sizeof(map->data));
     vkFlushMappedMemoryRanges(ctx->device, 1,
         &(VkMappedMemoryRange) {
             .sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE,
             .memory = tmp_mem,
             .offset = 0,
-            .size = TEST_BUFFER_SIZE,
+            .size = sizeof(struct buffer_layout),
         });
     vkUnmapMemory(ctx->device, tmp_mem);
 
     copy_memory(ctx,
                 memory, VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT,
                 tmp_mem, VK_ACCESS_HOST_WRITE_BIT,
-                TEST_BUFFER_SIZE);
+                sizeof(struct buffer_layout));
 }
 
 static void
 check_memory_contents(struct test_context *ctx,
-                      uint32_t *data, VkDeviceMemory memory)
+                      uint32_t *data, VkDeviceMemory memory,
+                      bool multi_ctx)
 {
     /* First, do the computation on the CPU */
     cpu_process_data(data);
 
     VkDeviceMemory tmp_mem =
         qoAllocMemory(ctx->device,
-                      .allocationSize = TEST_BUFFER_SIZE,
+                      .allocationSize = sizeof(struct buffer_layout),
                       .memoryTypeIndex = 0 /* TODO */);
 
     copy_memory(ctx,
                 tmp_mem, VK_ACCESS_HOST_READ_BIT,
                 memory, VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT,
-                TEST_BUFFER_SIZE);
+                sizeof(struct buffer_layout));
     vkQueueWaitIdle(ctx->queue);
 
-    void *tmp_map = qoMapMemory(ctx->device, tmp_mem, 0, TEST_BUFFER_SIZE, 0);
+    struct buffer_layout *map = qoMapMemory(ctx->device, tmp_mem, 0,
+                                            sizeof(struct buffer_layout), 0);
     vkInvalidateMappedMemoryRanges(ctx->device, 1,
         &(VkMappedMemoryRange) {
             .sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE,
             .memory = tmp_mem,
             .offset = 0,
-            .size = TEST_BUFFER_SIZE,
+            .size = sizeof(struct buffer_layout),
         });
 
-    t_assert(memcmp(data, tmp_map, TEST_BUFFER_SIZE) == 0);
+    t_assert(map->atomic == NUM_HASH_ITERATIONS);
+    for (unsigned i = 0; i < NUM_HASH_ITERATIONS; i++) {
+        unsigned ctx_iter = multi_ctx ? (i >> 1) : i;
+        if ((i & 1) == 0) {
+            t_assert(map->order[i] == ctx_iter);
+        } else {
+            t_assert(map->order[i] == (0x10000 | ctx_iter));
+        }
+    }
+    t_assert(memcmp(data, map->data, sizeof(map->data)) == 0);
 
     vkUnmapMemory(ctx->device, tmp_mem);
 }
@@ -451,7 +603,7 @@ test_sanity(void)
 
     qoBindBufferMemory(ctx.device, ctx.buffer, mem, 0);
 
-    uint32_t cpu_data[TEST_BUFFER_SIZE / 4];
+    uint32_t cpu_data[LOCAL_WORKGROUP_SIZE * 2];
     init_memory_contents(&ctx, cpu_data, mem);
 
     VkCommandBuffer cmd_buffer1 = create_command_buffer(&ctx, 0);
@@ -465,7 +617,7 @@ test_sanity(void)
         }
     }
 
-    check_memory_contents(&ctx, cpu_data, mem);
+    check_memory_contents(&ctx, cpu_data, mem, false);
 }
 
 test_define {
@@ -554,7 +706,7 @@ test_opaque_fd(void)
     qoBindBufferMemory(ctx1.device, ctx1.buffer, mem1, 0);
     qoBindBufferMemory(ctx2.device, ctx2.buffer, mem2, 0);
 
-    uint32_t cpu_data[TEST_BUFFER_SIZE / 4];
+    uint32_t cpu_data[LOCAL_WORKGROUP_SIZE * 2];
     init_memory_contents(&ctx1, cpu_data, mem1);
 
     VkCommandBuffer cmd_buffer1 = create_command_buffer(&ctx1, 0);
@@ -645,7 +797,7 @@ test_opaque_fd(void)
 
     free(semaphores);
 
-    check_memory_contents(&ctx1, cpu_data, mem1);
+    check_memory_contents(&ctx1, cpu_data, mem1, true);
 }
 
 test_define {
@@ -708,7 +860,7 @@ test_sync_fd(void)
     qoBindBufferMemory(ctx1.device, ctx1.buffer, mem1, 0);
     qoBindBufferMemory(ctx2.device, ctx2.buffer, mem2, 0);
 
-    uint32_t cpu_data[TEST_BUFFER_SIZE / 4];
+    uint32_t cpu_data[LOCAL_WORKGROUP_SIZE * 2];
     init_memory_contents(&ctx1, cpu_data, mem1);
 
     VkCommandBuffer cmd_buffer1 = create_command_buffer(&ctx1, 0);
@@ -788,7 +940,7 @@ test_sync_fd(void)
 
     logi("All compute batches queued\n");
 
-    check_memory_contents(&ctx1, cpu_data, mem1);
+    check_memory_contents(&ctx1, cpu_data, mem1, true);
 }
 
 test_define {
