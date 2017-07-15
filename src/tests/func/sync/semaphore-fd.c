@@ -63,9 +63,9 @@ init_context(struct test_context *ctx, float priority)
 
     ctx->buffer = qoCreateBuffer(ctx->device, .size = sizeof(struct buffer_layout),
         .usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-        .pNext = &(VkExternalMemoryBufferCreateInfoKHX) {
-            .sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO_KHX,
-            .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHX,
+        .pNext = &(VkExternalMemoryBufferCreateInfoKHR) {
+            .sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO_KHR,
+            .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
         });
 
     ctx->atomic = qoCreateBuffer(ctx->device, .size = 4,
@@ -342,7 +342,7 @@ create_command_buffer(struct test_context *ctx, int parity)
                             .srcAccessMask = 0,
                             .dstAccessMask = VK_ACCESS_SHADER_READ_BIT |
                                              VK_ACCESS_SHADER_WRITE_BIT,
-                            .srcQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL_KHX,
+                            .srcQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL_KHR,
                             .dstQueueFamilyIndex = 0,
                             .buffer = ctx->buffer,
                             .offset = 0,
@@ -381,7 +381,7 @@ create_command_buffer(struct test_context *ctx, int parity)
                                                  VK_ACCESS_SHADER_WRITE_BIT,
                                 .dstAccessMask = VK_ACCESS_SHADER_READ_BIT |
                                                  VK_ACCESS_SHADER_WRITE_BIT,
-                                .srcQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL_KHX,
+                                .srcQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL_KHR,
                                 .dstQueueFamilyIndex = 0,
                                 .buffer = ctx->buffer,
                                 .offset = 0,
@@ -401,7 +401,7 @@ create_command_buffer(struct test_context *ctx, int parity)
                                              VK_ACCESS_SHADER_WRITE_BIT,
                             .dstAccessMask = 0,
                             .srcQueueFamilyIndex = 0,
-                            .dstQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL_KHX,
+                            .dstQueueFamilyIndex = VK_QUEUE_FAMILY_EXTERNAL_KHR,
                             .buffer = ctx->buffer,
                             .offset = 0,
                             .size = VK_WHOLE_SIZE,
@@ -627,26 +627,26 @@ test_define {
 };
 
 static void
-require_handle_type(VkExternalSemaphoreHandleTypeFlagBitsKHX handle_type)
+require_handle_type(VkExternalSemaphoreHandleTypeFlagBitsKHR handle_type)
 {
 #define GET_FUNCTION_PTR(name) \
     PFN_vk##name name = (PFN_vk##name)vkGetInstanceProcAddr(t_instance, "vk"#name)
 
-    GET_FUNCTION_PTR(GetPhysicalDeviceExternalSemaphorePropertiesKHX);
+    GET_FUNCTION_PTR(GetPhysicalDeviceExternalSemaphorePropertiesKHR);
 
 #undef GET_FUNCTION_PTR
 
-    VkExternalSemaphorePropertiesKHX props = {
-        .sType = VK_STRUCTURE_TYPE_EXTERNAL_SEMAPHORE_PROPERTIES_KHX,
+    VkExternalSemaphorePropertiesKHR props = {
+        .sType = VK_STRUCTURE_TYPE_EXTERNAL_SEMAPHORE_PROPERTIES_KHR,
     };
-    GetPhysicalDeviceExternalSemaphorePropertiesKHX(t_physical_dev,
-        &(VkPhysicalDeviceExternalSemaphoreInfoKHX) {
+    GetPhysicalDeviceExternalSemaphorePropertiesKHR(t_physical_dev,
+        &(VkPhysicalDeviceExternalSemaphoreInfoKHR) {
             .handleType = handle_type,
         }, &props);
 
     const uint32_t features =
-        VK_EXTERNAL_SEMAPHORE_FEATURE_EXPORTABLE_BIT_KHX |
-        VK_EXTERNAL_SEMAPHORE_FEATURE_IMPORTABLE_BIT_KHX;
+        VK_EXTERNAL_SEMAPHORE_FEATURE_EXPORTABLE_BIT_KHR |
+        VK_EXTERNAL_SEMAPHORE_FEATURE_IMPORTABLE_BIT_KHR;
 
     if ((props.externalSemaphoreFeatures & features) != features)
         t_skip();
@@ -655,12 +655,12 @@ require_handle_type(VkExternalSemaphoreHandleTypeFlagBitsKHX handle_type)
 static void
 test_opaque_fd(void)
 {
-    t_require_ext("VK_KHX_external_memory");
-    t_require_ext("VK_KHX_external_memory_fd");
-    t_require_ext("VK_KHX_external_semaphore");
-    t_require_ext("VK_KHX_external_semaphore_fd");
+    t_require_ext("VK_KHR_external_memory");
+    t_require_ext("VK_KHR_external_memory_fd");
+    t_require_ext("VK_KHR_external_semaphore");
+    t_require_ext("VK_KHR_external_semaphore_fd");
 
-    require_handle_type(VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHX);
+    require_handle_type(VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR);
 
     struct test_context ctx1, ctx2;
     init_context(&ctx1, 1.0);
@@ -669,9 +669,9 @@ test_opaque_fd(void)
 #define GET_FUNCTION_PTR(name, device) \
     PFN_vk##name name = (PFN_vk##name)vkGetDeviceProcAddr(device, "vk"#name)
 
-    GET_FUNCTION_PTR(GetMemoryFdKHX, ctx1.device);
-    GET_FUNCTION_PTR(GetSemaphoreFdKHX, ctx1.device);
-    GET_FUNCTION_PTR(ImportSemaphoreFdKHX, ctx2.device);
+    GET_FUNCTION_PTR(GetMemoryFdKHR, ctx1.device);
+    GET_FUNCTION_PTR(GetSemaphoreFdKHR, ctx1.device);
+    GET_FUNCTION_PTR(ImportSemaphoreFdKHR, ctx2.device);
 
 #undef GET_FUNCTION_PTR
 
@@ -681,25 +681,27 @@ test_opaque_fd(void)
     VkDeviceMemory mem1 =
         qoAllocMemoryFromRequirements(ctx1.device, &buffer_reqs,
             .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            .pNext = &(VkExportMemoryAllocateInfoKHX) {
-                .sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHX,
-                .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHX,
+            .pNext = &(VkExportMemoryAllocateInfoKHR) {
+                .sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR,
+                .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
             });
 
     int fd;
-    VkResult result =
-        GetMemoryFdKHX(ctx1.device, mem1,
-                       VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHX,
-                       &fd);
+    VkResult result = GetMemoryFdKHR(ctx1.device,
+        &(VkMemoryGetFdInfoKHR) {
+            .sType = VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR,
+            .memory = mem1,
+            .handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
+        }, &fd);
     t_assert(result == VK_SUCCESS);
     t_assert(fd >= 0);
 
     VkDeviceMemory mem2 =
         qoAllocMemoryFromRequirements(ctx2.device, &buffer_reqs,
             .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            .pNext = &(VkImportMemoryFdInfoKHX) {
-                .sType = VK_STRUCTURE_TYPE_IMPORT_MEMORY_FD_INFO_KHX,
-                .handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHX,
+            .pNext = &(VkImportMemoryFdInfoKHR) {
+                .sType = VK_STRUCTURE_TYPE_IMPORT_MEMORY_FD_INFO_KHR,
+                .handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
                 .fd = fd,
             });
 
@@ -719,16 +721,20 @@ test_opaque_fd(void)
         result = vkCreateSemaphore(ctx1.device,
             &(VkSemaphoreCreateInfo) {
                 .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-            .pNext = &(VkExportSemaphoreCreateInfoKHX) {
-                .sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO_KHX,
-                .handleTypes = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHX,
+            .pNext = &(VkExportSemaphoreCreateInfoKHR) {
+                .sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO_KHR,
+                .handleTypes = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
             }}, NULL, &sem1);
         t_assert(result == VK_SUCCESS);
         t_cleanup_push_vk_semaphore(ctx1.device, sem1);
 
         int fd;
-        result = GetSemaphoreFdKHX(ctx1.device, sem1,
-            VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHX, &fd);
+        result = GetSemaphoreFdKHR(ctx1.device,
+            &(VkSemaphoreGetFdInfoKHR) {
+                .sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR,
+                .semaphore = sem1,
+                .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
+            }, &fd);
         t_assert(result == VK_SUCCESS);
 
         VkSemaphore sem2;
@@ -739,11 +745,11 @@ test_opaque_fd(void)
         t_assert(result == VK_SUCCESS);
         t_cleanup_push_vk_semaphore(ctx2.device, sem2);
 
-        result = ImportSemaphoreFdKHX(ctx2.device,
-            &(VkImportSemaphoreFdInfoKHX) {
-                .sType = VK_STRUCTURE_TYPE_IMPORT_SEMAPHORE_FD_INFO_KHX,
+        result = ImportSemaphoreFdKHR(ctx2.device,
+            &(VkImportSemaphoreFdInfoKHR) {
+                .sType = VK_STRUCTURE_TYPE_IMPORT_SEMAPHORE_FD_INFO_KHR,
                 .semaphore = sem2,
-                .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHX,
+                .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
                 .fd = fd,
             });
         t_assert(result == VK_SUCCESS);
@@ -809,12 +815,12 @@ test_define {
 static void
 test_sync_fd(void)
 {
-    t_require_ext("VK_KHX_external_memory");
-    t_require_ext("VK_KHX_external_memory_fd");
-    t_require_ext("VK_KHX_external_semaphore");
-    t_require_ext("VK_KHX_external_semaphore_fd");
+    t_require_ext("VK_KHR_external_memory");
+    t_require_ext("VK_KHR_external_memory_fd");
+    t_require_ext("VK_KHR_external_semaphore");
+    t_require_ext("VK_KHR_external_semaphore_fd");
 
-    require_handle_type(VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_FENCE_FD_BIT_KHX);
+    require_handle_type(VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT_KHR);
 
     struct test_context ctx1, ctx2;
     init_context(&ctx1, 1.0);
@@ -823,9 +829,9 @@ test_sync_fd(void)
 #define GET_FUNCTION_PTR(name, device) \
     PFN_vk##name name = (PFN_vk##name)vkGetDeviceProcAddr(device, "vk"#name)
 
-    GET_FUNCTION_PTR(GetMemoryFdKHX, ctx1.device);
-    GET_FUNCTION_PTR(GetSemaphoreFdKHX, ctx1.device);
-    GET_FUNCTION_PTR(ImportSemaphoreFdKHX, ctx2.device);
+    GET_FUNCTION_PTR(GetMemoryFdKHR, ctx1.device);
+    GET_FUNCTION_PTR(GetSemaphoreFdKHR, ctx1.device);
+    GET_FUNCTION_PTR(ImportSemaphoreFdKHR, ctx2.device);
 
 #undef GET_FUNCTION_PTR
 
@@ -835,25 +841,27 @@ test_sync_fd(void)
     VkDeviceMemory mem1 =
         qoAllocMemoryFromRequirements(ctx1.device, &buffer_reqs,
             .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            .pNext = &(VkExportMemoryAllocateInfoKHX) {
-                .sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHX,
-                .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHX,
+            .pNext = &(VkExportMemoryAllocateInfoKHR) {
+                .sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR,
+                .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
             });
 
     int fd;
-    VkResult result =
-        GetMemoryFdKHX(ctx1.device, mem1,
-                       VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHX,
-                       &fd);
+    VkResult result = GetMemoryFdKHR(ctx1.device,
+        &(VkMemoryGetFdInfoKHR) {
+            .sType = VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR,
+            .memory = mem1,
+            .handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
+        }, &fd);
     t_assert(result == VK_SUCCESS);
     t_assert(fd >= 0);
 
     VkDeviceMemory mem2 =
         qoAllocMemoryFromRequirements(ctx2.device, &buffer_reqs,
             .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            .pNext = &(VkImportMemoryFdInfoKHX) {
-                .sType = VK_STRUCTURE_TYPE_IMPORT_MEMORY_FD_INFO_KHX,
-                .handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHX,
+            .pNext = &(VkImportMemoryFdInfoKHR) {
+                .sType = VK_STRUCTURE_TYPE_IMPORT_MEMORY_FD_INFO_KHR,
+                .handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
                 .fd = fd,
             });
 
@@ -898,11 +906,11 @@ test_sync_fd(void)
             t_assert(result == VK_SUCCESS);
             t_cleanup_push_vk_semaphore(ctx->device, wait_sem);
 
-            result = ImportSemaphoreFdKHX(ctx->device,
-                &(VkImportSemaphoreFdInfoKHX) {
-                    .sType = VK_STRUCTURE_TYPE_IMPORT_SEMAPHORE_FD_INFO_KHX,
+            result = ImportSemaphoreFdKHR(ctx->device,
+                &(VkImportSemaphoreFdInfoKHR) {
+                    .sType = VK_STRUCTURE_TYPE_IMPORT_SEMAPHORE_FD_INFO_KHR,
                     .semaphore = wait_sem,
-                    .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_FENCE_FD_BIT_KHX,
+                    .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT_KHR,
                     .fd = last_fence_fd,
                 });
             t_assert(result == VK_SUCCESS);
@@ -915,9 +923,9 @@ test_sync_fd(void)
             result = vkCreateSemaphore(ctx->device,
                 &(VkSemaphoreCreateInfo) {
                     .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-                .pNext = &(VkExportSemaphoreCreateInfoKHX) {
-                    .sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO_KHX,
-                    .handleTypes = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_FENCE_FD_BIT_KHX,
+                .pNext = &(VkExportSemaphoreCreateInfoKHR) {
+                    .sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO_KHR,
+                    .handleTypes = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT_KHR,
                 }}, NULL, &signal_sem);
             t_assert(result == VK_SUCCESS);
             t_cleanup_push_vk_semaphore(ctx->device, signal_sem);
@@ -930,9 +938,12 @@ test_sync_fd(void)
         t_assert(result == VK_SUCCESS);
 
         if (i != NUM_HASH_ITERATIONS - 1) {
-            result = GetSemaphoreFdKHX(ctx->device, signal_sem,
-                VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHX,
-                &last_fence_fd);
+            result = GetSemaphoreFdKHR(ctx1.device,
+                &(VkSemaphoreGetFdInfoKHR) {
+                    .sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR,
+                    .semaphore = signal_sem,
+                    .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT_KHR,
+                }, &last_fence_fd);
             t_assert(result == VK_SUCCESS);
             t_assert(last_fence_fd >= 0);
         }
