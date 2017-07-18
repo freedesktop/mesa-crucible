@@ -97,6 +97,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/shader/fragcoord.c \
 	src/tests/func/shader/pack_unpack.c \
 	src/tests/func/shader_ballot/ext_shader_ballot.c \
+	src/tests/func/shader_ballot/amd_shader_ballot.c \
 	src/tests/func/shader_group_vote/ext_shader_subgroup_vote.c \
 	src/tests/func/ssbo/interleave.c \
 	src/tests/func/sync/semaphore-fd.c \
@@ -139,6 +140,7 @@ BUILT_SOURCES = \
 	src/tests/func/shader/fragcoord-spirv.h \
 	src/tests/func/shader/pack_unpack-spirv.h \
 	src/tests/func/shader_ballot/ext_shader_ballot-spirv.h \
+	src/tests/func/shader_ballot/amd_shader_ballot-spirv.h \
 	src/tests/func/shader_group_vote/ext_shader_subgroup_vote-spirv.h \
 	src/tests/func/ssbo/interleave-spirv.h \
 	src/tests/func/sync/semaphore-fd-spirv.h \
