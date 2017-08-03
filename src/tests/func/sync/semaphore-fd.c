@@ -911,6 +911,7 @@ test_sync_fd(void)
                     .sType = VK_STRUCTURE_TYPE_IMPORT_SEMAPHORE_FD_INFO_KHR,
                     .semaphore = wait_sem,
                     .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT_KHR,
+                    .flags = VK_SEMAPHORE_IMPORT_TEMPORARY_BIT_KHR,
                     .fd = last_fence_fd,
                 });
             t_assert(result == VK_SUCCESS);
