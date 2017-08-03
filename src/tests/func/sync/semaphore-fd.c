@@ -714,49 +714,41 @@ test_opaque_fd(void)
     VkCommandBuffer cmd_buffer1 = create_command_buffer(&ctx1, 0);
     VkCommandBuffer cmd_buffer2 = create_command_buffer(&ctx2, 1);
 
-    VkSemaphore *semaphores =
-        malloc(sizeof(VkSemaphore) * (NUM_HASH_ITERATIONS - 1) * 2);
-    for (unsigned i = 0; i < NUM_HASH_ITERATIONS - 1; i++) {
-        VkSemaphore sem1;
-        result = vkCreateSemaphore(ctx1.device,
-            &(VkSemaphoreCreateInfo) {
-                .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-            .pNext = &(VkExportSemaphoreCreateInfoKHR) {
-                .sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO_KHR,
-                .handleTypes = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
-            }}, NULL, &sem1);
-        t_assert(result == VK_SUCCESS);
-        t_cleanup_push_vk_semaphore(ctx1.device, sem1);
+    VkSemaphore sem1;
+    result = vkCreateSemaphore(ctx1.device,
+        &(VkSemaphoreCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+        .pNext = &(VkExportSemaphoreCreateInfoKHR) {
+            .sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO_KHR,
+            .handleTypes = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
+        }}, NULL, &sem1);
+    t_assert(result == VK_SUCCESS);
+    t_cleanup_push_vk_semaphore(ctx1.device, sem1);
 
-        int fd;
-        result = GetSemaphoreFdKHR(ctx1.device,
-            &(VkSemaphoreGetFdInfoKHR) {
-                .sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR,
-                .semaphore = sem1,
-                .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
-            }, &fd);
-        t_assert(result == VK_SUCCESS);
+    result = GetSemaphoreFdKHR(ctx1.device,
+        &(VkSemaphoreGetFdInfoKHR) {
+            .sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR,
+            .semaphore = sem1,
+            .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
+        }, &fd);
+    t_assert(result == VK_SUCCESS);
 
-        VkSemaphore sem2;
-        result = vkCreateSemaphore(ctx2.device,
-            &(VkSemaphoreCreateInfo) {
-                .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-            }, NULL, &sem2);
-        t_assert(result == VK_SUCCESS);
-        t_cleanup_push_vk_semaphore(ctx2.device, sem2);
+    VkSemaphore sem2;
+    result = vkCreateSemaphore(ctx2.device,
+        &(VkSemaphoreCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+        }, NULL, &sem2);
+    t_assert(result == VK_SUCCESS);
+    t_cleanup_push_vk_semaphore(ctx2.device, sem2);
 
-        result = ImportSemaphoreFdKHR(ctx2.device,
-            &(VkImportSemaphoreFdInfoKHR) {
-                .sType = VK_STRUCTURE_TYPE_IMPORT_SEMAPHORE_FD_INFO_KHR,
-                .semaphore = sem2,
-                .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
-                .fd = fd,
-            });
-        t_assert(result == VK_SUCCESS);
-
-        semaphores[i * 2 + 0] = sem1;
-        semaphores[i * 2 + 1] = sem2;
-    }
+    result = ImportSemaphoreFdKHR(ctx2.device,
+        &(VkImportSemaphoreFdInfoKHR) {
+            .sType = VK_STRUCTURE_TYPE_IMPORT_SEMAPHORE_FD_INFO_KHR,
+            .semaphore = sem2,
+            .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
+            .fd = fd,
+        });
+    t_assert(result == VK_SUCCESS);
 
     logi("Begin queuing batches\n");
 
@@ -773,26 +765,26 @@ test_opaque_fd(void)
         if ((i & 1) == 0) {
             if (i != 0) {
                 submit.waitSemaphoreCount = 1;
-                submit.pWaitSemaphores = &semaphores[(i - 1) * 2 + 0];
+                submit.pWaitSemaphores = &sem1;
             }
 
             submit.pCommandBuffers = &cmd_buffer1;
 
             if (i != NUM_HASH_ITERATIONS - 1) {
                 submit.signalSemaphoreCount = 1;
-                submit.pSignalSemaphores = &semaphores[i * 2 + 0];
+                submit.pSignalSemaphores = &sem1;
             }
 
             result = vkQueueSubmit(ctx1.queue, 1, &submit, VK_NULL_HANDLE);
             t_assert(result == VK_SUCCESS);
         } else {
             submit.waitSemaphoreCount = 1;
-            submit.pWaitSemaphores = &semaphores[(i - 1) * 2 + 1];
+            submit.pWaitSemaphores = &sem2;
 
             submit.pCommandBuffers = &cmd_buffer2;
 
             submit.signalSemaphoreCount = 1;
-            submit.pSignalSemaphores = &semaphores[i * 2 + 1];
+            submit.pSignalSemaphores = &sem2;
 
             result = vkQueueSubmit(ctx2.queue, 1, &submit, VK_NULL_HANDLE);
             t_assert(result == VK_SUCCESS);
@@ -800,8 +792,6 @@ test_opaque_fd(void)
     }
 
     logi("All compute batches queued\n");
-
-    free(semaphores);
 
     check_memory_contents(&ctx1, cpu_data, mem1, true);
 }
