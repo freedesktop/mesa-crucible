@@ -17,6 +17,7 @@ class ShaderCompileError(RuntimeError):
 
 class Shader:
     def __init__(self, stage):
+        self.glsl = None
         self.stream = io.StringIO()
         self.stage = stage
         self.dwords = None
@@ -25,10 +26,9 @@ class Shader:
         self.stream.write(s)
 
     def finish_text(self, line):
+        self.glsl = self.stream.getvalue()
+        self.stream = None
         self.line = line
-
-    def glsl_source(self):
-        return dedent(self.stream.getvalue())
 
     def __run_glslc(self, extra_args=[]):
         stage_flag = '-fshader-stage='
@@ -53,7 +53,7 @@ class Shader:
                               stderr = subprocess.PIPE,
                               stdin = subprocess.PIPE) as proc:
 
-            proc.stdin.write(self.glsl_source().encode('utf-8'))
+            proc.stdin.write(self.glsl.encode('utf-8'))
             out, err = proc.communicate(timeout=30)
 
             if proc.returncode != 0:
@@ -83,7 +83,7 @@ class Shader:
         f.write('static const char {0}[] ='.format(var_name))
         f.write('\n__QO_SPIRV_' + self.stage)
         f.write('\n"#version 330\\n"')
-        for line in self.glsl_source().splitlines():
+        for line in self.glsl.splitlines():
             if not line.strip():
                 continue
             f.write('\n"{0}\\n"'.format(line))

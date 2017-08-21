@@ -656,8 +656,10 @@ static void
 test_opaque_fd(void)
 {
     t_require_ext("VK_KHR_external_memory");
+    t_require_ext("VK_KHR_external_memory_capabilities");
     t_require_ext("VK_KHR_external_memory_fd");
     t_require_ext("VK_KHR_external_semaphore");
+    t_require_ext("VK_KHR_external_semaphore_capabilities");
     t_require_ext("VK_KHR_external_semaphore_fd");
 
     require_handle_type(VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR);
@@ -806,8 +808,10 @@ static void
 test_sync_fd(void)
 {
     t_require_ext("VK_KHR_external_memory");
+    t_require_ext("VK_KHR_external_memory_capabilities");
     t_require_ext("VK_KHR_external_memory_fd");
     t_require_ext("VK_KHR_external_semaphore");
+    t_require_ext("VK_KHR_external_semaphore_capabilities");
     t_require_ext("VK_KHR_external_semaphore_fd");
 
     require_handle_type(VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT_KHR);
