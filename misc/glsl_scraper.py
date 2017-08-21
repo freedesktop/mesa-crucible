@@ -28,6 +28,10 @@ class Shader:
     def finish_text(self, line):
         self.glsl = self.stream.getvalue()
         self.stream = None
+
+        # Handle the QO_EXTENSION macro
+        self.glsl = self.glsl.replace('QO_EXTENSION', '#extension')
+
         self.line = line
 
     def __run_glslc(self, extra_args=[]):
