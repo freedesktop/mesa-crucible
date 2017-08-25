@@ -276,6 +276,40 @@ t_setup_descriptor_pool(void)
     t_cleanup_push_vk_descriptor_pool(t->vk.device, t->vk.descriptor_pool);
 }
 
+static VkBool32 debug_cb(VkDebugReportFlagsEXT flags,
+    VkDebugReportObjectTypeEXT objectType,
+    uint64_t object,
+    size_t location,
+    int32_t messageCode,
+    const char *pLayerPrefix,
+    const char *pMessage,
+    void *pUserData)
+{
+    if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT)
+        logi("object %lu type 0x%x location %lu code %u layer \"%s\" msg %s",
+             object, objectType, location, messageCode, pLayerPrefix, pMessage);
+
+    if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
+        logw("object %lu type 0x%x location %lu code %u layer \"%s\" msg %s",
+             object, objectType, location, messageCode, pLayerPrefix, pMessage);
+
+    if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)
+        logw("object %lu type 0x%x location %lu code %u layer \"%s\" msg %s",
+             object, objectType, location, messageCode, pLayerPrefix, pMessage);
+
+    if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
+        loge("object %lu type 0x%x location %lu code %u layer \"%s\" msg %s",
+             object, objectType, location, messageCode, pLayerPrefix, pMessage);
+
+    /* We don't want to spam the logs in case both debug and info bit set. */
+    if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT &&
+       !flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT)
+        logd("object %lu type 0x%x location %lu code %u layer \"%s\" msg %s",
+             object, objectType, location, messageCode, pLayerPrefix, pMessage);
+
+    return false;
+}
+
 void
 t_setup_vulkan(void)
 {
@@ -299,12 +333,30 @@ t_setup_vulkan(void)
     ext_names = malloc(t->vk.instance_extension_count * sizeof(*ext_names));
     t_assert(ext_names);
 
-    for (uint32_t i = 0; i < t->vk.instance_extension_count; i++)
+    void *debug_report = NULL;
+    VkDebugReportCallbackCreateInfoEXT cb_info = {
+        VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
+        NULL,
+        VK_DEBUG_REPORT_INFORMATION_BIT_EXT |
+        VK_DEBUG_REPORT_WARNING_BIT_EXT |
+        VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT |
+        VK_DEBUG_REPORT_ERROR_BIT_EXT |
+        VK_DEBUG_REPORT_DEBUG_BIT_EXT,
+        debug_cb,
+        t
+    };
+
+    for (uint32_t i = 0; i < t->vk.instance_extension_count; i++) {
         ext_names[i] = t->vk.instance_extension_props[i].extensionName;
+
+        if (strcmp(ext_names[i], "VK_EXT_debug_report") == 0)
+           debug_report = &cb_info;
+    }
 
     res = vkCreateInstance(
         &(VkInstanceCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+            .pNext = debug_report,
             .pApplicationInfo = &(VkApplicationInfo) {
                 .pApplicationName = "crucible",
                 .apiVersion = VK_MAKE_VERSION(1, 0, 0),
@@ -315,6 +367,36 @@ t_setup_vulkan(void)
     free(ext_names);
     t_assert(res == VK_SUCCESS);
     t_cleanup_push_vk_instance(t->vk.instance, &test_alloc_cb);
+
+    if (debug_report) {
+#define RESOLVE(func)\
+    (PFN_ ##func) vkGetInstanceProcAddr(t->vk.instance, #func);
+        t->vk.vkCreateDebugReportCallbackEXT = RESOLVE(vkCreateDebugReportCallbackEXT);
+        t->vk.vkDestroyDebugReportCallbackEXT = RESOLVE(vkDestroyDebugReportCallbackEXT);
+#undef RESOLVE
+
+        assert(t->vk.vkCreateDebugReportCallbackEXT);
+        assert(t->vk.vkDestroyDebugReportCallbackEXT);
+
+        VkDebugReportCallbackCreateInfoEXT info;
+        info.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
+        info.pNext = NULL;
+        info.flags = VK_DEBUG_REPORT_INFORMATION_BIT_EXT |
+                     VK_DEBUG_REPORT_WARNING_BIT_EXT |
+                     VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT |
+                     VK_DEBUG_REPORT_ERROR_BIT_EXT |
+                     VK_DEBUG_REPORT_DEBUG_BIT_EXT;
+        info.pfnCallback = debug_cb;
+        info.pUserData = t;
+
+        res = t->vk.vkCreateDebugReportCallbackEXT(t_instance, &info, NULL,
+                                                   &t->vk.debug_callback);
+        t_assert(res == VK_SUCCESS);
+        t_assert(t->vk.debug_callback != 0);
+
+        t_cleanup_push_vk_debug_cb(t->vk.vkDestroyDebugReportCallbackEXT,
+                                   t->vk.instance, t->vk.debug_callback);
+    }
 
     t_setup_phys_dev();
 

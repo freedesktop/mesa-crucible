@@ -74,6 +74,12 @@ struct cmd_vk_instance {
     const VkAllocationCallbacks *alloc;
 };
 
+struct cmd_debug_cb {
+    PFN_vkDestroyDebugReportCallbackEXT func;
+    VkInstance instance;
+    VkDebugReportCallbackEXT callback;
+};
+
 struct cmd_vk_device {
     VkDevice dev;
     const VkAllocationCallbacks *alloc;
@@ -276,6 +282,13 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
             CMD_CREATE(struct cmd_vk_instance);
             CMD_SET(instance);
             CMD_SET(alloc);
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_DEBUG_CB: {
+            CMD_CREATE(struct cmd_debug_cb);
+            CMD_SET(func);
+            CMD_SET(instance);
+            CMD_SET(callback);
             break;
         }
         case CRU_CLEANUP_CMD_VK_DEVICE: {
@@ -485,6 +498,11 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
         case CRU_CLEANUP_CMD_VK_INSTANCE: {
             CMD_GET(struct cmd_vk_instance);
             CMD_DO(vkDestroyInstance(cmd->instance, cmd->alloc));
+            break;
+        }
+        case CRU_CLEANUP_CMD_VK_DEBUG_CB: {
+            CMD_GET(struct cmd_debug_cb);
+            CMD_DO(cmd->func(cmd->instance, cmd->callback, NULL));
             break;
         }
 

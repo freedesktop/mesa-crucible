@@ -159,6 +159,10 @@ struct test {
 
         VkImage ds_image;
         VkImageView depthstencil_image_view;
+
+        PFN_vkCreateDebugReportCallbackEXT vkCreateDebugReportCallbackEXT;
+        PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallbackEXT;
+        VkDebugReportCallbackEXT debug_callback;
     } vk;
 };
 
