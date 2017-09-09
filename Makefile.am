@@ -21,7 +21,7 @@
 
 export CRUCIBLE_TOP := $(srcdir)
 
-CPPFLAGS = \
+AM_CPPFLAGS = \
    $(MESA_CPPFLAGS) \
    -D_DEFAULT_SOURCE \
    -D_GNU_SOURCE \
@@ -38,13 +38,13 @@ common_CFLAGS = -Wall -O0 -g3 \
 	$(LIBXML2_CFLAGS) \
 	$(NULL)
 
-CFLAGS = -std=gnu11 \
+AM_CFLAGS = -std=gnu11 \
 	 $(common_CFLAGS) \
 	-Werror=implicit-function-declaration \
 	-Werror=implicit-int \
 	-Werror=missing-prototypes
 
-CXXFLAGS = -std=c++11 $(common_CFLAGS)
+AM_CXXFLAGS = -std=c++11 $(common_CFLAGS)
 
 noinst_PROGRAMS = \
 	bin/crucible
