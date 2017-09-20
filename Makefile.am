@@ -88,6 +88,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/gs/basic.c \
 	src/tests/func/query/timestamp.c \
 	src/tests/func/first.c \
+	src/tests/func/bind-points.c \
 	src/tests/func/compute.c \
 	src/tests/func/compute-local-id.c \
 	src/tests/func/compute-num-workgroups.c \
@@ -131,6 +132,7 @@ BUILT_SOURCES = \
 	src/tests/func/draw-indexed-spirv.h \
 	src/tests/func/gs/basic-spirv.h \
 	src/tests/func/first-spirv.h \
+	src/tests/func/bind-points-spirv.h \
 	src/tests/func/compute-spirv.h \
 	src/tests/func/compute-local-id-spirv.h \
 	src/tests/func/compute-num-workgroups-spirv.h \
