@@ -137,6 +137,7 @@ dispatch_and_wait(CTX *ctx)
     qoQueueWaitIdle(t_queue);
 
     vkResetCommandBuffer(t_cmd_buffer, 0);
+    qoBeginCommandBuffer(t_cmd_buffer);
 }
 
 static void
