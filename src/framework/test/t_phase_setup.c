@@ -400,6 +400,15 @@ t_setup_vulkan(void)
 
     t_setup_phys_dev();
 
+    uint32_t queue_family_count;
+    vkGetPhysicalDeviceQueueFamilyProperties(t->vk.physical_dev,
+                                             &queue_family_count, NULL);
+    for (uint32_t i = 0; i < queue_family_count; i++) {
+       VkQueueFamilyProperties *props = malloc(queue_family_count * sizeof(VkQueueFamilyProperties));
+       vkGetPhysicalDeviceQueueFamilyProperties(t->vk.physical_dev,
+                                                &queue_family_count, props);
+       free(props);
+    }
     qoGetPhysicalDeviceMemoryProperties(t->vk.physical_dev,
                                         &t->vk.physical_dev_mem_props);
 
