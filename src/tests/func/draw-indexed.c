@@ -93,6 +93,8 @@ test(void)
         }
     );
 
+    VkPipelineLayout pipeline_layout = qoCreatePipelineLayout(t_device);
+
     pipeline = qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
             QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS,
@@ -105,6 +107,7 @@ test(void)
                 .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
                 .primitiveRestartEnable = false,
             },
+            .layout = pipeline_layout,
             .renderPass = pass,
             .subpass = 0,
         }});
@@ -121,6 +124,7 @@ test(void)
                 .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
                 .primitiveRestartEnable = true,
             },
+            .layout = pipeline_layout,
             .renderPass = pass,
             .subpass = 0,
         }});

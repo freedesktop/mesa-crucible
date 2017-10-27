@@ -95,6 +95,7 @@ test_fragcoord(void)
         }
     };
 
+    VkPipelineLayout pipeline_layout = qoCreatePipelineLayout(t_device);
     VkPipeline pipeline = qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
             QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS,
@@ -108,6 +109,7 @@ test_fragcoord(void)
                 .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
             },
             .pVertexInputState = &vi_info,
+            .layout = pipeline_layout,
             .renderPass = pass,
             .subpass = 0,
         }});

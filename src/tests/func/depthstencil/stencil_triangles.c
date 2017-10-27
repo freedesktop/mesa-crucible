@@ -73,6 +73,8 @@ draw_triangle(void)
             },
         });
 
+    VkPipelineLayout pipeline_layout = qoCreatePipelineLayout(t_device);
+
     VkPipeline pipeline = qoCreateGraphicsPipeline(t_device,
         t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
@@ -134,7 +136,7 @@ draw_triangle(void)
                     .failOp = params->stencil_fail_op,
                 },
             },
-            .layout = VK_NULL_HANDLE,
+            .layout = pipeline_layout,
             .renderPass = pass,
             .subpass = 0,
         }}

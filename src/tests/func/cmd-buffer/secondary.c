@@ -54,8 +54,14 @@ make_vbo(void)
     return vbo;
 }
 
+static VkPipelineLayout
+create_pipeline_layout(void)
+{
+    return qoCreatePipelineLayout(t_device);
+}
+
 static VkPipeline
-create_pipeline(VkRenderPass pass)
+create_pipeline(VkRenderPass pass, VkPipelineLayout layout)
 {
     return qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
@@ -65,6 +71,7 @@ create_pipeline(VkRenderPass pass)
         &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .renderPass = pass,
+            .layout = layout,
             .subpass = 0,
         }});
 }
@@ -135,7 +142,8 @@ test_small_secondaries(void)
 {
     VkBuffer vbo = make_vbo();
     VkRenderPass pass = create_and_begin_render_pass();
-    VkPipeline pipeline = create_pipeline(pass);
+    VkPipelineLayout pipeline_layout = create_pipeline_layout();
+    VkPipeline pipeline = create_pipeline(pass, pipeline_layout);
 
     VkCommandBuffer secondaries[1024];
 
@@ -168,7 +176,8 @@ do_test_large_secondary(VkCommandBufferUsageFlags usage_flags)
 {
     VkBuffer vbo = make_vbo();
     VkRenderPass pass = create_and_begin_render_pass();
-    VkPipeline pipeline = create_pipeline(pass);
+    VkPipelineLayout pipeline_layout = create_pipeline_layout();
+    VkPipeline pipeline = create_pipeline(pass, pipeline_layout);
 
     VkCommandBuffer secondary =
         make_secondary_cmd_buffer(pass, pipeline, usage_flags);

@@ -121,6 +121,8 @@ test(void)
             }
         });
 
+    VkPipelineLayout pipeline_layout = qoCreatePipelineLayout(t_device);
+
     VkPipeline pipeline = qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
             QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS,
@@ -130,6 +132,7 @@ test(void)
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .pVertexInputState = &vi_create_info,
             .renderPass = pass,
+            .layout = pipeline_layout,
             .subpass = 0,
         }});
 
