@@ -24,7 +24,7 @@
 #include "compute-local-id-spirv.h"
 
 static VkDeviceMemory
-common_init(VkShaderModule cs, const uint32_t ssbo_size)
+common_init(VkShaderModule cs, const uint32_t ssbo_size, VkPipelineLayout *p_layout)
 {
     VkDescriptorSetLayout set_layout;
 
@@ -59,6 +59,7 @@ common_init(VkShaderModule cs, const uint32_t ssbo_size)
         .pushConstantRangeCount = 1,
         .pPushConstantRanges = &constants);
 
+    *p_layout = pipeline_layout;
     VkPipeline pipeline;
     vkCreateComputePipelines(t_device, t_pipeline_cache, 1,
         &(VkComputePipelineCreateInfo) {
@@ -140,7 +141,8 @@ basic(void)
     );
 
     const uint32_t ssbo_size = 64 * sizeof(uint32_t);
-    VkDeviceMemory mem_out = common_init(cs, ssbo_size);
+    VkPipelineLayout p_layout;
+    VkDeviceMemory mem_out = common_init(cs, ssbo_size, &p_layout);
 
     dispatch_and_wait(1, 1, 1);
 
@@ -182,10 +184,11 @@ push_constant(void)
     );
 
     const uint32_t ssbo_size = 64 * sizeof(uint32_t);
-    VkDeviceMemory mem_out = common_init(cs, ssbo_size);
+    VkPipelineLayout p_layout;
+    VkDeviceMemory mem_out = common_init(cs, ssbo_size, &p_layout);
 
     uint32_t add = 42;
-    vkCmdPushConstants(t_cmd_buffer, VK_NULL_HANDLE,
+    vkCmdPushConstants(t_cmd_buffer, p_layout,
                        VK_SHADER_STAGE_COMPUTE_BIT,
                        0, sizeof(add), &add);
 
@@ -253,7 +256,8 @@ local_ids(void)
     );
 
     const uint32_t ssbo_size = 8 * sizeof(uint32_t);
-    VkDeviceMemory mem_out = common_init(cs, ssbo_size);
+    VkPipelineLayout p_layout;
+    VkDeviceMemory mem_out = common_init(cs, ssbo_size, &p_layout);
 
     dispatch_and_wait(1, 1, 1);
 
