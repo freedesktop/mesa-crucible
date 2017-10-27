@@ -37,7 +37,7 @@ push_fs_color(VkPipelineLayout layout, unsigned first_component, unsigned num_co
 {
     vkCmdPushConstants(t_cmd_buffer, layout,
                        VK_SHADER_STAGE_FRAGMENT_BIT,
-                       first_component * sizeof(float),
+                       16 + first_component * sizeof(float),
                        num_components * sizeof(float), c);
 }
 
@@ -105,7 +105,7 @@ test_push_constants(void)
 
     VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
         layout(push_constant, std140) uniform Push {
-            vec4 color;
+            layout(offset = 16) vec4 color;
         } u_push;
         layout(location = 0) out vec4 f_color;
         void main()
@@ -121,7 +121,7 @@ test_push_constants(void)
         },
         {
             .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-            .offset = 12,
+            .offset = 16,
             .size = 16,
         }
     };
