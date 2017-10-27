@@ -154,8 +154,31 @@ t_setup_framebuffer(void)
     VkRenderPass pass = color_pass;
 
     if (t->def->depthstencil_format != VK_FORMAT_UNDEFINED) {
+        VkFormatProperties depth_format_props;
+
+        VkFormat format = t->def->depthstencil_format;
+
+        vkGetPhysicalDeviceFormatProperties(t->vk.physical_dev,
+                                               format,
+                                               &depth_format_props);
+
+        if (depth_format_props.optimalTilingFeatures == 0) {
+            /* upgrade to a supported format */
+            switch (format) {
+            case VK_FORMAT_X8_D24_UNORM_PACK32:
+            case VK_FORMAT_D16_UNORM:
+                format = VK_FORMAT_D32_SFLOAT;
+                break;
+            case VK_FORMAT_D24_UNORM_S8_UINT:
+                format = VK_FORMAT_D32_SFLOAT_S8_UINT;
+                break;
+            default:
+                break;
+            }
+        }
+
         t->vk.ds_image = qoCreateImage(t->vk.device,
-            .format = t->def->depthstencil_format,
+            .format = format,
             .extent = {
                 .width = t->ref.width,
                 .height = t->ref.height,
