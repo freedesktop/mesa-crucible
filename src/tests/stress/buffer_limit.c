@@ -45,6 +45,8 @@ test_max_buffer()
                                               VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                                      .size = buffer_size);
 
+    VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer);
+    qoBindBufferMemory(t_device, buffer, mem, 0);
     /* Allocate a descriptor set consisting of one binding */
     VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
             .bindingCount = 1,
