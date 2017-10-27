@@ -281,6 +281,7 @@ test_color_render_area(void)
     // Clear the whole image to green.
     vkCmdBeginRenderPass(t_cmd_buffer,
         &(VkRenderPassBeginInfo) {
+            .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
             .renderPass = pass,
             .framebuffer = t_framebuffer,
             .renderArea = {
@@ -298,6 +299,7 @@ test_color_render_area(void)
     // Clear a subregion to blue.
     vkCmdBeginRenderPass(t_cmd_buffer,
         &(VkRenderPassBeginInfo) {
+            .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
             .renderPass = pass,
             .framebuffer = t_framebuffer,
             .renderArea = {
