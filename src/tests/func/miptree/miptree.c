@@ -916,6 +916,7 @@ copy_color_images_with_draw(const test_data_t *data,
             .pAttachments = (VkImageView[]) {
                 attachment_views[i],
             },
+            .renderPass = data->draw.render_pass,
             .width = width,
             .height = height,
             .layers = 1);
@@ -941,6 +942,7 @@ copy_color_images_with_draw(const test_data_t *data,
 
         vkCmdBeginRenderPass(cmd,
             &(VkRenderPassBeginInfo) {
+                .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
                 .renderPass = data->draw.render_pass,
                 .framebuffer = fb,
                 .renderArea = { {0, 0}, {width, height} },
