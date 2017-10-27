@@ -24,18 +24,18 @@
 #include "basic-spirv.h"
 
 static void
-push_vs_offset(float x, float y)
+push_vs_offset(VkPipelineLayout layout, float x, float y)
 {
     /* The offset is storred in two floats with one float of padding */
     float offset[3] = { x, 0, y };
-    vkCmdPushConstants(t_cmd_buffer, VK_NULL_HANDLE,
+    vkCmdPushConstants(t_cmd_buffer, layout,
                        VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(offset), offset);
 }
 
 static void
-push_fs_color(unsigned first_component, unsigned num_components, float *c)
+push_fs_color(VkPipelineLayout layout, unsigned first_component, unsigned num_components, float *c)
 {
-    vkCmdPushConstants(t_cmd_buffer, VK_NULL_HANDLE,
+    vkCmdPushConstants(t_cmd_buffer, layout,
                        VK_SHADER_STAGE_FRAGMENT_BIT,
                        first_component * sizeof(float),
                        num_components * sizeof(float), c);
@@ -114,6 +114,21 @@ test_push_constants(void)
         }
     );
 
+    VkPushConstantRange constants[2] = { {
+            .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+            .offset = 0,
+            .size = 12,
+        },
+        {
+            .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+            .offset = 12,
+            .size = 16,
+        }
+    };
+    VkPipelineLayout pipeline_layout = qoCreatePipelineLayout(t_device,
+        .pushConstantRangeCount = 2,
+        .pPushConstantRanges = constants);
+
     VkPipeline pipeline = qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
             QO_EXTRA_GRAPHICS_PIPELINE_CREATE_INFO_DEFAULTS,
@@ -126,6 +141,7 @@ test_push_constants(void)
             .pVertexInputState = &vi_info,
             .renderPass = pass,
             .subpass = 0,
+            .layout = pipeline_layout,
         }});
 
     static const float vertices[] = {
@@ -162,26 +178,26 @@ test_push_constants(void)
                            (VkDeviceSize[]) { 0 });
 
     /* Start off upper-left and red */
-    push_vs_offset(-1.0, -1.0);
-    push_fs_color(0, 4, (float[]) { 1.0, 0.0, 0.0, 1.0 });
+    push_vs_offset(pipeline_layout, -1.0, -1.0);
+    push_fs_color(pipeline_layout, 0, 4, (float[]) { 1.0, 0.0, 0.0, 1.0 });
     vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     /* Upper-right */
-    push_vs_offset(0.0, -1.0);
+    push_vs_offset(pipeline_layout, 0.0, -1.0);
     /* Update just the green component to get yellow */
-    push_fs_color(1, 1, (float[]) { 1.0 });
+    push_fs_color(pipeline_layout, 1, 1, (float[]) { 1.0 });
     vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     /* Bottom-left */
-    push_vs_offset(-1.0, 0.0);
+    push_vs_offset(pipeline_layout, -1.0, 0.0);
     /* Update just the red component to get green */
-    push_fs_color(0, 1, (float[]) { 0.0 });
+    push_fs_color(pipeline_layout, 0, 1, (float[]) { 0.0 });
     vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     /* Bottom-right */
-    push_vs_offset(0.0, 0.0);
+    push_vs_offset(pipeline_layout, 0.0, 0.0);
     /* Update the green and blue components to get blue */
-    push_fs_color(1, 2, (float[]) { 0.0, 1.0 });
+    push_fs_color(pipeline_layout, 1, 2, (float[]) { 0.0, 1.0 });
     vkCmdDraw(t_cmd_buffer, 4, 1, 0, 0);
 
     vkCmdEndRenderPass(t_cmd_buffer);
