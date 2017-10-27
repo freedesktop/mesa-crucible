@@ -200,6 +200,7 @@ test_color8(void)
     qoBeginCommandBuffer(cmd);
     vkCmdBeginRenderPass(cmd,
         &(VkRenderPassBeginInfo) {
+            .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
             .renderPass = pass,
             .framebuffer = fb,
             .renderArea = {{0, 0}, {width, height}},
