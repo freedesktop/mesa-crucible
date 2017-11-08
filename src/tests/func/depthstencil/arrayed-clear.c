@@ -48,14 +48,22 @@ test(void)
 	    .attachmentCount = 1,
 	    .pAttachments = &fc_desc,
 	    .subpassCount = 1,
-	    .pSubpasses = (VkSubpassDescription[]) {
-	    {
+	    .pSubpasses = (VkSubpassDescription[]) { {
 		.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
 		.pDepthStencilAttachment = &(VkAttachmentReference){
 		.attachment = 0,
 		.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-		},
-  	    }, });
+	        }
+	    }},
+	    .dependencyCount = 1,
+	    .pDependencies = &(VkSubpassDependency) {
+		    .srcSubpass = 0,
+		    .dstSubpass = VK_SUBPASS_EXTERNAL,
+		    .srcStageMask = VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
+		    .dstStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+		    .srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+		    .dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT,
+	    });
 
     // Create the arrayed image that will be cleared
     VkImage depth_test = qoCreateImage(t_device,
@@ -151,7 +159,7 @@ test(void)
         .addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
         .addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
         .mipLodBias = 0,
-        .maxAnisotropy = 0,
+        .maxAnisotropy = 1.0,
         .compareOp = VK_COMPARE_OP_GREATER,
         .minLod = 0,
         .maxLod = 0,
@@ -268,6 +276,17 @@ test(void)
     vkCmdBindDescriptorSets(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
 		    pipeline_layout, 0, 1, &desc_set, 0, NULL);
 
+    vkCmdSetViewport(t_cmd_buffer, 0, 1,
+		     &(VkViewport) {
+		       .width = 1,
+		       .height = 1,
+		     });
+
+    vkCmdSetScissor(t_cmd_buffer, 0, 1,
+		     &(VkRect2D) {
+		       .extent.width = 1,
+		       .extent.height = 1,
+		     });
     vkCmdDraw(t_cmd_buffer, 1, 1, 0, 0);
 
     vkCmdEndRenderPass(t_cmd_buffer);
