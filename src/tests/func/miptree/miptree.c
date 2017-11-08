@@ -101,7 +101,7 @@ struct test_data {
         VkRenderPass render_pass;
         VkPipelineLayout pipeline_layout;
         VkPipeline pipeline;
-        VkDescriptorSet desc_sets[1];
+        VkDescriptorSet desc_sets[2];
     } draw;
 };
 
@@ -706,6 +706,24 @@ miptree_upload_copy_from_buffer(const test_data_t *data)
     VkCommandBuffer cmd = qoAllocateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
+    vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_HOST_BIT,
+			 VK_PIPELINE_STAGE_TRANSFER_BIT,
+			 0, 0, NULL, 0, NULL, 1,
+			 &(VkImageMemoryBarrier) {
+			     .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			     .srcAccessMask = 0,
+			     .dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
+			     .oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			     .newLayout = VK_IMAGE_LAYOUT_GENERAL,
+			     .image = mt->image,
+			     .subresourceRange = {
+				 .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				 .baseMipLevel = 0,
+				 .levelCount = params->levels,
+				 .baseArrayLayer = 0,
+				 .layerCount = params->array_length,
+			     }
+			 });
     cru_vec_foreach(slice, &mt->mipslices) {
         VkBufferImageCopy copy = {
             .bufferOffset = slice->buffer_offset,
@@ -785,6 +803,24 @@ miptree_upload_copy_from_linear_image(const test_data_t *data)
     VkCommandBuffer cmd = qoAllocateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
 
+    vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_HOST_BIT,
+			 VK_PIPELINE_STAGE_TRANSFER_BIT,
+			 0, 0, NULL, 0, NULL, 1,
+			 &(VkImageMemoryBarrier) {
+			     .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			     .srcAccessMask = 0,
+			     .dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
+			     .oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			     .newLayout = VK_IMAGE_LAYOUT_GENERAL,
+			     .image = mt->image,
+			     .subresourceRange = {
+				 .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				 .baseMipLevel = 0,
+				 .levelCount = params->levels,
+				 .baseArrayLayer = 0,
+				 .layerCount = params->array_length,
+			     }
+			 });
     cru_vec_foreach(slice, &mt->mipslices) {
         VkImageCopy copy = {
             .srcSubresource = {
@@ -926,7 +962,7 @@ copy_color_images_with_draw(const test_data_t *data,
             (VkWriteDescriptorSet[]) {
                 {
                     .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                    .dstSet = data->draw.desc_sets[0],
+                    .dstSet = data->draw.desc_sets[i],
                     .dstBinding = 0,
                     .dstArrayElement = 0,
                     .descriptorCount = 1,
@@ -953,8 +989,7 @@ copy_color_images_with_draw(const test_data_t *data,
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                                 data->draw.pipeline_layout,
                                 /*firstSet*/ 0,
-                                ARRAY_LENGTH(data->draw.desc_sets),
-                                data->draw.desc_sets,
+                                1, &data->draw.desc_sets[i],
                                 /*dynamicOffsetCount*/ 0,
                                 /*dynamicOffsets*/ NULL);
         vkCmdDraw(cmd, data->draw.num_vertices, /*instanceCount*/ 1,
@@ -1254,7 +1289,12 @@ init_draw_data(test_draw_data_t *draw_data)
     memcpy(qoMapMemory(t_device, vb_mem, /*offset*/ 0, vb_size, /*flags*/ 0),
            position_data, sizeof(position_data));
 
-    VkDescriptorSet desc_set =
+    VkDescriptorSet desc_set0 =
+        qoAllocateDescriptorSet(t_device,
+                                .descriptorPool = t_descriptor_pool,
+                                .pSetLayouts = &set_layout);
+
+    VkDescriptorSet desc_set1 =
         qoAllocateDescriptorSet(t_device,
                                 .descriptorPool = t_descriptor_pool,
                                 .pSetLayouts = &set_layout);
@@ -1268,7 +1308,7 @@ init_draw_data(test_draw_data_t *draw_data)
         .pipeline = pipeline,
         .render_pass = pass,
         .desc_sets = {
-            desc_set,
+            desc_set0, desc_set1
         },
     };
 }
