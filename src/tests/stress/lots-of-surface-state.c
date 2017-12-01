@@ -33,11 +33,21 @@
 // more than 64K worth of binding tablees while consuming a very small
 // amount of actual batch buffer space.
 
+static inline uint32_t
+align_u32(uint32_t v, uint32_t a)
+{
+   assert(a != 0 && a == (a & -a));
+   return (v + a - 1) & ~(a - 1);
+}
+
 static void
 test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
                            VkShaderStageFlagBits ubo_stage,
                            bool use_dynamic_offsets)
 {
+    VkPhysicalDeviceProperties dev_props;
+    vkGetPhysicalDeviceProperties(t_physical_dev, &dev_props);
+
     VkRenderPass pass = qoCreateRenderPass(t_device,
         .attachmentCount = 1,
         .pAttachments = (VkAttachmentDescription[]) {
@@ -117,7 +127,10 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
             .subpass = 0,
         }});
 
-    size_t ubo_size = 1024 * 3 * sizeof(float);
+    const uint32_t ubo_stride =
+        align_u32(sizeof(float),
+                  dev_props.limits.minUniformBufferOffsetAlignment);
+    const uint32_t ubo_size = 1024 * 3 * ubo_stride;
 
     VkBuffer ubo =
         qoCreateBuffer(t_device, .size = ubo_size,
@@ -126,8 +139,8 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
     VkDeviceMemory ubo_mem = qoAllocBufferMemory(t_device, ubo,
         .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-    float *const ubo_map = qoMapMemory(t_device, ubo_mem, /*offset*/ 0,
-                                       ubo_size, /*flags*/ 0);
+    void *ubo_map = qoMapMemory(t_device, ubo_mem, /*offset*/ 0,
+                                ubo_size, /*flags*/ 0);
 
     qoBindBufferMemory(t_device, ubo, ubo_mem, /*offset*/ 0);
 
@@ -159,7 +172,8 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
     // range [-1, 2].  Why that range?  Some are negative but it's centered
     // around 0.5.  In other words, it seemed good at the time.
     for (int i = 0; i < 1024; i++) {
-        ubo_map[i] = ((float)rand() / RAND_MAX) * 3 - 1;
+        float *f = ubo_map + i * ubo_stride;
+        *f = ((float)rand() / RAND_MAX) * 3 - 1;
     }
 
     vkCmdBeginRenderPass(t_cmd_buffer,
@@ -260,24 +274,24 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
         float sum = 0;
         for (int j = 0; j < 5; j++) {
             int idx = rand() % 1024;
-            offsets[j] = idx * sizeof(float);
-            sum += ubo_map[idx];
+            offsets[j] = idx * ubo_stride;
+            sum += *(float *)(ubo_map + idx * ubo_stride);
         }
 
         // The first batch should sum to zero.
-        ubo_map[1024 + i * 2 + 0] = 0 - sum;
-        offsets[5] = (1024 + i * 2 + 0) * sizeof(float);
+        *(float *)(ubo_map + (1024 + i * 2 + 0) * ubo_stride) = 0 - sum;
+        offsets[5] = (1024 + i * 2 + 0) * ubo_stride;
 
         sum = 0;
         for (int j = 6; j < 11; j++) {
             int idx = rand() % 1024;
-            offsets[j] = idx * sizeof(float);
-            sum += ubo_map[idx];
+            offsets[j] = idx * ubo_stride;
+            sum += *(float *)(ubo_map + idx * ubo_stride);
         }
 
         // The second batch should sum to one.
-        ubo_map[1024 + i * 2 + 1] = 1 - sum;
-        offsets[11] = (1024 + i * 2 + 1) * sizeof(float);
+        *(float *)(ubo_map + (1024 + i * 2 + 1) * ubo_stride) = 1 - sum;
+        offsets[11] = (1024 + i * 2 + 1) * ubo_stride;
 
         if (use_dynamic_offsets) {
             vkCmdBindDescriptorSets(t_cmd_buffer,
@@ -431,6 +445,9 @@ test_define {
 static void
 test_lots_of_surface_state_cs(bool use_dynamic_offsets)
 {
+    VkPhysicalDeviceProperties dev_props;
+    vkGetPhysicalDeviceProperties(t_physical_dev, &dev_props);
+
     // The compute shader takes 12 UBOs and one SSBO.
     VkShaderModule cs = qoCreateShaderModuleGLSL(t_device, COMPUTE,
         layout(local_size_x = 1) in;
@@ -488,7 +505,10 @@ test_lots_of_surface_state_cs(bool use_dynamic_offsets)
         }, NULL, &pipeline);
     t_cleanup_push_vk_pipeline(t_device, pipeline);
 
-    size_t ubo_size = 1024 * 3 * sizeof(float);
+    const uint32_t ubo_stride =
+        align_u32(sizeof(float),
+                  dev_props.limits.minUniformBufferOffsetAlignment);
+    const uint32_t ubo_size = 1024 * 3 * ubo_stride;
 
     VkBuffer ubo =
         qoCreateBuffer(t_device, .size = ubo_size,
@@ -497,8 +517,8 @@ test_lots_of_surface_state_cs(bool use_dynamic_offsets)
     VkDeviceMemory ubo_mem = qoAllocBufferMemory(t_device, ubo,
         .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-    float *const ubo_map = qoMapMemory(t_device, ubo_mem, /*offset*/ 0,
-                                       ubo_size, /*flags*/ 0);
+    void *ubo_map = qoMapMemory(t_device, ubo_mem, /*offset*/ 0,
+                                ubo_size, /*flags*/ 0);
 
     qoBindBufferMemory(t_device, ubo, ubo_mem, /*offset*/ 0);
 
@@ -508,10 +528,14 @@ test_lots_of_surface_state_cs(bool use_dynamic_offsets)
     // range [-1, 2].  Why that range?  Some are negative but it's centered
     // around 0.5.  In other words, it seemed good at the time.
     for (int i = 0; i < 1024; i++) {
-        ubo_map[i] = ((float)rand() / RAND_MAX) * 3 - 1;
+        float *f = ubo_map + i * ubo_stride;
+        *f = ((float)rand() / RAND_MAX) * 3 - 1;
     }
 
-    size_t ssbo_size = 1024 * 2 * sizeof(float);
+    const uint32_t ssbo_stride =
+        align_u32(2 * sizeof(float),
+                  dev_props.limits.minStorageBufferOffsetAlignment);
+    size_t ssbo_size = 1024 * ssbo_stride;
 
     VkBuffer ssbo =
         qoCreateBuffer(t_device, .size = ssbo_size,
@@ -639,27 +663,27 @@ test_lots_of_surface_state_cs(bool use_dynamic_offsets)
         float sum = 0;
         for (int j = 0; j < 5; j++) {
             int idx = rand() % 1024;
-            offsets[j] = idx * sizeof(float);
-            sum += ubo_map[idx];
+            offsets[j] = idx * ubo_stride;
+            sum += *(float *)(ubo_map + idx * ubo_stride);
         }
 
         // The first batch should sum to zero.
-        ubo_map[1024 + i * 2 + 0] = 0 - sum;
-        offsets[5] = (1024 + i * 2 + 0) * sizeof(float);
+        *(float *)(ubo_map + (1024 + i * 2 + 0) * ubo_stride) = 0 - sum;
+        offsets[5] = (1024 + i * 2 + 0) * ubo_stride;
 
         sum = 0;
         for (int j = 6; j < 11; j++) {
             int idx = rand() % 1024;
-            offsets[j] = idx * sizeof(float);
-            sum += ubo_map[idx];
+            offsets[j] = idx * ubo_stride;
+            sum += *(float *)(ubo_map + idx * ubo_stride);
         }
 
         // The second batch should sum to one.
-        ubo_map[1024 + i * 2 + 1] = 1 - sum;
-        offsets[11] = (1024 + i * 2 + 1) * sizeof(float);
+        *(float *)(ubo_map + (1024 + i * 2 + 1) * ubo_stride) = 1 - sum;
+        offsets[11] = (1024 + i * 2 + 1) * ubo_stride;
 
         /* SSBO offset */
-        offsets[12] = i * 2 * sizeof(float);
+        offsets[12] = i * ssbo_stride;
 
         if (use_dynamic_offsets) {
             vkCmdBindDescriptorSets(t_cmd_buffer,
@@ -731,12 +755,13 @@ test_lots_of_surface_state_cs(bool use_dynamic_offsets)
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
     qoQueueWaitIdle(t_queue);
 
-    float *const ssbo_map = qoMapMemory(t_device, ssbo_mem, /*offset*/ 0,
-                                        ssbo_size, /*flags*/ 0);
+    void *ssbo_map = qoMapMemory(t_device, ssbo_mem, /*offset*/ 0,
+                                 ssbo_size, /*flags*/ 0);
 
     for (unsigned i = 0; i < 1024; i++) {
-        t_assert(fabs(ssbo_map[i * 2 + 0] - 0.0f) < 0.0001);
-        t_assert(fabs(ssbo_map[i * 2 + 1] - 1.0f) < 0.0001);
+        float *f = ssbo_map + i * ssbo_stride;
+        t_assert(fabs(f[0] - 0.0f) < 0.0001);
+        t_assert(fabs(f[1] - 1.0f) < 0.0001);
     }
 }
 
