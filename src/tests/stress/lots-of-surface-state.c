@@ -45,9 +45,6 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
                            VkShaderStageFlagBits ubo_stage,
                            bool use_dynamic_offsets)
 {
-    VkPhysicalDeviceProperties dev_props;
-    vkGetPhysicalDeviceProperties(t_physical_dev, &dev_props);
-
     VkRenderPass pass = qoCreateRenderPass(t_device,
         .attachmentCount = 1,
         .pAttachments = (VkAttachmentDescription[]) {
@@ -127,9 +124,8 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
             .subpass = 0,
         }});
 
-    const uint32_t ubo_stride =
-        align_u32(sizeof(float),
-                  dev_props.limits.minUniformBufferOffsetAlignment);
+    const uint32_t ubo_stride = align_u32(sizeof(float),
+        t_physical_dev_props->limits.minUniformBufferOffsetAlignment);
     const uint32_t ubo_size = 1024 * 3 * ubo_stride;
 
     VkBuffer ubo =
@@ -445,9 +441,6 @@ test_define {
 static void
 test_lots_of_surface_state_cs(bool use_dynamic_offsets)
 {
-    VkPhysicalDeviceProperties dev_props;
-    vkGetPhysicalDeviceProperties(t_physical_dev, &dev_props);
-
     // The compute shader takes 12 UBOs and one SSBO.
     VkShaderModule cs = qoCreateShaderModuleGLSL(t_device, COMPUTE,
         layout(local_size_x = 1) in;
@@ -505,9 +498,8 @@ test_lots_of_surface_state_cs(bool use_dynamic_offsets)
         }, NULL, &pipeline);
     t_cleanup_push_vk_pipeline(t_device, pipeline);
 
-    const uint32_t ubo_stride =
-        align_u32(sizeof(float),
-                  dev_props.limits.minUniformBufferOffsetAlignment);
+    const uint32_t ubo_stride = align_u32(sizeof(float),
+        t_physical_dev_props->limits.minUniformBufferOffsetAlignment);
     const uint32_t ubo_size = 1024 * 3 * ubo_stride;
 
     VkBuffer ubo =
@@ -532,9 +524,8 @@ test_lots_of_surface_state_cs(bool use_dynamic_offsets)
         *f = ((float)rand() / RAND_MAX) * 3 - 1;
     }
 
-    const uint32_t ssbo_stride =
-        align_u32(2 * sizeof(float),
-                  dev_props.limits.minStorageBufferOffsetAlignment);
+    const uint32_t ssbo_stride = align_u32(2 * sizeof(float),
+        t_physical_dev_props->limits.minUniformBufferOffsetAlignment);
     size_t ssbo_size = 1024 * ssbo_stride;
 
     VkBuffer ssbo =
