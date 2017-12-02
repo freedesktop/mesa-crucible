@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 
 #include "tapi/t.h"
+#include "util/misc.h"
 
 #include "first-spirv.h"
 
@@ -192,8 +193,11 @@ test(void)
         0.0, 0.0, 0.5, 0.5
     };
 
-    VkBuffer uniform_buffer = qoCreateBuffer(t_device,
-        .size = sizeof(uniform_data));
+    const uint32_t ubo_stride = MAX(4 * sizeof(float),
+        t_physical_dev_props->limits.minUniformBufferOffsetAlignment);
+    const uint32_t ubo_size = ubo_stride * 3;
+
+    VkBuffer uniform_buffer = qoCreateBuffer(t_device, .size = ubo_size);
 
     VkDeviceMemory uniform_mem = qoAllocBufferMemory(t_device, uniform_buffer,
 						     .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT|VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
@@ -201,10 +205,13 @@ test(void)
     qoBindBufferMemory(t_device, uniform_buffer,
                        uniform_mem, /*offset*/ 0);
 
-    memcpy(qoMapMemory(t_device, uniform_mem, /*offset*/ 0,
-                       sizeof(uniform_data), /*flags*/ 0),
-           uniform_data,
-           sizeof(uniform_data));
+    void *ubo_map = qoMapMemory(t_device, uniform_mem, /*offset*/ 0,
+                                ubo_size, /*flags*/ 0);
+    for (int i = 0; i < 3; i++) {
+        memcpy(ubo_map + i * ubo_stride,
+               &uniform_data[4 * i],
+               4 * sizeof(float));
+    }
 
     static const float vertex_data[] = {
         // Triangle coordinates
@@ -293,7 +300,7 @@ test(void)
                     },
                     {
                         .buffer = uniform_buffer,
-                        .offset = 4 * sizeof(float),
+                        .offset = ubo_stride,
                         .range = VK_WHOLE_SIZE,
                     }
                 },
@@ -323,7 +330,7 @@ test(void)
                 .pBufferInfo = (VkDescriptorBufferInfo[]) {
                     {
                         .buffer = uniform_buffer,
-                        .offset = 4 * sizeof(float) * 2,
+                        .offset = 2 * ubo_stride,
                         .range = VK_WHOLE_SIZE,
                     }
                 },
