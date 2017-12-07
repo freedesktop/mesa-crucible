@@ -19,6 +19,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include "test.h"
 #include "t_phase_setup.h"
 
@@ -309,25 +311,25 @@ static VkBool32 debug_cb(VkDebugReportFlagsEXT flags,
     void *pUserData)
 {
     if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT)
-        logi("object %lu type 0x%x location %lu code %u layer \"%s\" msg %s",
+        logi("object %"PRIu64" type 0x%x location %zu code %u layer \"%s\" msg %s",
              object, objectType, location, messageCode, pLayerPrefix, pMessage);
 
     if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
-        logw("object %lu type 0x%x location %lu code %u layer \"%s\" msg %s",
+        logw("object %"PRIu64" type 0x%x location %zu code %u layer \"%s\" msg %s",
              object, objectType, location, messageCode, pLayerPrefix, pMessage);
 
     if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)
-        logw("object %lu type 0x%x location %lu code %u layer \"%s\" msg %s",
+        logw("object %"PRIu64" type 0x%x location %zu code %u layer \"%s\" msg %s",
              object, objectType, location, messageCode, pLayerPrefix, pMessage);
 
     if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
-        loge("object %lu type 0x%x location %lu code %u layer \"%s\" msg %s",
+        loge("object %"PRIu64" type 0x%x location %zu code %u layer \"%s\" msg %s",
              object, objectType, location, messageCode, pLayerPrefix, pMessage);
 
     /* We don't want to spam the logs in case both debug and info bit set. */
     if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT &&
        !flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT)
-        logd("object %lu type 0x%x location %lu code %u layer \"%s\" msg %s",
+        logd("object %"PRIu64" type 0x%x location %zu code %u layer \"%s\" msg %s",
              object, objectType, location, messageCode, pLayerPrefix, pMessage);
 
     return false;
