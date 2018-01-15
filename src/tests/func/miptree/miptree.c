@@ -717,7 +717,7 @@ miptree_upload_copy_from_buffer(const test_data_t *data)
 			     .newLayout = VK_IMAGE_LAYOUT_GENERAL,
 			     .image = mt->image,
 			     .subresourceRange = {
-				 .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				 .aspectMask = params->aspect,
 				 .baseMipLevel = 0,
 				 .levelCount = params->levels,
 				 .baseArrayLayer = 0,
@@ -814,7 +814,7 @@ miptree_upload_copy_from_linear_image(const test_data_t *data)
 			     .newLayout = VK_IMAGE_LAYOUT_GENERAL,
 			     .image = mt->image,
 			     .subresourceRange = {
-				 .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				 .aspectMask = params->aspect,
 				 .baseMipLevel = 0,
 				 .levelCount = params->levels,
 				 .baseArrayLayer = 0,
