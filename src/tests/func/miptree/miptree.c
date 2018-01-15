@@ -99,9 +99,9 @@ struct test_data {
         VkBuffer vertex_buffer;
         VkDeviceSize vertex_buffer_offset;
         VkRenderPass render_pass;
+        VkDescriptorSetLayout set_layout;
         VkPipelineLayout pipeline_layout;
         VkPipeline pipeline;
-        VkDescriptorSet desc_sets[2];
     } draw;
 };
 
@@ -914,6 +914,13 @@ copy_color_images_with_draw(const test_data_t *data,
                             VkImageView attachment_views[],
                             uint32_t count)
 {
+    VkDescriptorSet desc_sets[count];
+    for (uint32_t i = 0; i < count; i++) {
+        desc_sets[i] = qoAllocateDescriptorSet(t_device,
+            .descriptorPool = t_descriptor_pool,
+            .pSetLayouts = &data->draw.set_layout);
+    }
+
     VkCommandBuffer cmd = qoAllocateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmd);
     vkCmdBindVertexBuffers(cmd, /*startBinding*/ 0, /*bindingCount*/ 1,
@@ -962,7 +969,7 @@ copy_color_images_with_draw(const test_data_t *data,
             (VkWriteDescriptorSet[]) {
                 {
                     .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                    .dstSet = data->draw.desc_sets[i],
+                    .dstSet = desc_sets[i],
                     .dstBinding = 0,
                     .dstArrayElement = 0,
                     .descriptorCount = 1,
@@ -989,7 +996,7 @@ copy_color_images_with_draw(const test_data_t *data,
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                                 data->draw.pipeline_layout,
                                 /*firstSet*/ 0,
-                                1, &data->draw.desc_sets[i],
+                                1, &desc_sets[i],
                                 /*dynamicOffsetCount*/ 0,
                                 /*dynamicOffsets*/ NULL);
         vkCmdDraw(cmd, data->draw.num_vertices, /*instanceCount*/ 1,
@@ -1289,27 +1296,15 @@ init_draw_data(test_draw_data_t *draw_data)
     memcpy(qoMapMemory(t_device, vb_mem, /*offset*/ 0, vb_size, /*flags*/ 0),
            position_data, sizeof(position_data));
 
-    VkDescriptorSet desc_set0 =
-        qoAllocateDescriptorSet(t_device,
-                                .descriptorPool = t_descriptor_pool,
-                                .pSetLayouts = &set_layout);
-
-    VkDescriptorSet desc_set1 =
-        qoAllocateDescriptorSet(t_device,
-                                .descriptorPool = t_descriptor_pool,
-                                .pSetLayouts = &set_layout);
-
     // Prevent dumb bugs by initializing the struct in one shot.
     *draw_data = (test_draw_data_t) {
         .vertex_buffer = vb,
         .vertex_buffer_offset = 0,
         .num_vertices = num_vertices,
+        .set_layout = set_layout,
         .pipeline_layout = pipeline_layout,
         .pipeline = pipeline,
         .render_pass = pass,
-        .desc_sets = {
-            desc_set0, desc_set1
-        },
     };
 }
 
