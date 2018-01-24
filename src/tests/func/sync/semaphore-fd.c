@@ -45,9 +45,18 @@ struct buffer_layout {
 static void
 init_context(struct test_context *ctx, float priority)
 {
+   const char *extension_names[] = {
+      "VK_KHR_external_memory",
+      "VK_KHR_external_memory_fd",
+      "VK_KHR_external_semaphore",
+      "VK_KHR_external_semaphore_fd",
+   };
+
     VkResult result = vkCreateDevice(t_physical_dev,
         &(VkDeviceCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+            .enabledExtensionCount = 4,
+            .ppEnabledExtensionNames = extension_names,
             .queueCreateInfoCount = 1,
             .pQueueCreateInfos = &(VkDeviceQueueCreateInfo) {
                 .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
