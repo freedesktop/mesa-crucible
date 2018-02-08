@@ -43,23 +43,34 @@ struct buffer_layout {
 };
 
 static void
-init_context(struct test_context *ctx, float priority)
+init_context(struct test_context *ctx, float priority,
+             VkQueueGlobalPriorityEXT g_priority)
 {
    const char *extension_names[] = {
       "VK_KHR_external_memory",
       "VK_KHR_external_memory_fd",
       "VK_KHR_external_semaphore",
       "VK_KHR_external_semaphore_fd",
+      "VK_EXT_global_priority",
    };
+
+    bool use_global_priority =
+        t_has_ext("VK_EXT_global_priority");
+
+    VkDeviceQueueGlobalPriorityCreateInfoEXT gp_info = {
+       .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_GLOBAL_PRIORITY_CREATE_INFO_EXT,
+       .globalPriority = g_priority,
+    };
 
     VkResult result = vkCreateDevice(t_physical_dev,
         &(VkDeviceCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-            .enabledExtensionCount = 4,
+            .enabledExtensionCount = use_global_priority ? 5 : 4,
             .ppEnabledExtensionNames = extension_names,
             .queueCreateInfoCount = 1,
             .pQueueCreateInfos = &(VkDeviceQueueCreateInfo) {
                 .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+                .pNext = use_global_priority ? &gp_info : NULL,
                 .queueFamilyIndex = 0,
                 .queueCount = 1,
                 .pQueuePriorities = (float[]) { priority },
@@ -601,7 +612,7 @@ static void
 test_sanity(void)
 {
     struct test_context ctx;
-    init_context(&ctx, 1.0);
+    init_context(&ctx, 1.0, VK_QUEUE_GLOBAL_PRIORITY_MEDIUM);
 
     VkMemoryRequirements buffer_reqs =
         qoGetBufferMemoryRequirements(ctx.device, ctx.buffer);
@@ -674,8 +685,8 @@ test_opaque_fd(void)
     require_handle_type(VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR);
 
     struct test_context ctx1, ctx2;
-    init_context(&ctx1, 1.0);
-    init_context(&ctx2, 0.0);
+    init_context(&ctx1, 1.0, VK_QUEUE_GLOBAL_PRIORITY_MEDIUM);
+    init_context(&ctx2, 0.0, VK_QUEUE_GLOBAL_PRIORITY_LOW);
 
 #define GET_FUNCTION_PTR(name, device) \
     PFN_vk##name name = (PFN_vk##name)vkGetDeviceProcAddr(device, "vk"#name)
@@ -826,8 +837,8 @@ test_sync_fd(void)
     require_handle_type(VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT_KHR);
 
     struct test_context ctx1, ctx2;
-    init_context(&ctx1, 1.0);
-    init_context(&ctx2, 0.0);
+    init_context(&ctx1, 1.0, VK_QUEUE_GLOBAL_PRIORITY_MEDIUM);
+    init_context(&ctx2, 0.0, VK_QUEUE_GLOBAL_PRIORITY_LOW);
 
 #define GET_FUNCTION_PTR(name, device) \
     PFN_vk##name name = (PFN_vk##name)vkGetDeviceProcAddr(device, "vk"#name)
