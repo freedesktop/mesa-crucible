@@ -31,7 +31,7 @@ qoEnumeratePhysicalDevices(VkInstance instance, uint32_t *count,
     VkResult result;
 
     result = vkEnumeratePhysicalDevices(instance, count, physical_devices);
-    t_assert(result == VK_SUCCESS);
+    t_assert(result == VK_SUCCESS || result == VK_INCOMPLETE);
 }
 
 void
