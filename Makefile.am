@@ -76,6 +76,7 @@ bin_crucible_SOURCES = \
 	src/tests/example/images.c \
 	src/tests/example/messages.c \
 	src/tests/func/amd/amd_common.c \
+	src/tests/func/amd/gcn_shader.c \
 	src/tests/func/cmd-buffer/secondary.c \
 	src/tests/func/copy/copy-buffer.c \
 	src/tests/func/4-vertex-buffers.c \
