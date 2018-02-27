@@ -565,7 +565,7 @@ init_memory_contents(struct test_context *ctx,
 static void
 check_memory_contents(struct test_context *ctx,
                       uint32_t *data, VkDeviceMemory memory,
-                      bool multi_ctx)
+                      bool multi_ctx, bool expect_failure)
 {
     /* First, do the computation on the CPU */
     cpu_process_data(data);
@@ -590,6 +590,13 @@ check_memory_contents(struct test_context *ctx,
             .offset = 0,
             .size = sizeof(struct buffer_layout),
         });
+
+    /* If expecting a failure, do a simple memcmp. */
+    if (expect_failure) {
+        t_assert(memcmp(data, map->data, sizeof(map->data)) != 0);
+        vkUnmapMemory(ctx->device, tmp_mem);
+        return;
+    }
 
     t_assert(map->atomic == NUM_HASH_ITERATIONS);
     for (unsigned i = 0; i < NUM_HASH_ITERATIONS; i++) {
@@ -637,7 +644,7 @@ test_sanity(void)
         }
     }
 
-    check_memory_contents(&ctx, cpu_data, mem, false);
+    check_memory_contents(&ctx, cpu_data, mem, false, false);
 }
 
 test_define {
@@ -815,12 +822,102 @@ test_opaque_fd(void)
 
     logi("All compute batches queued\n");
 
-    check_memory_contents(&ctx1, cpu_data, mem1, true);
+    check_memory_contents(&ctx1, cpu_data, mem1, true, false);
 }
 
 test_define {
     .name = "func.sync.semaphore-fd.opaque-fd",
     .start = test_opaque_fd,
+    .no_image = true,
+};
+
+static void
+test_opaque_fd_no_sync(void)
+{
+    t_require_ext("VK_KHR_external_memory");
+    t_require_ext("VK_KHR_external_memory_capabilities");
+    t_require_ext("VK_KHR_external_memory_fd");
+    t_require_ext("VK_EXT_global_priority");
+
+    struct test_context ctx1, ctx2;
+    init_context(&ctx1, 1.0, VK_QUEUE_GLOBAL_PRIORITY_MEDIUM);
+    init_context(&ctx2, 0.0, VK_QUEUE_GLOBAL_PRIORITY_LOW);
+
+#define GET_FUNCTION_PTR(name, device) \
+    PFN_vk##name name = (PFN_vk##name)vkGetDeviceProcAddr(device, "vk"#name)
+    GET_FUNCTION_PTR(GetMemoryFdKHR, ctx1.device);
+#undef GET_FUNCTION_PTR
+
+    VkMemoryRequirements buffer_reqs =
+        qoGetBufferMemoryRequirements(ctx1.device, ctx1.buffer);
+
+    VkDeviceMemory mem1 =
+        qoAllocMemoryFromRequirements(ctx1.device, &buffer_reqs,
+            .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            .pNext = &(VkExportMemoryAllocateInfoKHR) {
+                .sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR,
+                .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
+            });
+
+    int fd;
+    VkResult result = GetMemoryFdKHR(ctx1.device,
+        &(VkMemoryGetFdInfoKHR) {
+            .sType = VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR,
+            .memory = mem1,
+            .handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
+        }, &fd);
+    t_assert(result == VK_SUCCESS);
+    t_assert(fd >= 0);
+
+    VkDeviceMemory mem2 =
+        qoAllocMemoryFromRequirements(ctx2.device, &buffer_reqs,
+            .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            .pNext = &(VkImportMemoryFdInfoKHR) {
+                .sType = VK_STRUCTURE_TYPE_IMPORT_MEMORY_FD_INFO_KHR,
+                .handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
+                .fd = fd,
+            });
+
+    qoBindBufferMemory(ctx1.device, ctx1.buffer, mem1, 0);
+    qoBindBufferMemory(ctx2.device, ctx2.buffer, mem2, 0);
+
+    uint32_t cpu_data[LOCAL_WORKGROUP_SIZE * 2];
+    init_memory_contents(&ctx1, cpu_data, mem1);
+
+    VkCommandBuffer cmd_buffer1 = create_command_buffer(&ctx1, 0);
+    VkCommandBuffer cmd_buffer2 = create_command_buffer(&ctx2, 1);
+
+    logi("Begin queuing batches\n");
+
+    /* NUM_HASH_ITERATIONS is odd, so we use ctx1 for both the first and
+     * last submissions.  This makes keeping track of where the memory is a
+     * bit easier.
+     */
+    for (unsigned i = 0; i < NUM_HASH_ITERATIONS; i++) {
+        VkSubmitInfo submit = {
+            .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+            .commandBufferCount = 1,
+        };
+
+        if ((i & 1) == 0) {
+            submit.pCommandBuffers = &cmd_buffer1;
+            result = vkQueueSubmit(ctx1.queue, 1, &submit, VK_NULL_HANDLE);
+            t_assert(result == VK_SUCCESS);
+        } else {
+            submit.pCommandBuffers = &cmd_buffer2;
+            result = vkQueueSubmit(ctx2.queue, 1, &submit, VK_NULL_HANDLE);
+            t_assert(result == VK_SUCCESS);
+        }
+    }
+
+    logi("All compute batches queued\n");
+
+    check_memory_contents(&ctx1, cpu_data, mem1, true, true);
+}
+
+test_define {
+    .name = "func.sync.semaphore-fd.opaque-fd-no-sync",
+    .start = test_opaque_fd_no_sync,
     .no_image = true,
 };
 
@@ -966,7 +1063,7 @@ test_sync_fd(void)
 
     logi("All compute batches queued\n");
 
-    check_memory_contents(&ctx1, cpu_data, mem1, true);
+    check_memory_contents(&ctx1, cpu_data, mem1, true, false);
 }
 
 test_define {
