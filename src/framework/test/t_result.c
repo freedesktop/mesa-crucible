@@ -186,22 +186,28 @@ __t_assertfv(const char *file, int line, bool cond, const char *cond_string,
     t_end(TEST_RESULT_FAIL);
 }
 
-void
-t_require_ext(const char *name)
+bool
+t_has_ext(const char *name)
 {
     GET_CURRENT_TEST(t);
 
     for (uint32_t i = 0; i < t->vk.instance_extension_count; i++) {
         if (!strcmp(name, t->vk.instance_extension_props[i].extensionName))
-            return;
+            return true;
     }
 
     for (uint32_t i = 0; i < t->vk.device_extension_count; i++) {
         if (!strcmp(name, t->vk.device_extension_props[i].extensionName))
-            return;
+            return true;
     }
+    return false;
+}
 
-    t_skip();
+void
+t_require_ext(const char *name)
+{
+    if (!t_has_ext(name))
+        t_skip();
 }
 
 static bool
