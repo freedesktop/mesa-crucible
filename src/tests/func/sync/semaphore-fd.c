@@ -916,7 +916,7 @@ test_opaque_fd_no_sync(void)
 }
 
 test_define {
-    .name = "func.sync.semaphore-fd.opaque-fd-no-sync",
+    .name = "func.sync.semaphore-fd.no-sync",
     .start = test_opaque_fd_no_sync,
     .no_image = true,
 };
