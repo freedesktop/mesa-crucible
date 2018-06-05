@@ -1,4 +1,5 @@
-Crucible: a Vulkan testsuite
+Crucible: a Vulkan test suite
+=============================
 
   cru·ci·ble
   ˈkro͞osəb(ə)l/
@@ -12,7 +13,8 @@ Crucible: a Vulkan testsuite
 
 
 Feature Summary
-===============
+---------------
+
 - Crucible requires no window system, as all tests run headless. To allow
   inspection of test images, tests may optionally dumping them to PNG files.
   (See option '--dump' in crucible-run.1.txt).
@@ -38,7 +40,8 @@ Feature Summary
 
 
 Supported Platforms
-===================
+-------------------
+
 - Crucible targets version 0.138.2 of vulkan.h.
 
 - Crucible requires a C11 compiler. This language requirement may be lowered to
@@ -65,5 +68,6 @@ Supported Platforms
 
 
 License
-=======
+-------
+
 Crucible is opensource software. See the LICENSE file for details.
