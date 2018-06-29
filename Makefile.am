@@ -98,6 +98,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/interleaved-cmd-buffers.c \
 	src/tests/func/miptree/miptree.c \
 	src/tests/func/push-constants/basic.c \
+	src/tests/func/shader/constants.c \
 	src/tests/func/shader/fragcoord.c \
 	src/tests/func/shader/pack_unpack.c \
 	src/tests/func/shader_ballot/ext_shader_ballot.c \
@@ -144,6 +145,7 @@ BUILT_SOURCES = \
 	src/tests/func/push-constants/basic-spirv.h \
 	src/tests/func/amd/gcn_shader-spirv.h \
 	src/tests/func/amd/shader_trinary_minmax-spirv.h \
+	src/tests/func/shader/constants-spirv.h \
 	src/tests/func/shader/fragcoord-spirv.h \
 	src/tests/func/shader/pack_unpack-spirv.h \
 	src/tests/func/shader_ballot/ext_shader_ballot-spirv.h \
