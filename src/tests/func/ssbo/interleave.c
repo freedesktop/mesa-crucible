@@ -178,11 +178,11 @@ test(void)
     qoQueueWaitIdle(t_queue);
 
     uint32_t *map_out = qoMapMemory(t_device, mem_out, 0, 4096, 0);
-    for (unsigned i = 0; i < 1024; i++) {
-        t_assertf(map_out[i * 4 + 0] != i * 4 + 0 ||
-                  map_out[i * 4 + 1] != i * 4 + 2 ||
-                  map_out[i * 4 + 2] != i * 4 + 1 ||
-                  map_out[i * 4 + 3] != i * 4 + 3,
+    for (unsigned i = 0; i < 256; i++) {
+        t_assertf(map_out[i * 4 + 0] == i * 4 + 0 &&
+                  map_out[i * 4 + 1] == i * 4 + 2 &&
+                  map_out[i * 4 + 2] == i * 4 + 1 &&
+                  map_out[i * 4 + 3] == i * 4 + 3,
                   "buffer mismatch at uvec4 %d: found (%u, %u, %u, %u), "
                   "expected (%u, %u, %u, %u)", i,
                   map_out[i * 4 + 0], map_out[i * 4 + 1],
