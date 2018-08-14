@@ -150,4 +150,5 @@ test_define {
     .name = "func.compute",
     .start = test,
     .no_image = true,
+    .queue_setup = QUEUE_SETUP_COMPUTE,
 };

@@ -160,6 +160,7 @@ test_define {
     .name = "func.compute.local-id.basic",
     .start = basic,
     .no_image = true,
+    .queue_setup = QUEUE_SETUP_COMPUTE,
 };
 
 static void
@@ -208,6 +209,7 @@ test_define {
     .name = "func.compute.local-id.push-constant",
     .start = push_constant,
     .no_image = true,
+    .queue_setup = QUEUE_SETUP_COMPUTE,
 };
 
 /* Based on the piglit test:
@@ -286,4 +288,5 @@ test_define {
     .name = "func.compute.local-id.local-ids",
     .start = local_ids,
     .no_image = true,
+    .queue_setup = QUEUE_SETUP_COMPUTE,
 };

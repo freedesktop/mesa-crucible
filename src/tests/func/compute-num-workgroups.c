@@ -184,6 +184,7 @@ test_define {
     .name = "func.compute.num-workgroups.basic",
     .start = basic,
     .no_image = true,
+    .queue_setup = QUEUE_SETUP_COMPUTE,
 };
 
 static void
@@ -240,4 +241,5 @@ test_define {
     .name = "func.compute.num-workgroups.indirect",
     .start = indirect,
     .no_image = true,
+    .queue_setup = QUEUE_SETUP_COMPUTE,
 };
