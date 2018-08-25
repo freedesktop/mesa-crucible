@@ -71,7 +71,7 @@ t_dump_image_fv(cru_image_t *image, const char *format, va_list va)
         return;
 
     string_t filename = STRING_INIT;
-    string_appendf(&filename, t_name);
+    string_append_cstr(&filename, t_name);
     string_append_char(&filename, '.');
     string_vappendf(&filename, format, va);
 

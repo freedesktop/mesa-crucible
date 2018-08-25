@@ -78,7 +78,7 @@ __t_skipfv(const char *file, int line, const char *format, va_list va)
         string_vappendf(&s, format, va);
     }
 
-    logi(string_data(&s));
+    logi("%s", string_data(&s));
     string_finish(&s);
 
     __t_skip_silent();
@@ -127,7 +127,7 @@ __t_failfv(const char *file, int line, const char *format, va_list va)
         string_vappendf(&s, format, va);
     }
 
-    loge(string_data(&s));
+    loge("%s", string_data(&s));
     string_finish(&s);
 
     __t_fail_silent();
@@ -179,7 +179,7 @@ __t_assertfv(const char *file, int line, bool cond, const char *cond_string,
         string_t s = STRING_INIT;
         string_appendf(&s, "%s:%d: ", file, line);
         string_vappendf(&s, format, va);
-        loge(string_data(&s));
+        loge("%s", string_data(&s));
         string_finish(&s);
     }
 

@@ -31,6 +31,7 @@ CPPFLAGS = \
 
 common_CFLAGS = -Wall -O0 -g3 \
 	-Werror=format \
+	-Werror=format-security \
 	-Werror=incompatible-pointer-types \
 	-Werror=int-conversion \
 	$(libpng_CFLAGS) \
@@ -72,6 +73,7 @@ bin_crucible_SOURCES = \
 	src/framework/test/test_def.c \
 	src/qonos/qonos.c \
 	src/qonos/qonos_pipeline.c \
+	src/tests/bug/104809.c \
 	src/tests/example/basic.c \
 	src/tests/example/images.c \
 	src/tests/example/messages.c \
@@ -127,6 +129,7 @@ bin_crucible_SOURCES = \
 BUILT_SOURCES = \
 	src/qonos/qonos_pipeline-spirv.h \
 	src/util/simple_pipeline-spirv.h \
+	src/tests/bug/104809-spirv.h \
 	src/tests/func/4-vertex-buffers-spirv.h \
 	src/tests/func/depthstencil/basic-spirv.h \
 	src/tests/func/depthstencil/arrayed-clear-spirv.h \

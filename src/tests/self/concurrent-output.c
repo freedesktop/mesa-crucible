@@ -45,7 +45,7 @@ test_logi_a(void)
     char *a = mk_big_str('a');
 
     for (int i = 0; i < 1024; ++i) {
-        logi(a);
+        logi("%s", a);
     }
 }
 
@@ -61,7 +61,7 @@ test_logi_b(void)
     char *b = mk_big_str('b');
 
     for (int i = 0; i < 1024; ++i) {
-        logi(b);
+        logi("%s", b);
     }
 }
 
