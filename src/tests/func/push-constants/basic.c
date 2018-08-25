@@ -44,29 +44,6 @@ push_fs_color(VkPipelineLayout layout, unsigned first_component, unsigned num_co
 static void
 test_push_constants(void)
 {
-    VkRenderPass pass = qoCreateRenderPass(t_device,
-        .attachmentCount = 1,
-        .pAttachments = (VkAttachmentDescription[]) {
-            {
-                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
-                .format = VK_FORMAT_R8G8B8A8_UNORM,
-                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-            },
-        },
-        .subpassCount = 1,
-        .pSubpasses = (VkSubpassDescription[]) {
-            {
-                QO_SUBPASS_DESCRIPTION_DEFAULTS,
-                .colorAttachmentCount = 1,
-                .pColorAttachments = (VkAttachmentReference[]) {
-                    {
-                        .attachment = 0,
-                        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                    },
-                },
-            }
-        });
-
     VkPipelineVertexInputStateCreateInfo vi_info = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
         .vertexBindingDescriptionCount = 1,
@@ -139,7 +116,7 @@ test_push_constants(void)
         &(VkGraphicsPipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .pVertexInputState = &vi_info,
-            .renderPass = pass,
+            .renderPass = t_render_pass,
             .subpass = 0,
             .layout = pipeline_layout,
         }});
@@ -163,7 +140,7 @@ test_push_constants(void)
     vkCmdBeginRenderPass(t_cmd_buffer,
         &(VkRenderPassBeginInfo) {
             .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-            .renderPass = pass,
+            .renderPass = t_render_pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
             .clearValueCount = 1,

@@ -152,6 +152,7 @@ struct test {
         VkPipelineCache pipeline_cache;
         VkCommandPool cmd_pool;
         VkCommandBuffer cmd_buffer;
+        VkRenderPass render_pass;
         VkFramebuffer framebuffer;
 
         VkImage color_image;

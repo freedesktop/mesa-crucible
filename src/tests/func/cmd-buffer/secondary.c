@@ -79,33 +79,10 @@ create_pipeline(VkRenderPass pass, VkPipelineLayout layout)
 static VkRenderPass
 create_and_begin_render_pass(void)
 {
-    VkRenderPass pass = qoCreateRenderPass(t_device,
-        .attachmentCount = 1,
-        .pAttachments = (VkAttachmentDescription[]) {
-            {
-                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
-                .format = VK_FORMAT_R8G8B8A8_UNORM,
-                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-            },
-        },
-        .subpassCount = 1,
-        .pSubpasses = (VkSubpassDescription[]) {
-            {
-                QO_SUBPASS_DESCRIPTION_DEFAULTS,
-                .colorAttachmentCount = 1,
-                .pColorAttachments = (VkAttachmentReference[]) {
-                    {
-                        .attachment = 0,
-                        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                    },
-                },
-            }
-        });
-
     vkCmdBeginRenderPass(t_cmd_buffer,
         &(VkRenderPassBeginInfo) {
             .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-            .renderPass = pass,
+            .renderPass = t_render_pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
             .clearValueCount = 1,
@@ -114,7 +91,7 @@ create_and_begin_render_pass(void)
             }
         }, VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
 
-    return pass;
+    return t_render_pass;
 }
 
 static VkCommandBuffer

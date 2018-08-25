@@ -137,6 +137,8 @@ t_setup_framebuffer(void)
             {
                 QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
                 .format = VK_FORMAT_R8G8B8A8_UNORM,
+                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+                .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
             },
         },
         .subpassCount = 1,
@@ -147,13 +149,13 @@ t_setup_framebuffer(void)
                 .pColorAttachments = (VkAttachmentReference[]) {
                     {
                         .attachment = 0,
-                        .layout = VK_IMAGE_LAYOUT_GENERAL,
+                        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
                     },
                 },
             }
         });
 
-    VkRenderPass pass = color_pass;
+    t->vk.render_pass = color_pass;
 
     if (t->def->depthstencil_format != VK_FORMAT_UNDEFINED) {
         VkFormatProperties depth_format_props;
@@ -236,10 +238,14 @@ t_setup_framebuffer(void)
                 {
                     QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
                     .format = VK_FORMAT_R8G8B8A8_UNORM,
+                    .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+                    .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
                 },
                 {
                     QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
                     .format = t->def->depthstencil_format,
+                    .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+                    .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
                 },
             },
             .subpassCount = 1,
@@ -250,21 +256,21 @@ t_setup_framebuffer(void)
                     .pColorAttachments = (VkAttachmentReference[]) {
                         {
                             .attachment = 0,
-                            .layout = VK_IMAGE_LAYOUT_GENERAL,
+                            .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
                         },
                     },
                     .pDepthStencilAttachment = &(VkAttachmentReference) {
                         .attachment = 1,
-                        .layout = VK_IMAGE_LAYOUT_GENERAL,
+                        .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
                     },
                 },
             });
 
-        pass = color_depth_pass;
+        t->vk.render_pass = color_depth_pass;
     }
 
     t->vk.framebuffer = qoCreateFramebuffer(t->vk.device,
-        .renderPass = pass,
+        .renderPass = t->vk.render_pass,
         .width = t->ref.width,
         .height = t->ref.height,
         .layers = 1,

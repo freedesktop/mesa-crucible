@@ -45,29 +45,6 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
                            VkShaderStageFlagBits ubo_stage,
                            bool use_dynamic_offsets)
 {
-    VkRenderPass pass = qoCreateRenderPass(t_device,
-        .attachmentCount = 1,
-        .pAttachments = (VkAttachmentDescription[]) {
-            {
-                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
-                .format = VK_FORMAT_R8G8B8A8_UNORM,
-                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-            },
-        },
-        .subpassCount = 1,
-        .pSubpasses = (VkSubpassDescription[]) {
-            {
-                QO_SUBPASS_DESCRIPTION_DEFAULTS,
-                .colorAttachmentCount = 1,
-                .pColorAttachments = (VkAttachmentReference[]) {
-                    {
-                        .attachment = 0,
-                        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                    },
-                },
-            }
-        });
-
     //  Create the descriptor set layout.
     VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
             .bindingCount = 1,
@@ -120,7 +97,7 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
             .pVertexInputState = &vi_create_info,
             .flags = 0,
             .layout = pipeline_layout,
-            .renderPass = pass,
+            .renderPass = t_render_pass,
             .subpass = 0,
         }});
 
@@ -175,7 +152,7 @@ test_lots_of_surface_state(VkShaderModule vs, VkShaderModule fs,
     vkCmdBeginRenderPass(t_cmd_buffer,
         &(VkRenderPassBeginInfo) {
             .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-            .renderPass = pass,
+            .renderPass = t_render_pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
             .clearValueCount = 1,

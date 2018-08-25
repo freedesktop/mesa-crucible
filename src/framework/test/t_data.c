@@ -148,6 +148,17 @@ __t_depthstencil_image_view(void)
     return &t->vk.depthstencil_image_view;
 }
 
+const VkRenderPass *
+__t_render_pass(void)
+{
+    ASSERT_TEST_IN_MAJOR_PHASE;
+    GET_CURRENT_TEST(t);
+
+    t_assert(!t->def->no_image);
+
+    return &t->vk.render_pass;
+}
+
 const VkFramebuffer *
 __t_framebuffer(void)
 {

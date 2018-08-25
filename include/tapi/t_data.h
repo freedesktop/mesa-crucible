@@ -48,6 +48,7 @@ typedef struct cru_image cru_image_t;
 #define t_color_image_view (*__t_color_image_view())
 #define t_depthstencil_image (*__t_depthstencil_image())
 #define t_depthstencil_image_view (*__t_depthstencil_image_view())
+#define t_render_pass (*__t_render_pass())
 #define t_framebuffer (*__t_framebuffer())
 #define t_pipeline_cache (*__t_pipeline_cache())
 #define t_width (*__t_width())
@@ -71,6 +72,7 @@ const VkImage *__t_color_image(void);
 const VkImageView *__t_color_image_view(void);
 const VkImage *__t_depthstencil_image(void);
 const VkImageView *__t_depthstencil_image_view(void);
+const VkRenderPass *__t_render_pass(void);
 const VkFramebuffer *__t_framebuffer(void);
 const VkPipelineCache *__t_pipeline_cache(void);
 const uint32_t *__t_height(void);

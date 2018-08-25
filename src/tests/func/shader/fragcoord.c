@@ -26,31 +26,6 @@
 static void
 test_fragcoord(void)
 {
-    VkRenderPass pass = qoCreateRenderPass(t_device,
-        .attachmentCount = 1,
-        .pAttachments = (VkAttachmentDescription[]) {
-            {
-                QO_ATTACHMENT_DESCRIPTION_DEFAULTS,
-                .format = VK_FORMAT_R8G8B8A8_UNORM,
-                .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-            },
-        },
-        .subpassCount = 1,
-        .pSubpasses = (VkSubpassDescription[]) {
-            {
-                QO_SUBPASS_DESCRIPTION_DEFAULTS,
-                .colorAttachmentCount = 1,
-                .pColorAttachments = (VkAttachmentReference[]) {
-                    {
-                        .attachment = 0,
-                        .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                    },
-                },
-                .preserveAttachmentCount = 1,
-                .pPreserveAttachments = (uint32_t[]) { 0 },
-            }
-        });
-
     VkShaderModule vs = qoCreateShaderModuleGLSL(t_device, VERTEX,
         layout(location = 0) in vec4 a_position;
         layout(location = 0) out vec2 v_attr;
@@ -110,7 +85,7 @@ test_fragcoord(void)
             },
             .pVertexInputState = &vi_info,
             .layout = pipeline_layout,
-            .renderPass = pass,
+            .renderPass = t_render_pass,
             .subpass = 0,
         }});
 
@@ -135,7 +110,7 @@ test_fragcoord(void)
     vkCmdBeginRenderPass(t_cmd_buffer,
         &(VkRenderPassBeginInfo) {
             .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-            .renderPass = pass,
+            .renderPass = t_render_pass,
             .framebuffer = t_framebuffer,
             .renderArea = { { 0, 0 }, { t_width, t_height } },
             .clearValueCount = 1,
