@@ -108,7 +108,6 @@ log_tag_v(const char *tag, pid_t pid, const char *format, va_list va)
                 printf("crucible [master]: %s: ", tag);
             }
         } else {
-            assert(pid > 0 && pid <= UINT16_MAX);
             int ipid = pid; // printf likes standard data types better
             if (log_has_aligned_tags) {
                 printf("crucible [%-6d]: %-7s: ", ipid, tag);
