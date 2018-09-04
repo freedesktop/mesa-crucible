@@ -34,7 +34,7 @@ color_1d_params_iter = (
     for format in (Format('r8g8b8a8-unorm', 'VK_FORMAT_R8G8B8A8_UNORM'),)
     for aspect in ('color',)
     for view in ('1d',)
-    for extent in (Extent3D(512, 1, 1),)
+    for extent in (Extent3D(512, 1, 1), Extent3D(16384, 1, 1),)
     for levels in (1, 2)
     for array_length in (1, 2)
     for upload_method in (
@@ -63,7 +63,7 @@ color_2d_params_iter = (
     for format in (Format('r8g8b8a8-unorm', 'VK_FORMAT_R8G8B8A8_UNORM'),)
     for aspect in ('color',)
     for view in ('2d',)
-    for extent in (Extent3D(512, 512, 1),)
+    for extent in (Extent3D(512, 512, 1), Extent3D(16384, 32, 1), Extent3D(32, 16384, 1),)
     for levels in (1, 2)
     for array_length in (1, 2)
     for upload_method in (

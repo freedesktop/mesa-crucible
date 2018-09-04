@@ -313,10 +313,16 @@ mipslice_get_template_filename(const cru_format_info_t *format_info,
 
     switch (params->view_type) {
     case VK_IMAGE_VIEW_TYPE_1D:
-    case VK_IMAGE_VIEW_TYPE_1D_ARRAY:
+    case VK_IMAGE_VIEW_TYPE_1D_ARRAY: {
+        uint32_t height = level_width;
+	if (level_width == 16384)
+	    height = 32;
+	else if (level_width == 8192)
+	    height = 16;
         // Reuse 2d image files for 1d images.
-        string_appendf(&filename, "-%ux%u.png", level_width, level_width);
+        string_appendf(&filename, "-%ux%u.png", level_width, height);
         break;
+    }
     case VK_IMAGE_VIEW_TYPE_2D:
     case VK_IMAGE_VIEW_TYPE_2D_ARRAY:
     case VK_IMAGE_VIEW_TYPE_3D:
