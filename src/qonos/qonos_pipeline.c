@@ -68,7 +68,15 @@ qoCreateGraphicsPipeline(VkDevice device,
         pipeline_info.pInputAssemblyState = &ia_info;
     }
 
-    if (pipeline_info.pViewportState == NULL) {
+    if (pipeline_info.pRasterizationState == NULL) {
+        rs_info = (VkPipelineRasterizationStateCreateInfo) {
+            QO_PIPELINE_RASTERIZATION_STATE_CREATE_INFO_DEFAULTS,
+        };
+        pipeline_info.pRasterizationState = &rs_info;
+    }
+
+    if (!pipeline_info.pRasterizationState->rasterizerDiscardEnable &&
+        pipeline_info.pViewportState == NULL) {
         vp_info = (VkPipelineViewportStateCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
             .viewportCount = 1,
@@ -93,13 +101,6 @@ qoCreateGraphicsPipeline(VkDevice device,
         }
 
         pipeline_info.pViewportState = &vp_info;
-    }
-
-    if (pipeline_info.pRasterizationState == NULL) {
-        rs_info = (VkPipelineRasterizationStateCreateInfo) {
-            QO_PIPELINE_RASTERIZATION_STATE_CREATE_INFO_DEFAULTS,
-        };
-        pipeline_info.pRasterizationState = &rs_info;
     }
 
     if (pipeline_info.pMultisampleState == NULL) {
