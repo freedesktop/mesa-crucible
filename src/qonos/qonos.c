@@ -319,6 +319,21 @@ __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info)
     return view;
 }
 
+VkQueryPool
+__qoCreateQueryPool(VkDevice dev, const VkQueryPoolCreateInfo *info)
+{
+    VkQueryPool pool = VK_NULL_HANDLE;
+    VkResult result;
+
+    result = vkCreateQueryPool(dev, info, NULL, &pool);
+
+    t_assert(result == VK_SUCCESS);
+    t_assert(pool != VK_NULL_HANDLE);
+    t_cleanup_push_vk_query_pool(dev, pool);
+
+    return pool;
+}
+
 VkCommandBuffer
 __qoAllocateCommandBuffer(VkDevice dev, VkCommandPool pool,
                           const VkCommandBufferAllocateInfo *info)

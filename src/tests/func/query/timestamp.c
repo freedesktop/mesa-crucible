@@ -28,13 +28,9 @@
 static uint64_t
 get_timestamp(void)
 {
-    VkQueryPool pool;
-    vkCreateQueryPool(t_device,
-        &(VkQueryPoolCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO,
-            .queryType = VK_QUERY_TYPE_TIMESTAMP,
-            .queryCount = 2,
-        }, NULL, &pool);
+    VkQueryPool pool = qoCreateQueryPool(t_device,
+                                         .queryType = VK_QUERY_TYPE_TIMESTAMP,
+                                         .queryCount = 2);
 
     VkCommandBuffer cmdBuffer = qoAllocateCommandBuffer(t_device, t_cmd_pool);
     qoBeginCommandBuffer(cmdBuffer);

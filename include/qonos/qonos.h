@@ -136,6 +136,11 @@ typedef struct QoShaderModuleCreateInfo_ {
 #define QO_BUFFER_VIEW_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO
 
+#define QO_QUERY_POOL_CREATE_INFO_DEFAULTS \
+    .sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO, \
+    .flags = 0, \
+    .queryCount = 1
+
 #define QO_PIPELINE_CACHE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO, \
     .initialDataSize = 0, \
@@ -353,6 +358,17 @@ VkBufferView qoCreateBufferView(VkDevice dev, ...);
 #endif
 
 #ifdef DOXYGEN
+VkQueryPool qoCreateQueryPool(VkDevice dev, ...);
+#else
+#define qoCreateQueryPool(dev, ...) \
+    __qoCreateQueryPool(dev, \
+        &(VkQueryPoolCreateInfo) { \
+            QO_QUERY_POOL_CREATE_INFO_DEFAULTS, \
+            ##__VA_ARGS__ , \
+        })
+#endif
+
+#ifdef DOXYGEN
 VkPipelineCacheCreateInfo qoCreatePipelineCache(VkDevice dev, ...);
 #else
 #define qoCreatePipelineCache(dev, ...) \
@@ -502,6 +518,7 @@ VkDeviceMemory __qoAllocBufferMemory(VkDevice dev, VkBuffer buffer, const QoMemo
 VkDeviceMemory __qoAllocImageMemory(VkDevice dev, VkImage image, const QoMemoryAllocateFromRequirementsInfo *info);
 VkBuffer __qoCreateBuffer(VkDevice dev, const VkBufferCreateInfo *info);
 VkBufferView __qoCreateBufferView(VkDevice dev, const VkBufferViewCreateInfo *info);
+VkQueryPool __qoCreateQueryPool(VkDevice dev, const VkQueryPoolCreateInfo *info);
 VkPipelineCache __qoCreatePipelineCache(VkDevice dev, const VkPipelineCacheCreateInfo *info);
 VkPipelineLayout __qoCreatePipelineLayout(VkDevice dev, const VkPipelineLayoutCreateInfo *info);
 VkSampler __qoCreateSampler(VkDevice dev, const VkSamplerCreateInfo *info);
