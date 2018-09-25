@@ -207,7 +207,7 @@ void
 t_require_ext(const char *name)
 {
     if (!t_has_ext(name))
-        t_skip();
+        t_skipf("missing required extension %s", name);
 }
 
 static bool
