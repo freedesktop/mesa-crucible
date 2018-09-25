@@ -100,6 +100,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/compute-num-workgroups.c \
 	src/tests/func/interleaved-cmd-buffers.c \
 	src/tests/func/miptree/miptree.c \
+	src/tests/func/multiview.c \
 	src/tests/func/push-constants/basic.c \
 	src/tests/func/shader/constants.c \
 	src/tests/func/shader/fragcoord.c \
@@ -147,6 +148,7 @@ BUILT_SOURCES = \
 	src/tests/func/compute-num-workgroups-spirv.h \
 	src/tests/func/miptree/miptree-spirv.h \
 	src/tests/func/miptree/miptree_gen.c \
+	src/tests/func/multiview-spirv.h \
 	src/tests/func/push-constants/basic-spirv.h \
 	src/tests/func/amd/gcn_shader-spirv.h \
 	src/tests/func/amd/shader_trinary_minmax-spirv.h \
