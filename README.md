@@ -67,6 +67,15 @@ Supported Platforms
     - Other: Not yet tested.
 
 
+Contributing
+------------
+
+Crucible uses merge requests in https://gitlab.freedesktop.org/mesa/crucible
+for code review.
+
+Read the HACKING file for information about how the code is organized.
+
+
 License
 -------
 
