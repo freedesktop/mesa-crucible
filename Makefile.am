@@ -113,6 +113,7 @@ bin_crucible_SOURCES = \
 	src/tests/stress/lots-of-surface-state.c \
 	src/tests/stress/buffer_limit.c \
 	src/tests/self/concurrent-output.c \
+	src/tests/func/calibrated-timestamps.c \
 	src/util/cru_cleanup.c \
 	src/util/cru_format.c \
 	src/util/cru_image.c \
