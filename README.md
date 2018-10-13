@@ -42,8 +42,6 @@ Feature Summary
 Supported Platforms
 -------------------
 
-- Crucible targets version 0.138.2 of vulkan.h.
-
 - Crucible requires a C11 compiler. This language requirement may be lowered to
   C99 for the sake of portability. (The language requirement will *not* be
   lowered to C90).
