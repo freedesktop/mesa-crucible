@@ -69,7 +69,9 @@ Contributing
 ------------
 
 Crucible uses merge requests in https://gitlab.freedesktop.org/mesa/crucible
-for code review.
+for code review.  When submitting merge requests, please check the box labeled
+"Allow commits from members who can merge to the target branch".  This allows
+maintainers to rebase your branch prior to merging.
 
 Read the HACKING file for information about how the code is organized.
 
