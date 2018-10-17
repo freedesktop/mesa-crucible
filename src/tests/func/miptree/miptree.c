@@ -855,6 +855,24 @@ miptree_upload_copy_from_linear_image(const test_data_t *data)
             },
         };
 
+        vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_HOST_BIT,
+                             VK_PIPELINE_STAGE_TRANSFER_BIT,
+                             0, 0, NULL, 0, NULL, 1,
+                             &(VkImageMemoryBarrier) {
+                                 .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+                                 .srcAccessMask = 0,
+                                 .dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
+                                 .oldLayout = VK_IMAGE_LAYOUT_PREINITIALIZED,
+                                 .newLayout = VK_IMAGE_LAYOUT_GENERAL,
+                                 .image = slice->src_vk_image,
+                                 .subresourceRange = {
+                                     .aspectMask = params->aspect,
+                                     .baseMipLevel = 0,
+                                     .levelCount = 1,
+                                     .baseArrayLayer = 0,
+                                     .layerCount = 1,
+                                 }
+                             });
         vkCmdCopyImage(cmd, slice->src_vk_image, VK_IMAGE_LAYOUT_GENERAL,
                        mt->image, VK_IMAGE_LAYOUT_GENERAL,
                        1, &copy);
@@ -903,6 +921,24 @@ miptree_download_copy_to_linear_image(const test_data_t *data)
             },
         };
 
+        vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_HOST_BIT,
+                             VK_PIPELINE_STAGE_TRANSFER_BIT,
+                             0, 0, NULL, 0, NULL, 1,
+                             &(VkImageMemoryBarrier) {
+                               .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+                               .srcAccessMask = 0,
+                               .dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
+                               .oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+                               .newLayout = VK_IMAGE_LAYOUT_GENERAL,
+                               .image = slice->dest_vk_image,
+                               .subresourceRange = {
+                                 .aspectMask = params->aspect,
+                                 .baseMipLevel = 0,
+                                 .levelCount = 1,
+                                 .baseArrayLayer = 0,
+                                 .layerCount = 1,
+                               }
+                           });
         vkCmdCopyImage(cmd, mt->image, VK_IMAGE_LAYOUT_GENERAL,
                        slice->dest_vk_image, VK_IMAGE_LAYOUT_GENERAL,
                        1, &copy);
