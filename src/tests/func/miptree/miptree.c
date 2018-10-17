@@ -591,7 +591,11 @@ miptree_create(void)
                         .depth = 1,
                     },
                     .tiling = VK_IMAGE_TILING_LINEAR,
+                    .initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED,
                     .usage = src_usage);
+                VkMemoryRequirements mem_reqs;
+                vkGetImageMemoryRequirements(t_device, src_vk_image, &mem_reqs);
+                assert(mem_reqs.size <= buffer_size);
                 qoBindImageMemory(t_device, src_vk_image, src_buffer_mem,
                                   buffer_offset);
                 break;
@@ -630,6 +634,9 @@ miptree_create(void)
                     },
                     .tiling = VK_IMAGE_TILING_LINEAR,
                     .usage = dest_usage);
+                VkMemoryRequirements mem_reqs;
+                vkGetImageMemoryRequirements(t_device, dest_vk_image, &mem_reqs);
+                assert(mem_reqs.size <= buffer_size);
                 qoBindImageMemory(t_device, dest_vk_image, dest_buffer_mem,
                                   buffer_offset);
                 break;
