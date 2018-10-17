@@ -558,12 +558,11 @@ miptree_create(void)
 
             uint32_t src_usage, dest_usage;
             VkFormat dest_format;
-            VkImage src_vk_image;
-            VkImage dest_vk_image;
+            VkImage src_vk_image = VK_NULL_HANDLE;
+            VkImage dest_vk_image = VK_NULL_HANDLE;
 
             switch (params->upload_method) {
             case MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER:
-                src_vk_image = (VkImage) {0}; // unused
                 break;
             case MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE:
             case MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW:
@@ -600,7 +599,6 @@ miptree_create(void)
 
             switch (params->download_method) {
             case MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER:
-                dest_vk_image = (VkImage) {0}; // unused
                 break;
             case MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE:
             case MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW:
