@@ -510,7 +510,7 @@ miptree_create(void)
         .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
     VkBuffer dest_buffer = qoCreateBuffer(t_device,
         .size = buffer_size,
-        .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+        .usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT);
 
     VkDeviceMemory image_mem = qoAllocImageMemory(t_device, image,
         .properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
