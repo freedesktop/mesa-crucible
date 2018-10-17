@@ -226,7 +226,7 @@ typedef struct QoShaderModuleCreateInfo_ {
 
 #define QO_ATTACHMENT_DESCRIPTION_DEFAULTS \
     .samples = VK_SAMPLE_COUNT_1_BIT, \
-    .loadOp = VK_ATTACHMENT_LOAD_OP_LOAD, \
+    .loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE, \
     .storeOp = VK_ATTACHMENT_STORE_OP_STORE, \
     .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED, \
     .finalLayout = VK_IMAGE_LAYOUT_GENERAL
