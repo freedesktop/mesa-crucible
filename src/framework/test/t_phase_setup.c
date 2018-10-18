@@ -294,7 +294,7 @@ t_setup_descriptor_pool(void)
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
         .pNext = NULL,
         .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-        .maxSets = 4,
+        .maxSets = 8,
         .poolSizeCount = VK_DESCRIPTOR_TYPE_RANGE_SIZE,
         .pPoolSizes = pool_sizes
     };
