@@ -322,6 +322,19 @@ mipslice_get_template_filename(const cru_format_info_t *format_info,
     return filename;
 }
 
+static void
+can_create_image(VkImageType type, VkImageTiling tiling,
+                 uint32_t usage, VkFormat format)
+{
+    VkImageFormatProperties fmt_properties;
+    VkResult result =
+              vkGetPhysicalDeviceImageFormatProperties(t_physical_dev, format,
+                                                       type, tiling, usage,
+                                                       0, &fmt_properties);
+    if (result == VK_ERROR_FORMAT_NOT_SUPPORTED)
+       t_end(TEST_RESULT_SKIP);
+}
+
 /// Calculate a buffer size that can hold all subimages of the miptree.
 static size_t
 miptree_calc_buffer_size(void)
@@ -333,7 +346,7 @@ miptree_calc_buffer_size(void)
     const uint32_t width = p->width;
     const uint32_t height = p->height;
     const uint32_t depth = p->depth;
-
+    bool need_img_size = false;
     switch (p->view_type) {
         case VK_IMAGE_VIEW_TYPE_1D:
         case VK_IMAGE_VIEW_TYPE_1D_ARRAY:
@@ -346,9 +359,43 @@ miptree_calc_buffer_size(void)
             break;
     }
 
+    if (p->upload_method == MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE ||
+        p->download_method == MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE) {
+        need_img_size = true;
+    }
+
     for (uint32_t l = 0; l < p->levels; ++l) {
-        buffer_size += cpp * cru_minify(width, l) *
-                             cru_minify(height, l) *
+        int level_width = cru_minify(width, l);
+        int level_height = cru_minify(height, l);
+        if (need_img_size) {
+            VkImageCreateInfo info = {
+                .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+                .imageType = VK_IMAGE_TYPE_2D,
+                .format = p->format,
+                .mipLevels = 1,
+                .arrayLayers = 1,
+                .extent = {
+                    .width = level_width,
+                    .height = level_height,
+                    .depth = 1,
+                },
+                .samples = 1,
+                .tiling = VK_IMAGE_TILING_LINEAR,
+                .initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED,
+                .usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+            };
+
+            can_create_image(VK_IMAGE_TYPE_2D, VK_IMAGE_TILING_LINEAR,
+                             VK_IMAGE_USAGE_TRANSFER_SRC_BIT, p->format);
+            VkImage test_vk_image;
+            vkCreateImage(t_device, &info, NULL, &test_vk_image);
+
+            VkMemoryRequirements mem_reqs;
+            vkGetImageMemoryRequirements(t_device, test_vk_image, &mem_reqs);
+            buffer_size += mem_reqs.size * cru_minify(depth, l);
+            vkDestroyImage(t_device, test_vk_image, NULL);
+        } else
+            buffer_size += cpp * level_width * level_height *
                              cru_minify(depth, l);
     }
 
@@ -408,19 +455,6 @@ miptree_destroy(miptree_t *mt)
 
     cru_vec_finish(&mt->mipslices);
     free(mt);
-}
-
-static void
-can_create_image(VkImageType type, VkImageTiling tiling,
-                 uint32_t usage, VkFormat format)
-{
-    VkImageFormatProperties fmt_properties;
-    VkResult result =
-              vkGetPhysicalDeviceImageFormatProperties(t_physical_dev, format,
-                                                       type, tiling, usage,
-                                                       0, &fmt_properties);
-    if (result == VK_ERROR_FORMAT_NOT_SUPPORTED)
-       t_end(TEST_RESULT_SKIP);
 }
 
 static VkFormat
@@ -546,7 +580,8 @@ miptree_create(void)
         const uint32_t level_width = cru_minify(width, l);
         const uint32_t level_height = cru_minify(height, l);
         const uint32_t level_depth = cru_minify(depth, l);
-
+        bool use_img_size = false;
+        uint32_t img_size = 0;
         // 3D array textures are illegal.
         t_assert(level_depth == 1 || array_length == 1);
 
@@ -560,7 +595,7 @@ miptree_create(void)
             VkFormat dest_format;
             VkImage src_vk_image = VK_NULL_HANDLE;
             VkImage dest_vk_image = VK_NULL_HANDLE;
-
+            uint32_t src_pitch = 0, dest_pitch = 0;
             switch (params->upload_method) {
             case MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER:
                 break;
@@ -569,6 +604,7 @@ miptree_create(void)
                 switch (params->upload_method) {
                 case MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE:
                     src_usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+                    use_img_size = true;
                     break;
                 case MIPTREE_UPLOAD_METHOD_COPY_WITH_DRAW:
                     src_usage = VK_IMAGE_USAGE_SAMPLED_BIT;
@@ -596,6 +632,16 @@ miptree_create(void)
                 VkMemoryRequirements mem_reqs;
                 vkGetImageMemoryRequirements(t_device, src_vk_image, &mem_reqs);
                 assert(mem_reqs.size <= buffer_size);
+                img_size = mem_reqs.size;
+
+                VkSubresourceLayout img_layout;
+                vkGetImageSubresourceLayout(t_device, src_vk_image,
+                     &(VkImageSubresource) {
+                         .aspectMask = params->aspect
+                     },
+                     &img_layout);
+                src_pitch = img_layout.rowPitch;
+
                 qoBindImageMemory(t_device, src_vk_image, src_buffer_mem,
                                   buffer_offset);
                 break;
@@ -610,6 +656,7 @@ miptree_create(void)
                 case MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE:
                     dest_usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT;
                     dest_format = format;
+                    use_img_size = true;
                     break;
                 case MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW:
                     dest_usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
@@ -637,6 +684,15 @@ miptree_create(void)
                 VkMemoryRequirements mem_reqs;
                 vkGetImageMemoryRequirements(t_device, dest_vk_image, &mem_reqs);
                 assert(mem_reqs.size <= buffer_size);
+                img_size = mem_reqs.size;
+
+                VkSubresourceLayout img_layout;
+                vkGetImageSubresourceLayout(t_device, dest_vk_image,
+                    &(VkImageSubresource) {
+                        .aspectMask = params->aspect
+                    },
+                    &img_layout);
+                dest_pitch = img_layout.rowPitch;
                 qoBindImageMemory(t_device, dest_vk_image, dest_buffer_mem,
                                   buffer_offset);
                 break;
@@ -655,6 +711,7 @@ miptree_create(void)
 
             src_image = t_new_cru_image_from_pixels(src_pixels,
                     format, level_width, level_height);
+            cru_image_set_pitch_bytes(src_image, src_pitch);
             t_assert(cru_image_copy(src_image, templ_image));
             mipslice_perturb_pixels(src_pixels, format_info,
                                     level_width, level_height,
@@ -663,6 +720,7 @@ miptree_create(void)
 
             dest_image = t_new_cru_image_from_pixels(dest_pixels,
                     format, level_width, level_height);
+            cru_image_set_pitch_bytes(dest_image, dest_pitch);
             fill_rect_with_canary(dest_pixels, format_info,
                                   level_width, level_height);
 
@@ -694,7 +752,10 @@ miptree_create(void)
 
             cru_vec_push_memcpy(&mt->mipslices, &mipslice, 1);
 
-            buffer_offset += cpp * level_width * level_height;
+            if (use_img_size)
+                buffer_offset += img_size;
+            else
+                buffer_offset += cpp * level_width * level_height;
         }
     }
 
