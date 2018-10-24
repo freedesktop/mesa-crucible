@@ -56,7 +56,9 @@ void cru_image_reference(cru_image_t *image);
 void cru_image_release(cru_image_t *image);
 uint32_t cru_image_get_width(cru_image_t *image);
 uint32_t cru_image_get_height(cru_image_t *image);
+uint32_t cru_image_get_pitch_bytes(cru_image_t *image);
 VkFormat cru_image_get_format(cru_image_t *image);
+void cru_image_set_pitch_bytes(cru_image_t *image, uint32_t pitch_bytes);
 
 /// \brief Create a Crucible image from an array of pixels.
 ///

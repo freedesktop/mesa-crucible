@@ -81,6 +81,12 @@ cru_image_get_height(cru_image_t *image)
     return image->height;
 }
 
+uint32_t
+cru_image_get_pitch_bytes(cru_image_t *image)
+{
+    return image->pitch_bytes ? image->pitch_bytes : image->width * image->format_info->cpp;
+}
+
 VkFormat
 cru_image_get_format(cru_image_t *image)
 {
@@ -114,8 +120,15 @@ cru_image_init(cru_image_t *image, enum cru_image_type type,
     image->height = height;
     image->type = type;
     image->read_only = read_only;
+    image->pitch_bytes = 0;
 
     return true;
+}
+
+void
+cru_image_set_pitch_bytes(cru_image_t *image, uint32_t pitch_bytes)
+{
+    image->pitch_bytes = pitch_bytes;
 }
 
 static bool
@@ -299,11 +312,9 @@ cru_image_copy_pixels_to_pixels(cru_image_t *dest, cru_image_t *src)
     const uint32_t width = src->width;
     const uint32_t height = src->height;
 
-    const uint32_t src_cpp = src->format_info->cpp;
-    const uint32_t src_stride = src_cpp * width;
+    const uint32_t src_stride = cru_image_get_pitch_bytes(src);
 
-    const uint32_t dest_cpp = dest->format_info->cpp;
-    const uint32_t dest_stride = dest_cpp * width;
+    const uint32_t dest_stride = cru_image_get_pitch_bytes(dest);
 
     assert(!dest->read_only);
 
@@ -422,8 +433,8 @@ cru_image_compare_rect(cru_image_t *a, uint32_t a_x, uint32_t a_y,
 
     const uint32_t cpp = a->format_info->cpp;
     const uint32_t row_size = cpp * width;
-    const uint32_t a_stride = cpp * a->width;
-    const uint32_t b_stride = cpp * b->width;
+    const uint32_t a_stride = cru_image_get_pitch_bytes(a);
+    const uint32_t b_stride = cru_image_get_pitch_bytes(b);
 
     a_map = a->map_pixels(a, CRU_IMAGE_MAP_ACCESS_READ);
     if (!a_map)

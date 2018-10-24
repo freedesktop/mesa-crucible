@@ -37,6 +37,7 @@ struct cru_image {
     const cru_format_info_t *format_info;
     uint32_t width;
     uint32_t height;
+    uint32_t pitch_bytes;
     bool read_only;
 
     cru_refcount_t refcount;
