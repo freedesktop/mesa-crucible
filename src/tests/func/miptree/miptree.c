@@ -77,6 +77,11 @@ enum miptree_download_method {
     MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW,
 };
 
+enum miptree_intermediate_method {
+    MIPTREE_INTERMEDIATE_METHOD_NONE,
+    MIPTREE_INTERMEDIATE_METHOD_COPY_IMAGE,
+};
+
 struct test_params {
     VkFormat format;
     VkImageAspectFlagBits aspect;
@@ -88,6 +93,7 @@ struct test_params {
     uint32_t array_length;
     enum miptree_upload_method upload_method;
     enum miptree_download_method download_method;
+    enum miptree_intermediate_method intermediate_method;
 };
 
 struct test_data {
@@ -127,6 +133,7 @@ CRU_VEC_DEFINE(struct mipslice_vec, struct mipslice);
 
 struct miptree {
     VkImage image;
+    VkImage intermediate_image;
 
     VkBuffer src_buffer;
     VkBuffer dest_buffer;
@@ -500,8 +507,8 @@ miptree_create(void)
     const uint32_t array_length = params->array_length;
     const size_t buffer_size = miptree_calc_buffer_size();
     VkImageType image_type = image_type_from_image_view_type(params->view_type);
-
-    uint32_t usage_bits = 0;
+    bool create_intermediate = false;
+    uint32_t usage_bits = 0, intermediate_usage_bits = 0;
     switch (params->upload_method) {
     case MIPTREE_UPLOAD_METHOD_COPY_FROM_BUFFER:
     case MIPTREE_UPLOAD_METHOD_COPY_FROM_LINEAR_IMAGE:
@@ -512,6 +519,16 @@ miptree_create(void)
         break;
     }
 
+    switch (params->intermediate_method) {
+    case MIPTREE_INTERMEDIATE_METHOD_NONE:
+        break;
+    case MIPTREE_INTERMEDIATE_METHOD_COPY_IMAGE:
+        usage_bits |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+        intermediate_usage_bits = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+        create_intermediate = true;
+        break;
+    }
+
     switch (params->download_method) {
     case MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER:
     case MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE:
@@ -519,6 +536,7 @@ miptree_create(void)
         break;
     case MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW:
         usage_bits |= VK_IMAGE_USAGE_SAMPLED_BIT;
+        intermediate_usage_bits |= VK_IMAGE_USAGE_SAMPLED_BIT;
         break;
     }
 
@@ -539,6 +557,30 @@ miptree_create(void)
         },
         .tiling = VK_IMAGE_TILING_OPTIMAL,
         .usage = usage_bits);
+
+    VkImage intermediate_image = VK_NULL_HANDLE;
+    if (create_intermediate) {
+        can_create_image(image_type, VK_IMAGE_TILING_OPTIMAL,
+                         intermediate_usage_bits, format);
+
+        intermediate_image = qoCreateImage(t_device,
+            .imageType = image_type,
+            .format = format,
+            .mipLevels = levels,
+            .arrayLayers = array_length,
+            .extent = {
+                .width = width,
+                .height = height,
+                .depth = depth,
+            },
+            .tiling = VK_IMAGE_TILING_OPTIMAL,
+            .usage = intermediate_usage_bits);
+        VkDeviceMemory intermediate_image_mem = qoAllocImageMemory(t_device,
+                                                                   intermediate_image,
+                                                                   .properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        qoBindImageMemory(t_device, intermediate_image, intermediate_image_mem, 0);
+    }
+
     VkBuffer src_buffer = qoCreateBuffer(t_device,
         .size = buffer_size,
         .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
@@ -566,6 +608,7 @@ miptree_create(void)
     t_cleanup_push_callback((cru_cleanup_callback_func_t) miptree_destroy, mt);
 
     mt->image = image;
+    mt->intermediate_image = intermediate_image;
     mt->src_buffer = src_buffer;
     mt->dest_buffer = dest_buffer;
     mt->width = width;
@@ -820,7 +863,7 @@ miptree_upload_copy_from_buffer(const test_data_t *data)
 }
 
 static void
-miptree_download_copy_to_buffer(const test_data_t *data)
+miptree_download_copy_to_buffer(const test_data_t *data, VkImage download_image)
 {
     const test_params_t *params = t_user_data;
     const miptree_t *mt = data->mt;
@@ -850,7 +893,7 @@ miptree_download_copy_to_buffer(const test_data_t *data)
             },
         };
 
-        vkCmdCopyImageToBuffer(cmd, mt->image, VK_IMAGE_LAYOUT_GENERAL,
+        vkCmdCopyImageToBuffer(cmd, download_image, VK_IMAGE_LAYOUT_GENERAL,
                                mt->dest_buffer, 1, &copy);
     }
 
@@ -944,7 +987,7 @@ miptree_upload_copy_from_linear_image(const test_data_t *data)
 }
 
 static void
-miptree_download_copy_to_linear_image(const test_data_t *data)
+miptree_download_copy_to_linear_image(const test_data_t *data, VkImage download_image)
 {
     const test_params_t *params = t_user_data;
     const miptree_t *mt = data->mt;
@@ -1000,7 +1043,7 @@ miptree_download_copy_to_linear_image(const test_data_t *data)
                                  .layerCount = 1,
                                }
                            });
-        vkCmdCopyImage(cmd, mt->image, VK_IMAGE_LAYOUT_GENERAL,
+        vkCmdCopyImage(cmd, download_image, VK_IMAGE_LAYOUT_GENERAL,
                        slice->dest_vk_image, VK_IMAGE_LAYOUT_GENERAL,
                        1, &copy);
     }
@@ -1160,7 +1203,7 @@ miptree_upload_copy_with_draw(const test_data_t *data)
 }
 
 static void
-miptree_download_copy_with_draw(const test_data_t *data)
+miptree_download_copy_with_draw(const test_data_t *data, VkImage download_image)
 {
     const test_params_t *params = t_user_data;
 
@@ -1182,7 +1225,7 @@ miptree_download_copy_with_draw(const test_data_t *data)
         extents[i].height = slice->height;
 
         tex_views[i] = qoCreateImageView(t_device,
-            .image = mt->image,
+            .image = download_image,
             .viewType = VK_IMAGE_VIEW_TYPE_2D,
             .format = params->format,
             .subresourceRange = {
@@ -1232,16 +1275,112 @@ static void
 miptree_download(const test_data_t *data)
 {
     const test_params_t *params = t_user_data;
+    VkImage download_image;
+    const miptree_t *mt = data->mt;
+
+    switch (params->intermediate_method) {
+    case MIPTREE_INTERMEDIATE_METHOD_NONE:
+    default:
+        download_image = mt->image;
+        break;
+    case MIPTREE_INTERMEDIATE_METHOD_COPY_IMAGE:
+        download_image = mt->intermediate_image;
+        break;
+    }
 
     switch (params->download_method) {
     case MIPTREE_DOWNLOAD_METHOD_COPY_TO_BUFFER:
-        miptree_download_copy_to_buffer(data);
+        miptree_download_copy_to_buffer(data, download_image);
         break;
     case MIPTREE_DOWNLOAD_METHOD_COPY_TO_LINEAR_IMAGE:
-        miptree_download_copy_to_linear_image(data);
+        miptree_download_copy_to_linear_image(data, download_image);
         break;
     case MIPTREE_DOWNLOAD_METHOD_COPY_WITH_DRAW:
-        miptree_download_copy_with_draw(data);
+        miptree_download_copy_with_draw(data, download_image);
+        break;
+    }
+}
+
+static void
+miptree_intermediate_copy_image(const test_data_t *data)
+{
+    const test_params_t *params = t_user_data;
+
+    const miptree_t *mt = data->mt;
+    const mipslice_t *slice;
+
+    VkCommandBuffer cmd = qoAllocateCommandBuffer(t_device, t_cmd_pool);
+    qoBeginCommandBuffer(cmd);
+
+    cru_vec_foreach(slice, &mt->mipslices) {
+        vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_HOST_BIT,
+                             VK_PIPELINE_STAGE_TRANSFER_BIT,
+                             0, 0, NULL, 0, NULL, 1,
+                             &(VkImageMemoryBarrier) {
+                                 .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+                                 .srcAccessMask = 0,
+                                 .dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
+                                 .oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+                                 .newLayout = VK_IMAGE_LAYOUT_GENERAL,
+                                 .image = mt->intermediate_image,
+                                 .subresourceRange = {
+                                     .aspectMask = params->aspect,
+                                     .baseMipLevel = slice->level,
+                                     .levelCount = 1,
+                                     .baseArrayLayer = slice->array_slice,
+                                     .layerCount = 1,
+                                  }
+                             });
+
+        VkImageCopy copy = {
+           .srcSubresource = {
+               .aspectMask = params->aspect,
+               .mipLevel = slice->level,
+               .baseArrayLayer = slice->array_slice,
+               .layerCount = 1,
+           },
+           .srcOffset = {
+               .x = 0,
+               .y = 0,
+               .z = slice->z_offset,
+           },
+
+           .dstSubresource = {
+               .aspectMask = params->aspect,
+               .mipLevel = slice->level,
+               .baseArrayLayer = slice->array_slice,
+               .layerCount = 1,
+           },
+           .dstOffset = {
+               .x = 0,
+               .y = 0,
+               .z = slice->z_offset
+           },
+           .extent = {
+               .width = slice->width,
+               .height = slice->height,
+               .depth = 1,
+           }
+        };
+
+        vkCmdCopyImage(cmd, mt->image, VK_IMAGE_LAYOUT_GENERAL,
+                       mt->intermediate_image, VK_IMAGE_LAYOUT_GENERAL, 1,
+                       &copy);
+    }
+    qoEndCommandBuffer(cmd);
+    qoQueueSubmit(t_queue, 1, &cmd, VK_NULL_HANDLE);
+}
+
+static void
+miptree_intermediate(const test_data_t *data)
+{
+    const test_params_t *params = t_user_data;
+
+    switch (params->intermediate_method) {
+    case MIPTREE_INTERMEDIATE_METHOD_NONE:
+        break;
+    case MIPTREE_INTERMEDIATE_METHOD_COPY_IMAGE:
+        miptree_intermediate_copy_image(data);
         break;
     }
 }
@@ -1419,6 +1558,8 @@ test(void)
     init_draw_data(&data.draw);
 
     miptree_upload(&data);
+
+    miptree_intermediate(&data);
     miptree_download(&data);
     miptree_compare_images(data.mt);
 }

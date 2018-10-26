@@ -27,10 +27,10 @@ from collections import namedtuple
 Extent3D = namedtuple('Extent3D', ('width', 'height', 'depth'))
 Format = namedtuple('Format', ('short_name', 'vk_name'))
 Params = namedtuple('Params', ('format', 'aspect', 'view', 'extent',
-                    'levels', 'array_length', 'upload', 'download'))
+                    'levels', 'array_length', 'upload', 'download', 'intermediate'))
 
 color_1d_params_iter = (
-    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method, intermediate_method)
     for format in (Format('r8g8b8a8-unorm', 'VK_FORMAT_R8G8B8A8_UNORM'),)
     for aspect in ('color',)
     for view in ('1d',)
@@ -51,10 +51,15 @@ color_1d_params_iter = (
         # FINISHME: The test cannot yet texture from 1D images.
         #'copy-with-draw',
     )
+
+    for intermediate_method in (
+        'none',
+        'copy-image'
+    )
 )
 
 color_2d_params_iter = (
-    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method, intermediate_method)
     for format in (Format('r8g8b8a8-unorm', 'VK_FORMAT_R8G8B8A8_UNORM'),)
     for aspect in ('color',)
     for view in ('2d',)
@@ -71,10 +76,14 @@ color_2d_params_iter = (
         'copy-to-linear-image',
         'copy-with-draw',
     )
+    for intermediate_method in (
+        'none',
+        'copy-image'
+    )
 )
 
 color_3d_params_iter = (
-    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method, intermediate_method)
     for format in (Format('r8g8b8a8-unorm', 'VK_FORMAT_R8G8B8A8_UNORM'),)
     for aspect in ('color',)
     for view in ('3d',)
@@ -97,10 +106,14 @@ color_3d_params_iter = (
         # FINISHME: The test cannot yet texture from 3D images.
         #'copy-with-draw',
     )
+    for intermediate_method in (
+        'none',
+        'copy-image'
+    )
 )
 
 depth_1d_params_iter = (
-    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method, intermediate_method)
     for format in (Format('d32-sfloat', 'VK_FORMAT_D32_SFLOAT'),)
     for aspect in ('depth',)
     for view in ('1d',)
@@ -121,10 +134,14 @@ depth_1d_params_iter = (
         # FINISHME: The test cannot yet texture from 1D images.
         #'copy-with-draw',
     )
+    for intermediate_method in (
+        'none',
+        'copy-image'
+    )
 )
 
 depth_2d_params_iter = (
-    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method, intermediate_method)
     for format in (Format('d32-sfloat', 'VK_FORMAT_D32_SFLOAT'),)
     for aspect in ('depth',)
     for view in ('2d',)
@@ -140,10 +157,14 @@ depth_2d_params_iter = (
         'copy-to-linear-image',
         'copy-with-draw',
     )
+    for intermediate_method in (
+        'none',
+        'copy-image'
+    )
 )
 
 depth_3d_params_iter = (
-    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method, intermediate_method)
     for format in (Format('d32-sfloat', 'VK_FORMAT_D32_SFLOAT'),)
     for aspect in ('depth',)
     for view in ('3d',)
@@ -166,10 +187,14 @@ depth_3d_params_iter = (
         # FINISHME: The test cannot yet texture from 3D images.
         #'copy-with-draw',
     )
+    for intermediate_method in (
+        'none',
+        'copy-image'
+    )
 )
 
 stencil_1d_params_iter = (
-    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method, intermediate_method)
     for format in (Format('s8-uint', 'VK_FORMAT_S8_UINT'),)
     for aspect in ('stencil',)
     for view in ('1d',)
@@ -195,10 +220,14 @@ stencil_1d_params_iter = (
         # FINISHME: The test cannot yet texture from 1D images.
         #'copy-with-draw',
     )
+    for intermediate_method in (
+        'none',
+        'copy-image'
+    )
 )
 
 stencil_2d_params_iter = (
-    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method, intermediate_method)
     for format in (Format('s8-uint', 'VK_FORMAT_S8_UINT'),)
     for aspect in ('stencil',)
     for view in ('2d',)
@@ -222,10 +251,14 @@ stencil_2d_params_iter = (
         # Intel doesn't support linear stencil images. See above comment.
         #'copy-to-linear-image',
     )
+    for intermediate_method in (
+        'none',
+        'copy-image'
+    )
 )
 
 stencil_3d_params_iter = (
-    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method)
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method, intermediate_method)
     for format in (Format('s8-uint', 'VK_FORMAT_S8_UINT'),)
     for aspect in ('stencil',)
     for view in ('3d',)
@@ -246,6 +279,10 @@ stencil_3d_params_iter = (
 
         # FINISHME: The test cannot yet texture from 3D stencil images.
         #'copy-with-draw',
+    )
+    for intermediate_method in (
+        'none',
+        'copy-image'
     )
 )
 
@@ -278,7 +315,7 @@ template = dedent("""
                 ".levels{levels:02}"
                 "{array_length_str}"
                 ".extent-{extent_str}"
-                ".upload-{upload}.download-{download}",
+                ".upload-{upload}.download-{download}.intermediate-{intermediate}",
         .start = test,
         .skip = {skip},
         .no_image = true,
@@ -293,6 +330,7 @@ template = dedent("""
             .array_length = {array_length},
             .upload_method = MIPTREE_UPLOAD_METHOD_{upload_caps},
             .download_method = MIPTREE_DOWNLOAD_METHOD_{download_caps},
+            .intermediate_method = MIPTREE_INTERMEDIATE_METHOD_{intermediate_caps},
         }},
     }};
     """)
@@ -361,10 +399,12 @@ def main():
                 array_length_str = get_array_length_str(p),
                 upload = p.upload,
                 download = p.download,
+                intermediate = p.intermediate,
                 aspect_caps = to_caps(p.aspect),
                 view_caps = to_caps(p.view),
                 upload_caps = to_caps(p.upload),
                 download_caps = to_caps(p.download),
+                intermediate_caps = to_caps(p.intermediate),
                 skip = 'false')
             out_file.write(test_def)
 
