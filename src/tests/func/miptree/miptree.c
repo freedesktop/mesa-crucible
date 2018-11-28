@@ -190,6 +190,8 @@ fill_rect_with_canary(void *pixels,
         }
     } else if (format_info->format == VK_FORMAT_S8_UINT) {
         memset(pixels, 0x19, width * height);
+    } else if (format_info->format == VK_FORMAT_BC3_UNORM_BLOCK) {
+        memset(pixels, 0, width * height);
     } else {
         t_failf("unsupported cru_format_info");
     }
@@ -275,14 +277,13 @@ static string_t
 mipslice_get_template_filename(const cru_format_info_t *format_info,
                                uint32_t image_width, uint32_t image_height,
                                uint32_t level, uint32_t num_levels,
-                               uint32_t layer, uint32_t num_layers)
+                               uint32_t layer, uint32_t num_layers, bool *has_mipmaps)
 {
     const test_params_t *params = t_user_data;
 
     string_t filename = STRING_INIT;
-    const uint32_t level_width = cru_minify(image_width, level);
-    const uint32_t level_height = cru_minify(image_height, level);
-
+    const char *ext = "png";
+    *has_mipmaps = false;
     // The test attempts to make each pair of adjact mipslices visually
     // distinct to (1) reduce the probability of the test falsely passing and
     // to (2) aid the debugging of failing tests.  For most formats,
@@ -306,27 +307,37 @@ mipslice_get_template_filename(const cru_format_info_t *format_info,
             string_appendf(&filename, "pink-leaves-grayscale");
         }
         break;
+    case VK_FORMAT_BC3_UNORM_BLOCK:
+        string_appendf(&filename, "mandrill-dxt5");
+        ext = "ktx";
+        *has_mipmaps = true;
+        break;
     default:
         t_failf("unsuppported %s", format_info->name);
         break;
     }
 
+    const uint32_t level_width = *has_mipmaps ? image_width : cru_minify(image_width, level);
+    const uint32_t level_height = *has_mipmaps ? image_height : cru_minify(image_height, level);
+
     switch (params->view_type) {
     case VK_IMAGE_VIEW_TYPE_1D:
     case VK_IMAGE_VIEW_TYPE_1D_ARRAY: {
         uint32_t height = level_width;
-	if (level_width == 16384)
-	    height = 32;
-	else if (level_width == 8192)
-	    height = 16;
+        if (!*has_mipmaps) {
+            if (level_width == 16384)
+                height = 32;
+            else if (level_width == 8192)
+                height = 16;
+        }
         // Reuse 2d image files for 1d images.
-        string_appendf(&filename, "-%ux%u.png", level_width, height);
+        string_appendf(&filename, "-%ux%u.%s", level_width, height, ext);
         break;
     }
     case VK_IMAGE_VIEW_TYPE_2D:
     case VK_IMAGE_VIEW_TYPE_2D_ARRAY:
     case VK_IMAGE_VIEW_TYPE_3D:
-        string_appendf(&filename, "-%ux%u.png", level_width, level_height);
+        string_appendf(&filename, "-%ux%u.%s", level_width, level_height, ext);
         break;
     default:
         t_failf("FINISHME: VkImageViewType %d", params->view_type);
@@ -424,16 +435,16 @@ mipslice_make_template_image(const struct cru_format_info *format_info,
                              uint32_t layer, uint32_t num_layers)
 {
     const test_params_t *params = t_user_data;
-
+    bool has_mipmaps = false;
     string_t filename = mipslice_get_template_filename(
             format_info, image_width, image_height,
-            level, num_levels, layer, num_layers);
+            level, num_levels, layer, num_layers, &has_mipmaps);
 
     // FIXME: Don't load the same file multiple times. It slows down the test
     // run.
-    cru_image_t *file_img =
-        t_new_cru_image_from_filename(string_data(&filename));
-
+    cru_image_array_t *file_ia =
+        t_new_cru_image_array_from_filename(string_data(&filename));
+    cru_image_t *file_img = cru_image_array_get_image(file_ia, has_mipmaps ? level : 0);
     switch (params->view_type) {
     case VK_IMAGE_VIEW_TYPE_1D:
     case VK_IMAGE_VIEW_TYPE_1D_ARRAY: {
@@ -758,14 +769,18 @@ miptree_create(void)
             t_assert(level_width == cru_image_get_width(templ_image));
             t_assert(level_height == cru_image_get_height(templ_image));
 
-            src_image = t_new_cru_image_from_pixels(src_pixels,
-                    format, level_width, level_height);
-            cru_image_set_pitch_bytes(src_image, src_pitch);
-            t_assert(cru_image_copy(src_image, templ_image));
-            mipslice_perturb_pixels(src_pixels, format_info,
-                                    level_width, level_height,
-                                    l, levels,
-                                    layer, num_layers);
+            if (cru_image_get_format(templ_image) == VK_FORMAT_BC3_UNORM_BLOCK) {
+                src_image = templ_image;
+            } else {
+                src_image = t_new_cru_image_from_pixels(src_pixels,
+                                                        format, level_width, level_height);
+                cru_image_set_pitch_bytes(src_image, src_pitch);
+                t_assert(cru_image_copy(src_image, templ_image));
+                mipslice_perturb_pixels(src_pixels, format_info,
+                                        level_width, level_height,
+                                        l, levels,
+                                        layer, num_layers);
+            }
 
             dest_image = t_new_cru_image_from_pixels(dest_pixels,
                     format, level_width, level_height);

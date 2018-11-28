@@ -82,6 +82,30 @@ color_2d_params_iter = (
     )
 )
 
+color_2d_bc3_params_iter = (
+    Params(format, aspect, view, extent, levels, array_length, upload_method, download_method, intermediate_method)
+    for format in (Format('bc3-unorm', 'VK_FORMAT_BC3_UNORM_BLOCK'),)
+    for aspect in ('color',)
+    for view in ('2d',)
+    for extent in (Extent3D(512, 512, 1),)
+    for levels in (1, 2)
+    for array_length in (1, 2)
+    for upload_method in (
+        'copy-from-buffer',
+        'copy-from-linear-image',
+        'copy-with-draw',
+    )
+    for download_method in (
+        'copy-to-buffer',
+        'copy-to-linear-image',
+        'copy-with-draw',
+    )
+    for intermediate_method in (
+        'none',
+        'copy-image'
+    )
+)
+
 color_3d_params_iter = (
     Params(format, aspect, view, extent, levels, array_length, upload_method, download_method, intermediate_method)
     for format in (Format('r8g8b8a8-unorm', 'VK_FORMAT_R8G8B8A8_UNORM'),)
@@ -290,6 +314,8 @@ def all_params_iter():
     for p in color_1d_params_iter:
         yield p
     for p in color_2d_params_iter:
+        yield p
+    for p in color_2d_bc3_params_iter:
         yield p
     for p in color_3d_params_iter:
         yield p
