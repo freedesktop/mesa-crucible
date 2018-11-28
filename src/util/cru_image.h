@@ -29,6 +29,7 @@
 enum cru_image_type {
     CRU_IMAGE_TYPE_PIXELS,
     CRU_IMAGE_TYPE_PNG,
+    CRU_IMAGE_TYPE_KTX,
     CRU_IMAGE_TYPE_TEXTURE,
     CRU_IMAGE_TYPE_VULKAN,
 };
@@ -68,3 +69,6 @@ char *cru_image_get_abspath(const char *filename);
 cru_image_t *cru_png_image_load_file(const char *filename);
 bool cru_png_image_write_file(cru_image_t *image, const string_t *filename);
 bool cru_png_image_copy_to_pixels(cru_image_t *png_image, cru_image_t *dest);
+
+// file: cru_ktx_image.c
+cru_image_array_t *cru_ktx_image_array_load_file(const char *filename);

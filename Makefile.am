@@ -132,6 +132,7 @@ bin_crucible_SOURCES = \
 	src/util/misc.c \
 	src/util/cru_pixel_image.c \
 	src/util/cru_png_image.c \
+	src/util/cru_ktx_image.c \
 	src/util/cru_vec.c \
 	src/util/string.c \
 	src/util/xalloc.c \

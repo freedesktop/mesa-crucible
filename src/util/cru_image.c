@@ -170,6 +170,8 @@ cru_image_from_filename(const char *_filename)
 
     if (string_endswith_cstr(&filename, ".png")) {
         image = cru_png_image_load_file(_filename);
+    } else if (string_endswith_cstr(&filename, ".ktx")) {
+        loge("loading ktx requires array in %s", _filename);
     } else {
         loge("unknown file extension in %s", _filename);
     }
@@ -536,6 +538,8 @@ cru_image_array_from_filename(const char *_filename)
             free(ia);
             return NULL;
         }
+    } else if (string_endswith_cstr(&filename, ".ktx")) {
+        ia = cru_ktx_image_array_load_file(_filename);
     }
 
     string_finish(&filename);
