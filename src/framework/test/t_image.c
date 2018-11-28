@@ -37,6 +37,20 @@ t_new_cru_image_from_filename(const char *filename)
     return cimg;
 }
 
+malloclike cru_image_array_t *
+t_new_cru_image_array_from_filename(const char *filename)
+{
+    t_thread_yield();
+
+    cru_image_array_t *cia = cru_image_array_from_filename(filename);
+    if (!cia)
+        t_failf("%s: failed to create image array", __func__);
+
+    t_cleanup_push_cru_image_array(cia);
+
+    return cia;
+}
+
 malloclike cru_image_t *
 t_new_cru_image_from_vk_image(VkDevice dev, VkQueue queue, VkImage image,
                               VkFormat format, VkImageAspectFlagBits aspect,

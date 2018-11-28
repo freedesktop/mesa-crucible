@@ -32,6 +32,7 @@ extern "C" {
 
 typedef struct cru_cleanup_stack cru_cleanup_stack_t;
 typedef struct cru_image cru_image_t;
+typedef struct cru_image_array cru_image_array_t;
 
 typedef void (*cru_cleanup_callback_func_t)(void *data);
 
@@ -40,6 +41,7 @@ enum cru_cleanup_cmd {
     CRU_CLEANUP_CMD_FREE,
     CRU_CLEANUP_CMD_CRU_CLEANUP_STACK,
     CRU_CLEANUP_CMD_CRU_IMAGE,
+    CRU_CLEANUP_CMD_CRU_IMAGE_ARRAY,
     CRU_CLEANUP_CMD_VK_BUFFER,
     CRU_CLEANUP_CMD_VK_BUFFER_VIEW,
     CRU_CLEANUP_CMD_VK_COMMAND_BUFFER,

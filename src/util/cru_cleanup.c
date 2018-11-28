@@ -90,6 +90,10 @@ struct cmd_cru_image {
     cru_image_t *image;
 };
 
+struct cmd_cru_image_array {
+    cru_image_array_t *ia;
+};
+
 struct cmd_vk_buffer {
     VkDevice dev;
     VkBuffer x;
@@ -274,6 +278,11 @@ cru_cleanup_push_commandv(cru_cleanup_stack_t *c,
         case CRU_CLEANUP_CMD_CRU_IMAGE: {
             CMD_CREATE(struct cmd_cru_image);
             CMD_SET(image);
+            break;
+        }
+        case CRU_CLEANUP_CMD_CRU_IMAGE_ARRAY: {
+            CMD_CREATE(struct cmd_cru_image_array);
+            CMD_SET(ia);
             break;
         }
 
@@ -486,6 +495,11 @@ cru_cleanup_pop_impl(cru_cleanup_stack_t *c, bool noop)
         case CRU_CLEANUP_CMD_CRU_IMAGE: {
             CMD_GET(struct cmd_cru_image);
             CMD_DO(cru_image_release(cmd->image));
+            break;
+        }
+        case CRU_CLEANUP_CMD_CRU_IMAGE_ARRAY: {
+            CMD_GET(struct cmd_cru_image_array);
+            CMD_DO(cru_image_array_release(cmd->ia));
             break;
         }
 

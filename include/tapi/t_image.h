@@ -28,6 +28,7 @@
 #include "util/vk_wrapper.h"
 
 typedef struct cru_image cru_image_t;
+typedef struct cru_image_array cru_image_array_t;
 
 /// \brief Create a Crucible image from a file.
 ///
@@ -64,3 +65,14 @@ t_new_cru_image_from_vk_image(VkDevice dev, VkQueue queue, VkImage image,
 malloclike cru_image_t *
 t_new_cru_image_from_pixels(void *restrict pixels, VkFormat format,
                             uint32_t width, uint32_t height);
+
+/// \brief Create a Crucible image array from a file.
+///
+/// This is a wrapper around cru_image_from_filename(). On success, the new
+/// image is pushed onto the test thread's cleanup stack.  On failure, the test
+/// fails.
+///
+/// \see cru_image_from_filename()
+///
+malloclike cru_image_array_t *
+t_new_cru_image_array_from_filename(const char *filename);

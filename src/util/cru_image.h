@@ -52,6 +52,12 @@ struct cru_image {
     bool (*unmap_pixels)(cru_image_t *image);
 };
 
+struct cru_image_array {
+    cru_refcount_t refcount;
+    int num_images;
+    struct cru_image **images;
+};
+
 // file: cru_image.c
 bool
 cru_image_init(cru_image_t *image, enum cru_image_type type, VkFormat format,

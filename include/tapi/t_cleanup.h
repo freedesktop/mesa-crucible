@@ -48,7 +48,8 @@ void t_cleanup_push(T obj, ...);
     _Generic((x), \
         cru_cleanup_callback_func_t     : t_cleanup_push_callback, \
         cru_cleanup_stack_t *           : t_cleanup_push_cru_cleanup_stack, \
-        cru_image_t *                   : t_cleanup_push_cru_image \
+        cru_image_t *                   : t_cleanup_push_cru_image, \
+        cru_image_array_t *             : t_cleanup_push_cru_image_array \
     )((x), ##__VA_ARGS__)
 #endif
 
@@ -56,6 +57,7 @@ static inline void t_cleanup_push_callback(void (*func)(void* data), void *data)
 static inline void t_cleanup_push_free(void *data)                                                                  { t_cleanup_push_command(CRU_CLEANUP_CMD_FREE, data); }
 static inline void t_cleanup_push_cru_cleanup_stack(cru_cleanup_stack_t *x)                                         { t_cleanup_push_command(CRU_CLEANUP_CMD_CRU_CLEANUP_STACK, x); }
 static inline void t_cleanup_push_cru_image(cru_image_t *x)                                                         { t_cleanup_push_command(CRU_CLEANUP_CMD_CRU_IMAGE, x); }
+static inline void t_cleanup_push_cru_image_array(cru_image_array_t *x)                                             { t_cleanup_push_command(CRU_CLEANUP_CMD_CRU_IMAGE_ARRAY, x); }
 
 static inline void t_cleanup_push_vk_debug_cb(PFN_vkDestroyDebugReportCallbackEXT f, VkInstance i, VkDebugReportCallbackEXT cb) { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_DEBUG_CB, f, i, cb); }
 static inline void t_cleanup_push_vk_instance(VkInstance x, const VkAllocationCallbacks *a)                         { t_cleanup_push_command(CRU_CLEANUP_CMD_VK_INSTANCE, x, a); }

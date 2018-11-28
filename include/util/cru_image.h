@@ -46,7 +46,7 @@ extern "C" {
 #endif
 
 typedef struct cru_image cru_image_t;
-
+typedef struct cru_image_array cru_image_array_t;
 enum {
    CRU_IMAGE_MAP_ACCESS_READ = 0x1,
    CRU_IMAGE_MAP_ACCESS_WRITE = 0x2,
@@ -121,6 +121,18 @@ void *cru_image_map(cru_image_t *image, uint32_t access_mask);
 /// unmapping.
 bool cru_image_unmap(cru_image_t *image);
 
+/// \brief Create a Crucible image array from a file.
+///
+/// If writing a test, consider using t_new_cru_image_from_filename(), which
+/// has a simpler interface.
+///
+/// Relative filenames are relative to Crucible's data directory. The resultant
+/// Crucible image is read-only.
+malloclike cru_image_array_t *
+cru_image_array_from_filename(const char *filename);
+void cru_image_array_reference(cru_image_array_t *ia);
+void cru_image_array_release(cru_image_array_t *ia);
+cru_image_t *cru_image_array_get_image(cru_image_array_t *ia, int index);
 #ifdef __cplusplus
 }
 #endif

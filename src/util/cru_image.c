@@ -480,3 +480,64 @@ cru_image_unmap(cru_image_t *image)
 {
     return image->unmap_pixels(image);
 }
+
+void
+cru_image_array_reference(cru_image_array_t *ia)
+{
+    cru_refcount_get(&ia->refcount);
+}
+
+static void
+cru_image_array_destroy(cru_image_array_t *ia)
+{
+    for (int i = 0; i < ia->num_images; i++)
+        cru_image_release(ia->images[i]);
+    free(ia->images);
+    free(ia);
+}
+
+void
+cru_image_array_release(cru_image_array_t *ia)
+{
+    if (cru_refcount_put(&ia->refcount) > 0)
+        return;
+
+    cru_image_array_destroy(ia);
+}
+
+cru_image_t *
+cru_image_array_get_image(cru_image_array_t *ia, int index)
+{
+    return ia->images[index];
+}
+
+cru_image_array_t *
+cru_image_array_from_filename(const char *_filename)
+{
+    string_t filename = STRING_INIT;
+    cru_image_array_t *ia = NULL;
+
+    string_copy_cstr(&filename, _filename);
+
+    if (string_endswith_cstr(&filename, ".png")) {
+        ia = calloc(1, sizeof(*ia));
+        if (!ia)
+            return NULL;
+        cru_refcount_init(&ia->refcount);
+        ia->num_images = 1;
+        ia->images = calloc(1, sizeof(struct cru_image *));
+        if (!ia->images) {
+            free(ia);
+            return NULL;
+        }
+        ia->images[0] = cru_png_image_load_file(_filename);
+        if (!ia->images[0]) {
+            free(ia->images);
+            free(ia);
+            return NULL;
+        }
+    }
+
+    string_finish(&filename);
+    return ia;
+}
