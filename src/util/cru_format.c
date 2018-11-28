@@ -100,6 +100,11 @@ cru_format_info_table[] = {
         .stencil_format = VK_FORMAT_S8_UINT,
     },
     {
+        FMT(VK_FORMAT_BC3_UNORM_BLOCK),
+        .num_type = CRU_NUM_TYPE_UNORM,
+        .is_color = true,
+    },
+    {
         FMT(VK_FORMAT_UNDEFINED),
     },
 };
