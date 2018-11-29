@@ -149,10 +149,10 @@ struct test {
         VkExtensionProperties *device_extension_props;
         uint32_t queue_family_count;
         VkQueueFamilyProperties *queue_family_props;
-        VkQueue queue;
+        VkQueue *queue;
         VkDescriptorPool descriptor_pool;
         VkPipelineCache pipeline_cache;
-        VkCommandPool cmd_pool;
+        VkCommandPool *cmd_pool;
         VkCommandBuffer cmd_buffer;
         VkRenderPass render_pass;
         VkFramebuffer framebuffer;

@@ -72,7 +72,16 @@ __t_queue(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->vk.queue;
+    return &t->vk.queue[0];
+}
+
+const VkQueue *
+__t_queue_idx(int q)
+{
+    ASSERT_TEST_IN_MAJOR_PHASE;
+    GET_CURRENT_TEST(t);
+
+    return &t->vk.queue[q];
 }
 
 const VkDescriptorPool *
@@ -90,7 +99,16 @@ __t_cmd_pool(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->vk.cmd_pool;
+    return &t->vk.cmd_pool[0];
+}
+
+const VkCommandPool *
+__t_cmd_pool_idx(int q)
+{
+    ASSERT_TEST_IN_MAJOR_PHASE;
+    GET_CURRENT_TEST(t);
+
+    return &t->vk.cmd_pool[q];
 }
 
 const VkCommandBuffer *

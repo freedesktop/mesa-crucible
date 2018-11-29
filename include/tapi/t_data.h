@@ -40,8 +40,10 @@ typedef struct cru_image cru_image_t;
 #define t_physical_dev_mem_props  (__t_physical_dev_mem_props())
 #define t_device (*__t_device())
 #define t_queue (*__t_queue())
+#define t_queue_idx(q) (*__t_queue_idx(q))
 #define t_descriptor_pool (*__t_descriptor_pool())
 #define t_cmd_pool (*__t_cmd_pool())
+#define t_cmd_pool_idx(q) (*__t_cmd_pool_idx(q))
 #define t_cmd_buffer (*__t_cmd_buffer())
 #define t_color_image (*__t_color_image())
 #define t_color_attachment_view (*__t_color_attachment_view())
@@ -65,8 +67,10 @@ const VkPhysicalDevice *__t_physical_dev(void);
 const VkPhysicalDeviceProperties *__t_physical_dev_props(void);
 const VkPhysicalDeviceMemoryProperties *__t_physical_dev_mem_props(void);
 const VkQueue *__t_queue(void);
+const VkQueue *__t_queue_idx(int q);
 const VkDescriptorPool *__t_descriptor_pool(void);
 const VkCommandPool *__t_cmd_pool(void);
+const VkCommandPool *__t_cmd_pool_idx(int q);
 const VkCommandBuffer *__t_cmd_buffer(void);
 const VkImage *__t_color_image(void);
 const VkImageView *__t_color_image_view(void);

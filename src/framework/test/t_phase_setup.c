@@ -484,20 +484,30 @@ t_setup_vulkan(void)
 
     t_setup_framebuffer();
 
-    vkGetDeviceQueue(t->vk.device, 0, 0, &t->vk.queue);
+    t->vk.queue =
+        calloc(t->vk.queue_family_count, sizeof(*t->vk.queue));
+    t_assert(t->vk.queue);
+    t_cleanup_push_free(t->vk.queue);
+
+    vkGetDeviceQueue(t->vk.device, 0, 0, &t->vk.queue[0]);
 
     t->vk.pipeline_cache = qoCreatePipelineCache(t->vk.device);
+
+    t->vk.cmd_pool =
+        calloc(t->vk.queue_family_count, sizeof(*t->vk.cmd_pool));
+    t_assert(t->vk.cmd_pool);
+    t_cleanup_push_free(t->vk.cmd_pool);
 
     res = vkCreateCommandPool(t->vk.device,
         &(VkCommandPoolCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
             .queueFamilyIndex = 0,
             .flags = 0,
-        }, NULL, &t->vk.cmd_pool);
+        }, NULL, &t->vk.cmd_pool[0]);
     t_assert(res == VK_SUCCESS);
-    t_cleanup_push_vk_cmd_pool(t->vk.device, t->vk.cmd_pool);
+    t_cleanup_push_vk_cmd_pool(t->vk.device, t->vk.cmd_pool[0]);
 
-    t->vk.cmd_buffer = qoAllocateCommandBuffer(t->vk.device, t->vk.cmd_pool);
+    t->vk.cmd_buffer = qoAllocateCommandBuffer(t->vk.device, t->vk.cmd_pool[0]);
 
     qoBeginCommandBuffer(t->vk.cmd_buffer);
 }
