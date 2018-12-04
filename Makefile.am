@@ -75,6 +75,7 @@ bin_crucible_SOURCES = \
 	src/qonos/qonos_pipeline.c \
 	src/tests/bug/104809.c \
 	src/tests/bug/108909.c \
+	src/tests/bug/108911.c \
 	src/tests/bench/copy-buffer.c \
 	src/tests/example/basic.c \
 	src/tests/example/images.c \
