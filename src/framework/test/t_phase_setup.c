@@ -463,19 +463,25 @@ t_setup_vulkan(void)
     for (uint32_t i = 0; i < t->vk.device_extension_count; i++)
         ext_names[i] = t->vk.device_extension_props[i].extensionName;
 
+    VkDeviceQueueCreateInfo *qci =
+        calloc(t->vk.queue_family_count, sizeof(*qci));
+    t_assert(qci);
+    for (uint32_t i = 0; i < t->vk.queue_family_count; i++) {
+        qci[i].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        qci[i].queueFamilyIndex = i;
+        qci[i].queueCount = 1;
+        qci[i].pQueuePriorities = (float[]) {1.0f};
+    }
+
     res = vkCreateDevice(t->vk.physical_dev,
         &(VkDeviceCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-            .queueCreateInfoCount = 1,
-            .pQueueCreateInfos = &(VkDeviceQueueCreateInfo) {
-                .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-                .queueFamilyIndex = 0,
-                .queueCount = 1,
-                .pQueuePriorities = (float[]) {1.0f},
-            },
+            .queueCreateInfoCount = t->vk.queue_family_count,
+            .pQueueCreateInfos = qci,
             .enabledExtensionCount = t->vk.device_extension_count,
             .ppEnabledExtensionNames = ext_names,
         }, NULL, &t->vk.device);
+    free(qci);
     free(ext_names);
     t_assert(res == VK_SUCCESS);
     t_cleanup_push_vk_device(t->vk.device, NULL);
@@ -489,7 +495,9 @@ t_setup_vulkan(void)
     t_assert(t->vk.queue);
     t_cleanup_push_free(t->vk.queue);
 
-    vkGetDeviceQueue(t->vk.device, 0, 0, &t->vk.queue[0]);
+    for (uint32_t i = 0; i < t->vk.queue_family_count; i++) {
+        vkGetDeviceQueue(t->vk.device, i, 0, &t->vk.queue[i]);
+    }
 
     t->vk.pipeline_cache = qoCreatePipelineCache(t->vk.device);
 
@@ -498,14 +506,16 @@ t_setup_vulkan(void)
     t_assert(t->vk.cmd_pool);
     t_cleanup_push_free(t->vk.cmd_pool);
 
-    res = vkCreateCommandPool(t->vk.device,
-        &(VkCommandPoolCreateInfo) {
-            .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-            .queueFamilyIndex = 0,
-            .flags = 0,
-        }, NULL, &t->vk.cmd_pool[0]);
-    t_assert(res == VK_SUCCESS);
-    t_cleanup_push_vk_cmd_pool(t->vk.device, t->vk.cmd_pool[0]);
+    for (uint32_t i = 0; i < t->vk.queue_family_count; i++) {
+        res = vkCreateCommandPool(t->vk.device,
+            &(VkCommandPoolCreateInfo) {
+                .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+                .queueFamilyIndex = i,
+                .flags = 0,
+            }, NULL, &t->vk.cmd_pool[i]);
+        t_assert(res == VK_SUCCESS);
+        t_cleanup_push_vk_cmd_pool(t->vk.device, t->vk.cmd_pool[i]);
+    }
 
     t->vk.cmd_buffer = qoAllocateCommandBuffer(t->vk.device, t->vk.cmd_pool[0]);
 
