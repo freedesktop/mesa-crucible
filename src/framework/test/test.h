@@ -147,6 +147,8 @@ struct test {
         VkDevice device;
         uint32_t device_extension_count;
         VkExtensionProperties *device_extension_props;
+        uint32_t queue_family_count;
+        VkQueueFamilyProperties *queue_family_props;
         VkQueue queue;
         VkDescriptorPool descriptor_pool;
         VkPipelineCache pipeline_cache;
