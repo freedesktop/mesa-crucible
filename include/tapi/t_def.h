@@ -27,6 +27,13 @@
 #include "util/macros.h"
 #include "util/vk_wrapper.h"
 
+enum test_queue_setup {
+    QUEUE_SETUP_GFX_AND_COMPUTE = 0, /* default if test does not specify */
+    QUEUE_SETUP_GRAPHICS,
+    QUEUE_SETUP_COMPUTE,
+    QUEUE_SETUP_TRANSFER,
+};
+
 typedef struct test_def test_def_t;
 
 /// \brief A test definition.
@@ -73,6 +80,12 @@ struct test_def {
     ///
     /// This is useful for work-in-progress tests.
     const bool skip;
+
+    /// \brief How to setup the default queue
+    ///
+    /// This essentially specifies if the test uses graphics, compute
+    /// and/or transfer operations.
+    enum test_queue_setup queue_setup;
 
     /// \brief Private data for the test framework.
     ///

@@ -445,6 +445,31 @@ t_setup_vulkan(void)
                                              &t->vk.queue_family_count,
                                              t->vk.queue_family_props);
 
+    uint32_t qf =
+        t->vk.queue_family_props[t_queue_family_index].queueFlags;
+    if (qf & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT))
+        qf &= ~VK_QUEUE_TRANSFER_BIT;
+    qf &= VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT |
+        VK_QUEUE_TRANSFER_BIT;
+    switch (t->def->queue_setup) {
+    case QUEUE_SETUP_GFX_AND_COMPUTE:
+        if (qf != (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT))
+            t_end(TEST_RESULT_SKIP);
+        break;
+    case QUEUE_SETUP_GRAPHICS:
+        if ((qf & VK_QUEUE_GRAPHICS_BIT) == 0)
+            t_end(TEST_RESULT_SKIP);
+        break;
+    case QUEUE_SETUP_COMPUTE:
+        if ((qf & VK_QUEUE_COMPUTE_BIT) == 0)
+            t_end(TEST_RESULT_SKIP);
+        break;
+    case QUEUE_SETUP_TRANSFER:
+        if (qf == 0 /* gfx and compute imply transfer */)
+            t_end(TEST_RESULT_SKIP);
+        break;
+    }
+
     qoGetPhysicalDeviceMemoryProperties(t->vk.physical_dev,
                                         &t->vk.physical_dev_mem_props);
 
