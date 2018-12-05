@@ -150,6 +150,26 @@ struct test {
         uint32_t queue_family_count;
         VkQueueFamilyProperties *queue_family_props;
         VkQueue *queue;
+
+        /// First queue with both graphics and compute support. -1 if
+        /// none exist.
+        int graphics_and_compute_queue;
+
+        /// First queue with graphics support. -1 if none exist. If a
+        /// queue exists with graphics support and without compute
+        /// support, then it will be preferred.
+        int graphics_queue;
+
+        /// First queue with compute support. -1 if none exist. If a
+        /// queue exists with compute support and without graphics
+        /// support, then it will be preferred.
+        int compute_queue;
+
+        /// First queue with transfer support. If a queue exists with
+        /// transfer support and without graphics or compute support,
+        /// then it will be preferred.
+        int transfer_queue;
+
         VkDescriptorPool descriptor_pool;
         VkPipelineCache pipeline_cache;
         VkCommandPool *cmd_pool;

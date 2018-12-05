@@ -517,6 +517,43 @@ t_setup_vulkan(void)
         t_cleanup_push_vk_cmd_pool(t->vk.device, t->vk.cmd_pool[i]);
     }
 
+    t->vk.graphics_and_compute_queue = -1;
+    t->vk.graphics_queue = -1;
+    t->vk.compute_queue = -1;
+    t->vk.transfer_queue = -1;
+
+    /* Search through the queues looking for a "best match" */
+    for (uint32_t i = 0; i < t->vk.queue_family_count; i++) {
+        uint32_t qf = t->vk.queue_family_props[i].queueFlags;
+        if (qf & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT))
+            qf &= ~VK_QUEUE_TRANSFER_BIT;
+        qf &= VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT |
+              VK_QUEUE_TRANSFER_BIT;
+        if (qf == (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT))
+            t->vk.graphics_and_compute_queue = i;
+        if (qf == VK_QUEUE_GRAPHICS_BIT)
+            t->vk.graphics_queue = i;
+        if (qf == VK_QUEUE_COMPUTE_BIT)
+            t->vk.compute_queue = i;
+        if (qf == VK_QUEUE_TRANSFER_BIT)
+            t->vk.transfer_queue = i;
+    }
+
+    /* Search through the queues looking for a "acceptable match" */
+    for (uint32_t i = 0; i < t->vk.queue_family_count; i++) {
+        uint32_t qf = t->vk.queue_family_props[i].queueFlags;
+        if (qf & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT))
+            qf |= VK_QUEUE_TRANSFER_BIT;
+        qf &= VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT |
+              VK_QUEUE_TRANSFER_BIT;
+        if (t->vk.graphics_queue < 0 && (qf & VK_QUEUE_GRAPHICS_BIT))
+            t->vk.graphics_queue = i;
+        if (t->vk.compute_queue < 0 && (qf & VK_QUEUE_COMPUTE_BIT))
+            t->vk.compute_queue = i;
+        if (t->vk.transfer_queue < 0 && (qf & VK_QUEUE_TRANSFER_BIT))
+            t->vk.transfer_queue = i;
+    }
+
     t->vk.cmd_buffer = qoAllocateCommandBuffer(t->vk.device, t->vk.cmd_pool[0]);
 
     qoBeginCommandBuffer(t->vk.cmd_buffer);
