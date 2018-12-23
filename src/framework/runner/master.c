@@ -32,6 +32,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/epoll.h>
+#include <sys/mman.h>
 #include <sys/signalfd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -45,6 +46,7 @@
 #include "util/string.h"
 
 #include "runner.h"
+#include "runner_vk.h"
 #include "master.h"
 #include "slave.h"
 
@@ -118,6 +120,8 @@ static struct master {
     uint32_t num_slaves;
     slave_t slaves[64];
 
+    uint32_t num_vulkan_queues;
+
     struct {
         char *filepath;
         FILE *file;
@@ -132,6 +136,7 @@ static struct master {
 
 static uint32_t master_get_num_ran_tests(void);
 static void master_print_header(void);
+static void master_gather_vulkan_info(void);
 static void master_enter_dispatch_phase(void);
 static void master_enter_cleanup_phase(void);
 static void master_print_summary(void);
@@ -358,6 +363,10 @@ master_run(uint32_t num_tests)
     master.max_dispatched_tests = CLAMP(runner_opts.jobs,
                                         1, ARRAY_LENGTH(master.slaves));
 
+    master_gather_vulkan_info();
+    if (master.goto_next_phase)
+        return false;
+
     if (!junit_init())
         return false;
 
@@ -407,6 +416,60 @@ master_print_summary(void)
     logi("fail %u", master.num_fail);
     logi("skip %u", master.num_skip);
     logi("lost %u", master.num_lost);
+}
+
+static void
+master_gather_vulkan_info(void)
+{
+    uint32_t num_vulkan_queues;
+    slave_pipe_t pipe;
+    slave_pipe_init(NULL, &pipe);
+    int pid = fork();
+
+    if (pid == -1) {
+        loge("test runner failed to fork process to gather vulkan info");
+        goto fail;
+    }
+
+    if (pid == 0) {
+        // Send any child process (driver) output to /dev/null while
+        // reading the number of queues.
+        int devnull = open("/dev/null", O_WRONLY);
+        dup2(devnull, 1);
+        dup2(devnull, 2);
+
+        // Read the number of queues and send it through the pipe
+        slave_pipe_become_writer(&pipe);
+        if (!runner_get_vulkan_queue_count(&num_vulkan_queues)) {
+            exit(EXIT_FAILURE);
+        } else {
+            if (write(pipe.write_fd, &num_vulkan_queues,
+                      sizeof(num_vulkan_queues)) != sizeof(num_vulkan_queues))
+                exit(EXIT_FAILURE);
+        }
+        exit(EXIT_SUCCESS);
+    } else {
+        // Read the number of queues from the pipe
+        slave_pipe_become_reader(&pipe);
+        if (read(pipe.read_fd, &num_vulkan_queues,
+                 sizeof(num_vulkan_queues)) != sizeof(num_vulkan_queues))
+            goto fail;
+    }
+
+    int result;
+    waitpid(pid, &result, 0);
+    result = WIFEXITED(result) ? WEXITSTATUS(result) : EXIT_FAILURE;
+    if (result != 0)
+        goto fail;
+
+    slave_pipe_finish(&pipe);
+    master.num_vulkan_queues = num_vulkan_queues;
+    return;
+
+ fail:
+    slave_pipe_finish(&pipe);
+    loge("test runner failed to gather vulkan info");
+    master.goto_next_phase = true;
 }
 
 static void
