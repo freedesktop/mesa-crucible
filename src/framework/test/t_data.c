@@ -19,6 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
+#include "util/string.h"
 #include "test.h"
 
 const VkInstance *
@@ -243,7 +244,7 @@ __t_name(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return t->def->name;
+    return string_data(&t->name);
 }
 
 const void *

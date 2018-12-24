@@ -32,13 +32,15 @@ typedef struct result_packet result_packet_t;
 
 struct dispatch_packet {
     const test_def_t *test_def;
+    uint32_t queue_family_index;
 };
 
 struct result_packet {
     const test_def_t *test_def;
+    uint32_t queue_family_index;
     test_result_t result;
 };
 
 extern runner_opts_t runner_opts;
 
-test_result_t run_test_def(const test_def_t *def);
+test_result_t run_test_def(const test_def_t *def, uint32_t queue_family_index);

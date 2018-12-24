@@ -31,25 +31,30 @@ static int dispatch_fd;
 static int result_fd;
 
 /// Return NULL if the pipe is empty or has errors.
-static const test_def_t *
-slave_recv_test(void)
+static void
+slave_recv_test(const test_def_t **test_def, uint32_t *queue_family_index)
 {
     dispatch_packet_t pk;
 
     static_assert(sizeof(pk) <= PIPE_BUF, "dispatch packets will not be read "
                   "and written atomically");
 
-    if (read(dispatch_fd, &pk, sizeof(pk)) != sizeof(pk))
-        return false;
+    if (read(dispatch_fd, &pk, sizeof(pk)) != sizeof(pk)) {
+        *test_def = NULL;
+        return;
+    }
 
-    return pk.test_def;
+    *queue_family_index = pk.queue_family_index;
+    *test_def = pk.test_def;
 }
 
 static bool
-slave_send_result(const test_def_t *def, test_result_t result)
+slave_send_result(const test_def_t *def, uint32_t queue_family_index,
+                  test_result_t result)
 {
     const result_packet_t pk = {
         .test_def = def,
+        .queue_family_index = queue_family_index,
         .result = result,
     };
 
@@ -66,13 +71,14 @@ slave_loop(void)
 
     for (;;) {
         test_result_t result;
+        uint32_t queue_family_index;
 
-        def = slave_recv_test();
+        slave_recv_test(&def, &queue_family_index);
         if (!def)
             return;
 
-        result = run_test_def(def);
-        slave_send_result(def, result);
+        result = run_test_def(def, queue_family_index);
+        slave_send_result(def, queue_family_index, result);
     }
 }
 

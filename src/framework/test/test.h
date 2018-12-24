@@ -67,6 +67,7 @@ struct test_thread_arg {
 
 struct test {
     const test_def_t *def;
+    string_t name;
 
     atomic_uint num_threads;
 

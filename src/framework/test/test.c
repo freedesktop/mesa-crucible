@@ -121,6 +121,7 @@ test_destroy(test_t *t)
 
     pthread_mutex_destroy(&t->stop_mutex);
     pthread_cond_destroy(&t->stop_cond);
+    string_finish(&t->name);
     string_finish(&t->ref.filename);
     string_finish(&t->ref.stencil_filename);
 
@@ -137,6 +138,8 @@ test_create_s(const test_create_info_t *info)
 
     t = xzalloc(sizeof(*t));
 
+    t->name = STRING_INIT;
+    string_printf(&t->name, "%s.q%d", info->def->name, info->queue_family_index);
     t->phase = ATOMIC_VAR_INIT(TEST_PHASE_PRESTART);
     t->result = TEST_RESULT_PASS;
     t->ref.filename = STRING_INIT;
@@ -159,11 +162,11 @@ test_create_s(const test_create_info_t *info)
 
         // Force-enable image dumps when in bootstrap mode.
         t->opt.no_dump = false;
-
         if (!info->def->no_image &&
             (info->bootstrap_image_width == 0 ||
              info->bootstrap_image_height == 0)) {
-            loge("%s: bootstrap image must have non-zero size", t->def->name);
+            loge("%s: bootstrap image must have non-zero size",
+                 string_data(&t->name));
             goto fail;
         }
 
@@ -172,14 +175,15 @@ test_create_s(const test_create_info_t *info)
     }
 
     if (t->def->samples > 0) {
-        loge("%s: multisample tests not yet supported", t->def->name);
+        loge("%s: multisample tests not yet supported", string_data(&t->name));
         goto fail;
     }
 
     err = pthread_mutex_init(&t->stop_mutex, NULL);
     if (err) {
         // Abort to avoid destroying an uninitialized mutex later.
-        loge("%s: failed to init mutex during test creation", t->def->name);
+        loge("%s: failed to init mutex during test creation",
+             string_data(&t->name));
         abort();
     }
 
@@ -187,7 +191,7 @@ test_create_s(const test_create_info_t *info)
     if (err) {
         // Abort to avoid destroying an uninitialized cond later.
         loge("%s: failed to init thread condition during test creation",
-             t->def->name);
+             string_data(&t->name));
         abort();
     }
 
@@ -246,7 +250,8 @@ test_start(test_t *t)
     // t_thread_release()] and force it to recover. Doing so provides
     // persistent validation of that recovery path.
     if (!test_thread_create(t, t_thread_release_wrapper, NULL)) {
-        loge("%s: failed to create test's start thread", t->def->name);
+        loge("%s: failed to create test's start thread",
+             string_data(&t->name));
         t->result = TEST_RESULT_FAIL;
         test_broadcast_stop(t);
         return;
@@ -262,7 +267,7 @@ test_wait(test_t *t)
 
     err = pthread_mutex_lock(&t->stop_mutex);
     if (err) {
-        loge("%s: failed to lock test mutex", t->def->name);
+        loge("%s: failed to lock test mutex", string_data(&t->name));
         abort();
     }
 
@@ -272,7 +277,7 @@ test_wait(test_t *t)
         err = pthread_cond_wait(&t->stop_cond, &t->stop_mutex);
         if (err) {
             loge("%s: failed to wait on test's result condition",
-                  t->def->name);
+                 string_data(&t->name));
             abort();
         }
     }

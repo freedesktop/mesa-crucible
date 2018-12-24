@@ -139,7 +139,8 @@ static void master_print_summary(void);
 static void master_dispatch_loop_no_fork(void);
 static void master_dispatch_loop_with_fork(void);
 
-static void master_dispatch_test(const test_def_t *def);
+static void master_dispatch_test(const test_def_t *def,
+                                 uint32_t queue_family_index);
 static slave_t * master_get_open_slave(void);
 static slave_t * master_get_new_slave(void);
 static slave_t * master_find_unborn_slave(void);
@@ -147,7 +148,8 @@ static void master_cleanup_dead_slave(slave_t *slave);
 
 static void master_collect_result(int timeout_ms);
 
-static void master_report_result(const test_def_t *def, pid_t pid, test_result_t result);
+static void master_report_result(const test_def_t *def, uint32_t queue_family_index,
+                                 pid_t pid, test_result_t result);
 static bool master_send_packet(slave_t *slave, const dispatch_packet_t *pk);
 
 static void master_kill_all_slaves(void);
@@ -168,7 +170,8 @@ static int32_t slave_find_test(slave_t *slave, const test_def_t *def);
 static bool slave_insert_test(slave_t *slave, const test_def_t *def);
 static void slave_rm_test(slave_t *slave, const test_def_t *def);
 
-static bool slave_start_test(slave_t *slave, const test_def_t *def);
+static bool slave_start_test(slave_t *slave, const test_def_t *def,
+                             uint32_t queue_family_index);
 static void slave_send_sentinel(slave_t *slave);
 static void slave_drain_result_pipe(slave_t *slave);
 
@@ -252,7 +255,7 @@ junit_init(void)
 }
 
 static void
-junit_add_result(const test_def_t *def, test_result_t result)
+junit_add_result(const char *name, test_result_t result)
 {
     if (!master.junit.doc)
         return;
@@ -267,7 +270,7 @@ junit_add_result(const test_def_t *def, test_result_t result)
     //   <testcase status="pass" name="mozarella"/>
     //   <testcase status="fail" name="blue-cheese"/>
     xmlNewProp(testcase_node, u("status"), u(test_result_to_string(result)));
-    xmlNewProp(testcase_node, u("name"), u(def->name));
+    xmlNewProp(testcase_node, u("name"), u(name));
 
     switch (result) {
     case TEST_RESULT_PASS:
@@ -454,13 +457,13 @@ master_dispatch_loop_no_fork(void)
             continue;
 
         if (def->skip) {
-            master_report_result(def, 0, TEST_RESULT_SKIP);
+            master_report_result(def, 0, 0, TEST_RESULT_SKIP);
             continue;
         }
 
-        log_tag("start", 0, "%s", def->name);
-        result = run_test_def(def);
-        master_report_result(def, 0, result);
+        log_tag("start", 0, "%s.q%d", def->name, 0);
+        result = run_test_def(def, 0);
+        master_report_result(def, 0, 0, result);
     }
 }
 
@@ -475,11 +478,11 @@ master_dispatch_loop_with_fork(void)
             continue;
 
         if (def->skip) {
-            master_report_result(def, 0, TEST_RESULT_SKIP);
+            master_report_result(def, 0, 0, TEST_RESULT_SKIP);
             continue;
         }
 
-        master_dispatch_test(def);
+        master_dispatch_test(def, 0);
         if (master.goto_next_phase)
             return;
 
@@ -490,7 +493,7 @@ master_dispatch_loop_with_fork(void)
 }
 
 static void
-master_dispatch_test(const test_def_t *def)
+master_dispatch_test(const test_def_t *def, uint32_t queue_family_index)
 {
     slave_t *slave = NULL;
 
@@ -516,7 +519,7 @@ master_dispatch_test(const test_def_t *def)
             return;
     }
 
-    slave_start_test(slave, def);
+    slave_start_test(slave, def, queue_family_index);
 }
 
 static slave_t *
@@ -667,7 +670,7 @@ master_cleanup_dead_slave(slave_t *slave)
     // Any remaining tests owned by the slave are lost.
     for (uint32_t i = 0; i < slave->tests.len; ++i) {
         const test_def_t *def = slave->tests.data[i];
-        master_report_result(def, slave->pid, TEST_RESULT_LOST);
+        master_report_result(def, 0, slave->pid, TEST_RESULT_LOST);
     }
 
     assert(master.cur_dispatched_tests >= slave->tests.len);
@@ -721,9 +724,12 @@ master_collect_result(int timeout_ms)
 }
 
 static void
-master_report_result(const test_def_t *def, pid_t pid, test_result_t result)
+master_report_result(const test_def_t *def, uint32_t queue_family_index,
+                     pid_t pid, test_result_t result)
 {
-    log_tag(test_result_to_string(result), pid, "%s", def->name);
+    string_t name = STRING_INIT;
+    string_printf(&name, "%s.q%d", def->name, queue_family_index);
+    log_tag(test_result_to_string(result), pid, "%s", string_data(&name));
     fflush(stdout);
 
     switch (result) {
@@ -733,7 +739,8 @@ master_report_result(const test_def_t *def, pid_t pid, test_result_t result)
     case TEST_RESULT_LOST: master.num_lost++; break;
     }
 
-    junit_add_result(def, result);
+    junit_add_result(string_data(&name), result);
+    string_finish(&name);
 }
 
 static bool
@@ -1037,9 +1044,13 @@ slave_rm_test(slave_t *slave, const test_def_t *def)
 }
 
 static bool
-slave_start_test(slave_t *slave, const test_def_t *def)
+slave_start_test(slave_t *slave, const test_def_t *def,
+                 uint32_t queue_family_index)
 {
-    const dispatch_packet_t pk = { .test_def = def };
+    const dispatch_packet_t pk = {
+        .test_def = def,
+        .queue_family_index = queue_family_index,
+    };
 
     if (!def)
         return false;
@@ -1053,7 +1064,7 @@ slave_start_test(slave_t *slave, const test_def_t *def)
     if (!slave_insert_test(slave, def))
         return false;
 
-    log_tag("start", slave->pid, "%s", def->name);
+    log_tag("start", slave->pid, "%s.q%d", def->name, 0);
 
     if (!master_send_packet(slave, &pk)) {
         slave_rm_test(slave, def);
@@ -1103,7 +1114,8 @@ slave_drain_result_pipe(slave_t *slave)
             return;
 
         slave_rm_test(slave, pk.test_def);
-        master_report_result(pk.test_def, slave->pid, pk.result);
+        master_report_result(pk.test_def, pk.queue_family_index, slave->pid,
+                             pk.result);
     }
 }
 

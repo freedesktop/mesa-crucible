@@ -40,7 +40,7 @@ test_thread_start(void *arg)
         // That prevents us from calling any "t_*" functions, even t_end(). So
         // give up and die.
         loge("%s: failed to create cleanup stack for test thread",
-             t->def->name);
+             string_data(&t->name));
         abort();
     }
 

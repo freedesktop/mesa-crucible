@@ -84,7 +84,7 @@ runner_init(runner_opts_t *opts)
 }
 
 test_result_t
-run_test_def(const test_def_t *def)
+run_test_def(const test_def_t *def, uint32_t queue_family_index)
 {
     ASSERT_RUNNER_IS_INIT;
 
@@ -99,7 +99,7 @@ run_test_def(const test_def_t *def)
                        .enable_spir_v = runner_opts.use_spir_v,
                        .enable_separate_cleanup_thread =
                             runner_opts.use_separate_cleanup_threads,
-                       .queue_family_index = 0);
+                       .queue_family_index = queue_family_index);
     if (!test)
         return TEST_RESULT_FAIL;
 
