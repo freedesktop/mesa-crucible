@@ -514,19 +514,30 @@ master_dispatch_loop_no_fork(void)
     const test_def_t *def;
 
     cru_foreach_test_def(def) {
-        test_result_t result;
-
-        if (!def->priv.enable)
-            continue;
-
-        if (def->skip) {
-            master_report_result(def, 0, 0, TEST_RESULT_SKIP);
-            continue;
+        uint32_t queue_start, queue_end;
+        if (def->priv.queue_family_index == NO_QUEUE_FAMILY_INDEX_PREF) {
+            queue_start = 0;
+            queue_end = master.num_vulkan_queues;
+        } else {
+            queue_start = def->priv.queue_family_index;
+            queue_end = def->priv.queue_family_index + 1;
         }
 
-        log_tag("start", 0, "%s.q%d", def->name, 0);
-        result = run_test_def(def, 0);
-        master_report_result(def, 0, 0, result);
+        for (uint32_t qi = queue_start; qi < queue_end; qi++) {
+            test_result_t result;
+
+            if (!def->priv.enable)
+                continue;
+
+            if (def->skip) {
+                master_report_result(def, qi, 0, TEST_RESULT_SKIP);
+                continue;
+            }
+
+            log_tag("start", 0, "%s.q%d", def->name, qi);
+            result = run_test_def(def, qi);
+            master_report_result(def, qi, 0, result);
+        }
     }
 }
 
@@ -537,21 +548,32 @@ master_dispatch_loop_with_fork(void)
     const test_def_t *def;
 
     cru_foreach_test_def(def) {
-        if (!def->priv.enable)
-            continue;
-
-        if (def->skip) {
-            master_report_result(def, 0, 0, TEST_RESULT_SKIP);
-            continue;
+        uint32_t queue_start, queue_end;
+        if (def->priv.queue_family_index == NO_QUEUE_FAMILY_INDEX_PREF) {
+            queue_start = 0;
+            queue_end = master.num_vulkan_queues;
+        } else {
+            queue_start = def->priv.queue_family_index;
+            queue_end = def->priv.queue_family_index + 1;
         }
 
-        master_dispatch_test(def, 0);
-        if (master.goto_next_phase)
-            return;
+        for (uint32_t qi = queue_start; qi < queue_end; qi++) {
+            if (!def->priv.enable)
+                continue;
 
-        master_collect_result(0);
-        if (master.goto_next_phase)
-            return;
+            if (def->skip) {
+                master_report_result(def, qi, 0, TEST_RESULT_SKIP);
+                continue;
+            }
+
+            master_dispatch_test(def, qi);
+            if (master.goto_next_phase)
+                return;
+
+            master_collect_result(0);
+            if (master.goto_next_phase)
+                return;
+        }
     }
 }
 
