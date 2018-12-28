@@ -60,6 +60,7 @@ bin_crucible_SOURCES = \
 	src/cmd/version.c \
 	src/framework/runner/master.c \
 	src/framework/runner/runner.c \
+	src/framework/runner/runner_vk.c \
 	src/framework/runner/slave.c \
 	src/framework/test/t_cleanup.c \
 	src/framework/test/t_data.c \
