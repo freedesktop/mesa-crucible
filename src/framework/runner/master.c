@@ -529,6 +529,12 @@ master_dispatch_loop_no_fork(void)
             if (!def->priv.enable)
                 continue;
 
+            if (qi >= master.num_vulkan_queues) {
+                logi("queue-family-index %d does not exist", qi);
+                master_report_result(def, qi, 0, TEST_RESULT_SKIP);
+                continue;
+            }
+
             if (def->skip) {
                 master_report_result(def, qi, 0, TEST_RESULT_SKIP);
                 continue;
@@ -560,6 +566,12 @@ master_dispatch_loop_with_fork(void)
         for (uint32_t qi = queue_start; qi < queue_end; qi++) {
             if (!def->priv.enable)
                 continue;
+
+            if (qi >= master.num_vulkan_queues) {
+                logi("queue-family-index %d does not exist", qi);
+                master_report_result(def, qi, 0, TEST_RESULT_SKIP);
+                continue;
+            }
 
             if (def->skip) {
                 master_report_result(def, qi, 0, TEST_RESULT_SKIP);
