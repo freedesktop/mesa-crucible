@@ -21,16 +21,16 @@
 #
 # SYNOPSIS
 #
-#   AX_CHECK_PYTHON2_MODULE_OPENCV()
+#   AX_CHECK_PYTHON3_MODULE_OPENCV()
 #
 # DESCRIPTION
 #
-#   Check that the Python2 OpenCV module is installed.
+#   Check that the Python3 OpenCV module is installed.
 #
 
-AC_DEFUN([AX_CHECK_PYTHON2_MODULE_OPENCV],
-[AC_MSG_CHECKING(if Python2 OpenCV modules is installed)
-    $PYTHON2 -c "
+AC_DEFUN([AX_CHECK_PYTHON3_MODULE_OPENCV],
+[AC_MSG_CHECKING(if Python3 OpenCV modules is installed)
+    $PYTHON3 -c "
 try:
     import cv2
 except ImportError as err:
@@ -39,7 +39,7 @@ except ImportError as err:
 "
 
     if test $? -ne 0 ; then
-       AC_MSG_ERROR([Python2 OpenCV module not found])
+       AC_MSG_ERROR([Python3 OpenCV module not found])
     else
        AC_MSG_RESULT([yes])
     fi

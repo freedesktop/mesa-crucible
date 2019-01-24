@@ -7,8 +7,7 @@ External Dependencies
 - AsciiDoc (http://asciidoc.org)
 - libxml2 (http://www.xmlsoft.org)
 - Python3
-- Python2
-- Python2 OpenCV (http://opencv.org)
+- Python3 OpenCV (http://opencv.org)
 
 
 Configure and Build

@@ -249,22 +249,22 @@ data: $(built_data_files)
 data/grass-2048x1024.jpg: \
     $(srcdir)/data/grass-2014x1536.jpg \
     $(srcdir)/misc/gen_image
-	$(AM_V_GEN) $(PYTHON2) $(srcdir)/misc/gen_image crop $< $@
+	$(AM_V_GEN) $(PYTHON3) $(srcdir)/misc/gen_image crop $< $@
 
 data/grass-%.png: \
     $(srcdir)/data/grass-2048x1024.jpg \
     $(srcdir)/misc/gen_image
-	$(AM_V_GEN) $(PYTHON2) $(srcdir)/misc/gen_image scale $< $@
+	$(AM_V_GEN) $(PYTHON3) $(srcdir)/misc/gen_image scale $< $@
 
 data/pink-leaves-2048x1024.jpg: \
     $(srcdir)/data/pink-leaves-3264x2448.jpg \
     $(srcdir)/misc/gen_image
-	$(AM_V_GEN) $(PYTHON2) $(srcdir)/misc/gen_image crop $< $@
+	$(AM_V_GEN) $(PYTHON3) $(srcdir)/misc/gen_image crop $< $@
 
 data/pink-leaves-%.png: \
     $(srcdir)/data/pink-leaves-2048x1024.jpg \
     $(srcdir)/misc/gen_image
-	$(AM_V_GEN) $(PYTHON2) $(srcdir)/misc/gen_image scale $< $@
+	$(AM_V_GEN) $(PYTHON3) $(srcdir)/misc/gen_image scale $< $@
 
 TESTS = \
 	src/tests/self/bad-test-names.bash \
