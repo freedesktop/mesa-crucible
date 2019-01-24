@@ -106,6 +106,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/compute-num-workgroups.c \
 	src/tests/func/compute-subgroup-quad.c \
 	src/tests/func/interleaved-cmd-buffers.c \
+	src/tests/func/memory-budget.c \
 	src/tests/func/miptree/miptree.c \
 	src/tests/func/multiview.c \
 	src/tests/func/push-constants/basic.c \
