@@ -33,9 +33,9 @@ pattern denotes an include rule. If the first given pattern is an exclude
 pattern, then Crucible inserts an implied "*" as the first pattern.
 
 Special tests match only patterns with special prefixes.  Example tests match
-only patterns that start with "example.".  Crucible's self tests match only
-patterns that start with "self.". As a corollary, special tests do not match
-the pattern "*".
+only patterns that start with "example.".  Benchmark tests match only patterns
+that start with "bench.".  Crucible's self tests match only patterns that start
+with "self.".  As a corollary, special tests do not match the pattern "*".
 
 OPTIONS
 -------

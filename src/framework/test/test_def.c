@@ -25,16 +25,21 @@
 
 /// Match the test name against the glob pattern.
 ///
-/// Crucible's example tests and self tests are special. The user doesn't
-/// want to run them during normal test runs. Therefore example tests match
-/// only patterns that begin with a literal "example.", and self tests
-/// a literal "self.".
+/// Crucible's bench, example and self tests are special. The user
+/// doesn't want to run them during normal test runs. Therefore these
+/// tests only are run if the pattern explicitely contains the entire
+/// literal prefix.
 bool
 test_def_match(const test_def_t *def, const char *glob)
 {
     // Strip the leading '!' modifier before performing the match.
     while (glob && glob[0] == '!') {
         ++glob;
+    }
+
+    if (strncmp("bench.", def->name, 6) == 0 &&
+        strncmp("bench.", glob, 6) != 0) {
+        return false;
     }
 
     if (strncmp("example.", def->name, 8) == 0 &&
