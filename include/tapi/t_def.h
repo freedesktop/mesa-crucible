@@ -96,6 +96,10 @@ struct test_def {
     /// second pass, it runs the enabled tests.
     struct test_def_priv {
         bool enable;
+
+        uint64_t queue_family_index;
+        #define NO_QUEUE_FAMILY_INDEX_PREF 0x100000000
+        #define INVALID_QUEUE_FAMILY_INDEX_PREF 0x100000001
     } priv;
 } __attribute__((aligned(32)));
 

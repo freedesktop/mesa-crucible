@@ -32,6 +32,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <regex.h>
+
 #include "util/log.h"
 
 #include "framework/runner/runner.h"
@@ -133,19 +135,80 @@ glob_is_negative(const char *glob)
     return neg;
 }
 
+typedef struct {
+    char *glob;
+    bool free_string;
+    uint64_t queue_family_index;
+} split_glob_t;
+
+typedef struct split_glob_vec split_glob_vec_t;
+CRU_VEC_DEFINE(struct split_glob_vec, split_glob_t)
+
+static bool
+parse_u32(const char *str, uint32_t *u32)
+{
+    char *endptr;
+    unsigned long l;
+
+    if (str[0] == 0)
+        return false;
+
+    l = strtoul(str, &endptr, 10);
+    if (endptr[0] != 0) {
+        // Entire string was not parsed.
+        return false;
+    } else if (l < 0 || l > UINT32_MAX) {
+        return false;
+    }
+
+    *u32 = l;
+    return true;
+}
+
 void
 runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
 {
     ASSERT_RUNNER_IS_INIT;
 
+    regex_t device_suffix_re;
+    if (regcomp(&device_suffix_re, "\\.q[0-9]+$", REG_EXTENDED) != 0)
+        abort();
+
     test_def_t *def;
     char **glob;
+
+    cru_foreach_test_def(def) {
+        def->priv.queue_family_index = NO_QUEUE_FAMILY_INDEX_PREF;
+    }
+
+    split_glob_vec_t split_globs = CRU_VEC_INIT;
+    cru_vec_foreach(glob, testname_globs) {
+        split_glob_t *split_glob = cru_vec_push(&split_globs, 1);
+        regmatch_t match;
+        if (regexec(&device_suffix_re, *glob, 1, &match, 0) == 0) {
+            split_glob->glob = strdup(*glob);
+            split_glob->glob[match.rm_so] = '\0';
+            split_glob->free_string = true;
+            char *queue_family_index_str = &split_glob->glob[match.rm_so + 2];
+            uint32_t queue_family_index;
+            if (parse_u32(queue_family_index_str, &queue_family_index)) {
+                split_glob->queue_family_index = queue_family_index;
+            } else {
+                split_glob->queue_family_index = INVALID_QUEUE_FAMILY_INDEX_PREF;
+            }
+        } else {
+            split_glob->glob = *glob;
+            split_glob->free_string = false;
+            split_glob->queue_family_index = NO_QUEUE_FAMILY_INDEX_PREF;
+        }
+    }
 
     const bool first_glob_is_neg = testname_globs->len > 0 &&
                                    glob_is_negative(testname_globs->data[0]);
 
     const bool implicit_all = testname_globs->len == 0 || first_glob_is_neg;
 
+    split_glob_t *split_glob;
     cru_foreach_test_def(def) {
         bool enable = false;
 
@@ -154,9 +217,13 @@ runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
         }
 
         // Last matching glob wins.
-        cru_vec_foreach(glob, testname_globs) {
-            if (test_def_match(def, *glob)) {
-                enable = !glob_is_negative(*glob);
+        cru_vec_foreach(split_glob, &split_globs) {
+            if (test_def_match(def, split_glob->glob)) {
+                enable =
+                    (split_glob->queue_family_index !=
+                     INVALID_QUEUE_FAMILY_INDEX_PREF) &&
+                    !glob_is_negative(split_glob->glob);
+                def->priv.queue_family_index = split_glob->queue_family_index;
             }
         }
 
@@ -165,4 +232,11 @@ runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
             ++runner_num_tests;
         }
     }
+
+    cru_vec_foreach(split_glob, &split_globs) {
+        if (split_glob->free_string)
+            free(split_glob->glob);
+    }
+    cru_vec_finish(&split_globs);
+    regfree(&device_suffix_re);
 }

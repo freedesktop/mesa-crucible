@@ -32,6 +32,12 @@ Test patterns that begin with \'!' denotes an exclude rule; otherwise the
 pattern denotes an include rule. If the first given pattern is an exclude
 pattern, then Crucible inserts an implied "*" as the first pattern.
 
+Test patterns can optionally add a suffix specifying the queue family index to
+use when running the test.  For example func.foo.q0 will only run the func.foo
+test on queue family index 0, and func.foo.q1 will only run the func.foo
+test on queue family index 1.  If the suffix is not used, then the test will
+be run on all detected queue families.
+
 Special tests match only patterns with special prefixes.  Example tests match
 only patterns that start with "example.".  Benchmark tests match only patterns
 that start with "bench.".  Crucible's self tests match only patterns that start
