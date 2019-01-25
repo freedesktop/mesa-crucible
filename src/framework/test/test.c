@@ -148,6 +148,7 @@ test_create_s(const test_create_info_t *info)
     t->opt.no_separate_cleanup_thread = !info->enable_separate_cleanup_thread;
     t->opt.use_spir_v = info->enable_spir_v;
     t->opt.bootstrap = info->enable_bootstrap;
+    t->opt.queue_family_index = info->queue_family_index;
 
     if (info->enable_bootstrap) {
         if (info->enable_cleanup_phase) {

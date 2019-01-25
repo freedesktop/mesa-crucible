@@ -98,7 +98,8 @@ run_test_def(const test_def_t *def)
                        .enable_cleanup_phase = !runner_opts.no_cleanup_phase,
                        .enable_spir_v = runner_opts.use_spir_v,
                        .enable_separate_cleanup_thread =
-                            runner_opts.use_separate_cleanup_threads);
+                            runner_opts.use_separate_cleanup_threads,
+                       .queue_family_index = 0);
     if (!test)
         return TEST_RESULT_FAIL;
 

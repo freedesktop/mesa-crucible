@@ -72,7 +72,7 @@ __t_queue(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->vk.queue[0];
+    return &t->vk.queue[t_queue_family_index];
 }
 
 const VkQueue *
@@ -99,7 +99,7 @@ __t_cmd_pool(void)
     ASSERT_TEST_IN_MAJOR_PHASE;
     GET_CURRENT_TEST(t);
 
-    return &t->vk.cmd_pool[0];
+    return &t->vk.cmd_pool[t_queue_family_index];
 }
 
 const VkCommandPool *
@@ -226,6 +226,15 @@ __t_use_spir_v(void)
     GET_CURRENT_TEST(t);
 
     return &t->opt.use_spir_v;
+}
+
+const uint32_t *
+__t_queue_family_index(void)
+{
+    ASSERT_TEST_IN_MAJOR_PHASE;
+    GET_CURRENT_TEST(t);
+
+    return &t->opt.queue_family_index;
 }
 
 const char *

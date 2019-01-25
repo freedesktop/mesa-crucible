@@ -56,6 +56,7 @@ typedef struct cru_image cru_image_t;
 #define t_width (*__t_width())
 #define t_height (*__t_height())
 #define t_use_spir_v (*__t_use_spir_v())
+#define t_queue_family_index (*__t_queue_family_index())
 cru_image_t *t_ref_image(void);
 cru_image_t *t_ref_stencil_image(void);
 
@@ -82,3 +83,4 @@ const VkPipelineCache *__t_pipeline_cache(void);
 const uint32_t *__t_height(void);
 const uint32_t *__t_width(void);
 const bool * __t_use_spir_v(void);
+const uint32_t * __t_queue_family_index(void);

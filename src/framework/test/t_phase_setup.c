@@ -433,6 +433,10 @@ t_setup_vulkan(void)
 
     vkGetPhysicalDeviceQueueFamilyProperties(t->vk.physical_dev,
                                              &t->vk.queue_family_count, NULL);
+
+    if (t_queue_family_index >= t->vk.queue_family_count)
+        t_end(TEST_RESULT_SKIP);
+
     t->vk.queue_family_props = malloc(t->vk.queue_family_count *
                                       sizeof(VkQueueFamilyProperties));
     t_assert(t->vk.queue_family_props);
@@ -554,7 +558,7 @@ t_setup_vulkan(void)
             t->vk.transfer_queue = i;
     }
 
-    t->vk.cmd_buffer = qoAllocateCommandBuffer(t->vk.device, t->vk.cmd_pool[0]);
+    t->vk.cmd_buffer = qoAllocateCommandBuffer(t->vk.device, t_cmd_pool);
 
     qoBeginCommandBuffer(t->vk.cmd_buffer);
 }

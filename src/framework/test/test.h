@@ -119,6 +119,8 @@ struct test {
         /// thread. If unset, the result thread will create a separate cleanup
         /// thread.
         bool no_separate_cleanup_thread;
+
+        uint32_t queue_family_index;
     } opt;
 
     /// Atomic counter for t_dump_seq_image().
