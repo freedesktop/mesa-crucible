@@ -32,24 +32,23 @@
 bool
 test_def_match(const test_def_t *def, const char *glob)
 {
+    static const char *skip_prefixes[] = {
+        "bench.",
+        "example.",
+        "self.",
+    };
+
     // Strip the leading '!' modifier before performing the match.
     while (glob && glob[0] == '!') {
         ++glob;
     }
 
-    if (strncmp("bench.", def->name, 6) == 0 &&
-        strncmp("bench.", glob, 6) != 0) {
-        return false;
-    }
-
-    if (strncmp("example.", def->name, 8) == 0 &&
-        strncmp("example.", glob, 8) != 0) {
-        return false;
-    }
-
-    if (strncmp("self.", def->name, 5) == 0 &&
-        strncmp("self.", glob, 5) != 0) {
-        return false;
+    for (size_t i = 0; i < ARRAY_LENGTH(skip_prefixes); i++) {
+        const char *prefix = skip_prefixes[i];
+        if (strncmp(prefix, def->name, strlen(prefix)) == 0 &&
+            strncmp(prefix, glob, strlen(prefix)) != 0) {
+            return false;
+        }
     }
 
     return fnmatch(glob, def->name, 0) == 0;
