@@ -182,7 +182,7 @@ test_multiview(void)
 
     for (int i = 0; i < 2; i++) {
         string_t ref_name = STRING_INIT;
-        string_printf(&ref_name, "%s.ref.%d.png", t_name, i);
+        string_printf(&ref_name, "func.multiview.ref.%d.png", i);
         cru_image_t *ref = t_new_cru_image_from_filename(string_data(&ref_name));
         string_finish(&ref_name);
 
@@ -198,7 +198,7 @@ test_multiview(void)
             result = TEST_RESULT_FAIL;
 
             string_t actual_name = STRING_INIT;
-            string_printf(&actual_name, "%s.actual.%d.png", t_name, i);
+            string_printf(&actual_name, "func.multiview.actual.%d.png", i);
             cru_image_write_file(actual, string_data(&actual_name));
             string_finish(&actual_name);
         }
