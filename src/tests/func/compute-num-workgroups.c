@@ -139,7 +139,10 @@ dispatch_and_wait(CTX *ctx)
 static void
 verify_ssbo(CTX *ctx)
 {
-    uint32_t *map_out = qoMapMemory(t_device, ctx->ssbo, 0, ctx->ssbo_size, 0);
+    uint32_t *map_out = NULL;
+    VkResult result = vkMapMemory(t_device, ctx->ssbo, 0, ctx->ssbo_size, 0, (void **)&map_out);
+    t_assert(result == VK_SUCCESS);
+
     for (unsigned i = 0; i < 64; i++) {
         for (unsigned j = 0; j < 3; j++) {
             uint32_t found = map_out[4 * i + j];
@@ -203,7 +206,10 @@ build_indirect_cmd_buffer(CTX *ctx)
 static void
 indirect_dispatch_and_wait(CTX *ctx)
 {
-    uint32_t *ssbo = qoMapMemory(t_device, ctx->ssbo, 0, ctx->ssbo_size, 0);
+    uint32_t *ssbo = NULL;
+    VkResult result = vkMapMemory(t_device, ctx->ssbo, 0, ctx->ssbo_size, 0, (void **)&ssbo);
+    t_assert(result == VK_SUCCESS);
+
     for (unsigned i = 0; i < 3; i++)
         ssbo[4 * 64 + i] = ctx->sizes[i];
     vkUnmapMemory(t_device, ctx->ssbo);
