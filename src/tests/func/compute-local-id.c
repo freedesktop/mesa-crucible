@@ -29,19 +29,11 @@ common_init(VkShaderModule cs, const uint32_t ssbo_size, VkPipelineLayout *p_lay
     VkDescriptorSetLayout set_layout;
 
     set_layout = qoCreateDescriptorSetLayout(t_device,
-            .bindingCount = 2,
+            .bindingCount = 1,
             .pBindings = (VkDescriptorSetLayoutBinding[]) {
                 {
                     .binding = 0,
                     .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                    .descriptorCount = 1,
-                    .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-                    .pImmutableSamplers = NULL,
-                },
-                /* FIXME: Why do I need this for the test to pass? */
-                {
-                    .binding = 1,
-                    .descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER,
                     .descriptorCount = 1,
                     .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
                     .pImmutableSamplers = NULL,
