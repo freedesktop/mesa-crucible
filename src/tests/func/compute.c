@@ -81,7 +81,9 @@ test(void)
                                 .descriptorPool = t_descriptor_pool,
                                 .pSetLayouts = &set_layout);
 
-    VkBuffer buffer = qoCreateBuffer(t_device, .size = 1024);
+    VkBuffer buffer = qoCreateBuffer(t_device,
+        .size = 1024,
+        .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
 
     VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
         .properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);

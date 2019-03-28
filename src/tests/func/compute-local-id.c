@@ -72,7 +72,9 @@ common_init(VkShaderModule cs, const uint32_t ssbo_size, VkPipelineLayout *p_lay
                                 .descriptorPool = t_descriptor_pool,
                                 .pSetLayouts = &set_layout);
 
-    VkBuffer buffer_out = qoCreateBuffer(t_device, .size = ssbo_size);
+    VkBuffer buffer_out = qoCreateBuffer(t_device,
+        .size = ssbo_size,
+        .usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
     VkDeviceMemory mem_out = qoAllocBufferMemory(t_device, buffer_out,
         .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     qoBindBufferMemory(t_device, buffer_out, mem_out, 0);

@@ -87,7 +87,9 @@ common_init(CTX *ctx)
                                        .descriptorPool = t_descriptor_pool,
                                        .pSetLayouts = &set_layout);
 
-    ctx->ssbo_buf = qoCreateBuffer(t_device, .size = ctx->ssbo_size);
+    ctx->ssbo_buf = qoCreateBuffer(t_device,
+        .size = ctx->ssbo_size,
+        .usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
     ctx->ssbo = qoAllocBufferMemory(t_device, ctx->ssbo_buf,
         .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     qoBindBufferMemory(t_device, ctx->ssbo_buf, ctx->ssbo, 0);
