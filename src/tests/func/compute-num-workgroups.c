@@ -69,7 +69,7 @@ common_init(CTX *ctx)
         }
     );
 
-    vkCreateComputePipelines(t_device, t_pipeline_cache, 1,
+    VkResult result = vkCreateComputePipelines(t_device, t_pipeline_cache, 1,
         &(VkComputePipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
             .pNext = NULL,
@@ -82,6 +82,8 @@ common_init(CTX *ctx)
             .flags = 0,
             .layout = ctx->pipeline_layout
         }, NULL, &ctx->pipeline);
+    t_assert(result == VK_SUCCESS);
+    t_cleanup_push_vk_pipeline(t_device, ctx->pipeline);
 
     ctx->set = qoAllocateDescriptorSet(t_device,
                                        .descriptorPool = t_descriptor_pool,

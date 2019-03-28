@@ -53,7 +53,7 @@ common_init(VkShaderModule cs, const uint32_t ssbo_size, VkPipelineLayout *p_lay
 
     *p_layout = pipeline_layout;
     VkPipeline pipeline;
-    vkCreateComputePipelines(t_device, t_pipeline_cache, 1,
+    VkResult result = vkCreateComputePipelines(t_device, t_pipeline_cache, 1,
         &(VkComputePipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
             .pNext = NULL,
@@ -66,6 +66,8 @@ common_init(VkShaderModule cs, const uint32_t ssbo_size, VkPipelineLayout *p_lay
             .flags = 0,
             .layout = pipeline_layout
         }, NULL, &pipeline);
+    t_assert(result == VK_SUCCESS);
+    t_cleanup_push_vk_pipeline(t_device, pipeline);
 
     VkDescriptorSet set =
         qoAllocateDescriptorSet(t_device,

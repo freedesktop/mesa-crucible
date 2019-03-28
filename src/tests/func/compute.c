@@ -62,7 +62,7 @@ test(void)
     );
 
     VkPipeline pipeline;
-    vkCreateComputePipelines(t_device, t_pipeline_cache, 1,
+    VkResult result = vkCreateComputePipelines(t_device, t_pipeline_cache, 1,
         &(VkComputePipelineCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
             .pNext = NULL,
@@ -75,6 +75,8 @@ test(void)
             .flags = 0,
             .layout = pipeline_layout
         }, NULL, &pipeline);
+    t_assert(result == VK_SUCCESS);
+    t_cleanup_push_vk_pipeline(t_device, pipeline);
 
     VkDescriptorSet set =
         qoAllocateDescriptorSet(t_device,
