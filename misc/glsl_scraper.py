@@ -15,12 +15,15 @@ class ShaderCompileError(RuntimeError):
     def __init__(self, *args):
         super(ShaderCompileError, self).__init__(*args)
 
+target_env_re = re.compile(r'QO_TARGET_ENV\s+(\S+)')
+
 class Shader:
     def __init__(self, stage):
         self.glsl = None
         self.stream = io.StringIO()
         self.stage = stage
         self.dwords = None
+        self.target_env = ""
 
     def add_text(self, s):
         self.stream.write(s)
@@ -31,6 +34,11 @@ class Shader:
 
         # Handle the QO_EXTENSION macro
         self.glsl = self.glsl.replace('QO_EXTENSION', '#extension')
+
+        m = target_env_re.search(self.glsl)
+        if m:
+            self.target_env = m.group(1)
+        self.glsl = self.glsl.replace('QO_TARGET_ENV', '// --target-env')
 
         self.line = line
 
@@ -58,6 +66,8 @@ class Shader:
         in_file.flush()
         out_file = tempfile.NamedTemporaryFile(suffix='.spirv')
         args = [glslang, '-H'] + extra_args + stage_flags
+        if self.target_env:
+            args += ['--target-env', self.target_env]
         args += ['-o', out_file.name, in_file.name]
         with subprocess.Popen(args,
                               stdout = subprocess.PIPE,
