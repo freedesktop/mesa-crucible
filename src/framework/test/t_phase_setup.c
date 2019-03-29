@@ -384,13 +384,16 @@ t_setup_vulkan(void)
            debug_report = &cb_info;
     }
 
+    uint32_t api_version = t->def->api_version ?
+        t->def->api_version : VK_MAKE_VERSION(1, 0, 0);
+
     res = vkCreateInstance(
         &(VkInstanceCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
             .pNext = debug_report,
             .pApplicationInfo = &(VkApplicationInfo) {
                 .pApplicationName = "crucible",
-                .apiVersion = VK_MAKE_VERSION(1, 0, 0),
+                .apiVersion = api_version
             },
             .enabledExtensionCount = t->vk.instance_extension_count,
             .ppEnabledExtensionNames = ext_names,

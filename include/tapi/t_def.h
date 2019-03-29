@@ -87,6 +87,8 @@ struct test_def {
     /// and/or transfer operations.
     enum test_queue_setup queue_setup;
 
+    const uint32_t api_version;
+
     /// \brief Private data for the test framework.
     ///
     /// Test authors shouldn't touch this struct.
