@@ -21,6 +21,7 @@
 // IN THE SOFTWARE.
 
 #include "util/simple_pipeline.h"
+#include "util/misc.h"
 
 #include "tapi/t.h"
 
@@ -163,3 +164,124 @@ run_simple_pipeline(VkShaderModule fs, void *push_constants,
     qoEndCommandBuffer(t_cmd_buffer);
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
 }
+
+
+void run_simple_compute_pipeline(VkShaderModule cs,
+                                 const simple_compute_pipeline_options_t *opts)
+{
+    bool has_push_constants = opts->push_constants_size > 0;
+    bool has_storage = opts->storage_size > 0;
+
+    VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
+        .bindingCount = 1,
+        .pBindings = (VkDescriptorSetLayoutBinding[]) {
+            {
+                .binding = 0,
+                .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                .descriptorCount = 1,
+                .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+                .pImmutableSamplers = NULL,
+            },
+        });
+
+    VkPushConstantRange constant_range = {
+        .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+        .offset = 0,
+        .size = opts->push_constants_size,
+    };
+
+    VkPipelineLayout pipeline_layout = qoCreatePipelineLayout(t_device,
+        .setLayoutCount = has_storage ? 1 : 0,
+        .pSetLayouts = has_storage ? &set_layout : NULL,
+        .pushConstantRangeCount = has_push_constants ? 1 : 0,
+        .pPushConstantRanges = has_push_constants ? &constant_range : NULL);
+
+    VkPipeline pipeline;
+    VkResult result = vkCreateComputePipelines(t_device, t_pipeline_cache, 1,
+        &(VkComputePipelineCreateInfo) {
+            .sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
+            .stage = {
+                .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+                .stage = VK_SHADER_STAGE_COMPUTE_BIT,
+                .module = cs,
+                .pName = "main",
+            },
+            .flags = 0,
+            .layout = pipeline_layout
+        }, NULL, &pipeline);
+    t_assert(result == VK_SUCCESS);
+    t_cleanup_push_vk_pipeline(t_device, pipeline);
+
+    VkDescriptorSet set = qoAllocateDescriptorSet(t_device,
+        .descriptorPool = t_descriptor_pool,
+        .pSetLayouts = &set_layout);
+
+    VkBuffer storage_buf;
+    VkDeviceMemory storage_mem;
+    if (has_storage) {
+        storage_buf = qoCreateBuffer(t_device,
+            .size = opts->storage_size,
+            .usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
+
+        storage_mem = qoAllocBufferMemory(t_device, storage_buf,
+            .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        qoBindBufferMemory(t_device, storage_buf, storage_mem, 0);
+
+        // Copy storage to buffer.
+        void *storage_ptr = NULL;
+        VkResult result = vkMapMemory(t_device, storage_mem, 0,
+                                      opts->storage_size, 0, &storage_ptr);
+        t_assert(result == VK_SUCCESS);
+        memcpy(storage_ptr, opts->storage, opts->storage_size);
+        vkUnmapMemory(t_device, storage_mem);
+
+        vkUpdateDescriptorSets(t_device,
+            /*writeCount*/ 1,
+            (VkWriteDescriptorSet[]) {
+                {
+                    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                    .dstSet = set,
+                    .dstBinding = 0,
+                    .dstArrayElement = 0,
+                    .descriptorCount = 1,
+                    .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                    .pBufferInfo = &(VkDescriptorBufferInfo) {
+                        .buffer = storage_buf,
+                        .offset = 0,
+                        .range = opts->storage_size,
+                    },
+                },
+            }, 0, NULL);
+    }
+
+    vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
+
+    vkCmdBindDescriptorSets(t_cmd_buffer,
+        VK_PIPELINE_BIND_POINT_COMPUTE,
+        pipeline_layout, 0, 1,
+        &set, 0, NULL);
+
+    if (has_push_constants) {
+        vkCmdPushConstants(t_cmd_buffer, pipeline_layout,
+            VK_SHADER_STAGE_COMPUTE_BIT, 0,
+            opts->push_constants_size, opts->push_constants);
+    }
+
+    vkCmdDispatch(t_cmd_buffer, MAX(1, opts->x_count),
+                  MAX(1, opts->y_count), MAX(1, opts->z_count));
+
+    qoEndCommandBuffer(t_cmd_buffer);
+    qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
+    qoQueueWaitIdle(t_queue);
+
+    // Copy storage back.
+    if (has_storage) {
+        void *storage_ptr = NULL;
+        VkResult result = vkMapMemory(t_device, storage_mem, 0,
+                                      opts->storage_size, 0, &storage_ptr);
+        t_assert(result == VK_SUCCESS);
+        memcpy(opts->storage, storage_ptr, opts->storage_size);
+        vkUnmapMemory(t_device, storage_mem);
+    }
+}
+

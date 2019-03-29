@@ -24,3 +24,22 @@
 
 void run_simple_pipeline(VkShaderModule fs, void *push_constants,
                          size_t push_constants_size);
+
+typedef struct simple_compute_pipeline_options simple_compute_pipeline_options_t;
+
+struct simple_compute_pipeline_options {
+    void *push_constants;
+    size_t push_constants_size;
+
+    // Bound to set 0, descriptor 0.
+    void *storage;
+    size_t storage_size;
+
+    // Defaults to 1 if not specified.
+    uint32_t x_count;
+    uint32_t y_count;
+    uint32_t z_count;
+};
+
+void run_simple_compute_pipeline(VkShaderModule cs,
+                                 const struct simple_compute_pipeline_options *opts);
