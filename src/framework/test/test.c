@@ -152,6 +152,7 @@ test_create_s(const test_create_info_t *info)
     t->opt.use_spir_v = info->enable_spir_v;
     t->opt.bootstrap = info->enable_bootstrap;
     t->opt.queue_family_index = info->queue_family_index;
+    t->opt.device_id = info->device_id;
 
     if (info->enable_bootstrap) {
         if (info->enable_cleanup_phase) {

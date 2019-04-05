@@ -24,6 +24,9 @@
 #include "test.h"
 #include "t_phase_setup.h"
 
+/* Maximum supported physical devs. */
+#define MAX_PHYSICAL_DEVS 4
+
 static void *
 test_vk_alloc(void *pUserData, size_t size, size_t alignment,
               VkSystemAllocationScope scope)
@@ -70,16 +73,16 @@ t_setup_phys_dev(void)
     ASSERT_TEST_IN_SETUP_PHASE;
     GET_CURRENT_TEST(t);
 
-    // Crucible uses only the first physical device.
-    // FINISHME: Add a command-line option to use non-default physical device.
+    VkPhysicalDevice physical_devs[MAX_PHYSICAL_DEVS];
 
     uint32_t count = 0;
     qoEnumeratePhysicalDevices(t->vk.instance, &count, NULL);
     t_assertf(count > 0, "failed to enumerate any physical devices");
+    t_assertf(count <= MAX_PHYSICAL_DEVS, "reached the maximum supported physical devices");
+    t_assertf(t->opt.device_id <= count, "requested device id not found");
 
-    count = 1;
-    qoEnumeratePhysicalDevices(t->vk.instance, &count, &t->vk.physical_dev);
-    t_assertf(count == 1, "enumerated %u physical devices, expected 1", count);
+    qoEnumeratePhysicalDevices(t->vk.instance, &count, physical_devs);
+    t->vk.physical_dev = physical_devs[t->opt.device_id - 1];
 
     qoGetPhysicalDeviceProperties(t->vk.physical_dev, &t->vk.physical_dev_props);
 }

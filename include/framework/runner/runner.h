@@ -51,6 +51,8 @@ struct runner_opts {
 
     /// The runner will write JUnit XML to this path, if not NULL.
     const char *junit_xml_filepath;
+
+    int device_id;
 };
 
 bool runner_init(runner_opts_t *opts);

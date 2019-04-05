@@ -35,6 +35,7 @@ __crucible_run()
       --no-cleanup
       --use-spir-v
       --junit-xml
+      --device-id
    "
 
    COMPREPLY=($(compgen -W "$flags $($1 ls-tests)" -- ${COMP_WORDS[COMP_CWORD]}))

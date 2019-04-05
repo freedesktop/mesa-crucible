@@ -121,6 +121,9 @@ struct test {
         /// thread.
         bool no_separate_cleanup_thread;
 
+        /// The Vulkan device ID.
+        int device_id;
+
         uint32_t queue_family_index;
     } opt;
 

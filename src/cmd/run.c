@@ -39,6 +39,7 @@ static int opt_dump = 0;
 static int opt_use_spir_v = 1;
 static int opt_separate_cleanup_thread = 1;
 static char *opt_junit_xml = NULL;
+static int opt_device_id = 1;
 
 // From man:getopt(3) :
 //
@@ -52,12 +53,13 @@ static char *opt_junit_xml = NULL;
 //    above) of optstring is a colon (':'),  then getopt() returns ':' instead
 //    of '?' to indicate a missing option argument.
 //
-static const char *shortopts = "+:hj:I:";
+static const char *shortopts = "+:hj:I:d:";
 
 enum opt_name {
     OPT_NAME_HELP = 'h',
     OPT_NAME_JOBS = 'j',
     OPT_NAME_ISLOATION = 'I',
+    OPT_NAME_DEVICE_ID = 'd',
 
     // Begin long-only options. They begin with the first char value outside
     // the ASCII range.
@@ -77,6 +79,7 @@ static const struct option longopts[] = {
     {"use-spir-v",    no_argument,       &opt_use_spir_v, true},
     {"no-spir-v",     no_argument,       &opt_use_spir_v, false},
     {"junit-xml",     required_argument, NULL,            OPT_NAME_JUNIT_XML},
+    {"device-id",     required_argument, NULL,            OPT_NAME_DEVICE_ID},
 
     {"separate-cleanup-threads",    no_argument, &opt_separate_cleanup_thread, true},
     {"no-separate-cleanup-threads", no_argument, &opt_separate_cleanup_thread, false},
@@ -150,6 +153,12 @@ parse_args(const cru_command_t *cmd, int argc, char **argv)
             break;
         case OPT_NAME_JUNIT_XML:
             opt_junit_xml = strdup(optarg);
+            break;
+        case OPT_NAME_DEVICE_ID:
+            opt_device_id = strtol(optarg, NULL, 10);
+            if (opt_device_id <= 0) {
+                cru_usage_error(cmd, "--device must be at least 1");
+            }
             break;
         case ':':
             cru_usage_error(cmd, "%s requires an argument", argv[optind-1]);
@@ -265,6 +274,7 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
         .no_image_dumps = !opt_dump,
         .use_spir_v = opt_use_spir_v,
         .junit_xml_filepath = opt_junit_xml,
+        .device_id = opt_device_id,
     });
 
     if (opt_log_pids)

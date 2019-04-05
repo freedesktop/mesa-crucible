@@ -13,6 +13,7 @@ SYNOPSIS
                [--jobs=<jobs> | -j <jobs>] [--[no-]separate-cleanup-threads]
                [--use-spir-v|--no-spir-v] [--isolation=<method> | -I <method>]
                [--junit-xml=<junit-xml-file>]
+               [--device-id=<device-id>]
                [<pattern>...]
 
 DESCRIPTION
@@ -82,6 +83,9 @@ OPTIONS
 
 --junit-xml=<junit-xml-file>::
     Write JUnit XML to the given file.
+
+--device-id=<device-id>::
+    Select the Vulkan device ID (IDs start from 1).
 
 EXAMPLES
 --------
