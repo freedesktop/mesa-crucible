@@ -85,19 +85,19 @@ cubeFaceCoordTC(void)
         float result;
     } cases[] = {
         {{1.0, -0.1, 0.8,},  0.1},  // -y
-        {{-1.0, 0.5, 0.3,}, -0.5},  // -y
-        {{-0.2, 1.0, 0.7,},  0.7},  // +z
-        {{0.9, -1.0, 0.4,}, -0.4},  // -z
-        {{-0.1, 0.0, 1.0,}, -0.0},  // -y
-        {{0.3, 0.6, -1.0,}, -0.6},  // -y
+        {{-1.0, 0.5, 0.3,},  0.35}, // -y
+        {{-0.2, 1.0, 0.7,},  0.4},  // +z
+        {{0.9, -1.0, 0.4,},  0.05}, // -z
+        {{-0.1, 0.0, 1.0,},  0.45}, // -y
+        {{0.3, 0.6, -1.0,},  0.65}, // -y
         /* corner cases */
-        {{1.0, 1.0, -0.0,}, -0.0},  // +z -> posY
+        {{1.0, 1.0, -0.0,},  1.0},  // +z -> posY
         {{1.0, -1.0, 0.0,}, -0.0},  // -z -> negY
-        {{0.0, 0.0,  0.0,}, -0.0},  // -y -> posZ
-        {{1.0, 1.0, -1.0,}, -1.0},  // -y -> negZ
+        {{0.0, 0.0,  0.0,}, -NAN},  // -y -> posZ
+        {{1.0, 1.0, -1.0,},  1.0},  // -y -> negZ
     };
 
-    RUN_CASES(float, "%f");
+    RUN_CASES_CLOSE(float, "%f");
 }
 test_define {
     .name = "func.amd.gcn-shader.cube-face-coord-tc",
@@ -129,20 +129,20 @@ cubeFaceCoordSC(void)
         float params[3];
         float result;
     } cases[] = {
-        {{1.0, -0.1, 0.8,}, -0.8},  // -z
-        {{-1.0, 0.5, 0.3,},  0.3},  // +z
-        {{-0.2, 1.0, 0.7,}, -0.2},  // +x
-        {{0.9, -1.0, 0.4,},  0.9},  // +x
-        {{-0.1, 0.0, 1.0,}, -0.1},  // +x
-        {{0.3, 0.6, -1.0,}, -0.3},  // -x
+        {{1.0, -0.1, 0.8,},  0.55}, // -z
+        {{-1.0, 0.5, 0.3,},  0.75}, // +z
+        {{-0.2, 1.0, 0.7,},  0.85}, // +x
+        {{0.9, -1.0, 0.4,},  0.7},  // +x
+        {{-0.1, 0.0, 1.0,},  0.5},  // +x
+        {{0.3, 0.6, -1.0,},  0.8},  // -x
         /* corner cases */
-        {{1.0, 1.0, -0.0,},  1.0}, // +x -> posY
-        {{1.0, -1.0, 0.0,},  1.0}, // +x -> negY
-        {{0.0, 0.0,  0.0,},  0.0}, // +x -> posZ
-        {{1.0, 1.0, -1.0,}, -1.0}, // -x -> negZ
+        {{1.0, 1.0, -0.0,},  0.5}, // +x -> posY
+        {{1.0, -1.0, 0.0,},  0.5}, // +x -> negY
+        {{0.0, 0.0,  0.0,}, -NAN}, // +x -> posZ
+        {{1.0, 1.0, -1.0,},  1.0}, // -x -> negZ
     };
 
-    RUN_CASES(float, "%f");
+    RUN_CASES_CLOSE(float, "%f");
 }
 test_define {
     .name = "func.amd.gcn-shader.cube-face-coord-sc",
@@ -208,23 +208,32 @@ constant_folding(void)
             vec3 i[8];
         };
 
+        /* compare integer representations to handle NaNs */
+        bool test(float a, float b) {
+            return floatBitsToInt(a) == floatBitsToInt(b);
+        }
+
+        bool test(vec2 a, vec2 b) {
+            return floatBitsToInt(a) == floatBitsToInt(b);
+        }
+
         void main() {
-            if (cubeFaceCoordAMD(vec3(1.0, -0.1, 0.8)) == cubeFaceCoordAMD(i[0]) &&
-            cubeFaceCoordAMD(vec3(-1.0, 0.5, 0.3)) == cubeFaceCoordAMD(i[1]) &&
-            cubeFaceCoordAMD(vec3(-0.2, 1.0, 0.7)) == cubeFaceCoordAMD(i[2]) &&
-            cubeFaceCoordAMD(vec3(0.9, -1.0, 0.4)) == cubeFaceCoordAMD(i[3]) &&
-            cubeFaceCoordAMD(vec3(-0.1, 0.0, 1.0)) == cubeFaceCoordAMD(i[4]) &&
-            cubeFaceCoordAMD(vec3(0.3, 0.6, -1.0)) == cubeFaceCoordAMD(i[5]) &&
-            cubeFaceCoordAMD(vec3(1.0, 1.0, -0.0)) == cubeFaceCoordAMD(i[6]) &&
-            cubeFaceCoordAMD(vec3(0.0, 0.0,  0.0)) == cubeFaceCoordAMD(i[7]) &&
-            cubeFaceIndexAMD(vec3(1.0, -0.1, 0.8)) == cubeFaceIndexAMD(i[0]) &&
-            cubeFaceIndexAMD(vec3(-1.0, 0.5, 0.3)) == cubeFaceIndexAMD(i[1]) &&
-            cubeFaceIndexAMD(vec3(-0.2, 1.0, 0.7)) == cubeFaceIndexAMD(i[2]) &&
-            cubeFaceIndexAMD(vec3(0.9, -1.0, 0.4)) == cubeFaceIndexAMD(i[3]) &&
-            cubeFaceIndexAMD(vec3(-0.1, 0.0, 1.0)) == cubeFaceIndexAMD(i[4]) &&
-            cubeFaceIndexAMD(vec3(0.3, 0.6, -1.0)) == cubeFaceIndexAMD(i[5]) &&
-            cubeFaceIndexAMD(vec3(1.0, 1.0, -0.0)) == cubeFaceIndexAMD(i[6]) &&
-            cubeFaceIndexAMD(vec3(0.0, 0.0,  0.0)) == cubeFaceIndexAMD(i[7]))
+            if (test(cubeFaceCoordAMD(vec3(1.0, -0.1, 0.8)), cubeFaceCoordAMD(i[0])) &&
+            test(cubeFaceCoordAMD(vec3(-1.0, 0.5, 0.3)), cubeFaceCoordAMD(i[1])) &&
+            test(cubeFaceCoordAMD(vec3(-0.2, 1.0, 0.7)), cubeFaceCoordAMD(i[2])) &&
+            test(cubeFaceCoordAMD(vec3(0.9, -1.0, 0.4)), cubeFaceCoordAMD(i[3])) &&
+            test(cubeFaceCoordAMD(vec3(-0.1, 0.0, 1.0)), cubeFaceCoordAMD(i[4])) &&
+            test(cubeFaceCoordAMD(vec3(0.3, 0.6, -1.0)), cubeFaceCoordAMD(i[5])) &&
+            test(cubeFaceCoordAMD(vec3(1.0, 1.0, -0.0)), cubeFaceCoordAMD(i[6])) &&
+            test(cubeFaceCoordAMD(vec3(0.0, 0.0,  0.0)), cubeFaceCoordAMD(i[7])) &&
+            test(cubeFaceIndexAMD(vec3(1.0, -0.1, 0.8)), cubeFaceIndexAMD(i[0])) &&
+            test(cubeFaceIndexAMD(vec3(-1.0, 0.5, 0.3)), cubeFaceIndexAMD(i[1])) &&
+            test(cubeFaceIndexAMD(vec3(-0.2, 1.0, 0.7)), cubeFaceIndexAMD(i[2])) &&
+            test(cubeFaceIndexAMD(vec3(0.9, -1.0, 0.4)), cubeFaceIndexAMD(i[3])) &&
+            test(cubeFaceIndexAMD(vec3(-0.1, 0.0, 1.0)), cubeFaceIndexAMD(i[4])) &&
+            test(cubeFaceIndexAMD(vec3(0.3, 0.6, -1.0)), cubeFaceIndexAMD(i[5])) &&
+            test(cubeFaceIndexAMD(vec3(1.0, 1.0, -0.0)), cubeFaceIndexAMD(i[6])) &&
+            test(cubeFaceIndexAMD(vec3(0.0, 0.0,  0.0)), cubeFaceIndexAMD(i[7])))
                 f_color = vec4(0.0, 1.0, 0.0, 1.0);
             else
                 f_color = vec4(1.0, 0.0, 0.0, 1.0);

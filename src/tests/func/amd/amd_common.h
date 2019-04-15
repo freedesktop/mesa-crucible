@@ -22,13 +22,15 @@
 #ifndef AMD_COMMON_H
 #define AMD_COMMON_H
 
+#include <math.h>
+
 VkDeviceMemory
 common_init(VkShaderModule cs, const uint32_t ssbo_size);
 
 void
 dispatch_and_wait(uint32_t x, uint32_t y, uint32_t z);
 
-#define RUN_CASES(type, printf_identifier) {                                              \
+#define RUN_CASES_CMP(type, printf_identifier, cmp) {                                     \
     const unsigned case_count = sizeof(cases) / sizeof(cases[0]);                         \
     const uint32_t ssbo_size = 16 * case_count;                                           \
     VkDeviceMemory mem = common_init(cs, ssbo_size);                                      \
@@ -42,12 +44,20 @@ dispatch_and_wait(uint32_t x, uint32_t y, uint32_t z);
     dispatch_and_wait(case_count, 1, 1);                                                  \
                                                                                           \
     for (unsigned i = 0; i < case_count; i++) {                                           \
-        t_assertf(map[4 * i + 3] == cases[i].result,                                      \
+        t_assertf((cmp(map[4 * i + 3], cases[i].result)),                                 \
                   "buffer mismatch at case %d: found " printf_identifier ", "             \
                   "expected " printf_identifier, i, map[4 * i + 3], cases[i].result);     \
     }                                                                                     \
     t_pass();                                                                             \
 }
+
+#define CMP_EXACT(a, b) a == b
+#define RUN_CASES(type, printf_identifier)                                                \
+    RUN_CASES_CMP(type, printf_identifier, CMP_EXACT)
+
+#define CMP_CLOSE(a, b) (isnan(a) && isnan(b)) || fabs(a - b) < 0.001
+#define RUN_CASES_CLOSE(type, printf_identifier)                                          \
+    RUN_CASES_CMP(type, printf_identifier, CMP_CLOSE)
 
 
 #endif	// AMD_COMMON_H
