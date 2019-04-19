@@ -56,11 +56,8 @@ subgroup_quad_swap_vertical_linear(void)
 
         layout(local_size_x = 4, local_size_y = 2) in;
 
-        layout(push_constant, std430) uniform Push {
-            uint expected[8];
-        };
-
         layout(set = 0, binding = 0) buffer Storage {
+            uint expected[8];
             uint fail;
         };
 
@@ -72,23 +69,25 @@ subgroup_quad_swap_vertical_linear(void)
         }
     );
 
-    uint32_t expected[8] = {
-        2, 3,
-        0, 1,
+    struct {
+        uint32_t expected[8];
+        uint32_t failed;
+    } data = {
+        {
+            2, 3,
+            0, 1,
 
-        6, 7,
-        4, 5,
+            6, 7,
+            4, 5
+        },
     };
-    uint32_t failed = 0;
-    simple_compute_pipeline_options_t opts = {
-        .push_constants = expected,
-        .push_constants_size = sizeof(expected),
 
-        .storage = &failed,
-        .storage_size = sizeof(failed),
+    simple_compute_pipeline_options_t opts = {
+        .storage = &data,
+        .storage_size = sizeof(data),
     };
     run_simple_compute_pipeline(cs, &opts);
-    t_assert(!failed);
+    t_assert(!data.failed);
 
     t_pass();
 }
@@ -136,11 +135,8 @@ subgroup_quad_swap_vertical_grid(void)
         layout(local_size_x = 4, local_size_y = 2) in;
         layout(derivative_group_quadsNV) in;
 
-        layout(push_constant, std430) uniform Push {
-            uint expected[8];
-        };
-
         layout(set = 0, binding = 0) buffer Storage {
+            uint expected[8];
             uint fail;
         };
 
@@ -152,20 +148,22 @@ subgroup_quad_swap_vertical_grid(void)
         }
     );
 
-    uint32_t expected[8] = {
-        4, 5, 6, 7,
-        0, 1, 2, 3,
+    struct {
+        uint32_t expected[8];
+        uint32_t failed;
+    } data = {
+        {
+            4, 5, 6, 7,
+            0, 1, 2, 3,
+        },
     };
-    uint32_t failed = 0;
-    simple_compute_pipeline_options_t opts = {
-        .push_constants = expected,
-        .push_constants_size = sizeof(expected),
 
-        .storage = &failed,
-        .storage_size = sizeof(failed),
+    simple_compute_pipeline_options_t opts = {
+        .storage = &data,
+        .storage_size = sizeof(data),
     };
     run_simple_compute_pipeline(cs, &opts);
-    t_assert(!failed);
+    t_assert(!data.failed);
 
     t_pass();
 }
