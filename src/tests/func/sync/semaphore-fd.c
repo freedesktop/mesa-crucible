@@ -995,9 +995,11 @@ test_sync_fd(void)
     for (unsigned i = 0; i < NUM_HASH_ITERATIONS; i++) {
         struct test_context *ctx;
 
+        VkPipelineStageFlags top_of_pipeline = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
         VkSubmitInfo submit = {
             .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
             .commandBufferCount = 1,
+            .pWaitDstStageMask = &top_of_pipeline,
         };
 
         if ((i & 1) == 0) {
