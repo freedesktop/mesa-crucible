@@ -1052,7 +1052,7 @@ test_sync_fd(void)
         t_assert(result == VK_SUCCESS);
 
         if (i != NUM_HASH_ITERATIONS - 1) {
-            result = GetSemaphoreFdKHR(ctx1.device,
+            result = GetSemaphoreFdKHR(ctx->device,
                 &(VkSemaphoreGetFdInfoKHR) {
                     .sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR,
                     .semaphore = signal_sem,
