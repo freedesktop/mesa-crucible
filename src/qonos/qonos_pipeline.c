@@ -43,6 +43,7 @@ qoCreateGraphicsPipeline(VkDevice device,
     VkPipelineRasterizationStateCreateInfo rs_info;
     VkPipelineMultisampleStateCreateInfo ms_info;
     VkPipelineDepthStencilStateCreateInfo ds_info;
+    VkPipelineColorBlendAttachmentState cb_att;
     VkPipelineColorBlendStateCreateInfo cb_info;
     VkPipelineShaderStageCreateInfo stage_info[NUM_SHADER_STAGES];
     VkDynamicState dynamic_states[VK_DYNAMIC_STATE_RANGE_SIZE];
@@ -118,8 +119,13 @@ qoCreateGraphicsPipeline(VkDevice device,
     }
 
     if (pipeline_info.pColorBlendState == NULL) {
+        cb_att = (VkPipelineColorBlendAttachmentState) {
+            QO_PIPELINE_COLOR_BLEND_ATTACHMENT_STATE_DEFAULTS,
+        };
         cb_info = (VkPipelineColorBlendStateCreateInfo) {
             QO_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO_DEFAULTS,
+            .attachmentCount = 1,
+            .pAttachments = &cb_att,
         };
         pipeline_info.pColorBlendState = &cb_info;
     }

@@ -210,10 +210,7 @@ typedef struct QoShaderModuleCreateInfo_ {
 
 #define QO_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO_DEFAULTS \
     .sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO, \
-    .attachmentCount = 1, \
-    .pAttachments = (VkPipelineColorBlendAttachmentState []) { \
-       { QO_PIPELINE_COLOR_BLEND_ATTACHMENT_STATE_DEFAULTS }, \
-    }, \
+    .attachmentCount = 0, \
     .blendConstants = {0.0f, 0.0f, 0.0f, 0.0f} /* default in OpenGL ES 3.1 */
 
 #define QO_COMMAND_BUFFER_ALLOCATE_INFO_DEFAULTS \
