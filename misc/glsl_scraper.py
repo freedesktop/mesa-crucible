@@ -28,7 +28,7 @@ class Shader:
     def add_text(self, s):
         self.stream.write(s)
 
-    def finish_text(self, line):
+    def finish_text(self, start_line, end_line):
         self.glsl = self.stream.getvalue()
         self.stream = None
 
@@ -40,7 +40,8 @@ class Shader:
             self.target_env = m.group(1)
         self.glsl = self.glsl.replace('QO_TARGET_ENV', '// --target-env')
 
-        self.line = line
+        self.start_line = start_line
+        self.end_line = end_line
 
     def __run_glslang(self, extra_args=[]):
         if self.stage == 'VERTEX':
@@ -131,7 +132,7 @@ class Shader:
 
     def dump_c_code(self, f, glsl_only = False):
         f.write('\n\n')
-        var_prefix = '__qonos_shader{0}'.format(self.line)
+        var_prefix = '__qonos_shader{0}'.format(self.end_line)
 
         self._dump_glsl_code(f, var_prefix + '_glsl_src')
 
@@ -152,7 +153,10 @@ class Shader:
 
         f.write("    .stage = VK_SHADER_STAGE_{0}_BIT,\n".format(self.stage))
 
-        f.write('};')
+        f.write('};\n')
+
+        f.write('#define __qonos_shader{0}_info __qonos_shader{1}_info\n'\
+                .format(self.start_line, self.end_line))
 
 token_exp = re.compile(r'(qoShaderModuleCreateInfoGLSL|qoCreateShaderModuleGLSL|\(|\)|,)')
 
@@ -208,6 +212,8 @@ class Parser:
         t = next(self.token_iter)
         assert t == '('
 
+        start_line = self.line_number
+
         if macro == 'qoCreateShaderModuleGLSL':
             # Throw away the device parameter
             t = next(self.token_iter)
@@ -221,7 +227,7 @@ class Parser:
 
         self.current_shader = Shader(stage)
         self.handle_shader_src()
-        self.current_shader.finish_text(self.line_number)
+        self.current_shader.finish_text(start_line, self.line_number)
 
         self.shaders.append(self.current_shader)
         self.current_shader = None
