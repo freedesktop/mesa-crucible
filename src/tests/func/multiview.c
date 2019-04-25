@@ -113,9 +113,6 @@ test_multiview(void)
                 QO_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO_DEFAULTS,
                 .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
             },
-            .pColorBlendState = &(VkPipelineColorBlendStateCreateInfo) {
-                QO_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO_DEFAULTS
-            },
             .pViewportState = &(VkPipelineViewportStateCreateInfo) {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
                 .viewportCount = 1,

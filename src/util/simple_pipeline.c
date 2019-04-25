@@ -110,9 +110,6 @@ run_simple_pipeline(VkShaderModule fs, void *push_constants,
                 QO_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO_DEFAULTS,
                 .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
             },
-            .pColorBlendState = &(VkPipelineColorBlendStateCreateInfo) {
-                QO_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO_DEFAULTS
-            },
             .pVertexInputState = &vi_info,
             .renderPass = pass,
             .layout = layout,
