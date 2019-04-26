@@ -78,6 +78,7 @@ bin_crucible_SOURCES = \
 	src/tests/bug/108909.c \
 	src/tests/bug/108911.c \
 	src/tests/bench/copy-buffer.c \
+	src/tests/bench/descriptor-pool-reset.c \
 	src/tests/example/basic.c \
 	src/tests/example/images.c \
 	src/tests/example/messages.c \
