@@ -422,6 +422,12 @@ static void
 master_gather_vulkan_info(void)
 {
     uint32_t num_vulkan_queues;
+
+    if (runner_opts.no_fork) {
+        if (!runner_get_vulkan_queue_count(&master.num_vulkan_queues))
+            master.goto_next_phase = true;
+        return;
+    }
     slave_pipe_t pipe;
     slave_pipe_init(NULL, &pipe);
     int pid = fork();
