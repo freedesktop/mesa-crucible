@@ -64,6 +64,7 @@ test_memory_budget(void)
          type_index++)
     {
         uint32_t heap_index = t_physical_dev_mem_props->memoryTypes[type_index].heapIndex;
+        VkMemoryPropertyFlags property = t_physical_dev_mem_props->memoryTypes[type_index].propertyFlags;
 
         VkDeviceSize usage_before, budget_before;
         get_memory_budget(heap_index, &usage_before, &budget_before);
@@ -73,11 +74,13 @@ test_memory_budget(void)
         VkDeviceMemory mem = qoAllocBufferMemory(t_device, buffer,
                                                  .memoryTypeIndex = type_index);
 
-        uint8_t *map = qoMapMemory(t_device, mem, /*offset*/ 0,
-                                   BUFFER_SIZE, /*flags*/ 0);
+        if (property & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) {
+            uint8_t *map = qoMapMemory(t_device, mem, /*offset*/ 0,
+                                       BUFFER_SIZE, /*flags*/ 0);
 
-        /* Write something so that the memory gets actually allocated */
-        memset(map, 0xff, BUFFER_SIZE);
+            /* Write something so that the memory gets actually allocated */
+            memset(map, 0xff, BUFFER_SIZE);
+        }
 
         VkDeviceSize usage_after, budget_after;
         get_memory_budget(heap_index, &usage_after, &budget_after);
