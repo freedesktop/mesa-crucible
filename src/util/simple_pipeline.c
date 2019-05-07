@@ -85,7 +85,7 @@ run_simple_pipeline(VkShaderModule fs, void *push_constants,
         }
     };
 
-    VkPipelineLayout layout = VK_NULL_HANDLE;
+    VkPipelineLayout layout;
     if (push_constants_size) {
         VkPushConstantRange constants = {
             .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -96,6 +96,8 @@ run_simple_pipeline(VkShaderModule fs, void *push_constants,
         layout = qoCreatePipelineLayout(t_device,
             .pushConstantRangeCount = 1,
             .pPushConstantRanges = &constants);
+    } else {
+        layout = qoCreatePipelineLayout(t_device, .pushConstantRangeCount = 0);
     }
 
     VkPipeline pipeline = qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
