@@ -125,6 +125,8 @@ struct test {
         int device_id;
 
         uint32_t queue_family_index;
+
+        bool verbose;
     } opt;
 
     /// Atomic counter for t_dump_seq_image().

@@ -14,6 +14,7 @@ SYNOPSIS
                [--use-spir-v|--no-spir-v] [--isolation=<method> | -I <method>]
                [--junit-xml=<junit-xml-file>]
                [--device-id=<device-id>]
+	       [--verbose]
                [<pattern>...]
 
 DESCRIPTION
@@ -86,6 +87,9 @@ OPTIONS
 
 --device-id=<device-id>::
     Select the Vulkan device ID (IDs start from 1).
+
+--verbose::
+    Show more detailed output when executing tests.
 
 EXAMPLES
 --------

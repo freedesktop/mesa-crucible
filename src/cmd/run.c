@@ -40,6 +40,7 @@ static int opt_use_spir_v = 1;
 static int opt_separate_cleanup_thread = 1;
 static char *opt_junit_xml = NULL;
 static int opt_device_id = 1;
+static int opt_verbose = 0;
 
 // From man:getopt(3) :
 //
@@ -83,6 +84,9 @@ static const struct option longopts[] = {
 
     {"separate-cleanup-threads",    no_argument, &opt_separate_cleanup_thread, true},
     {"no-separate-cleanup-threads", no_argument, &opt_separate_cleanup_thread, false},
+
+    {"verbose",    no_argument, &opt_verbose, true},
+    {"no-verbose", no_argument, &opt_verbose, false},
 
     {0},
 };
@@ -275,6 +279,7 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
         .use_spir_v = opt_use_spir_v,
         .junit_xml_filepath = opt_junit_xml,
         .device_id = opt_device_id,
+        .verbose = opt_verbose,
     });
 
     if (opt_log_pids)

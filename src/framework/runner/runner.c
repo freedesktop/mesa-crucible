@@ -102,7 +102,8 @@ run_test_def(const test_def_t *def, uint32_t queue_family_index)
                        .enable_separate_cleanup_thread =
                             runner_opts.use_separate_cleanup_threads,
                        .device_id = runner_opts.device_id,
-                       .queue_family_index = queue_family_index);
+                       .queue_family_index = queue_family_index,
+                       .verbose = runner_opts.verbose);
     if (!test)
         return TEST_RESULT_FAIL;
 

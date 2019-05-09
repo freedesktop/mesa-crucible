@@ -153,6 +153,7 @@ test_create_s(const test_create_info_t *info)
     t->opt.bootstrap = info->enable_bootstrap;
     t->opt.queue_family_index = info->queue_family_index;
     t->opt.device_id = info->device_id;
+    t->opt.verbose = info->verbose;
 
     if (info->enable_bootstrap) {
         if (info->enable_cleanup_phase) {
