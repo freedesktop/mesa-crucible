@@ -370,14 +370,17 @@ t_setup_vulkan(void)
     bool has_debug_report = false;
     VkDebugReportCallbackCreateInfoEXT debug_report_info = {
         .sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
-        .flags = VK_DEBUG_REPORT_INFORMATION_BIT_EXT |
-                 VK_DEBUG_REPORT_WARNING_BIT_EXT |
+        .flags = VK_DEBUG_REPORT_WARNING_BIT_EXT |
                  VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT |
-                 VK_DEBUG_REPORT_ERROR_BIT_EXT |
-                 VK_DEBUG_REPORT_DEBUG_BIT_EXT,
+                 VK_DEBUG_REPORT_ERROR_BIT_EXT,
         .pfnCallback = debug_cb,
         .pUserData = t,
     };
+
+    if (t->opt.verbose) {
+        debug_report_info.flags |= VK_DEBUG_REPORT_INFORMATION_BIT_EXT |
+                                   VK_DEBUG_REPORT_DEBUG_BIT_EXT;
+    }
 
     for (uint32_t i = 0; i < t->vk.instance_extension_count; i++) {
         ext_names[i] = t->vk.instance_extension_props[i].extensionName;

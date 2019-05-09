@@ -89,7 +89,9 @@ OPTIONS
     Select the Vulkan device ID (IDs start from 1).
 
 --verbose::
-    Show more detailed output when executing tests.
+    Show more detailed output when executing tests. When
+    VK_KHR_debug_report is available, show all the available messages
+    instead of just warnings and errors.
 
 EXAMPLES
 --------
