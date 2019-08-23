@@ -146,17 +146,21 @@ builtins(void)
                 return;
             }
 
+            // Used to ensure that only valid invocations can have
+            // their bit set.
+            uint64_t mask = ~(~0ul << gl_SubGroupSizeARB);
+
             if (gl_SubGroupEqMaskARB != (1ul << id)) {
                 f_color = vec4(1.0, 1 / 255.0, id / 255.0, 0.0);
                 return;
             }
 
-            if (gl_SubGroupGeMaskARB != (~0ul << id)) {
+            if (gl_SubGroupGeMaskARB != ((~0ul << id) & mask)) {
                 f_color = vec4(1.0, 2 / 255.0, id / 255.0, 0.0);
                 return;
             }
 
-            if (gl_SubGroupGtMaskARB != (~1ul << id)) {
+            if (gl_SubGroupGtMaskARB != ((~1ul << id) & mask)) {
                 f_color = vec4(1.0, 2 / 255.0, id / 255.0, 0.0);
                 return;
             }
