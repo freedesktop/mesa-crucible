@@ -104,6 +104,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/compute-derivative.c \
 	src/tests/func/compute-local-id.c \
 	src/tests/func/compute-num-workgroups.c \
+	src/tests/func/compute-shared-memory.c \
 	src/tests/func/compute-subgroup-quad.c \
 	src/tests/func/interleaved-cmd-buffers.c \
 	src/tests/func/memory-budget.c \
@@ -155,6 +156,7 @@ BUILT_SOURCES = \
 	src/tests/func/compute-derivative-spirv.h \
 	src/tests/func/compute-local-id-spirv.h \
 	src/tests/func/compute-num-workgroups-spirv.h \
+	src/tests/func/compute-shared-memory-spirv.h \
 	src/tests/func/compute-subgroup-quad-spirv.h \
 	src/tests/func/miptree/miptree-spirv.h \
 	src/tests/func/miptree/miptree_gen.c \
