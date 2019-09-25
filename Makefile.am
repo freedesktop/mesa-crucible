@@ -80,6 +80,7 @@ bin_crucible_SOURCES = \
 	src/tests/bench/copy-buffer.c \
 	src/tests/bench/descriptor-pool-reset.c \
 	src/tests/bench/multiview.c \
+	src/tests/bench/queue-submit.c \
 	src/tests/example/basic.c \
 	src/tests/example/images.c \
 	src/tests/example/messages.c \
