@@ -73,6 +73,12 @@ test_multiview(unsigned view_count, unsigned view_mask)
             vec4(-0.7,  0.5, 0, 1)
         );
 
+        vec4 colors[3] = vec4[](
+            vec4(0, 1, 1, 1),
+            vec4(0, 1, 0, 1),
+            vec4(0, 0, 1, 1)
+        );
+
         vec4 displacement[6] = vec4[](
             vec4( 0.0,  0.0, 0, 0),
             vec4( 0.2,  0.2, 0, 0),
@@ -85,7 +91,7 @@ test_multiview(unsigned view_count, unsigned view_mask)
         void main()
         {
             gl_Position = displacement[gl_ViewIndex] + positions[gl_VertexIndex];
-            v_color = vec4(0, 0, 1, 1);
+            v_color = colors[gl_VertexIndex];
         }
     );
 
