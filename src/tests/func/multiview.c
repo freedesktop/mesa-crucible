@@ -66,6 +66,7 @@ test_multiview(unsigned view_count, unsigned view_mask)
         QO_EXTENSION GL_EXT_multiview : enable
 
         layout(location = 0) out vec4 v_color;
+        layout(location = 1) out float v_check;
 
         vec4 positions[3] = vec4[](
             vec4(   0, -0.5, 0, 1),
@@ -92,16 +93,22 @@ test_multiview(unsigned view_count, unsigned view_mask)
         {
             gl_Position = displacement[gl_ViewIndex] + positions[gl_VertexIndex];
             v_color = colors[gl_VertexIndex];
+            v_check = 22;
         }
     );
 
     VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
         layout(location = 0) in vec4 v_color;
+        layout(location = 1) in float v_check;
+
         layout(location = 0) out vec4 f_color;
 
         void main()
         {
-            f_color = v_color;
+            if (v_check != 22)
+                f_color = vec4(1, 0, 0, 1);
+            else
+                f_color = v_color;
         }
     );
 
