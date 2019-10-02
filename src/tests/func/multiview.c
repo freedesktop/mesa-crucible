@@ -120,7 +120,9 @@ test_multiview(void)
                 .scissorCount = 1,
                 .pScissors = &(VkRect2D) { { 0, 0 }, { width, height } },
             },
-            .pVertexInputState = &(VkPipelineVertexInputStateCreateInfo) {},
+            .pVertexInputState = &(VkPipelineVertexInputStateCreateInfo) {
+                .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+            },
             .renderPass = pass,
             .layout = layout,
             .subpass = 0,
