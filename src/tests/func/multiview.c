@@ -29,7 +29,7 @@
 // with different positions.
 
 static void
-test_multiview(void)
+test_multiview(unsigned view_count, unsigned view_mask)
 {
     t_require_ext("VK_KHR_multiview");
 
@@ -37,7 +37,7 @@ test_multiview(void)
         .pNext = &(VkRenderPassMultiviewCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_RENDER_PASS_MULTIVIEW_CREATE_INFO,
             .subpassCount = 1,
-            .pViewMasks = (uint32_t[]) { 3 },
+            .pViewMasks = (uint32_t[]) { view_mask },
         },
         .attachmentCount = 1,
         .pAttachments = (VkAttachmentDescription[]) {
@@ -73,9 +73,13 @@ test_multiview(void)
             vec4(-0.7,  0.5, 0, 1)
         );
 
-        vec4 displacement[2] = vec4[](
-            vec4(0,     0, 0, 0),
-            vec4(0.2, 0.2, 0, 0)
+        vec4 displacement[6] = vec4[](
+            vec4( 0.0,  0.0, 0, 0),
+            vec4( 0.2,  0.2, 0, 0),
+            vec4( 0.4,  0.3, 0, 0),
+            vec4(-0.2, -0.2, 0, 0),
+            vec4(-0.4,  0.3, 0, 0),
+            vec4( 0.4, -0.3, 0, 0)
         );
 
         void main()
@@ -133,7 +137,7 @@ test_multiview(void)
         .tiling = VK_IMAGE_TILING_OPTIMAL,
         .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
         .mipLevels = 1,
-        .arrayLayers = 2,
+        .arrayLayers = view_count,
         .extent = {
             .width = width,
             .height = height,
@@ -148,7 +152,7 @@ test_multiview(void)
         .format = VK_FORMAT_R8G8B8A8_UNORM,
         .image = image,
         .viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY,
-        .subresourceRange.layerCount = 2);
+        .subresourceRange.layerCount = view_count);
 
     VkFramebuffer framebuffer = qoCreateFramebuffer(t_device,
         .renderPass = pass,
@@ -178,9 +182,12 @@ test_multiview(void)
 
     test_result_t result = TEST_RESULT_PASS;
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < view_count; i++) {
         string_t ref_name = STRING_INIT;
-        string_printf(&ref_name, "func.multiview.ref.%d.png", i);
+        if ((view_mask & (1 << i)) == 0)
+            string_printf(&ref_name, "func.multiview.ref.empty.png");
+        else
+            string_printf(&ref_name, "func.multiview.ref.%d.png", i);
         cru_image_t *ref = t_new_cru_image_from_filename(string_data(&ref_name));
         string_finish(&ref_name);
 
@@ -196,7 +203,7 @@ test_multiview(void)
             result = TEST_RESULT_FAIL;
 
             string_t actual_name = STRING_INIT;
-            string_printf(&actual_name, "func.multiview.actual.%d.png", i);
+            string_printf(&actual_name, "%s.actual.%d.png", t_name, i);
             cru_image_write_file(actual, string_data(&actual_name));
             string_finish(&actual_name);
         }
@@ -205,8 +212,93 @@ test_multiview(void)
     t_end(result);
 }
 
+
+static void
+test_multiview_count_2(void)
+{
+    test_multiview(2, 0x3);
+}
+
 test_define {
-    .name = "func.multiview",
-    .start = test_multiview,
+    .name = "func.multiview.count_2",
+    .start = test_multiview_count_2,
+    .no_image = true,
+};
+
+
+static void
+test_multiview_count_2_masked_0(void)
+{
+    test_multiview(2, (1 << 0));
+}
+
+test_define {
+    .name = "func.multiview.count_2.masked_0",
+    .start = test_multiview_count_2_masked_0,
+    .no_image = true,
+};
+
+
+static void
+test_multiview_count_2_masked_1(void)
+{
+    test_multiview(2, (1 << 1));
+}
+
+test_define {
+    .name = "func.multiview.count_2.masked_1",
+    .start = test_multiview_count_2_masked_1,
+    .no_image = true,
+};
+
+
+static void
+test_multiview_count_6(void)
+{
+    test_multiview(6, (1 << 6) - 1);
+}
+
+test_define {
+    .name = "func.multiview.count_6",
+    .start = test_multiview_count_6,
+    .no_image = true,
+};
+
+
+static void
+test_multiview_count_6_masked_0_2(void)
+{
+    test_multiview(6, (1 << 0) | (1 << 2));
+}
+
+test_define {
+    .name = "func.multiview.count_6.masked_0_2",
+    .start = test_multiview_count_6_masked_0_2,
+    .no_image = true,
+};
+
+
+static void
+test_multiview_count_6_masked_1_3_5(void)
+{
+    test_multiview(6, (1 << 1) | (1 << 3) | (1 << 5));
+}
+
+test_define {
+    .name = "func.multiview.count_6.masked_1_3_5",
+    .start = test_multiview_count_6_masked_1_3_5,
+    .no_image = true,
+};
+
+
+static void
+test_multiview_count_6_masked_3_4(void)
+{
+    test_multiview(6, (1 << 3) | (1 << 4));
+}
+
+test_define {
+    .name = "func.multiview.count_6.masked_3_4",
+    .start = test_multiview_count_6_masked_3_4,
     .no_image = true,
 };
