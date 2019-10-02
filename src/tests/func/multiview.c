@@ -46,7 +46,6 @@ test_multiview(void)
                 .format = VK_FORMAT_R8G8B8A8_UNORM,
                 .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
                 .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-                .finalLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
             },
         },
         .subpassCount = 1,
