@@ -67,6 +67,12 @@ advanced(void)
 {
     t_require_ext("VK_EXT_shader_subgroup_vote");
     t_require_ext("VK_EXT_shader_subgroup_ballot");
+
+    VkPhysicalDeviceFeatures features = {};
+    vkGetPhysicalDeviceFeatures(t_physical_dev, &features);
+    if (!features.shaderInt64)
+        t_skipf("shaderInt64 not supported");
+
     VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
     QO_EXTENSION GL_ARB_shader_group_vote : enable
     QO_EXTENSION GL_ARB_shader_ballot : enable
