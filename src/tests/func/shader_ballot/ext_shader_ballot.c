@@ -25,9 +25,25 @@
 #include "ext_shader_ballot-spirv.h"
 
 static void
+require_shader_int64(void)
+{
+    VkPhysicalDeviceFeatures features = {};
+    vkGetPhysicalDeviceFeatures(t_physical_dev, &features);
+    if (!features.shaderInt64)
+        t_skipf("shaderInt64 not supported");
+}
+
+static void
 ballot_basic(void)
 {
     t_require_ext("VK_EXT_shader_subgroup_ballot");
+
+    /* GL_ARB_shader_ballot implicitly requires int64 support.  See
+     * https://github.com/KhronosGroup/glslang/issues/1292 for
+     * discussion.
+     */
+    require_shader_int64();
+
     VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
     QO_EXTENSION GL_ARB_shader_ballot : enable
         layout(location = 0) out vec4 f_color;
@@ -54,6 +70,8 @@ static void
 ballot_if_else(void)
 {
     t_require_ext("VK_EXT_shader_subgroup_ballot");
+    require_shader_int64();
+
     VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
     QO_EXTENSION GL_ARB_gpu_shader_int64 : enable
     QO_EXTENSION GL_ARB_shader_ballot : enable
@@ -131,6 +149,8 @@ static void
 builtins(void)
 {
     t_require_ext("VK_EXT_shader_subgroup_ballot");
+    require_shader_int64();
+
     VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
     QO_EXTENSION GL_ARB_gpu_shader_int64 : enable
     QO_EXTENSION GL_ARB_shader_ballot : enable
@@ -190,6 +210,8 @@ static void
 read_first_invocation(void)
 {
     t_require_ext("VK_EXT_shader_subgroup_ballot");
+    require_shader_int64();
+
     VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
     QO_EXTENSION GL_ARB_gpu_shader_int64 : enable
     QO_EXTENSION GL_ARB_shader_ballot : enable
