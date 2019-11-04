@@ -25,7 +25,7 @@
 
 #include "multiview-spirv.h"
 
-// Use VK_KHR_multiview to write a triangle to two different views
+// Use VK_KHR_multiview to write various triangles to different views
 // with different positions.
 
 struct params {
@@ -72,20 +72,11 @@ test_multiview()
     VkShaderModule vs = qoCreateShaderModuleGLSL(t_device, VERTEX,
         QO_EXTENSION GL_EXT_multiview : enable
 
+        layout(location = 0) in vec4 in_position;
+        layout(location = 1) in vec4 in_color;
+
         layout(location = 0) out vec4 v_color;
         layout(location = 1) out float v_check;
-
-        vec4 positions[3] = vec4[](
-            vec4(   0, -0.5, 0, 1),
-            vec4( 0.7,  0.5, 0, 1),
-            vec4(-0.7,  0.5, 0, 1)
-        );
-
-        vec4 colors[3] = vec4[](
-            vec4(0, 1, 1, 1),
-            vec4(0, 1, 0, 1),
-            vec4(0, 0, 1, 1)
-        );
 
         vec4 displacement[6] = vec4[](
             vec4( 0.0,  0.0, 0, 0),
@@ -98,8 +89,8 @@ test_multiview()
 
         void main()
         {
-            gl_Position = displacement[gl_ViewIndex] + positions[gl_VertexIndex];
-            v_color = colors[gl_VertexIndex];
+            gl_Position = in_position + displacement[gl_ViewIndex];
+            v_color = in_color;
             v_check = 22;
         }
     );
@@ -122,7 +113,94 @@ test_multiview()
     const int width = 128;
     const int height = 128;
 
-    VkPipelineLayout layout = qoCreatePipelineLayout(t_device);
+    VkDescriptorSetLayout set_layout = qoCreateDescriptorSetLayout(t_device,
+        .bindingCount = 1,
+        .pBindings = (VkDescriptorSetLayoutBinding[]) {
+            {
+                .binding = 0,
+                .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                .descriptorCount = 1,
+                .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+                .pImmutableSamplers = NULL,
+            },
+        });
+
+    VkPipelineLayout layout = qoCreatePipelineLayout(t_device,
+        .setLayoutCount = 1,
+        .pSetLayouts = &set_layout);
+
+    static const struct {
+        float vertices[12][4];
+        float colors[12][4];
+    } vertex_data = {
+        .vertices = {
+            {    0, -0.5, 0, 1 },
+            {  0.5,  0.0, 0, 1 },
+            {    0,  0.0, 0, 1 },
+
+            {    0, -0.5, 0, 1 },
+            {    0,  0.0, 0, 1 },
+            { -0.5,  0.0, 0, 1 },
+
+            {    0,  0.5, 0, 1 },
+            {    0,  0.0, 0, 1 },
+            {  0.5,  0.0, 0, 1 },
+
+            {    0,  0.5, 0, 1 },
+            {    0,  0.0, 0, 1 },
+            { -0.5,  0.0, 0, 1 },
+        },
+        .colors = {
+            { 1, 1, 1, 1 },
+            { 1, 1, 1, 1 },
+            { 1, 1, 1, 1 },
+
+            { 0, 1, 0, 1 },
+            { 0, 1, 0, 1 },
+            { 0, 1, 0, 1 },
+
+            { 0, 0, 1, 1 },
+            { 0, 0, 1, 1 },
+            { 0, 0, 1, 1 },
+
+            { 1, 0, 1, 1 },
+            { 1, 0, 1, 1 },
+            { 1, 0, 1, 1 },
+        },
+    };
+
+    VkPipelineVertexInputStateCreateInfo vi_info = {
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+        .vertexBindingDescriptionCount = 2,
+        .pVertexBindingDescriptions = (VkVertexInputBindingDescription[]) {
+            {
+                .binding = 0,
+                .stride = sizeof(vertex_data.vertices[0]),
+                .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+            },
+            {
+                .binding = 1,
+                .stride = sizeof(vertex_data.colors[0]),
+                .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+            },
+        },
+
+        .vertexAttributeDescriptionCount = 2,
+        .pVertexAttributeDescriptions = (VkVertexInputAttributeDescription[]) {
+            {
+                .location = 0,
+                .binding = 0,
+                .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+                .offset = 0,
+            },
+            {
+                .location = 1,
+                .binding = 1,
+                .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+                .offset = 0,
+            },
+        },
+    };
 
     VkPipeline pipeline = qoCreateGraphicsPipeline(t_device, t_pipeline_cache,
         &(QoExtraGraphicsPipelineCreateInfo) {
@@ -134,7 +212,7 @@ test_multiview()
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .pInputAssemblyState = &(VkPipelineInputAssemblyStateCreateInfo) {
                 QO_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO_DEFAULTS,
-                .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+                .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
             },
             .pViewportState = &(VkPipelineViewportStateCreateInfo) {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
@@ -143,9 +221,7 @@ test_multiview()
                 .scissorCount = 1,
                 .pScissors = &(VkRect2D) { { 0, 0 }, { width, height } },
             },
-            .pVertexInputState = &(VkPipelineVertexInputStateCreateInfo) {
-                .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-            },
+            .pVertexInputState = &vi_info,
             .renderPass = pass,
             .layout = layout,
             .subpass = 0,
@@ -174,6 +250,17 @@ test_multiview()
         .viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY,
         .subresourceRange.layerCount = params->view_count);
 
+    VkBuffer vertex_buffer = qoCreateBuffer(t_device,
+        .size = sizeof(vertex_data),
+        .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+
+    VkDeviceMemory vertex_mem = qoAllocBufferMemory(t_device, vertex_buffer,
+        .properties = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+    void *vertex_map = qoMapMemory(t_device, vertex_mem, 0, sizeof(vertex_data), 0);
+    qoBindBufferMemory(t_device, vertex_buffer, vertex_mem, 0);
+    memcpy(vertex_map, &vertex_data, sizeof(vertex_data));
+
     VkFramebuffer framebuffer = qoCreateFramebuffer(t_device,
         .renderPass = pass,
         .width = width,
@@ -192,8 +279,12 @@ test_multiview()
             .pClearValues = &(VkClearValue) { .color = { .float32 = {0.0, 0.0, 0.0, 1.0} } },
         }, VK_SUBPASS_CONTENTS_INLINE);
 
+    vkCmdBindVertexBuffers(t_cmd_buffer, 0, 2,
+                           (VkBuffer[]) { vertex_buffer, vertex_buffer },
+                           (VkDeviceSize[]) { 0, sizeof(vertex_data.vertices) });
+
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-    vkCmdDraw(t_cmd_buffer, 3, 1, 0, 0);
+    vkCmdDraw(t_cmd_buffer, 12, 1, 0, 0);
     vkCmdEndRenderPass(t_cmd_buffer);
 
     qoEndCommandBuffer(t_cmd_buffer);
