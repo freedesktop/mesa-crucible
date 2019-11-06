@@ -28,16 +28,23 @@
 // Use VK_KHR_multiview to write a triangle to two different views
 // with different positions.
 
+struct params {
+    unsigned view_count;
+    unsigned view_mask;
+};
+
 static void
-test_multiview(unsigned view_count, unsigned view_mask)
+test_multiview()
 {
     t_require_ext("VK_KHR_multiview");
+
+    const struct params *params = t_user_data;
 
     VkRenderPass pass = qoCreateRenderPass(t_device,
         .pNext = &(VkRenderPassMultiviewCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_RENDER_PASS_MULTIVIEW_CREATE_INFO,
             .subpassCount = 1,
-            .pViewMasks = (uint32_t[]) { view_mask },
+            .pViewMasks = (uint32_t[]) { params->view_mask },
         },
         .attachmentCount = 1,
         .pAttachments = (VkAttachmentDescription[]) {
@@ -150,7 +157,7 @@ test_multiview(unsigned view_count, unsigned view_mask)
         .tiling = VK_IMAGE_TILING_OPTIMAL,
         .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
         .mipLevels = 1,
-        .arrayLayers = view_count,
+        .arrayLayers = params->view_count,
         .extent = {
             .width = width,
             .height = height,
@@ -165,7 +172,7 @@ test_multiview(unsigned view_count, unsigned view_mask)
         .format = VK_FORMAT_R8G8B8A8_UNORM,
         .image = image,
         .viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY,
-        .subresourceRange.layerCount = view_count);
+        .subresourceRange.layerCount = params->view_count);
 
     VkFramebuffer framebuffer = qoCreateFramebuffer(t_device,
         .renderPass = pass,
@@ -195,9 +202,9 @@ test_multiview(unsigned view_count, unsigned view_mask)
 
     test_result_t result = TEST_RESULT_PASS;
 
-    for (int i = 0; i < view_count; i++) {
+    for (int i = 0; i < params->view_count; i++) {
         string_t ref_name = STRING_INIT;
-        if ((view_mask & (1 << i)) == 0)
+        if ((params->view_mask & (1 << i)) == 0)
             string_printf(&ref_name, "func.multiview.ref.empty.png");
         else
             string_printf(&ref_name, "func.multiview.ref.%d.png", i);
@@ -225,93 +232,72 @@ test_multiview(unsigned view_count, unsigned view_mask)
     t_end(result);
 }
 
-
-static void
-test_multiview_count_2(void)
-{
-    test_multiview(2, 0x3);
-}
-
 test_define {
     .name = "func.multiview.count_2",
-    .start = test_multiview_count_2,
+    .start = test_multiview,
     .no_image = true,
+    .user_data = &(struct params) {
+        .view_count = 2,
+        .view_mask = (1 << 2) - 1,
+    }
 };
-
-
-static void
-test_multiview_count_2_masked_0(void)
-{
-    test_multiview(2, (1 << 0));
-}
 
 test_define {
     .name = "func.multiview.count_2.masked_0",
-    .start = test_multiview_count_2_masked_0,
+    .start = test_multiview,
     .no_image = true,
+    .user_data = &(struct params) {
+        .view_count = 2,
+        .view_mask = (1 << 0),
+    }
 };
-
-
-static void
-test_multiview_count_2_masked_1(void)
-{
-    test_multiview(2, (1 << 1));
-}
 
 test_define {
     .name = "func.multiview.count_2.masked_1",
-    .start = test_multiview_count_2_masked_1,
+    .start = test_multiview,
     .no_image = true,
+    .user_data = &(struct params) {
+        .view_count = 2,
+        .view_mask = (1 << 1),
+    }
 };
-
-
-static void
-test_multiview_count_6(void)
-{
-    test_multiview(6, (1 << 6) - 1);
-}
 
 test_define {
     .name = "func.multiview.count_6",
-    .start = test_multiview_count_6,
+    .start = test_multiview,
     .no_image = true,
+    .user_data = &(struct params) {
+        .view_count = 6,
+        .view_mask = (1 << 6) - 1,
+    }
 };
-
-
-static void
-test_multiview_count_6_masked_0_2(void)
-{
-    test_multiview(6, (1 << 0) | (1 << 2));
-}
 
 test_define {
     .name = "func.multiview.count_6.masked_0_2",
-    .start = test_multiview_count_6_masked_0_2,
+    .start = test_multiview,
     .no_image = true,
+    .user_data = &(struct params) {
+        .view_count = 6,
+        .view_mask = (1 << 0) | (1 << 2),
+    }
 };
-
-
-static void
-test_multiview_count_6_masked_1_3_5(void)
-{
-    test_multiview(6, (1 << 1) | (1 << 3) | (1 << 5));
-}
 
 test_define {
     .name = "func.multiview.count_6.masked_1_3_5",
-    .start = test_multiview_count_6_masked_1_3_5,
+    .start = test_multiview,
     .no_image = true,
+    .user_data = &(struct params) {
+        .view_count = 6,
+        .view_mask = (1 << 1) | (1 << 3) | (1 << 5),
+    }
 };
-
-
-static void
-test_multiview_count_6_masked_3_4(void)
-{
-    test_multiview(6, (1 << 3) | (1 << 4));
-}
 
 test_define {
     .name = "func.multiview.count_6.masked_3_4",
-    .start = test_multiview_count_6_masked_3_4,
+    .start = test_multiview,
     .no_image = true,
+    .user_data = &(struct params) {
+        .view_count = 6,
+        .view_mask = (1 << 3) | (1 << 4),
+    }
 };
