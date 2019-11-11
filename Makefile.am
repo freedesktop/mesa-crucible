@@ -79,6 +79,7 @@ bin_crucible_SOURCES = \
 	src/tests/bug/108911.c \
 	src/tests/bench/copy-buffer.c \
 	src/tests/bench/descriptor-pool-reset.c \
+	src/tests/bench/multiview.c \
 	src/tests/example/basic.c \
 	src/tests/example/images.c \
 	src/tests/example/messages.c \
@@ -145,6 +146,7 @@ bin_crucible_SOURCES = \
 BUILT_SOURCES = \
 	src/qonos/qonos_pipeline-spirv.h \
 	src/util/simple_pipeline-spirv.h \
+	src/tests/bench/multiview-spirv.h \
 	src/tests/bug/104809-spirv.h \
 	src/tests/func/4-vertex-buffers-spirv.h \
 	src/tests/func/depthstencil/basic-spirv.h \
