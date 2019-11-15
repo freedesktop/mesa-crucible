@@ -44,6 +44,9 @@ class Shader:
         # Handle the QO_EXTENSION macro
         self.glsl = self.glsl.replace('QO_EXTENSION', '#extension')
 
+        # Handle the QO_DEFINE macro
+        self.glsl = self.glsl.replace('QO_DEFINE', '#define')
+
         m = target_env_re.search(self.glsl)
         if m:
             self.target_env = m.group(1)
