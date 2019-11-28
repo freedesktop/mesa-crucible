@@ -504,6 +504,9 @@ t_setup_vulkan(void)
         qci[i].pQueuePriorities = &priority;
     }
 
+    VkPhysicalDeviceFeatures pdf;
+    vkGetPhysicalDeviceFeatures(t->vk.physical_dev, &pdf);
+
     res = vkCreateDevice(t->vk.physical_dev,
         &(VkDeviceCreateInfo) {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
@@ -511,6 +514,7 @@ t_setup_vulkan(void)
             .pQueueCreateInfos = qci,
             .enabledExtensionCount = t->vk.device_extension_count,
             .ppEnabledExtensionNames = ext_names,
+            .pEnabledFeatures = &pdf,
         }, NULL, &t->vk.device);
     free(qci);
     free(ext_names);
