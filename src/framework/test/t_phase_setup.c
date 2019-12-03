@@ -495,11 +495,13 @@ t_setup_vulkan(void)
     VkDeviceQueueCreateInfo *qci =
         calloc(t->vk.queue_family_count, sizeof(*qci));
     t_assert(qci);
+
+    const float priority = 1.0f;
     for (uint32_t i = 0; i < t->vk.queue_family_count; i++) {
         qci[i].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         qci[i].queueFamilyIndex = i;
         qci[i].queueCount = 1;
-        qci[i].pQueuePriorities = (float[]) {1.0f};
+        qci[i].pQueuePriorities = &priority;
     }
 
     res = vkCreateDevice(t->vk.physical_dev,
