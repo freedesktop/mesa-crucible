@@ -84,19 +84,24 @@ runner_get_vulkan_queue_count(uint32_t *count)
 
     uint32_t phy_dev_count = 0;
     res = vkEnumeratePhysicalDevices(instance, &phy_dev_count, NULL);
-    if (res != VK_SUCCESS || phy_dev_count == 0)
+    if (res != VK_SUCCESS || phy_dev_count == 0) {
+        vkDestroyInstance(instance, NULL);
         return false;
+    }
 
     VkPhysicalDevice phy_dev;
     phy_dev_count = 1;
     res = vkEnumeratePhysicalDevices(instance, &phy_dev_count, &phy_dev);
-    if ((res != VK_SUCCESS && res != VK_INCOMPLETE) || phy_dev_count != 1)
+    if ((res != VK_SUCCESS && res != VK_INCOMPLETE) || phy_dev_count != 1) {
+        vkDestroyInstance(instance, NULL);
         return false;
+    }
 
     uint32_t queue_family_count;
     vkGetPhysicalDeviceQueueFamilyProperties(phy_dev,
                                              &queue_family_count, NULL);
     *count = queue_family_count;
 
+    vkDestroyInstance(instance, NULL);
     return true;
 }
