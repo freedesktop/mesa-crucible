@@ -24,6 +24,14 @@ stage_to_glslang_stage = {
     'GEOMETRY': 'geom',
     'FRAGMENT': 'frag',
     'COMPUTE': 'comp',
+    'TASK': 'task',
+    'MESH': 'mesh',
+    'RAYGEN': 'rgen',
+    'ANY_HIT': 'rahit',
+    'CLOSEST_HIT': 'rchit',
+    'MISS': 'rmiss',
+    'INTERSECTION': 'rint',
+    'CALLABLE': 'rcall',
 }
 
 class Shader:
@@ -144,7 +152,13 @@ class Shader:
                 .pSpirv = {0}_spir_v_src,
             """.format(var_prefix)))
 
-        f.write("    .stage = VK_SHADER_STAGE_{0}_BIT,\n".format(self.stage))
+        if self.stage in ['RAYGEN', 'ANY_HIT', 'CLOSEST_HIT',
+                          'MISS', 'INTERSECTION', 'CALLABLE']:
+            f.write("    .stage = VK_SHADER_STAGE_{0}_BIT_KHR,\n".format(self.stage))
+        elif self.stage in ['TASK', 'MESH']:
+            f.write("    .stage = VK_SHADER_STAGE_{0}_BIT_NV,\n".format(self.stage))
+        else:
+            f.write("    .stage = VK_SHADER_STAGE_{0}_BIT,\n".format(self.stage))
 
         f.write('};\n')
 
