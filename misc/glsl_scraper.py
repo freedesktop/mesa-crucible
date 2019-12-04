@@ -17,6 +17,15 @@ class ShaderCompileError(RuntimeError):
 
 target_env_re = re.compile(r'QO_TARGET_ENV\s+(\S+)')
 
+stage_to_glslang_stage = {
+    'VERTEX': 'vert',
+    'TESS_CONTROL': 'tesc',
+    'TESS_EVALUATION': 'tese',
+    'GEOMETRY': 'geom',
+    'FRAGMENT': 'frag',
+    'COMPUTE': 'comp',
+}
+
 class Shader:
     def __init__(self, stage):
         self.glsl = None
@@ -44,21 +53,7 @@ class Shader:
         self.end_line = end_line
 
     def __run_glslang(self, extra_args=[]):
-        if self.stage == 'VERTEX':
-            stage = 'vert'
-        elif self.stage == 'TESS_CONTROL':
-            stage = 'tesc'
-        elif self.stage == 'TESS_EVALUATION':
-            stage = 'tese'
-        elif self.stage == 'GEOMETRY':
-            stage = 'geom'
-        elif self.stage == 'FRAGMENT':
-            stage = 'frag'
-        elif self.stage == 'COMPUTE':
-            stage = 'comp'
-        else:
-            assert False
-
+        stage = stage_to_glslang_stage[self.stage]
         stage_flags = ['-S', stage]
 
         in_file = tempfile.NamedTemporaryFile(suffix='.'+stage)
