@@ -36,7 +36,6 @@ static int opt_fork = -1; // -1 => unset on cmdline
 static int opt_log_pids = 0;
 static int opt_no_cleanup = 0;
 static int opt_dump = 0;
-static int opt_use_spir_v = 1;
 static int opt_separate_cleanup_thread = 1;
 static char *opt_junit_xml = NULL;
 static int opt_device_id = 1;
@@ -77,8 +76,6 @@ static const struct option longopts[] = {
     {"no-cleanup",    no_argument,       &opt_no_cleanup, true},
     {"dump",          no_argument,       &opt_dump,       true},
     {"no-dump",       no_argument,       &opt_dump,       false},
-    {"use-spir-v",    no_argument,       &opt_use_spir_v, true},
-    {"no-spir-v",     no_argument,       &opt_use_spir_v, false},
     {"junit-xml",     required_argument, NULL,            OPT_NAME_JUNIT_XML},
     {"device-id",     required_argument, NULL,            OPT_NAME_DEVICE_ID},
 
@@ -276,7 +273,6 @@ cmd_start(const cru_command_t *cmd, int argc, char **argv)
         .no_cleanup_phase = opt_no_cleanup,
         .use_separate_cleanup_threads = opt_separate_cleanup_thread,
         .no_image_dumps = !opt_dump,
-        .use_spir_v = opt_use_spir_v,
         .junit_xml_filepath = opt_junit_xml,
         .device_id = opt_device_id,
         .verbose = opt_verbose,

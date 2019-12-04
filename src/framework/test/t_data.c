@@ -220,15 +220,6 @@ __t_width(void)
     return &t->ref.width;
 }
 
-const bool *
-__t_use_spir_v(void)
-{
-    ASSERT_TEST_IN_MAJOR_PHASE;
-    GET_CURRENT_TEST(t);
-
-    return &t->opt.use_spir_v;
-}
-
 const uint32_t *
 __t_queue_family_index(void)
 {

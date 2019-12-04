@@ -114,8 +114,6 @@ typedef struct QoShaderModuleCreateInfo_ {
     void *pNext;
     size_t spirvSize;
     const void *pSpirv;
-    size_t glslSize;
-    const char *pGlsl;
     VkShaderStageFlagBits stage;
 } QoShaderModuleCreateInfo;
 

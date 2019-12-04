@@ -98,7 +98,6 @@ run_test_def(const test_def_t *def, uint32_t queue_family_index)
     test = test_create(.def = def,
                        .enable_dump = !runner_opts.no_image_dumps,
                        .enable_cleanup_phase = !runner_opts.no_cleanup_phase,
-                       .enable_spir_v = runner_opts.use_spir_v,
                        .enable_separate_cleanup_thread =
                             runner_opts.use_separate_cleanup_threads,
                        .device_id = runner_opts.device_id,

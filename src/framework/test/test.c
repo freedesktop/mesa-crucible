@@ -149,7 +149,6 @@ test_create_s(const test_create_info_t *info)
     t->opt.no_dump = !info->enable_dump;
     t->opt.no_cleanup = !info->enable_cleanup_phase;
     t->opt.no_separate_cleanup_thread = !info->enable_separate_cleanup_thread;
-    t->opt.use_spir_v = info->enable_spir_v;
     t->opt.bootstrap = info->enable_bootstrap;
     t->opt.queue_family_index = info->queue_family_index;
     t->opt.device_id = info->device_id;

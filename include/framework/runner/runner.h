@@ -46,7 +46,6 @@ struct runner_opts {
     bool no_fork;
     bool no_cleanup_phase;
     bool no_image_dumps;
-    bool use_spir_v;
     bool use_separate_cleanup_threads;
     bool verbose;
 

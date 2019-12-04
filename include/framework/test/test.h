@@ -32,7 +32,6 @@ struct test_create_info {
     bool enable_dump;
     bool enable_cleanup_phase;
     bool enable_separate_cleanup_thread;
-    bool enable_spir_v;
     bool enable_bootstrap;
     int device_id;
     uint32_t queue_family_index;

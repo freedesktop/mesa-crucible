@@ -113,9 +113,6 @@ struct test {
         /// Don't run the cleanup commands in cru_test::cleanup_stacks.
         bool no_cleanup;
 
-        /// Try and use SPIR-V shaders when available
-        bool use_spir_v;
-
         /// If set, the test's cleanup stacks will unwind in the result
         /// thread. If unset, the result thread will create a separate cleanup
         /// thread.
