@@ -255,10 +255,12 @@ void run_simple_compute_pipeline(VkShaderModule cs,
 
     vkCmdBindPipeline(t_cmd_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
 
-    vkCmdBindDescriptorSets(t_cmd_buffer,
-        VK_PIPELINE_BIND_POINT_COMPUTE,
-        pipeline_layout, 0, 1,
-        &set, 0, NULL);
+    if (has_storage) {
+        vkCmdBindDescriptorSets(t_cmd_buffer,
+            VK_PIPELINE_BIND_POINT_COMPUTE,
+            pipeline_layout, 0, 1,
+            &set, 0, NULL);
+    }
 
     if (has_push_constants) {
         vkCmdPushConstants(t_cmd_buffer, pipeline_layout,
