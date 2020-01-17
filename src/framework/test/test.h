@@ -147,6 +147,7 @@ struct test {
         uint32_t instance_extension_count;
         VkExtensionProperties *instance_extension_props;
         VkPhysicalDevice physical_dev;
+        VkPhysicalDeviceFeatures physical_dev_features;
         VkPhysicalDeviceProperties physical_dev_props;
         VkPhysicalDeviceMemoryProperties physical_dev_mem_props;
         VkDevice device;

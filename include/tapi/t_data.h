@@ -36,6 +36,7 @@ typedef struct cru_image cru_image_t;
 #define t_user_data __t_user_data()
 #define t_instance (*__t_instance())
 #define t_physical_dev (*__t_physical_dev())
+#define t_physical_dev_features  (__t_physical_dev_features())
 #define t_physical_dev_props  (__t_physical_dev_props())
 #define t_physical_dev_mem_props  (__t_physical_dev_mem_props())
 #define t_device (*__t_device())
@@ -64,6 +65,7 @@ const void *__t_user_data(void);
 const VkInstance *__t_instance(void);
 const VkDevice *__t_device(void);
 const VkPhysicalDevice *__t_physical_dev(void);
+const VkPhysicalDeviceFeatures *__t_physical_dev_features(void);
 const VkPhysicalDeviceProperties *__t_physical_dev_props(void);
 const VkPhysicalDeviceMemoryProperties *__t_physical_dev_mem_props(void);
 const VkQueue *__t_queue(void);

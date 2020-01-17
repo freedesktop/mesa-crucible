@@ -62,6 +62,11 @@ noreturn void t_pass(void);
 bool t_has_ext(const char *extension_name);
 void t_require_ext(const char *extension_name);
 
+#define  t_require_feature(feature) do {     \
+        if (!t_physical_dev_features->feature)   \
+            t_skip();                           \
+    } while (0)
+
 noreturn void __t_skip(const char *file, int line);
 noreturn void __t_skipf(const char *file, int line, const char *format, ...) printflike(3, 4);
 noreturn void __t_skipfv(const char *file, int line, const char *format, va_list va);

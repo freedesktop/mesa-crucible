@@ -84,6 +84,7 @@ t_setup_phys_dev(void)
     qoEnumeratePhysicalDevices(t->vk.instance, &count, physical_devs);
     t->vk.physical_dev = physical_devs[t->opt.device_id - 1];
 
+    vkGetPhysicalDeviceFeatures(t->vk.physical_dev, &t->vk.physical_dev_features);
     qoGetPhysicalDeviceProperties(t->vk.physical_dev, &t->vk.physical_dev_props);
 }
 
