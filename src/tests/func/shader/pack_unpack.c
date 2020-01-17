@@ -27,6 +27,8 @@
 static void
 pack_double(void)
 {
+    t_require_feature(shaderFloat64);
+
     VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
         layout(location = 0) out vec4 f_color;
         layout(push_constant) uniform push_consts {
@@ -63,6 +65,8 @@ test_define {
 static void
 unpack_double(void)
 {
+    t_require_feature(shaderFloat64);
+
     VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
         layout(location = 0) out vec4 f_color;
         layout(push_constant) uniform push_consts {
@@ -99,6 +103,8 @@ test_define {
 static void
 pack_int64(void)
 {
+    t_require_feature(shaderInt64);
+
     VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
     QO_EXTENSION GL_ARB_gpu_shader_int64 : enable
         layout(location = 0) out vec4 f_color;
@@ -136,6 +142,8 @@ test_define {
 static void
 unpack_int64(void)
 {
+    t_require_feature(shaderInt64);
+
     VkShaderModule fs = qoCreateShaderModuleGLSL(t_device, FRAGMENT,
     QO_EXTENSION GL_ARB_gpu_shader_int64 : enable
         layout(location = 0) out vec4 f_color;
