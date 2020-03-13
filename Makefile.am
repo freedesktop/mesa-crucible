@@ -122,6 +122,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/ssbo/interleave.c \
 	src/tests/func/sync/semaphore-fd.c \
 	src/tests/func/renderpass/clear.c \
+	src/tests/func/ubo/robust-push-ubo.c \
 	src/tests/stress/lots-of-surface-state.c \
 	src/tests/stress/buffer_limit.c \
 	src/tests/self/concurrent-output.c \
@@ -177,6 +178,7 @@ BUILT_SOURCES = \
 	src/tests/func/shader_group_vote/ext_shader_subgroup_vote-spirv.h \
 	src/tests/func/ssbo/interleave-spirv.h \
 	src/tests/func/sync/semaphore-fd-spirv.h \
+	src/tests/func/ubo/robust-push-ubo-spirv.h \
 	src/tests/stress/lots-of-surface-state-spirv.h
 
 bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread $(libpng_LIBS) \
