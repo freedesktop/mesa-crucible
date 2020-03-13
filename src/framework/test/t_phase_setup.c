@@ -507,6 +507,7 @@ t_setup_vulkan(void)
 
     VkPhysicalDeviceFeatures pdf;
     vkGetPhysicalDeviceFeatures(t->vk.physical_dev, &pdf);
+    pdf.robustBufferAccess = t->def->robust_buffer_access;
 
     res = vkCreateDevice(t->vk.physical_dev,
         &(VkDeviceCreateInfo) {

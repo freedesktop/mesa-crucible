@@ -89,6 +89,8 @@ struct test_def {
 
     const uint32_t api_version;
 
+    const bool robust_buffer_access;
+
     /// \brief Private data for the test framework.
     ///
     /// Test authors shouldn't touch this struct.
