@@ -86,7 +86,6 @@ bin_crucible_SOURCES = \
 	src/tests/example/messages.c \
 	src/tests/func/amd/amd_common.c \
 	src/tests/func/amd/gcn_shader.c \
-	src/tests/func/amd/shader_trinary_minmax.c \
 	src/tests/func/buffer/buffer.c \
 	src/tests/func/buffer_reference/atomic.c \
 	src/tests/func/buffer_reference/simple.c \
@@ -170,7 +169,6 @@ BUILT_SOURCES = \
 	src/tests/func/multiview-spirv.h \
 	src/tests/func/push-constants/basic-spirv.h \
 	src/tests/func/amd/gcn_shader-spirv.h \
-	src/tests/func/amd/shader_trinary_minmax-spirv.h \
 	src/tests/func/buffer_reference/atomic-spirv.h \
 	src/tests/func/buffer_reference/simple-spirv.h \
 	src/tests/func/shader/constants-spirv.h \
