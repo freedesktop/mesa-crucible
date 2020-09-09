@@ -128,6 +128,7 @@ bin_crucible_SOURCES = \
 	src/tests/stress/buffer_limit.c \
 	src/tests/self/concurrent-output.c \
 	src/tests/func/calibrated-timestamps.c \
+	src/tests/func/uniform-subgroup.c \
 	src/util/cru_cleanup.c \
 	src/util/cru_format.c \
 	src/util/cru_image.c \
@@ -180,7 +181,8 @@ BUILT_SOURCES = \
 	src/tests/func/ssbo/interleave-spirv.h \
 	src/tests/func/sync/semaphore-fd-spirv.h \
 	src/tests/func/ubo/robust-push-ubo-spirv.h \
-	src/tests/stress/lots-of-surface-state-spirv.h
+	src/tests/stress/lots-of-surface-state-spirv.h \
+	src/tests/func/uniform-subgroup-spirv.h
 
 bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread $(libpng_LIBS) \
 		     $(LIBXML2_LIBS)
