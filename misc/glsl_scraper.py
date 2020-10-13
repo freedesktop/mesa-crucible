@@ -104,11 +104,16 @@ class Shader:
     def _dump_glsl_code(self, f):
         # Dump GLSL code for reference.  Use // instead of /* */
         # comments so we don't need to escape the GLSL code.
+        # We also ask the compiler to not complain about multi-line comments
+        # that are created if a line of the GLSL ends in "\"
+        f.write('#pragma GCC diagnostic push //"warning: multi-line comment"\n')
+        f.write('#pragma GCC diagnostic ignored "-Wcomment"\n')
         f.write('// GLSL code:\n')
         f.write('//')
         for line in self.glsl.splitlines():
             f.write('\n// {0}'.format(line))
         f.write('\n\n')
+        f.write('#pragma GCC diagnostic pop\n')
 
     def _dump_spirv_code(self, f, var_name):
         f.write('/* SPIR-V Assembly:\n')
