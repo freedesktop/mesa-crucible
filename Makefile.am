@@ -124,6 +124,7 @@ bin_crucible_SOURCES = \
 	src/tests/func/sync/semaphore-fd.c \
 	src/tests/func/renderpass/clear.c \
 	src/tests/func/ubo/robust-push-ubo.c \
+	src/tests/func/memory-fd.c \
 	src/tests/stress/lots-of-surface-state.c \
 	src/tests/stress/buffer_limit.c \
 	src/tests/self/concurrent-output.c \
