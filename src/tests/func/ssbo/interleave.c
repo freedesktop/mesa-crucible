@@ -177,6 +177,9 @@ test(void)
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
     qoQueueWaitIdle(t_queue);
 
+    t_skipf("Skipping, since proper execution of this test depends on "
+            "https://github.com/KhronosGroup/glslang/issues/94");
+
     uint32_t *map_out = qoMapMemory(t_device, mem_out, 0, 4096, 0);
     for (unsigned i = 0; i < 256; i++) {
         t_assertf(map_out[i * 4 + 0] == i * 4 + 0 &&
@@ -193,7 +196,7 @@ test(void)
 }
 
 test_define {
-    .name = "func.ssbo.interleve",
+    .name = "func.ssbo.interleave",
     .start = test,
     .image_filename = "32x32-green.ref.png",
 };
