@@ -435,7 +435,7 @@ t_setup_vulkan(void)
     vkGetPhysicalDeviceQueueFamilyProperties(t->vk.physical_dev,
                                              &t->vk.queue_family_count, NULL);
 
-    if (t_queue_family_index >= t->vk.queue_family_count)
+    if (t_queue_num >= t->vk.queue_family_count)
         t_end(TEST_RESULT_SKIP);
 
     t->vk.queue_family_props = malloc(t->vk.queue_family_count *
@@ -447,7 +447,7 @@ t_setup_vulkan(void)
                                              t->vk.queue_family_props);
 
     uint32_t qf =
-        t->vk.queue_family_props[t_queue_family_index].queueFlags;
+        t->vk.queue_family_props[t_queue_num].queueFlags;
     if (qf & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT))
         qf &= ~VK_QUEUE_TRANSFER_BIT;
     qf &= VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT |

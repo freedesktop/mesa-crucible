@@ -139,7 +139,7 @@ test_create_s(const test_create_info_t *info)
     t = xzalloc(sizeof(*t));
 
     t->name = STRING_INIT;
-    string_printf(&t->name, "%s.q%d", info->def->name, info->queue_family_index);
+    string_printf(&t->name, "%s.q%d", info->def->name, info->queue_num);
     t->phase = ATOMIC_VAR_INIT(TEST_PHASE_PRESTART);
     t->result = TEST_RESULT_PASS;
     t->ref.filename = STRING_INIT;
@@ -150,7 +150,7 @@ test_create_s(const test_create_info_t *info)
     t->opt.no_cleanup = !info->enable_cleanup_phase;
     t->opt.no_separate_cleanup_thread = !info->enable_separate_cleanup_thread;
     t->opt.bootstrap = info->enable_bootstrap;
-    t->opt.queue_family_index = info->queue_family_index;
+    t->opt.queue_num = info->queue_num;
     t->opt.device_id = info->device_id;
     t->opt.verbose = info->verbose;
 

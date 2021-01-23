@@ -145,7 +145,7 @@ static void master_dispatch_loop_no_fork(void);
 static void master_dispatch_loop_with_fork(void);
 
 static void master_dispatch_test(const test_def_t *def,
-                                 uint32_t queue_family_index);
+                                 uint32_t queue_num);
 static slave_t * master_get_open_slave(void);
 static slave_t * master_get_new_slave(void);
 static slave_t * master_find_unborn_slave(void);
@@ -153,7 +153,7 @@ static void master_cleanup_dead_slave(slave_t *slave);
 
 static void master_collect_result(int timeout_ms);
 
-static void master_report_result(const test_def_t *def, uint32_t queue_family_index,
+static void master_report_result(const test_def_t *def, uint32_t queue_num,
                                  pid_t pid, test_result_t result);
 static bool master_send_packet(slave_t *slave, const dispatch_packet_t *pk);
 
@@ -176,7 +176,7 @@ static bool slave_insert_test(slave_t *slave, const test_def_t *def);
 static void slave_rm_test(slave_t *slave, const test_def_t *def);
 
 static bool slave_start_test(slave_t *slave, const test_def_t *def,
-                             uint32_t queue_family_index);
+                             uint32_t queue_num);
 static void slave_send_sentinel(slave_t *slave);
 static void slave_drain_result_pipe(slave_t *slave);
 
@@ -521,12 +521,12 @@ master_dispatch_loop_no_fork(void)
 
     cru_foreach_test_def(def) {
         uint32_t queue_start, queue_end;
-        if (def->priv.queue_family_index == NO_QUEUE_FAMILY_INDEX_PREF) {
+        if (def->priv.queue_num == NO_QUEUE_NUM_PREF) {
             queue_start = 0;
             queue_end = master.num_vulkan_queues;
         } else {
-            queue_start = def->priv.queue_family_index;
-            queue_end = def->priv.queue_family_index + 1;
+            queue_start = def->priv.queue_num;
+            queue_end = def->priv.queue_num + 1;
         }
 
         for (uint32_t qi = queue_start; qi < queue_end; qi++) {
@@ -561,12 +561,12 @@ master_dispatch_loop_with_fork(void)
 
     cru_foreach_test_def(def) {
         uint32_t queue_start, queue_end;
-        if (def->priv.queue_family_index == NO_QUEUE_FAMILY_INDEX_PREF) {
+        if (def->priv.queue_num == NO_QUEUE_NUM_PREF) {
             queue_start = 0;
             queue_end = master.num_vulkan_queues;
         } else {
-            queue_start = def->priv.queue_family_index;
-            queue_end = def->priv.queue_family_index + 1;
+            queue_start = def->priv.queue_num;
+            queue_end = def->priv.queue_num + 1;
         }
 
         for (uint32_t qi = queue_start; qi < queue_end; qi++) {
@@ -596,7 +596,7 @@ master_dispatch_loop_with_fork(void)
 }
 
 static void
-master_dispatch_test(const test_def_t *def, uint32_t queue_family_index)
+master_dispatch_test(const test_def_t *def, uint32_t queue_num)
 {
     slave_t *slave = NULL;
 
@@ -622,7 +622,7 @@ master_dispatch_test(const test_def_t *def, uint32_t queue_family_index)
             return;
     }
 
-    slave_start_test(slave, def, queue_family_index);
+    slave_start_test(slave, def, queue_num);
 }
 
 static slave_t *
@@ -827,11 +827,11 @@ master_collect_result(int timeout_ms)
 }
 
 static void
-master_report_result(const test_def_t *def, uint32_t queue_family_index,
+master_report_result(const test_def_t *def, uint32_t queue_num,
                      pid_t pid, test_result_t result)
 {
     string_t name = STRING_INIT;
-    string_printf(&name, "%s.q%d", def->name, queue_family_index);
+    string_printf(&name, "%s.q%d", def->name, queue_num);
     log_tag(test_result_to_string(result), pid, "%s", string_data(&name));
     fflush(stdout);
 
@@ -1148,11 +1148,11 @@ slave_rm_test(slave_t *slave, const test_def_t *def)
 
 static bool
 slave_start_test(slave_t *slave, const test_def_t *def,
-                 uint32_t queue_family_index)
+                 uint32_t queue_num)
 {
     const dispatch_packet_t pk = {
         .test_def = def,
-        .queue_family_index = queue_family_index,
+        .queue_num = queue_num,
     };
 
     if (!def)
@@ -1217,7 +1217,7 @@ slave_drain_result_pipe(slave_t *slave)
             return;
 
         slave_rm_test(slave, pk.test_def);
-        master_report_result(pk.test_def, pk.queue_family_index, slave->pid,
+        master_report_result(pk.test_def, pk.queue_num, slave->pid,
                              pk.result);
     }
 }

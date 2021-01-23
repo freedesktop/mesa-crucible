@@ -32,7 +32,7 @@ static int result_fd;
 
 /// Return NULL if the pipe is empty or has errors.
 static void
-slave_recv_test(const test_def_t **test_def, uint32_t *queue_family_index)
+slave_recv_test(const test_def_t **test_def, uint32_t *queue_num)
 {
     dispatch_packet_t pk;
 
@@ -44,17 +44,17 @@ slave_recv_test(const test_def_t **test_def, uint32_t *queue_family_index)
         return;
     }
 
-    *queue_family_index = pk.queue_family_index;
+    *queue_num = pk.queue_num;
     *test_def = pk.test_def;
 }
 
 static bool
-slave_send_result(const test_def_t *def, uint32_t queue_family_index,
+slave_send_result(const test_def_t *def, uint32_t queue_num,
                   test_result_t result)
 {
     const result_packet_t pk = {
         .test_def = def,
-        .queue_family_index = queue_family_index,
+        .queue_num = queue_num,
         .result = result,
     };
 
@@ -71,14 +71,14 @@ slave_loop(void)
 
     for (;;) {
         test_result_t result;
-        uint32_t queue_family_index;
+        uint32_t queue_num;
 
-        slave_recv_test(&def, &queue_family_index);
+        slave_recv_test(&def, &queue_num);
         if (!def)
             return;
 
-        result = run_test_def(def, queue_family_index);
-        slave_send_result(def, queue_family_index, result);
+        result = run_test_def(def, queue_num);
+        slave_send_result(def, queue_num, result);
     }
 }
 

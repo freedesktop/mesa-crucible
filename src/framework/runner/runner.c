@@ -86,7 +86,7 @@ runner_init(runner_opts_t *opts)
 }
 
 test_result_t
-run_test_def(const test_def_t *def, uint32_t queue_family_index)
+run_test_def(const test_def_t *def, uint32_t queue_num)
 {
     ASSERT_RUNNER_IS_INIT;
 
@@ -101,7 +101,7 @@ run_test_def(const test_def_t *def, uint32_t queue_family_index)
                        .enable_separate_cleanup_thread =
                             runner_opts.use_separate_cleanup_threads,
                        .device_id = runner_opts.device_id,
-                       .queue_family_index = queue_family_index,
+                       .queue_num = queue_num,
                        .verbose = runner_opts.verbose);
     if (!test)
         return TEST_RESULT_FAIL;
@@ -139,7 +139,7 @@ glob_is_negative(const char *glob)
 typedef struct {
     char *glob;
     bool free_string;
-    uint64_t queue_family_index;
+    uint64_t queue_num;
 } split_glob_t;
 
 typedef struct split_glob_vec split_glob_vec_t;
@@ -179,7 +179,7 @@ runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
     char **glob;
 
     cru_foreach_test_def(def) {
-        def->priv.queue_family_index = NO_QUEUE_FAMILY_INDEX_PREF;
+        def->priv.queue_num = NO_QUEUE_NUM_PREF;
     }
 
     split_glob_vec_t split_globs = CRU_VEC_INIT;
@@ -190,17 +190,17 @@ runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
             split_glob->glob = strdup(*glob);
             split_glob->glob[match.rm_so] = '\0';
             split_glob->free_string = true;
-            char *queue_family_index_str = &split_glob->glob[match.rm_so + 2];
-            uint32_t queue_family_index;
-            if (parse_u32(queue_family_index_str, &queue_family_index)) {
-                split_glob->queue_family_index = queue_family_index;
+            char *queue_num_str = &split_glob->glob[match.rm_so + 2];
+            uint32_t queue_num;
+            if (parse_u32(queue_num_str, &queue_num)) {
+                split_glob->queue_num = queue_num;
             } else {
-                split_glob->queue_family_index = INVALID_QUEUE_FAMILY_INDEX_PREF;
+                split_glob->queue_num = INVALID_QUEUE_NUM_PREF;
             }
         } else {
             split_glob->glob = *glob;
             split_glob->free_string = false;
-            split_glob->queue_family_index = NO_QUEUE_FAMILY_INDEX_PREF;
+            split_glob->queue_num = NO_QUEUE_NUM_PREF;
         }
     }
 
@@ -221,10 +221,10 @@ runner_enable_matching_tests(const cru_cstr_vec_t *testname_globs)
         cru_vec_foreach(split_glob, &split_globs) {
             if (test_def_match(def, split_glob->glob)) {
                 enable =
-                    (split_glob->queue_family_index !=
-                     INVALID_QUEUE_FAMILY_INDEX_PREF) &&
+                    (split_glob->queue_num !=
+                     INVALID_QUEUE_NUM_PREF) &&
                     !glob_is_negative(split_glob->glob);
-                def->priv.queue_family_index = split_glob->queue_family_index;
+                def->priv.queue_num = split_glob->queue_num;
             }
         }
 

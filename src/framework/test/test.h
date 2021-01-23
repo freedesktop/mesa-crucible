@@ -121,7 +121,7 @@ struct test {
         /// The Vulkan device ID.
         int device_id;
 
-        uint32_t queue_family_index;
+        uint32_t queue_num;
 
         bool verbose;
     } opt;

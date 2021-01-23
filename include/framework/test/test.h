@@ -34,7 +34,7 @@ struct test_create_info {
     bool enable_separate_cleanup_thread;
     bool enable_bootstrap;
     int device_id;
-    uint32_t queue_family_index;
+    uint32_t queue_num;
     bool verbose;
 
     uint32_t bootstrap_image_width;
