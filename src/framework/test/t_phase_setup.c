@@ -435,9 +435,6 @@ t_setup_vulkan(void)
     vkGetPhysicalDeviceQueueFamilyProperties(t->vk.physical_dev,
                                              &t->vk.queue_family_count, NULL);
 
-    if (t_queue_num >= t->vk.queue_family_count)
-        t_end(TEST_RESULT_SKIP);
-
     t->vk.queue_family_props = malloc(t->vk.queue_family_count *
                                       sizeof(VkQueueFamilyProperties));
     t_assert(t->vk.queue_family_props);
@@ -446,8 +443,30 @@ t_setup_vulkan(void)
                                              &t->vk.queue_family_count,
                                              t->vk.queue_family_props);
 
+    bool queue_found = false;
+    uint32_t queue_family = 0;
+    uint32_t queue_in_family = 0;
+    t->vk.queue_count = 0;
+    for (uint32_t i = 0; i < t->vk.queue_family_count; i++) {
+        uint32_t next_start =
+            t->vk.queue_count + t->vk.queue_family_props[i].queueCount;
+        if (t_queue_num >= t->vk.queue_count && t_queue_num < next_start) {
+            queue_family = i;
+            queue_in_family = t_queue_num - t->vk.queue_count;
+            queue_found = true;
+        }
+        t->vk.queue_count = next_start;
+    }
+
+    if (!queue_found)
+        t_end(TEST_RESULT_SKIP);
+
+    /* Skip if not the first queue in the queue-family */
+    if (queue_in_family != 0)
+        t_end(TEST_RESULT_SKIP);
+
     uint32_t qf =
-        t->vk.queue_family_props[t_queue_num].queueFlags;
+        t->vk.queue_family_props[queue_family].queueFlags;
     if (qf & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT))
         qf &= ~VK_QUEUE_TRANSFER_BIT;
     qf &= VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT |
@@ -493,15 +512,14 @@ t_setup_vulkan(void)
     for (uint32_t i = 0; i < t->vk.device_extension_count; i++)
         ext_names[i] = t->vk.device_extension_props[i].extensionName;
 
-    VkDeviceQueueCreateInfo *qci =
-        calloc(t->vk.queue_family_count, sizeof(*qci));
+    VkDeviceQueueCreateInfo *qci = calloc(t->vk.queue_count, sizeof(*qci));
     t_assert(qci);
 
     const float priority = 1.0f;
     for (uint32_t i = 0; i < t->vk.queue_family_count; i++) {
         qci[i].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         qci[i].queueFamilyIndex = i;
-        qci[i].queueCount = 1;
+        qci[i].queueCount = t->vk.queue_family_props[i].queueCount;
         qci[i].pQueuePriorities = &priority;
     }
 
@@ -527,31 +545,38 @@ t_setup_vulkan(void)
 
     t_setup_framebuffer();
 
-    t->vk.queue =
-        calloc(t->vk.queue_family_count, sizeof(*t->vk.queue));
+    t->vk.queue = calloc(t->vk.queue_count, sizeof(*t->vk.queue));
     t_assert(t->vk.queue);
     t_cleanup_push_free(t->vk.queue);
 
-    for (uint32_t i = 0; i < t->vk.queue_family_count; i++) {
-        vkGetDeviceQueue(t->vk.device, i, 0, &t->vk.queue[i]);
+    for (uint32_t qfam = 0, q = 0; qfam < t->vk.queue_family_count; qfam++) {
+        uint32_t queues_in_fam = t->vk.queue_family_props[qfam].queueCount;
+        for (uint32_t j = 0; j < queues_in_fam; j++) {
+            vkGetDeviceQueue(t->vk.device, qfam, j, &t->vk.queue[q + j]);
+        }
+        q += queues_in_fam;
     }
 
     t->vk.pipeline_cache = qoCreatePipelineCache(t->vk.device);
 
     t->vk.cmd_pool =
-        calloc(t->vk.queue_family_count, sizeof(*t->vk.cmd_pool));
+        calloc(t->vk.queue_count, sizeof(*t->vk.cmd_pool));
     t_assert(t->vk.cmd_pool);
     t_cleanup_push_free(t->vk.cmd_pool);
 
-    for (uint32_t i = 0; i < t->vk.queue_family_count; i++) {
-        res = vkCreateCommandPool(t->vk.device,
-            &(VkCommandPoolCreateInfo) {
-                .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-                .queueFamilyIndex = i,
-                .flags = 0,
-            }, NULL, &t->vk.cmd_pool[i]);
-        t_assert(res == VK_SUCCESS);
-        t_cleanup_push_vk_cmd_pool(t->vk.device, t->vk.cmd_pool[i]);
+    for (uint32_t qfam = 0, q = 0; qfam < t->vk.queue_family_count; qfam++) {
+        uint32_t queues_in_fam = t->vk.queue_family_props[qfam].queueCount;
+        for (uint32_t j = 0; j < queues_in_fam; j++) {
+            res = vkCreateCommandPool(t->vk.device,
+                &(VkCommandPoolCreateInfo) {
+                    .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+                    .queueFamilyIndex = qfam,
+                    .flags = 0,
+                }, NULL, &t->vk.cmd_pool[q]);
+            t_assert(res == VK_SUCCESS);
+            t_cleanup_push_vk_cmd_pool(t->vk.device, t->vk.cmd_pool[q]);
+            q++;
+        }
     }
 
     t->vk.graphics_and_compute_queue = -1;
@@ -560,35 +585,37 @@ t_setup_vulkan(void)
     t->vk.transfer_queue = -1;
 
     /* Search through the queues looking for a "best match" */
-    for (uint32_t i = 0; i < t->vk.queue_family_count; i++) {
-        uint32_t qf = t->vk.queue_family_props[i].queueFlags;
+    for (uint32_t qfam = 0, q = 0; qfam < t->vk.queue_family_count; qfam++) {
+        uint32_t qf = t->vk.queue_family_props[qfam].queueFlags;
         if (qf & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT))
             qf &= ~VK_QUEUE_TRANSFER_BIT;
         qf &= VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT |
               VK_QUEUE_TRANSFER_BIT;
         if (qf == (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT))
-            t->vk.graphics_and_compute_queue = i;
+            t->vk.graphics_and_compute_queue = q;
         if (qf == VK_QUEUE_GRAPHICS_BIT)
-            t->vk.graphics_queue = i;
+            t->vk.graphics_queue = q;
         if (qf == VK_QUEUE_COMPUTE_BIT)
-            t->vk.compute_queue = i;
+            t->vk.compute_queue = q;
         if (qf == VK_QUEUE_TRANSFER_BIT)
-            t->vk.transfer_queue = i;
+            t->vk.transfer_queue = q;
+        q += t->vk.queue_family_props[qfam].queueCount;
     }
 
     /* Search through the queues looking for a "acceptable match" */
-    for (uint32_t i = 0; i < t->vk.queue_family_count; i++) {
-        uint32_t qf = t->vk.queue_family_props[i].queueFlags;
+    for (uint32_t qfam = 0, q = 0; qfam < t->vk.queue_family_count; qfam++) {
+        uint32_t qf = t->vk.queue_family_props[qfam].queueFlags;
         if (qf & (VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT))
             qf |= VK_QUEUE_TRANSFER_BIT;
         qf &= VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT |
               VK_QUEUE_TRANSFER_BIT;
         if (t->vk.graphics_queue < 0 && (qf & VK_QUEUE_GRAPHICS_BIT))
-            t->vk.graphics_queue = i;
+            t->vk.graphics_queue = q;
         if (t->vk.compute_queue < 0 && (qf & VK_QUEUE_COMPUTE_BIT))
-            t->vk.compute_queue = i;
+            t->vk.compute_queue = q;
         if (t->vk.transfer_queue < 0 && (qf & VK_QUEUE_TRANSFER_BIT))
-            t->vk.transfer_queue = i;
+            t->vk.transfer_queue = q;
+        q += t->vk.queue_family_props[qfam].queueCount;
     }
 
     t->vk.cmd_buffer = qoAllocateCommandBuffer(t->vk.device, t_cmd_pool);

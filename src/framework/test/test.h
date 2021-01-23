@@ -155,6 +155,7 @@ struct test {
         VkExtensionProperties *device_extension_props;
         uint32_t queue_family_count;
         VkQueueFamilyProperties *queue_family_props;
+        uint32_t queue_count;
         VkQueue *queue;
 
         /// First queue with both graphics and compute support. -1 if

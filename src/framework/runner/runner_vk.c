@@ -100,7 +100,27 @@ runner_get_vulkan_queue_count(uint32_t *count)
     uint32_t queue_family_count;
     vkGetPhysicalDeviceQueueFamilyProperties(phy_dev,
                                              &queue_family_count, NULL);
-    *count = queue_family_count;
+    if (queue_family_count == 0) {
+        vkDestroyInstance(instance, NULL);
+        return false;
+    }
+
+    VkQueueFamilyProperties *family_props;
+    family_props = malloc(queue_family_count * sizeof(*family_props));
+    if (family_props == NULL) {
+        vkDestroyInstance(instance, NULL);
+        return false;
+    }
+
+    vkGetPhysicalDeviceQueueFamilyProperties(phy_dev,
+                                             &queue_family_count, family_props);
+
+    uint32_t queue_count = 0;
+    for (uint32_t i = 0; i < queue_family_count; i++) {
+        queue_count += family_props[i].queueCount;
+    }
+    free(family_props);
+    *count = queue_count;
 
     vkDestroyInstance(instance, NULL);
     return true;
