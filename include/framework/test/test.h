@@ -35,6 +35,7 @@ struct test_create_info {
     bool enable_bootstrap;
     int device_id;
     uint32_t queue_num;
+    bool run_all_queues;
     bool verbose;
 
     uint32_t bootstrap_image_width;

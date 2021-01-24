@@ -461,8 +461,10 @@ t_setup_vulkan(void)
     if (!queue_found)
         t_end(TEST_RESULT_SKIP);
 
-    /* Skip if not the first queue in the queue-family */
-    if (queue_in_family != 0)
+    /* If we are not running on all queues, and this is not the first
+     * queue in the queue-family, then skip the test for this queue.
+     */
+    if (!t_run_all_queues && queue_in_family != 0)
         t_end(TEST_RESULT_SKIP);
 
     uint32_t qf =

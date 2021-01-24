@@ -123,6 +123,8 @@ struct test {
 
         uint32_t queue_num;
 
+        bool run_all_queues;
+
         bool verbose;
     } opt;
 

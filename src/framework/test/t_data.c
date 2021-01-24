@@ -238,6 +238,15 @@ __t_queue_num(void)
     return &t->opt.queue_num;
 }
 
+const bool *
+__t_run_all_queues(void)
+{
+    ASSERT_TEST_IN_MAJOR_PHASE;
+    GET_CURRENT_TEST(t);
+
+    return &t->opt.run_all_queues;
+}
+
 const char *
 __t_name(void)
 {

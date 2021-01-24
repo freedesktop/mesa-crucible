@@ -14,7 +14,8 @@ SYNOPSIS
                [--isolation=<method> | -I <method>]
                [--junit-xml=<junit-xml-file>]
                [--device-id=<device-id>]
-	       [--verbose]
+               [--all-queues]
+               [--verbose]
                [<pattern>...]
 
 DESCRIPTION
@@ -84,6 +85,10 @@ OPTIONS
 
 --device-id=<device-id>::
     Select the Vulkan device ID (IDs start from 1).
+
+--all-queues::
+    Run tests on all queues for all queue families. By default, only the
+    first queue from a queue family will be tested.
 
 --verbose::
     Show more detailed output when executing tests. When

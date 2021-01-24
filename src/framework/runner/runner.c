@@ -102,6 +102,7 @@ run_test_def(const test_def_t *def, uint32_t queue_num)
                             runner_opts.use_separate_cleanup_threads,
                        .device_id = runner_opts.device_id,
                        .queue_num = queue_num,
+                       .run_all_queues = runner_opts.run_all_queues,
                        .verbose = runner_opts.verbose);
     if (!test)
         return TEST_RESULT_FAIL;

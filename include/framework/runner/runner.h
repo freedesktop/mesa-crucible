@@ -47,6 +47,7 @@ struct runner_opts {
     bool no_cleanup_phase;
     bool no_image_dumps;
     bool use_separate_cleanup_threads;
+    bool run_all_queues;
     bool verbose;
 
     /// The runner will write JUnit XML to this path, if not NULL.
