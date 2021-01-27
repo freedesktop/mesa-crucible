@@ -23,6 +23,8 @@
 
 #include "src/tests/func/shader/constants-spirv.h"
 
+#define ALIGN(val, align) (((val) + (align) - 1) & ~((align) - 1))
+
 static void
 test(void)
 {
@@ -129,9 +131,11 @@ test(void)
         0.0, 1.0, 0.0, 1.0,
         1.0, 1.0, 0.0, 1.0,
     };
-    const unsigned colors_offset = vertices_offset + sizeof(vertices);
+    const unsigned colors_offset =
+        ALIGN(vertices_offset + sizeof(vertices),
+              t_physical_dev_props->limits.minUniformBufferOffsetAlignment);
 
-    const unsigned buffer_size = sizeof(vertices) + sizeof(colors);
+    const unsigned buffer_size = colors_offset + sizeof(colors);
 
     VkBuffer buffer = qoCreateBuffer(t_device, .size = buffer_size,
         .usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
