@@ -568,17 +568,17 @@ t_setup_vulkan(void)
 
     for (uint32_t qfam = 0, q = 0; qfam < t->vk.queue_family_count; qfam++) {
         uint32_t queues_in_fam = t->vk.queue_family_props[qfam].queueCount;
-        for (uint32_t j = 0; j < queues_in_fam; j++) {
-            res = vkCreateCommandPool(t->vk.device,
-                &(VkCommandPoolCreateInfo) {
-                    .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-                    .queueFamilyIndex = qfam,
-                    .flags = 0,
-                }, NULL, &t->vk.cmd_pool[q]);
-            t_assert(res == VK_SUCCESS);
-            t_cleanup_push_vk_cmd_pool(t->vk.device, t->vk.cmd_pool[q]);
-            q++;
-        }
+        res = vkCreateCommandPool(t->vk.device,
+            &(VkCommandPoolCreateInfo) {
+                .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+                .queueFamilyIndex = qfam,
+                .flags = 0,
+            }, NULL, &t->vk.cmd_pool[q]);
+        t_assert(res == VK_SUCCESS);
+        t_cleanup_push_vk_cmd_pool(t->vk.device, t->vk.cmd_pool[q]);
+        for (uint32_t j = 1; j < queues_in_fam; j++)
+            t->vk.cmd_pool[q + j] = t->vk.cmd_pool[q];
+        q += queues_in_fam;
     }
 
     t->vk.graphics_and_compute_queue = -1;
