@@ -154,7 +154,7 @@ BUILT_SOURCES = \
 	src/tests/func/depthstencil/basic-spirv.h \
 	src/tests/func/depthstencil/arrayed-clear-spirv.h \
 	src/tests/func/depthstencil/stencil_triangles-spirv.h \
-	src/tests/func/depthstencil/stencil_triangles_gen.c \
+	src/tests/func/depthstencil/stencil_triangles_gen.h \
 	src/tests/func/desc/dynamic-spirv.h \
 	src/tests/func/draw-indexed-spirv.h \
 	src/tests/func/gs/basic-spirv.h \
@@ -167,7 +167,7 @@ BUILT_SOURCES = \
 	src/tests/func/compute-shared-memory-spirv.h \
 	src/tests/func/compute-subgroup-quad-spirv.h \
 	src/tests/func/miptree/miptree-spirv.h \
-	src/tests/func/miptree/miptree_gen.c \
+	src/tests/func/miptree/miptree_gen.h \
 	src/tests/func/multiview-spirv.h \
 	src/tests/func/push-constants/basic-spirv.h \
 	src/tests/func/amd/gcn_shader-spirv.h \
@@ -191,7 +191,7 @@ bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread $(libpng_LIBS) \
 %-spirv.h: %.c misc/glsl_scraper.py
 	$(AM_V_GEN) $(PYTHON3) $(srcdir)/misc/glsl_scraper.py --with-glslang=$(GLSLANG) -o $@ $<
 
-%_gen.c: %_gen.py
+%_gen.h: %_gen.py
 	$(AM_V_GEN) $(PYTHON3) $< $@
 
 man1_MANS = \

@@ -1585,4 +1585,4 @@ test(void)
     miptree_compare_images(data.mt);
 }
 
-#include "miptree_gen.c"
+#include "miptree_gen.h"

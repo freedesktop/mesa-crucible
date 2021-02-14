@@ -185,4 +185,4 @@ test(void)
     qoQueueSubmit(t_queue, 1, &t_cmd_buffer, VK_NULL_HANDLE);
 }
 
-#include "stencil_triangles_gen.c"
+#include "stencil_triangles_gen.h"
