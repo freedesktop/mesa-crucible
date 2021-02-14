@@ -21,7 +21,7 @@
 
 #include "tapi/t.h"
 
-#include "basic-spirv.h"
+#include "src/tests/func/gs/basic-spirv.h"
 
 static void
 test_basic_gs(void)

@@ -22,7 +22,7 @@
 #include "util/simple_pipeline.h"
 #include "tapi/t.h"
 
-#include "simple-spirv.h"
+#include "src/tests/func/buffer_reference/simple-spirv.h"
 
 #define GET_DEVICE_FUNCTION_PTR(name) \
     PFN_##name name = (PFN_##name)vkGetDeviceProcAddr(t_device, #name)

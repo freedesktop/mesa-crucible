@@ -21,7 +21,7 @@
 
 #include "tapi/t.h"
 
-#include "basic-spirv.h"
+#include "src/tests/func/push-constants/basic-spirv.h"
 
 static void
 push_vs_offset(VkPipelineLayout layout, float x, float y)

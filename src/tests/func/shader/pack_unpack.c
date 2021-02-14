@@ -22,7 +22,7 @@
 #include "util/simple_pipeline.h"
 #include "tapi/t.h"
 
-#include "pack_unpack-spirv.h"
+#include "src/tests/func/shader/pack_unpack-spirv.h"
 
 static void
 pack_double(void)

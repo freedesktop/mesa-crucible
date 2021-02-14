@@ -22,7 +22,7 @@
 #include "util/simple_pipeline.h"
 #include "tapi/t.h"
 
-#include "compute-derivative-spirv.h"
+#include "src/tests/func/compute-derivative-spirv.h"
 
 static void
 group_none(void)

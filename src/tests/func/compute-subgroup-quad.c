@@ -22,7 +22,7 @@
 #include "util/simple_pipeline.h"
 #include "tapi/t.h"
 
-#include "compute-subgroup-quad-spirv.h"
+#include "src/tests/func/compute-subgroup-quad-spirv.h"
 
 static bool
 has_subgroup_quad_operations()

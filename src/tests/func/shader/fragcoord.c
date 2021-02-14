@@ -21,7 +21,7 @@
 
 #include "tapi/t.h"
 
-#include "fragcoord-spirv.h"
+#include "src/tests/func/shader/fragcoord-spirv.h"
 
 static void
 test_fragcoord(void)

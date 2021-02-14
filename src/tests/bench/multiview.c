@@ -22,7 +22,7 @@
 #include "tapi/t.h"
 #include "util/string.h"
 
-#include "multiview-spirv.h"
+#include "src/tests/bench/multiview-spirv.h"
 
 #include <math.h>
 #include <time.h>

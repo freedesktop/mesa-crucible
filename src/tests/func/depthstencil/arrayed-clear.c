@@ -25,7 +25,7 @@
 //
 #include "tapi/t.h"
 #include <stdio.h>
-#include "arrayed-clear-spirv.h"
+#include "src/tests/func/depthstencil/arrayed-clear-spirv.h"
 
 #define CLEAR_VALUE 0.4f
 #define INIT_VALUE 0.19f

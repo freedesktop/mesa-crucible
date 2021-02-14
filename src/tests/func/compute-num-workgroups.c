@@ -21,7 +21,7 @@
 
 #include "tapi/t.h"
 
-#include "compute-num-workgroups-spirv.h"
+#include "src/tests/func/compute-num-workgroups-spirv.h"
 
 typedef struct {
     VkPipeline pipeline;

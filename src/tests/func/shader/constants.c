@@ -21,7 +21,7 @@
 
 #include "tapi/t.h"
 
-#include "constants-spirv.h"
+#include "src/tests/func/shader/constants-spirv.h"
 
 static void
 test(void)

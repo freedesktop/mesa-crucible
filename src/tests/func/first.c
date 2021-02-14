@@ -22,7 +22,7 @@
 #include "tapi/t.h"
 #include "util/misc.h"
 
-#include "first-spirv.h"
+#include "src/tests/func/first-spirv.h"
 
 static VkPipeline
 create_pipeline(VkDevice device, VkPipelineLayout pipeline_layout)

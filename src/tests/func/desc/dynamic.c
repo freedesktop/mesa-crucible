@@ -21,7 +21,7 @@
 
 #include "tapi/t.h"
 
-#include "dynamic-spirv.h"
+#include "src/tests/func/desc/dynamic-spirv.h"
 
 struct params {
     VkDescriptorType descriptor_type;

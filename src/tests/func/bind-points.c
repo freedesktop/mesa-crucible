@@ -21,7 +21,7 @@
 
 #include "tapi/t.h"
 
-#include "bind-points-spirv.h"
+#include "src/tests/func/bind-points-spirv.h"
 
 static void
 test_bind_points(void)

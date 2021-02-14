@@ -22,7 +22,7 @@
 #include "util/simple_pipeline.h"
 #include "tapi/t.h"
 
-#include "ext_shader_ballot-spirv.h"
+#include "src/tests/func/shader_ballot/ext_shader_ballot-spirv.h"
 
 static void
 require_shader_int64(void)

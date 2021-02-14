@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include "tapi/t.h"
 
-#include "basic-spirv.h"
+#include "src/tests/func/depthstencil/basic-spirv.h"
 
 typedef struct test_params {
     float depth_clear_value;

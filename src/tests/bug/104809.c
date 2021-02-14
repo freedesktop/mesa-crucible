@@ -32,7 +32,7 @@
  * which does just that.
  */
 
-#include "104809-spirv.h"
+#include "src/tests/bug/104809-spirv.h"
 
 static void
 test(void)

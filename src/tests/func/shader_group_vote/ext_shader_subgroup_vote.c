@@ -22,7 +22,7 @@
 #include "util/simple_pipeline.h"
 #include "tapi/t.h"
 
-#include "ext_shader_subgroup_vote-spirv.h"
+#include "src/tests/func/shader_group_vote/ext_shader_subgroup_vote-spirv.h"
 
 static void
 basic(void)

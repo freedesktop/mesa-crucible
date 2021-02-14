@@ -24,7 +24,7 @@
 #include "tapi/t.h"
 #include "util/cru_format.h"
 
-#include "stencil_triangles-spirv.h"
+#include "src/tests/func/depthstencil/stencil_triangles-spirv.h"
 
 typedef struct test_params {
     VkClearDepthStencilValue clear_value;

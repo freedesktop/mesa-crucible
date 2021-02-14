@@ -23,7 +23,7 @@
 #include <string.h>
 
 #include "qonos/qonos.h"
-#include "qonos_pipeline-spirv.h"
+#include "src/qonos/qonos_pipeline-spirv.h"
 #include "tapi/t_cleanup.h"
 #include "tapi/t_data.h"
 #include "tapi/t_result.h"

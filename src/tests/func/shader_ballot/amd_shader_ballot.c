@@ -23,7 +23,7 @@
 #include "tapi/t.h"
 #include <stdio.h>
 
-#include "amd_shader_ballot-spirv.h"
+#include "src/tests/func/shader_ballot/amd_shader_ballot-spirv.h"
 
 static void
 basic(void)

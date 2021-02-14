@@ -23,7 +23,7 @@
 #include "tapi/t.h"
 #include "amd_common.h"
 
-#include "gcn_shader-spirv.h"
+#include "src/tests/func/amd/gcn_shader-spirv.h"
 
 static void
 time(void)

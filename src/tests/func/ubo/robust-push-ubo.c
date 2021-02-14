@@ -22,7 +22,7 @@
 #include "tapi/t.h"
 #include "util/misc.h"
 
-#include "robust-push-ubo-spirv.h"
+#include "src/tests/func/ubo/robust-push-ubo-spirv.h"
 
 #define UBO_PAD_SIZE (4 * 4 * 15)
 #define UBO_BIND_SIZE (UBO_PAD_SIZE + 4 * 4)

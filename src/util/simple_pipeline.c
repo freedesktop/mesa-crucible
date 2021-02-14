@@ -25,7 +25,7 @@
 
 #include "tapi/t.h"
 
-#include "simple_pipeline-spirv.h"
+#include "src/util/simple_pipeline-spirv.h"
 
 void
 run_simple_pipeline(VkShaderModule fs, void *push_constants,

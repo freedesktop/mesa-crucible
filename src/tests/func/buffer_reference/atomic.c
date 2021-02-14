@@ -21,7 +21,7 @@
 
 #include "tapi/t.h"
 
-#include "atomic-spirv.h"
+#include "src/tests/func/buffer_reference/atomic-spirv.h"
 
 #define GET_DEVICE_FUNCTION_PTR(name) \
     PFN_vk##name name = (PFN_vk##name)vkGetDeviceProcAddr(t_device, "vk"#name)

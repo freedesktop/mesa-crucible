@@ -21,7 +21,7 @@
 
 #include "tapi/t.h"
 
-#include "interleave-spirv.h"
+#include "src/tests/func/ssbo/interleave-spirv.h"
 
 #define HEX_COLOR(v)                            \
     {                                           \

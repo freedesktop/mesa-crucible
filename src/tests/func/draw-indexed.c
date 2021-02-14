@@ -21,7 +21,7 @@
 
 #include "tapi/t.h"
 
-#include "draw-indexed-spirv.h"
+#include "src/tests/func/draw-indexed-spirv.h"
 
 struct params {
     const void *index_data;

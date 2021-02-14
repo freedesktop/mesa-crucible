@@ -23,7 +23,7 @@
 #include "util/string.h"
 #include "util/cru_format.h"
 
-#include "multiview-spirv.h"
+#include "src/tests/func/multiview-spirv.h"
 
 // Use VK_KHR_multiview to write various triangles to different views
 // with different positions.

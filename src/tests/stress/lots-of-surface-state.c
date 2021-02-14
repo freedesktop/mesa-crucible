@@ -23,7 +23,7 @@
 #include <math.h>
 #include "tapi/t.h"
 
-#include "lots-of-surface-state-spirv.h"
+#include "src/tests/stress/lots-of-surface-state-spirv.h"
 
 // This file implements a test that pokes a particular aspect of the Intel
 // open-source vulkan driver.  In particular, the Intel hardware has a

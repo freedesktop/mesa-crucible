@@ -22,7 +22,7 @@
 #include "util/simple_pipeline.h"
 #include "tapi/t.h"
 
-#include "compute-shared-memory-spirv.h"
+#include "src/tests/func/compute-shared-memory-spirv.h"
 
 static void
 shared_memory_bool_scalar(void)

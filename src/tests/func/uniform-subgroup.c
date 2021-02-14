@@ -24,7 +24,7 @@
 // ACO has optimized implementations for several reductions for when the source
 // is uniform.
 
-#include "uniform-subgroup-spirv.h"
+#include "src/tests/func/uniform-subgroup-spirv.h"
 
 static VkDeviceMemory
 common_init(VkShaderModule cs, const uint32_t ssbo_size,

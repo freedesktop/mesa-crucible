@@ -21,7 +21,7 @@
 
 #include "tapi/t.h"
 
-#include "compute-local-id-spirv.h"
+#include "src/tests/func/compute-local-id-spirv.h"
 
 static VkDeviceMemory
 common_init(VkShaderModule cs, const uint32_t ssbo_size, VkPipelineLayout *p_layout)

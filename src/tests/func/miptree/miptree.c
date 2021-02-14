@@ -56,7 +56,7 @@
 #include "util/string.h"
 #include "tapi/t.h"
 
-#include "miptree-spirv.h"
+#include "src/tests/func/miptree/miptree-spirv.h"
 
 typedef struct test_params test_params_t;
 typedef struct test_data test_data_t;

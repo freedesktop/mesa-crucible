@@ -21,7 +21,7 @@
 
 #include "tapi/t.h"
 
-#include "4-vertex-buffers-spirv.h"
+#include "src/tests/func/4-vertex-buffers-spirv.h"
 
 static void
 test(void)

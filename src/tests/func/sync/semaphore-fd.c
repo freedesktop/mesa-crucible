@@ -21,7 +21,7 @@
 
 #include "tapi/t.h"
 
-#include "semaphore-fd-spirv.h"
+#include "src/tests/func/sync/semaphore-fd-spirv.h"
 
 struct test_context {
     VkDevice device;
