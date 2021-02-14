@@ -408,7 +408,8 @@ def get_array_length_str(params):
         raise Exception('unhandled view in get_array_length_str')
 
 def main():
-    out_filename = __file__.replace('.py', '.c')
+    import sys
+    out_filename = sys.argv[1]
 
     with open(out_filename, 'w') as out_file:
         out_file.write(copyright)

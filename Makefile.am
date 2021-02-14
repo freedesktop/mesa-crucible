@@ -192,7 +192,7 @@ bin_crucible_LDADD = $(MESA_LDFLAGS) -lm -lvulkan -lpthread $(libpng_LIBS) \
 	$(AM_V_GEN) $(PYTHON3) $(srcdir)/misc/glsl_scraper.py --with-glslang=$(GLSLANG) -o $@ $<
 
 %_gen.c: %_gen.py
-	$(AM_V_GEN) $(PYTHON3) $<
+	$(AM_V_GEN) $(PYTHON3) $< $@
 
 man1_MANS = \
     doc/crucible-bootstrap.1 \
