@@ -80,7 +80,14 @@ static void
 cru_prefix_setup(void)
 {
     static char buf[2048];
+#ifdef MESON_BUILD
+    /* When MESON_BUILD_DIR is defined, then the crucible executable
+     * may be built in a directory named something besides bin.
+     */
+    const char *tail = "/crucible";
+#else
     const char *tail = "/bin/crucible";
+#endif
 
     ssize_t len = readlink("/proc/self/exe", buf, sizeof(buf));
     if (len <= 0) {
@@ -99,7 +106,14 @@ cru_prefix_setup(void)
 
     // Transform PREFIX/bin/crucible to PREFIX.
     path_dirname(&cru_prefix_path_);
+#ifndef MESON_BUILD
+    /* With meson builds, the data & doc direcories are built in
+     * sub-directories parallel to the directory where the crucible
+     * executable is built, but for autotools we need to remove the
+     * bin directory as well.
+     */
     path_dirname(&cru_prefix_path_);
+#endif
 }
 
 const string_t *

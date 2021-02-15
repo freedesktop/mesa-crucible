@@ -33,6 +33,7 @@ pre_args = [
   '-D_GNU_SOURCE',
   '-D_POSIX_C_SOURCE=200809L',
   '-D_XOPEN_SOURCE=700',
+  '-DMESON_BUILD',
 ]
 
 foreach a : pre_args
