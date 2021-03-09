@@ -288,9 +288,23 @@ t_setup_descriptor_pool(void)
     ASSERT_TEST_IN_SETUP_PHASE;
     GET_CURRENT_TEST(t);
 
-    VkDescriptorPoolSize pool_sizes[VK_DESCRIPTOR_TYPE_RANGE_SIZE];
-    for (uint32_t i = 0; i < VK_DESCRIPTOR_TYPE_RANGE_SIZE; i++) {
-        pool_sizes[i].type = i;
+    VkDescriptorType desc_types[] = {
+        VK_DESCRIPTOR_TYPE_SAMPLER,
+        VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+        VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+        VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+        VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER,
+        VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER,
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
+        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC,
+        VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT,
+    };
+
+    VkDescriptorPoolSize pool_sizes[ARRAY_LENGTH(desc_types)];
+    for (uint32_t i = 0; i < ARRAY_LENGTH(pool_sizes); i++) {
+        pool_sizes[i].type = desc_types[i];
         pool_sizes[i].descriptorCount = 5;
     }
 
@@ -299,7 +313,7 @@ t_setup_descriptor_pool(void)
         .pNext = NULL,
         .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
         .maxSets = 8,
-        .poolSizeCount = VK_DESCRIPTOR_TYPE_RANGE_SIZE,
+        .poolSizeCount = ARRAY_LENGTH(pool_sizes),
         .pPoolSizes = pool_sizes
     };
 
