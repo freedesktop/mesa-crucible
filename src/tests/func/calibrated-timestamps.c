@@ -23,9 +23,7 @@
 #define GET_INSTANCE_FUNCTION_PTR(name) \
     PFN_vk##name name = (PFN_vk##name)vkGetInstanceProcAddr(t_instance, "vk"#name)
 
-/* Test 1: Make sure the function pointers promised by the extension
- * are valid
- */
+/* Make sure the function pointers promised by the extension are valid. */
 static void
 test_funcs(void)
 {
@@ -44,8 +42,7 @@ test_define {
     .no_image = true,
 };
 
-/* Test 2: Make sure all of the domains offered by the driver are in range
- */
+/* Make sure all of the domains offered by the driver are in range. */
 static void
 test_domains(void)
 {
@@ -117,8 +114,7 @@ crucible_clock_gettime(VkTimeDomainEXT domain)
     return (uint64_t) current.tv_sec * 1000000000ULL + current.tv_nsec;
 }
 
-/* Test 3: Make sure any monotonic domains return accurate data
- */
+/* Make sure any monotonic domains return accurate data. */
 static void
 test_monotonic(void)
 {
@@ -221,9 +217,7 @@ device_time_to_ns(uint64_t device_time)
     return (uint64_t) floorl(ns + 0.5);
 }
 
-/* Test 4: Make sure the Device domain doesn't drift relative to a
- * monotonic domain
- */
+/* Make sure the Device domain doesn't drift relative to a monotonic domain. */
 static void
 test_device(void)
 {
