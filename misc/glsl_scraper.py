@@ -16,6 +16,7 @@ class ShaderCompileError(RuntimeError):
         super(ShaderCompileError, self).__init__(*args)
 
 target_env_re = re.compile(r'QO_TARGET_ENV\s+(\S+)')
+version_re = re.compile(r'QO_VERSION\s+(\S+)')
 
 stage_to_glslang_stage = {
     'VERTEX': 'vert',
@@ -60,6 +61,11 @@ class Shader:
             self.target_env = m.group(1)
         self.glsl = self.glsl.replace('QO_TARGET_ENV', '// --target-env')
 
+        if self.glsl.find('QO_VERSION') != -1:
+            self.glsl = self.glsl.replace('QO_VERSION', '#version')
+        else:
+            self.glsl = "#version 450\n" + self.glsl
+
         self.start_line = start_line
         self.end_line = end_line
 
@@ -68,7 +74,7 @@ class Shader:
         stage_flags = ['-S', stage]
 
         in_file = tempfile.NamedTemporaryFile(suffix='.'+stage)
-        src = ('#version 450\n' + self.glsl).encode('utf-8')
+        src = self.glsl.encode('utf-8')
         in_file.write(src)
         in_file.flush()
         out_file = tempfile.NamedTemporaryFile(suffix='.spirv')
