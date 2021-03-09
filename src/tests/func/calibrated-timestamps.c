@@ -42,51 +42,6 @@ test_define {
     .no_image = true,
 };
 
-/* Make sure all of the domains offered by the driver are in range. */
-static void
-test_domains(void)
-{
-    t_require_ext("VK_EXT_calibrated_timestamps");
-
-    GET_INSTANCE_FUNCTION_PTR(GetPhysicalDeviceCalibrateableTimeDomainsEXT);
-    GET_DEVICE_FUNCTION_PTR(GetCalibratedTimestampsEXT);
-
-    t_assert(GetPhysicalDeviceCalibrateableTimeDomainsEXT != NULL);
-    t_assert(GetCalibratedTimestampsEXT != NULL);
-
-    VkResult result;
-
-    uint32_t timeDomainCount;
-    result = GetPhysicalDeviceCalibrateableTimeDomainsEXT(
-        t_physical_dev,
-        &timeDomainCount,
-        NULL);
-    t_assert(result == VK_SUCCESS);
-    t_assert(timeDomainCount > 0);
-
-    VkTimeDomainEXT *timeDomains = calloc(timeDomainCount, sizeof (VkTimeDomainEXT));
-    t_assert(timeDomains != NULL);
-
-    result = GetPhysicalDeviceCalibrateableTimeDomainsEXT(
-        t_physical_dev,
-        &timeDomainCount,
-        timeDomains);
-
-    t_assert(result == VK_SUCCESS);
-
-    /* Make sure all reported domains are valid */
-    for (uint32_t d = 0; d < timeDomainCount; d++) {
-        t_assert(VK_TIME_DOMAIN_BEGIN_RANGE_EXT <= timeDomains[d] &&
-                 timeDomains[d] <= VK_TIME_DOMAIN_END_RANGE_EXT);
-    }
-}
-
-test_define {
-    .name = "func.calibrated-timestamps.domains",
-    .start = test_domains,
-    .no_image = true,
-};
-
 static uint64_t
 crucible_clock_gettime(VkTimeDomainEXT domain)
 {
