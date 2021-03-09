@@ -46,7 +46,9 @@ qoCreateGraphicsPipeline(VkDevice device,
     VkPipelineColorBlendAttachmentState cb_att;
     VkPipelineColorBlendStateCreateInfo cb_info;
     VkPipelineShaderStageCreateInfo stage_info[NUM_SHADER_STAGES];
-    VkDynamicState dynamic_states[VK_DYNAMIC_STATE_RANGE_SIZE];
+    // Enough dynamic states to cover the 32 bits available in
+    // QoExtraGraphicsPipelineCreateInfo.
+    VkDynamicState dynamic_states[32];
     VkPipelineDynamicStateCreateInfo dy_info;
     VkPipeline pipeline;
     VkResult result;
@@ -132,7 +134,7 @@ qoCreateGraphicsPipeline(VkDevice device,
 
     if (pipeline_info.pDynamicState == NULL) {
         int count = 0;
-        for (int s = 0; s < VK_DYNAMIC_STATE_RANGE_SIZE; s++) {
+        for (int s = 0; s < 32; s++) {
             if (extra->dynamicStates & (1u << s))
                 dynamic_states[count++] = s;
         }
