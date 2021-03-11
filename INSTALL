@@ -12,11 +12,10 @@ External Dependencies
 
 Configure and Build
 -------------------
-Do the typical autotools dance:
+Do the typical meson dance:
 
-  $ autoreconf -vfi
-  $ ./configure
-  $ make
+  $ meson bin
+  $ ninja -C bin
 
 The configure script will search for Vulkan headers and libraries in the usual
 system locations.  You can modify the search paths with environment variables
@@ -26,4 +25,4 @@ CPATH and LIBRARY_PATH [see man:gcc(1)].
 How to Install
 ==============
 
-Sorry. Crucible does not yet support `make install`.
+Sorry. Crucible does not yet support `ninja install`.
